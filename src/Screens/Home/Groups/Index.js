@@ -8,14 +8,14 @@ import { changeName } from '../../../redux/user'
 import AddGroup from './AddGroup'
 import { Modalize } from 'react-native-modalize';
 import { height } from '../../../GlobalStyles'
-import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
+// import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 
 const modalHeight = height * 0.9
 
 const Groups = ({navigation}) => {
 
   useEffect(()=>{
-		AndroidKeyboardAdjust.setAdjustNothing()
+		// AndroidKeyboardAdjust.setAdjustNothing()
 	});
 	
   const name = useSelector((state) => state.user.name)  

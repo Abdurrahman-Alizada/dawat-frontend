@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from "react";
+import React, { useState} from "react";
 import {
 	View,
 	Text,
@@ -8,48 +8,14 @@ import {
 	TouchableOpacity,
 } from "react-native";
 
-import Animated, {
-	useSharedValue,
-	withSpring,
-	withTiming,
-	useAnimatedStyle,
-} from "react-native-reanimated";
-
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import EmojiPicker from "./emojis/EmojiPicker";
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 
 const ChatInput = ({ reply, closeReply, isLeft, username }) => {
 	const [message, setMessage] = useState("");
-	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-	const height = useSharedValue(70);
-
-	
-	useEffect(() => {
-		if (showEmojiPicker) {
-			height.value = withTiming(400);
-		} else {
-			height.value = reply ? withSpring(130) : withSpring(70);
-		}
-	}, [showEmojiPicker]);
-
-	useEffect(() => {
-		if (reply) {
-			height.value = showEmojiPicker ? withTiming(450) : withTiming(130);
-		} else {
-			height.value = showEmojiPicker ? withSpring(400) : withSpring(70);
-		}
-	}, [reply]);
-
-	const heightAnimatedStyle = useAnimatedStyle(() => {
-		return {
-			height: height.value
-		}
-	})
-
 
 	return (
-		<Animated.View style={[styles.container, heightAnimatedStyle]}>
+		<View style={[styles.container]}>
 			{reply ? (
 				<View style={styles.replyContainer}>
 					<TouchableOpacity
@@ -68,12 +34,8 @@ const ChatInput = ({ reply, closeReply, isLeft, username }) => {
 				<View style={styles.inputAndMicrophone}>
 					<TouchableOpacity
 						style={styles.emoticonButton}
-						onPress={() => setShowEmojiPicker((value) => !value)}
 					>
-						<Icon
-							name={
-								showEmojiPicker ? "close" : "emoticon-outline"
-							}
+						<Icon name="emoticon-outline"
 							size={23}
 							color="#9f9f9f"
 						/>
@@ -102,8 +64,7 @@ const ChatInput = ({ reply, closeReply, isLeft, username }) => {
 					/>
 				</TouchableOpacity>
 			</View>
-			<EmojiPicker />
-		</Animated.View>
+		</View>
 	);
 };
 

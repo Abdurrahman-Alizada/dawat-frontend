@@ -11,24 +11,23 @@ import GroupBrief from './GroupBrief'
 import { Modalize } from 'react-native-modalize';
 import { height } from '../../../../GlobalStyles'
 const modalHeight = height * 0.9
-import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
+// import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 
 const Tab = createMaterialTopTabNavigator();
 
 const Tabs = () => {
   useEffect(()=>{
-    AndroidKeyboardAdjust.setAdjustResize()
+    // AndroidKeyboardAdjust.setAdjustResize()
 });
 
   return (
     <Tab.Navigator
-      initialRouteName="chats"
-      style={{paddingTop:0}}
+      initialRouteName="invitations"
+      style={{}}
       screenOptions={{
         tabBarActiveTintColor :"#ffffff",
         tabBarLabelStyle: { fontSize: 16, fontWeight: "bold" },
         // tabBarItemStyle: { width: 100 },
-        // tabBarStyle: { backgroundColor: 'powderblue' },
         tabBarStyle: { backgroundColor: "#6c6399" },
         tabBarIndicatorStyle:{backgroundColor:'#fff'}
       }}
@@ -84,8 +83,6 @@ const Tabs = () => {
     </Tab.Navigator>
   );
 };
-
-
 
 const Index = ({navigation}) => {
 
