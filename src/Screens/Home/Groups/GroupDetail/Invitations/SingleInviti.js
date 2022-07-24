@@ -1,6 +1,6 @@
 import React from 'react'
 import {StyleSheet, Text, View, Alert} from 'react-native'
-import {Chip, ListItem, Avatar, Badge } from 'react-native-elements'
+import {Icon, Chip, ListItem, Avatar, Badge } from 'react-native-elements'
 
 const SingleInviti = ({ item }, navigation ) => {
  
@@ -30,9 +30,9 @@ const SingleInviti = ({ item }, navigation ) => {
         <ListItem.Content>
         <Chip
           onPress={ onPressHandler}
-          title="Outlined Chip"
-          type="outline"
-          containerStyle={{ marginVertical: 15 }}
+          title={<Icon name="people" color="#fff" />}
+          type="solid"
+          containerStyle={{ margin: 15, alignSelf:"flex-end" }}
           // loading
           />
         </ListItem.Content>

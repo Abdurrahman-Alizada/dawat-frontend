@@ -15,7 +15,7 @@ const Groups = ({navigation}) => {
   
   const modalizeRef = useRef(null);
 
-  const onOpen = () => {
+  const FABHandler = () => {
     modalizeRef.current?.open();
   };
 
@@ -30,9 +30,8 @@ const Groups = ({navigation}) => {
     />
 
     <FAB
-      // onPress={()=> FABHandler(true) }
+      onPress={()=> FABHandler() }
       visible={true}
-      onPress={onOpen}
       placement="right"
       // title="Show"
       style={{

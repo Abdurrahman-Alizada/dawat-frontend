@@ -121,8 +121,8 @@ const AddInviti = ({navigation}) => {
         }) => (
           <View style={{marginVertical: '2%'}}>
             <Input
-            label="Enter your Group name"
-            placeholder="Czn Marriage etc."
+            label="Enter invite name"
+            placeholder="Gulab"
             onChangeText={handleChange('groupName')}
             onBlur={handleBlur('groupName')}
             value={values.groupName}

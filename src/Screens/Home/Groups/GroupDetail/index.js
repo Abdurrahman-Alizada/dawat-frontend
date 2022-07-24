@@ -3,7 +3,7 @@ import { View, Text,  } from 'react-native'
 import Chat from './Chat'
 import Tasks from './Tasks'
 import Header from './Header';
-import Invitaions from './Invitaions'
+import Invitations from './Invitations'
 import { Badge } from 'react-native-elements';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import GroupBrief from './GroupBrief'
@@ -45,7 +45,7 @@ const Tabs = () => {
             </View>
           ),
         }}        
-        component={Invitaions}
+        component={Invitations}
       />
 
       <Tab.Screen
