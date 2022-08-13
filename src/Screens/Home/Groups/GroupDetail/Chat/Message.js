@@ -58,7 +58,7 @@ const Message = ({ time, isLeft, message, onSwipe }) => {
 
 	return (
 		<FlingGestureHandler
-			direction={isLeft ? Directions.RIGHT : Directions.LEFT}
+			direction={Directions.LEFT}
 			onGestureEvent={eventHandler}
 			onHandlerStateChange={({ nativeEvent }) => {
 				if (nativeEvent.state === State.ACTIVE) {

@@ -29,10 +29,9 @@ const Header = ({navigation}, props) => {
 
   return (
     <>
-      <StatusBar />
       <HeaderRNE
         barStyle="dark-content"
-        containerStyle={{backgroundColor: '#6c6399',  height: '12%',}}
+        containerStyle={{backgroundColor: '#6c6399', }}
         >
         
         {isSearch ?

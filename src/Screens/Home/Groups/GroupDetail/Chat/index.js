@@ -11,7 +11,7 @@ const MessagesScreen = ({ navigation, route }) => {
 	const [isLeft, setIsLeft] = useState();
 
 	const swipeToReply = (message, isLeft) => {
-		setReply(message.length > 50 ? message.slice(0, 30) + '...' : message);
+		setReply(message.length > 50 ? message.slice(0, 20) + '...' : message);
 		setIsLeft(isLeft);
 	};
 
