@@ -50,8 +50,6 @@ const SingleGroup = ({item}, navigation) => {
     Alert.alert('Hello', 'onlongPress');
   };
 
-  const id = item.id;
-
   return (
     <ListItem
       onPress={onPressHandler}

@@ -6,13 +6,20 @@ import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
+import { allInvitations } from '../../../../../redux/reducers/groups/groupThunk'
 
 const modalHeight = height * 0.7;
 
 export default function Example() {
   const groupList = useSelector(state => state.groups);
   const modalizeRef = useRef(null);
+  const dispatch = useDispatch();
 
+  const getAllPosts = ()=>{
+    dispatch(allInvitations())
+  }
+  getAllPosts()
+  
   const FABHandler = () => {
     modalizeRef.current?.open();
   };
@@ -22,7 +29,7 @@ export default function Example() {
       <Text style={styles.sectionHeader}>Invited</Text>
       <FlatList
         numColumns={2}
-        data={groupList}
+        data={groupList.invitations}
         style={styles.gridView}
         renderItem={({item, section, index}) => <RenderItem item={item} />}
       />
