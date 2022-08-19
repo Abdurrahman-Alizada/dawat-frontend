@@ -16,7 +16,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {addGroup} from '../../../../../redux/groups';
+import {addGroup} from '../../../../../redux/reducers/groups/groups';
 
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import {
+  StatusBar,
   StyleSheet,
   View,
   Text,
   Linking,
   TouchableOpacity,
-  StatusBar,
 } from 'react-native';
 import {Header as HeaderRNE, Icon, Avatar} from 'react-native-elements';
 import { width } from '../../../GlobalStyles'
 import { SearchBar } from 'react-native-elements';
 
-const Header = ({navigation}, props) => {
+const Header = ({navigation, isSearch, setIsSearch}, props) => {
 
-   const [isSearch, setIsSearch] = useState(false)
+  //  const [isSearch, setIsSearch] = useState(false)
    const [search, setSearch] = useState("");
    const updateSearch = (search) => {
      setSearch(search);
@@ -30,9 +30,10 @@ const Header = ({navigation}, props) => {
   return (
     <>
       <HeaderRNE
-        barStyle="dark-content"
-        containerStyle={{backgroundColor: '#6c6399', }}
+        barStyle="default"
+        containerStyle={{backgroundColor: '#6c6399', padding:0}}
         >
+      <StatusBar barStyle="light-content" backgroundColor="#6c6399" />
         
         {isSearch ?
         <SearchBar
@@ -47,15 +48,14 @@ const Header = ({navigation}, props) => {
         cancel={()=>{console.log('hello')}}
         inputContainerStyle={{backgroundColor:'#fff'}}
         searchIcon={()=><Icon type="antdesign" name="search1" color="#000" />}
-        // rightIconContainerStyle={{backgroundColor:'#000'}}
-        containerStyle={{width:width, marginLeft:-10, backgroundColor:'#fff', minHeight:'10%'}}
+        containerStyle={{width:width,padding:0, backgroundColor:'#fff',}}
         />
         :
-        <View style={{flexDirection:'row', justifyContent:'space-between', width:width - 20,}} >        
+        <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:"center", width:width - 30,}} >        
           <View style={styles.headerRight}>
             <Avatar
             onPress={()=>navigation.openDrawer()}
-            size={25}
+            size={30}
             source={{uri: 'https://media.istockphoto.com/photos/macaw-parrot-isolated-on-white-background-picture-id1328860045?b=1&k=20&m=1328860045&s=170667a&w=0&h=o24me3gyECkw5b_iKKrCiyowQYyAaW8q1cx8WUfwfoI='}}
             rounded
             />
@@ -63,7 +63,7 @@ const Header = ({navigation}, props) => {
           </View>
 
           <View style={styles.headerRight}>
-            <Text style={styles.heading}>Hello</Text>
+            <Text style={styles.heading}>Dawat</Text>
           </View>
 
           <View style={styles.headerRight}>

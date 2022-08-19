@@ -103,7 +103,7 @@ const SignUp = ({navigation}) => {
 
         <View style={{marginVertical: '2%'}}>
           <Button
-            onPress={() => navigation.replace('SignUpwithEmail')}
+            onPress={() => navigation.navigate('SignUpwithEmail')}
             title="Sign Up With Email"
             titleStyle={{fontWeight: 'bold', color: '#333', width: '70%'}}
             buttonStyle={{

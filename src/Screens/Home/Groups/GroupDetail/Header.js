@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StatusBar,
 } from 'react-native';
 import {Header as HeaderRNE, Icon} from 'react-native-elements';
 import { width } from '../../../../GlobalStyles'

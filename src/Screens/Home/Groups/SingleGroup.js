@@ -6,7 +6,7 @@ const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers) {
     return (
       <View style={styles.groupMembersContent}>
-        {groupMembers.membersAvatars.map((groupMember, key) => {
+        {/* {groupMembers.membersAvatars.map((groupMember, key) => {
           return (
             <View key={key}>
               {key < 3 ? (
@@ -16,17 +16,29 @@ const RenderGroupMembers = ({groupMembers}) => {
               )}
             </View>
           );
-        })}
-        <View style={{ justifyContent:"center", alignItems:"center", borderWidth: 1, borderRadius:50, borderColor: "#20232a",}}>
-          <Text style={{fontSize:10, paddingHorizontal:'1%', fontWeight:"bold"}}>+39</Text>
+        })} */}
+         <Image style={styles.memberImage} source={require('../../../assets/drawer/userImage.png')} />
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1.5,
+            borderRadius: 50,
+            borderColor: '#20232a',
+          }}>
+          <Text
+            style={{fontSize: 10, paddingHorizontal: '2%', fontWeight: 'bold'}}>
+            {groupMembers.totalMembers}
+          </Text>
         </View>
       </View>
     );
   }
-  return <Text>hello</Text>;
+  return <Image style={styles.memberImage} source={require('../../../assets/images/onboarding/1.png')} />
 };
 
 const SingleGroup = ({item}, navigation) => {
+  // console.log("single item is ..",item)
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
       itemId: 2,
@@ -48,11 +60,13 @@ const SingleGroup = ({item}, navigation) => {
       <Avatar
         containerStyle={{height: 50, width: 50}}
         avatarStyle={{borderRadius: 50}}
-        source={{uri: item.avatar_url}}
+        // source={{uri: item.avatar_url}}
+        source={require('../../../assets/drawer/userImage.png')}
+
       />
 
       <ListItem.Content>
-        <ListItem.Title>{item.name} </ListItem.Title>
+        <ListItem.Title>{item.groupName} </ListItem.Title>
         <View style={styles.subtitleView}>
           <RenderGroupMembers groupMembers={item} />
 

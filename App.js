@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
+
 import {createStackNavigator} from '@react-navigation/stack';
 
 import SplashScreen from './src/Screens/SplashScreen/SplashScreen';
@@ -28,7 +29,7 @@ export const App = () => {
   
     <Provider store={store}>
       <ThemeProvider theme={Theme}>
-        <NavigationContainer>
+        <NavigationContainer >
       <Stack.Navigator initialRouteName="SplashScreen">
         {/* SplashScreen which will come once for 5 Seconds */}
         <Stack.Screen

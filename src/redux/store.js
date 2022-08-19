@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from './user'
-import groupReducer from './groups'
-import taskReducer from './tasks'
-import chatReducer from './chat'
+import userReducer from './reducers/user/user'
+import groupReducer from './reducers/groups/groups'
+import taskReducer from './reducers/tasks'
+import chatReducer from './reducers/chat'
 
 export const store = configureStore({
   reducer: {

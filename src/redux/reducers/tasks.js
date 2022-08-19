@@ -29,7 +29,7 @@ const initialState = [
 ]
 
 export const groupSlice = createSlice({
-  name: 'groups',
+  name: 'tasks',
   initialState,
   reducers: {
     addGroup: (state, action) =>{

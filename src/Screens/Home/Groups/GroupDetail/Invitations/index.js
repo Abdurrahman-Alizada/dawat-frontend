@@ -6,13 +6,11 @@ import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
-import {SectionGrid, FlatGrid} from 'react-native-super-grid';
 
 const modalHeight = height * 0.7;
 
 export default function Example() {
   const groupList = useSelector(state => state.groups);
-  console.log(groupList);
   const modalizeRef = useRef(null);
 
   const FABHandler = () => {
@@ -21,26 +19,12 @@ export default function Example() {
 
   return (
     <>
-      <SectionGrid
-        itemDimension={130}
-        // staticDimension={300}
-        // fixed
-        // spacing={20}
-        sections={[
-          {
-            title: 'To be Invited',
-            data: groupList,
-          },
-          {
-            title: 'Invited',
-            data: groupList,
-          },
-        ]}
+      <Text style={styles.sectionHeader}>Invited</Text>
+      <FlatList
+        numColumns={2}
+        data={groupList}
         style={styles.gridView}
         renderItem={({item, section, index}) => <RenderItem item={item} />}
-        renderSectionHeader={({section}) => (
-          <Text style={styles.sectionHeader}>{section.title}</Text>
-        )}
       />
 
       <FAB
@@ -75,6 +59,11 @@ export default function Example() {
 }
 
 const styles = StyleSheet.create({
+  gridView: {
+    padding: 10,
+    flex: 1,
+    width: '100%',
+  },
   sectionHeader: {
     fontSize: 20,
     fontWeight: 'bold',

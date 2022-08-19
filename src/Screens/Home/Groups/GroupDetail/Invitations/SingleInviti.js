@@ -34,11 +34,11 @@ const SingleInviti = ({item}, navigation) => {
 export default SingleInviti;
 
 const styles = StyleSheet.create({
-  gridView: {
-    marginTop: 10,
-    flex: 1,
-  },
+  
   itemContainer: {
+    width:"48%",
+    marginHorizontal:"1%",
+    marginVertical:"0.5%",
     justifyContent: 'flex-start',
     borderRadius: 5,
     padding: 10,

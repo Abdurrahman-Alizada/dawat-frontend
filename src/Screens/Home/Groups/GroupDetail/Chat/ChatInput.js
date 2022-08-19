@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import {useDispatch} from 'react-redux';
-import {addChat} from '../../../../../redux/chat';
+import {addChat} from '../../../../../redux/reducers/chat';
 
 const ChatInput = ({reply, closeReply, isLeft, username}) => {
   // chat
