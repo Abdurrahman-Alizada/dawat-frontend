@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {Image, StyleSheet, Text, View, FlatList, Alert} from 'react-native';
 import RenderItem from './SingleInviti';
 import {FAB, Avatar} from 'react-native-elements';
@@ -7,25 +7,33 @@ import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
 import { allInvitations } from '../../../../../redux/reducers/groups/groupThunk'
+import CustomLoader from '../../../../../Components/CustomLoader';
 
 const modalHeight = height * 0.7;
 
 export default function Example() {
+  
+  // const [animating, setAnimating] = useState(false); //State for ActivityIndicator animation
   const groupList = useSelector(state => state.groups);
+  const animating = useSelector(state=> state.groups.invitationsLoader) 
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
 
-  const getAllPosts = ()=>{
-    dispatch(allInvitations())
-  }
-  getAllPosts()
-  
+  useEffect(()=>{
+
+    const getAllPosts = ()=>{
+      dispatch(allInvitations())
+    }
+    getAllPosts()
+  },[])
+
   const FABHandler = () => {
     modalizeRef.current?.open();
   };
 
   return (
     <>
+      <CustomLoader animating={animating} />
       <Text style={styles.sectionHeader}>Invited</Text>
       <FlatList
         numColumns={2}

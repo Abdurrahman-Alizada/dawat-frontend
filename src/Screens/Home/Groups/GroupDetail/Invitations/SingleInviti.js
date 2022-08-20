@@ -12,7 +12,7 @@ const SingleInviti = ({item}, navigation) => {
   };
 
   return (
-    <View style={[styles.itemContainer, {backgroundColor: item.code}]}>
+    <View style={[styles.itemContainer, {backgroundColor: item.invitationCode}]}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Avatar
           containerStyle={{height: 50, width: 50}}
@@ -22,9 +22,9 @@ const SingleInviti = ({item}, navigation) => {
 
         <View style={{paddingHorizontal: '5%', width: '80%'}}>
           <Text numberOfLines={1} style={styles.itemName}>
-            {item.name}
+            {item.invitationName}
           </Text>
-          <Text style={styles.itemCode}>{item.subtitle}</Text>
+          <Text style={styles.itemCode}>{item.invitationSubtitle}</Text>
         </View>
       </View>
     </View>
