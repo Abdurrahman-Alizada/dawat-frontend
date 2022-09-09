@@ -52,7 +52,7 @@ const Groups = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: '#fff',flex:1}}>
-      <CustomLoader animating={animating} />
+      {/* <CustomLoader animating={animating} /> */}
       <Header navigation={navigation} isSearch={isSearch} setIsSearch={setIsSearch} />
 
       <FlatList

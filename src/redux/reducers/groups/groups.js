@@ -6,7 +6,21 @@ const initialState = {
   groupLoader: true,
   invitations: [],
   invitationsLoader: false,
-  tasks: [],
+  tasks: [
+    {
+      id: '0',
+      name: 'Amy Farha',
+      checked : true,
+      date: new Date(),
+      description: 'Some random text..',
+      responsibleAvatars:[
+        "https://bootdey.com/img/Content/avatar/avatar6.png",
+        "https://bootdey.com/img/Content/avatar/avatar7.png",
+        "https://bootdey.com/img/Content/avatar/avatar2.png",
+      ]
+    },
+    
+  ],
   chat: [],
 };
 
@@ -18,14 +32,14 @@ export const groupSlice = createSlice({
     //get all groups
     [allGroups.pending]: state => {
       console.log('pending');
-      state.groupLoader = true;
+      // state.groupLoader = true;
     },
     [allGroups.fulfilled]: (state, {payload}) => {
       state.groupLoader = false
       state.totalgroups = payload;
     },
     [allGroups.rejected]: state => {
-      state.groupLoader = false
+      // state.groupLoader = false
       console.log('rejected');
     },
 
@@ -47,7 +61,7 @@ export const groupSlice = createSlice({
       console.log('pending');
     },
     [allInvitations.fulfilled]: (state, {payload}) => {
-      console.log('invitaions ', payload);
+      // console.log('invitaions ', payload);
       state.invitationsLoader = false;
       state.invitations = payload;
     },

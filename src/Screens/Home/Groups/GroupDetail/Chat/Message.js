@@ -1,5 +1,7 @@
 import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
+import { Avatar } from "react-native-elements";
+import moment from "moment/moment";
 import {
 	FlingGestureHandler,
 	Directions,
@@ -12,7 +14,7 @@ import Animated, {
 	useSharedValue
 } from "react-native-reanimated";
 
-const Message = ({ time, isLeft, message, onSwipe }) => {
+const Message = ({ time, isLeft, message, onSwipe, pic }) => {
 	const startingPosition = 0;
 	const x = useSharedValue(startingPosition);
 
@@ -67,24 +69,48 @@ const Message = ({ time, isLeft, message, onSwipe }) => {
 			}}
 		>
 			<Animated.View style={[styles.container, uas]}>
-				<View
+			  <View style={{flexDirection: isLeft ?"row" :"row-reverse", marginHorizontal:"2%"}}>
+        <Avatar
+            activeOpacity={0.2}
+            avatarStyle={{}}
+            containerStyle={{ backgroundColor: "#BDBDBD" }}
+            icon={{}}
+            iconStyle={{}}
+            imageProps={{}}
+            onLongPress={() => alert("onLongPress")}
+            onPress={() => alert("onPress")}
+            overlayContainerStyle={{}}
+            placeholderStyle={{}}
+            rounded
+            size="small"
+            source={{uri: 'https://media.istockphoto.com/photos/macaw-parrot-isolated-on-white-background-picture-id1328860045?b=1&k=20&m=1328860045&s=170667a&w=0&h=o24me3gyECkw5b_iKKrCiyowQYyAaW8q1cx8WUfwfoI='}}
+            title="P"
+            titleStyle={{}}
+          />
+      	
+        <View
 					style={[
 						styles.messageContainer,
 						isOnLeft("messageContainer"),
 					]}
 				>
+          <View>
 					<View style={styles.messageView}>
 						<Text style={[styles.message, isOnLeft("message")]}>
 							{message}
 						</Text>
 					</View>
-					<View style={styles.timeView}>
+				
+        	<View style={styles.timeView}>
 						<Text style={[styles.time, isOnLeft("time")]}>
-							{time}
+							{moment(time).startOf('hour').fromNow() }
 						</Text>
-					</View>
-				</View>
-			</Animated.View>
+          </View>
+          </View>
+        </View>
+            
+			</View>
+      </Animated.View>
 		</FlingGestureHandler>
 	);
 };
@@ -96,7 +122,6 @@ const styles = StyleSheet.create({
 	},
 	messageContainer: {
 		backgroundColor: '#1B5583',
-		maxWidth: "80%",
 		alignSelf: "flex-end",
 		flexDirection: "row",
 		borderRadius: 15,
@@ -107,7 +132,7 @@ const styles = StyleSheet.create({
 	},
 	messageView: {
 		backgroundColor: "transparent",
-		maxWidth: "80%",
+		// maxWidth: "80%",
 	},
 	timeView: {
 		backgroundColor: "transparent",

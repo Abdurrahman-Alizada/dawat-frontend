@@ -16,6 +16,8 @@ import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AppImages } from '../assets/drawer/index';
 import Config from './Config';
+import { useDispatch } from 'react-redux';
+import { Logout } from '../redux/reducers/user/userThunk';
 
 const DrawerItemRow = (props) => {
   const window = useWindowDimensions();
@@ -90,6 +92,12 @@ const CustomDrawer = (props) => {
     outputRange: [-rowWidth, 0],
   });
 
+  const dispatch = useDispatch();
+
+  const logout = ()=>{
+    dispatch(Logout())
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 16, marginTop: 30 }}>
@@ -139,11 +147,12 @@ const CustomDrawer = (props) => {
       </DrawerContentScrollView>
 
       <Pressable
+        onPress={logout}
         style={({ pressed }) => [
           styles.signOutBtnStyle,
           { opacity: !Config.isAndroid && pressed ? 0.4 : 1 },
         ]}
-        // android_ripple={{ color: 'lightgrey' }}
+        android_ripple={{ color: 'lightgrey' }}
       >
         <Text
           style={{ flex: 1, fontSize: 16, fontFamily: 'WorkSans-SemiBold' }}

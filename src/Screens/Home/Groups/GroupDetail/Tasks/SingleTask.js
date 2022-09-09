@@ -13,7 +13,7 @@ const SingleTask = ({item}) => {
         <Text>{moment().format('2016-01-01 11:31:23 PM', "dddd, MMMM Do YYYY, h:mm:ss")}</Text>
         <View style={{flexDirection:"row", marginVertical:"2%"}}>
 
-        {item.responsibleAvatars.map((responsibleAvatar, key) => {
+        {/* {item.responsibleAvatars.map((responsibleAvatar, key) => {
           return (
             <View key={key}>
               {key < 3 ? (
@@ -23,10 +23,10 @@ const SingleTask = ({item}) => {
                   )}
             </View>
           );
-        })}
-        <View style={{ justifyContent:"center", alignItems:"center", borderWidth: 1, borderRadius:50, borderColor: "#20232a",}}>
+        })} */}
+        {/* <View style={{ justifyContent:"center", alignItems:"center", borderWidth: 1, borderRadius:50, borderColor: "#20232a",}}>
           <Text style={{fontSize:10, paddingHorizontal:'2%', fontWeight:"bold"}}>+3</Text>
-        </View>
+        </View> */}
         </View>
       
 

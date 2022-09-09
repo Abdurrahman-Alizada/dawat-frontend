@@ -33,7 +33,6 @@ export default function Example() {
 
   return (
     <>
-      <CustomLoader animating={animating} />
       <Text style={styles.sectionHeader}>Invited</Text>
       <FlatList
         numColumns={2}
@@ -41,6 +40,7 @@ export default function Example() {
         style={styles.gridView}
         renderItem={({item, section, index}) => <RenderItem item={item} />}
       />
+      {/* <CustomLoader animating={animating} /> */}
 
       <FAB
         onPress={() => FABHandler()}

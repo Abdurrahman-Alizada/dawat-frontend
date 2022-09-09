@@ -45,7 +45,7 @@ const SignupWithEmail = () => {
         password: values.password,
         passwordConfirmation: values.passwordConfirmation,
         navigation : navigation 
-      }),
+      })
     )
   };
 

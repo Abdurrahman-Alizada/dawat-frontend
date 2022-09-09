@@ -38,11 +38,9 @@ const SplashScreen = ({navigation}) => {
       //Check if user_id is set or not If not then send for Authentication else send to Home Screen
       AsyncStorage.getItem('isLoggedIn')
         .then(value => {
-          // console.log(isAppFirstLaunched);
-          // console.log(value, 'This is Value');
           isAppFirstLaunched.current
             ? navigation.replace('Onboarding')
-            : navigation.navigate(value === null ? 'Drawer' : 'Auth');
+            : navigation.navigate(value == "0" ? 'Auth' : 'Drawer');
         })
         .catch(err => {
           console.log(err);

@@ -1,5 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {registerUser} from './userThunk';
+import {registerUser, Logout} from './userThunk';
 
 const initialState = {
   name: '',
@@ -26,13 +26,23 @@ export const UserSlice = createSlice({
     },
     [registerUser.fulfilled]: (state, {payload}) => {
       console.log('fulfilled', payload);
-      // if(payload.email){
-      //   state.success = true
-      // }
-      // const navigationRef = createNavigationContainerRef()
+      state.name = payload.name;
+      state.email = payload.email;
     },
     [registerUser.rejected]: state => {
       console.log('rejected');
+    },
+     // user logout
+     [Logout.pending]: () => {
+      console.log('pending - user logout');
+    },
+    [Logout.fulfilled]: (state, {payload}) => {
+      console.log('fulfilled - user logout', payload);
+      state.name = "";
+      state.email = "";
+    },
+    [Logout.rejected]: state => {
+      console.log('rejected - user logout');
     },
   },
 });

@@ -1,29 +1,41 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {ScrollView} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
+import { allMessages } from '../../../../../redux/reducers/groups/chat/chatThunk';
 
 import Message from './Message';
 
 const MessagesList = ({onSwipeToReply}) => {
-  const messages = useSelector(state => state.chat);
+  const dispatch = useDispatch()
+  const messages = useSelector(state => state.chat.messages);
 
   const user = useRef(0);
-  const scrollView = useRef();
+  const scrollViewRef = useRef(null);
+
+  let listViewRef;
+  const downButtonHandler = () => {
+    listViewRef?.scrollToEnd({ animated: true });
+  };
+
+  useEffect(()=>{
+    downButtonHandler()
+    dispatch(allMessages())
+  }, [])
 
   return (
     <ScrollView
       style={{backgroundColor: '#fff', flex: 1}}
-      ref={ref => (scrollView.current = ref)}
-      onContentChange={() => {
-        scrollView.current.scrollToEnd({animated: true});
-      }}>
+      ref={scrollViewRef} onContentSizeChange={() => {scrollViewRef.current?.scrollToEnd()}}
+      
+      >
       {messages.map((message, index) => (
         <Message
           key={index}
-          time={message.time}
+          time={message.createdAt}
           isLeft={message.user !== user.current}
           message={message.content}
           onSwipe={onSwipeToReply}
+          pic={message.pic}
         />
       ))}
     </ScrollView>

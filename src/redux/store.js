@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './reducers/user/user'
 import groupReducer from './reducers/groups/groups'
 import taskReducer from './reducers/tasks'
-import chatReducer from './reducers/chat'
+import chatReducer from './reducers/groups/chat/chatSlice'
 
 export const store = configureStore({
   reducer: {

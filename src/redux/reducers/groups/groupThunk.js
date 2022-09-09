@@ -32,7 +32,12 @@ export const addNewGroup = createAsyncThunk(
 
 export const allGroups = createAsyncThunk('group/allGroups', async () => {
   // const { data } = await instance.get("/api/group/allposts")
-  return fetch(`https://dawat-backend.herokuapp.com/api/group/allposts`)
+   return fetch(`https://dawat-backend.herokuapp.com/api/group`, {
+    method: "GET",
+    headers: {
+      'Authorization': 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMDM2NzcwNThjMDM3MjhmYzBhNTU0ZiIsImlhdCI6MTY2MTE2NzQ3MywiZXhwIjoxNjYzNzU5NDczfQ.KHDR-Tv1tFYMyDR1DWah9PbXV0ES89pmhASPvNJpC-I"
+    }
+  })
     .then(response => response.json())
     .then(json => {
       // console.log(json)
@@ -46,8 +51,16 @@ export const allGroups = createAsyncThunk('group/allGroups', async () => {
 // return fetch(`https://dawat-backend.herokuapp.com/api/group/invitations/allInvitations`)
 // export const allInvitations = createAsyncThunk(
 
-  export const allInvitations = createAsyncThunk('group/allInvitations', async () => {
-    return fetch(`https://dawat-backend.herokuapp.com/api/group/invitations/allInvitations`)
+export const allInvitations = createAsyncThunk(
+  'group/allInvitations',
+  async () => {
+    return fetch(`https://dawat-backend.herokuapp.com/api/group/invitations/6314a23ffd34b28f7cc98c7f`, {
+      method: "GET",
+      headers: {
+        'Authorization': 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMDM2NzcwNThjMDM3MjhmYzBhNTU0ZiIsImlhdCI6MTY2MTE2NzQ3MywiZXhwIjoxNjYzNzU5NDczfQ.KHDR-Tv1tFYMyDR1DWah9PbXV0ES89pmhASPvNJpC-I"
+      }
+    }
+    )
       .then(response => response.json())
       .then(json => {
         // console.log(json)
@@ -56,5 +69,5 @@ export const allGroups = createAsyncThunk('group/allGroups', async () => {
       .catch(error => {
         console.error(error);
       });
-  });
-  
+  },
+);

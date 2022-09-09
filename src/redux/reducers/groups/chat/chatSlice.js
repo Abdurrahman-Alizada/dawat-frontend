@@ -1,0 +1,43 @@
+import { createSlice } from '@reduxjs/toolkit'
+import {allMessages} from './chatThunk';
+
+const initialState = {   
+    messages : [],
+}
+
+export const chatSlice = createSlice({
+  name: 'chat',
+  initialState,
+  reducers: {
+    addChat: (state, action) =>{
+    //   console.log(action.payload)
+      const newchat = {
+        user : action.payload.user,
+        time:action.payload.time,
+        content : action.payload.content,
+      }
+      state.messages.push(newchat)
+    },
+  },
+  extraReducers :{
+    [allMessages.pending]: state => {
+        console.log('pending');
+        // state.groupLoader = true;
+      },
+      [allMessages.fulfilled]: (state, {payload}) => {
+        // state.groupLoader = false
+        state.messages = payload;
+        console.log("messages are,", payload)
+      },
+      [allMessages.rejected]: state => {
+        // state.groupLoader = false
+        console.log('rejected');
+      },
+  
+  }
+})
+
+// Action creators are generated for each case reducer function
+export const { addChat } = chatSlice.actions
+
+export default chatSlice.reducer

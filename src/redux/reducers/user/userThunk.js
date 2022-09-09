@@ -1,7 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
 import {instance} from '../../axios';
-
 // register new user
 export const registerUser = createAsyncThunk(
   'user/registerUser',
@@ -13,27 +12,42 @@ export const registerUser = createAsyncThunk(
       password,
       passwordConfirmation,
     });
-    // await AsyncStorage.setItem('token', data?.token);
-    // await AsyncStorage.setItem('userId', data?._id);
-    // await AsyncStorage.setItem('name', data?.name);
-    // console.log("data is..", data)
-    // user.navigation.navigate({
-    //   name: 'Drawer',
-    //   params: {
-    //     user: 'jane',
-    //   },
-    // });
-    if (data.email) {
-      await AsyncStorage.setItem('name', data._id);
+
+    console.log('data is..', data);
+    // if (data.email) {
+      await AsyncStorage.setItem('isLoggedIn', 'login');
+      await AsyncStorage.setItem('id', data._id);
+      await AsyncStorage.setItem('token', data?.token);
+      await AsyncStorage.setItem('userId', data?._id);
+      await AsyncStorage.setItem('name', data?.name);
       user.navigation.navigate({
         name: 'Drawer',
         params: {
           user: 'jane',
         },
+      }).then(()=>{
+        console.log("navigate")
       });
       return data;
-    } else {
-      return null;
-    }
+    // } else {
+    //   return null;
+    // }
   },
 );
+
+export const Logout = createAsyncThunk('user/Logout', async (navigation) => {
+  
+  console.log(AsyncStorage.getItem("isLoggedIn")) 
+    await AsyncStorage.setItem('isLoggedIn',"0");
+    await AsyncStorage.setItem('id', "");
+    await AsyncStorage.setItem('token', "");
+    await AsyncStorage.setItem('userId', "");
+    await AsyncStorage.setItem('name', "");
+    // navigation.navigation.navigate({
+    //   name: 'Auth',
+    //   params: {
+    //     user: 'jane',
+    //   },
+    // });
+   
+});

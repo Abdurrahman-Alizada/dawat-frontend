@@ -11,9 +11,9 @@ import { SearchBar } from 'react-native-elements';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 
 const Header = ({navigation, onOpen}) => {
-  useEffect(()=>{
-    AndroidKeyboardAdjust.setAdjustNothing()
- });
+//   useEffect(()=>{
+//     AndroidKeyboardAdjust.setAdjustNothing()
+//  });
 
    const [isSearch, setIsSearch] = useState(true)
 
@@ -32,11 +32,10 @@ const Header = ({navigation, onOpen}) => {
   };
 
   return (
-    <>
       <HeaderRNE
         backgroundColor="#6c6399"
-        barStyle="dark-content"
-        containerStyle={{backgroundColor: '#6c6399', }}
+        // barStyle="light-content"
+        containerStyle={{backgroundColor: '#6c6399' }}
         >
         
         {isSearch ?
@@ -90,19 +89,11 @@ const Header = ({navigation, onOpen}) => {
         />
         }
       </HeaderRNE>
-    </>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#397af8',
-    marginBottom: 20,
-    width: '100%',
-    paddingVertical: 15,
-  },
+  
   heading: {
     color: 'white',
     fontSize: 22,
@@ -111,7 +102,6 @@ const styles = StyleSheet.create({
   headerRight: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 5,
   },
   subheaderText: {
     color: 'white',

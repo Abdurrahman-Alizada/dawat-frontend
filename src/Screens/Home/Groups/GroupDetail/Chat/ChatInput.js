@@ -10,14 +10,14 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import {useDispatch} from 'react-redux';
-import {addChat} from '../../../../../redux/reducers/chat';
+import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
+
+import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk'
 
 const ChatInput = ({reply, closeReply, isLeft, username}) => {
   // chat
   const [message, setMessage] = useState('');
   const [serverState, setServerState] = React.useState('Loading...');
-  const [disableButton, setDisableButton] = React.useState(true);
-  const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
   const [serverMessages, setServerMessages] = React.useState([]);
 
   let ws = React.useRef(
@@ -51,12 +51,15 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
 
   const submitMessage = () => {
     dispatch(
-      addChat({
-        user: 0,
-        time: '01:09',
-        content: 'Good bye',
-      }),
-    );
+      // addChat({
+      //   user: 0,
+      //   time: '01:09',
+      //   content: message,
+      // }),
+   addNewMessage({
+    content:message
+   })
+      );
     ws.send(message);
     setMessage('');
   };
@@ -79,14 +82,6 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
       ) : null}
       <View style={styles.innerContainer}>
         <View style={styles.inputAndMicrophone}>
-          {/* <TouchableOpacity
-						style={styles.emoticonButton}
-					>
-						<Icon name="emoticon-outline"
-							size={23}
-							color="#9f9f9f"
-						/>
-					</TouchableOpacity> */}
           <TextInput
             multiline
             placeholder={'Type something...'}
@@ -95,17 +90,19 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
             onChangeText={text => setMessage(text)}
             onFocus={() => AndroidKeyboardAdjust.setAdjustResize()}
           />
-          {/* <TouchableOpacity style={styles.rightIconButtonStyle}>
-						<Icon
-							name="camera"
-							size={23}
-							color='#9f9f9f'
-						/>
-					</TouchableOpacity> */}
         </View>
-        <TouchableOpacity onPress={submitMessage} style={styles.sendButton}>
+        <TouchableOpacity
+          disabled={message ? false : true}
+          onPress={submitMessage}
+          style={{
+            backgroundColor: message ? '#003153' : "#d4cfcf",
+            borderRadius: 50,
+            height: 40,
+            width: 40,
+            alignItems: 'center',
+            justifyContent: 'center',        
+          }}>
           <Icon
-            // name={message ? "send" : "microphone"}
             name="send"
             size={23}
             color="#fff"
