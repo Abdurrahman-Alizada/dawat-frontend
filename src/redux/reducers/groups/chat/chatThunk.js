@@ -39,7 +39,7 @@ export const allMessages = createAsyncThunk('group/allMessagess', async () => {
   })
     .then(response => response.json())
     .then(json => {
-      console.log(json)
+      // console.log(json)
       return json;
     })
     .catch(error => {

@@ -32,14 +32,15 @@ export const groupSlice = createSlice({
     //get all groups
     [allGroups.pending]: state => {
       console.log('pending');
-      // state.groupLoader = true;
+      state.groupLoader = true;
     },
     [allGroups.fulfilled]: (state, {payload}) => {
-      state.groupLoader = false
       state.totalgroups = payload;
+      console.log('fulfilled');
+      state.groupLoader = false
     },
     [allGroups.rejected]: state => {
-      // state.groupLoader = false
+      state.groupLoader = false
       console.log('rejected');
     },
 

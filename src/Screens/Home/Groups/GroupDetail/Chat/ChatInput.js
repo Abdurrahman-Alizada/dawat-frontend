@@ -12,55 +12,45 @@ import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import {useDispatch} from 'react-redux';
 import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
 
-import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk'
+import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
 const ChatInput = ({reply, closeReply, isLeft, username}) => {
   // chat
   const [message, setMessage] = useState('');
-  const [serverState, setServerState] = React.useState('Loading...');
-  const [serverMessages, setServerMessages] = React.useState([]);
-
+  const [localMessage, setLocalMessage]= useState('');
   let ws = React.useRef(
     new WebSocket('wss://dawat-backend.herokuapp.com/'),
   ).current;
   // https://dawat-backend.herokuapp.com/
+  // gjb7gt.sse.codesandbox.io/
   React.useEffect(() => {
-    const serverMessagesList = [];
 
     ws.onopen = () => {
       console.log('connected to the server');
-      // setServerState('Connected to the server')
-      // setDisableButton(false);
     };
 
     ws.onclose = e => {
       console.log('not connected to the server');
-      // setServerState('Disconnected. Check internet or server.')
-      // setDisableButton(true);
     };
 
     ws.onerror = e => {
-      setServerState(e.message);
+      console.log('error in socket', e);
     };
 
     ws.onmessage = e => {
-      serverMessagesList.push(e.data);
-      setServerMessages([...serverMessagesList]);
+      console.log(e.data);
+      dispatch(addChat({sender:"", content:e.data}))
     };
   }, []);
 
   const submitMessage = () => {
     dispatch(
-      // addChat({
-      //   user: 0,
-      //   time: '01:09',
-      //   content: message,
-      // }),
-   addNewMessage({
-    content:message
-   })
-      );
+      addNewMessage({
+        content: message,
+      }),
+    );
     ws.send(message);
+    setLocalMessage(message)
     setMessage('');
   };
   // end chat
@@ -95,18 +85,14 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
           disabled={message ? false : true}
           onPress={submitMessage}
           style={{
-            backgroundColor: message ? '#003153' : "#d4cfcf",
+            backgroundColor: message ? '#003153' : '#d4cfcf',
             borderRadius: 50,
             height: 40,
             width: 40,
             alignItems: 'center',
-            justifyContent: 'center',        
+            justifyContent: 'center',
           }}>
-          <Icon
-            name="send"
-            size={23}
-            color="#fff"
-          />
+          <Icon name="send" size={23} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>

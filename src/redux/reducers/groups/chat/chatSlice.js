@@ -10,10 +10,9 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     addChat: (state, action) =>{
-    //   console.log(action.payload)
+      console.log(action.payload)
       const newchat = {
-        user : action.payload.user,
-        time:action.payload.time,
+        sender : action.payload.user,
         content : action.payload.content,
       }
       state.messages.push(newchat)
@@ -27,7 +26,7 @@ export const chatSlice = createSlice({
       [allMessages.fulfilled]: (state, {payload}) => {
         // state.groupLoader = false
         state.messages = payload;
-        console.log("messages are,", payload)
+        // console.log("messages are,", payload)
       },
       [allMessages.rejected]: state => {
         // state.groupLoader = false
