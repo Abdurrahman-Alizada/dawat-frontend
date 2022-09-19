@@ -1,36 +1,23 @@
-import React, {useEffect, useRef} from 'react';
-import {
-  RefreshControl,
-  ActivityIndicator,
-  StyleSheet,
-  View,
-  FlatList,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, RefreshControl, View, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
 import Header from './Header';
-import {FAB} from 'react-native-elements';
+import { AnimatedFAB } from 'react-native-paper';
+
 import {useSelector, useDispatch} from 'react-redux';
-import AddGroup from './AddGroup';
-import {Modalize} from 'react-native-modalize';
-import {height} from '../../../GlobalStyles';
 import {allGroups} from '../../../redux/reducers/groups/groupThunk';
-import CustomLoader from '../../../Components/CustomLoader';
-
-const modalHeight = height * 0.9;
-
+import {Provider} from 'react-native-paper';
 const Groups = ({navigation}) => {
   const [userId, setuserId] = React.useState(null);
   const [isSearch, setIsSearch] = React.useState(false);
   const groupList = useSelector(state => state.groups);
   const animating = useSelector(state => state.groups.groupLoader);
-  // console.log("in index is....",groupList)
   const dispatch = useDispatch();
 
   const getUserInfo = async () => {
     let userId = await AsyncStorage.getItem('userId');
     setuserId(userId);
-    // console.log("user id is..", userId);
   };
 
   const getAllGroups = () => {
@@ -42,42 +29,61 @@ const Groups = ({navigation}) => {
     getAllGroups();
   }, []);
 
-  const modalizeRef = useRef(null);
-
   const onOpen = () => {
-    modalizeRef.current?.open();
+    navigation.navigate('AddGroup');
   };
 
-  const onClose = () => {
-    modalizeRef.current?.close();
+
+  // fab
+
+  const [isExtended, setIsExtended] = React.useState(true);
+
+  const onScroll = ({ nativeEvent }) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
   };
+
+  const fabStyle = { ["right"]: 16 };
+  // end fab
 
   return (
-    <View style={{backgroundColor: '#fff', flex: 1}}>
-      {/* <CustomLoader animating={animating} /> */}
-      <Header
-        navigation={navigation}
-        isSearch={isSearch}
-        setIsSearch={setIsSearch}
+    <View style={{backgroundColor: '#fff', flexGrow: 1}}>
+      <Provider>
+        <Header
+          navigation={navigation}
+          isSearch={isSearch}
+          setIsSearch={setIsSearch}
+        />
+        <FlatList
+          onScroll={onScroll}
+          keyExtractor={item => item._id}
+          data={groupList.totalgroups}
+          renderItem={item => RenderItem(item, navigation)}
+          refreshControl={
+            <RefreshControl
+              //refresh control used for the Pull to Refresh
+              refreshing={animating}
+              onRefresh={getAllGroups}
+            />
+          }
+        />
+      </Provider>
+     
+      <AnimatedFAB
+       icon={'plus'}
+        label={'New Program'}
+        extended={isExtended}
+        onPress={() => onOpen()}
+        visible={true}
+        animateFrom={'right'}
+        iconMode={'static'}
+        style={[styles.fabStyle,{justifyContent:"flex-end", alignItems:"flex-end"}, fabStyle]}
       />
-
-      <FlatList
-        keyExtractor={item => item._id}
-        data={groupList.totalgroups}
-        renderItem={item => RenderItem(item, navigation)}
-        refreshControl={
-          <RefreshControl
-            //refresh control used for the Pull to Refresh
-            refreshing={animating}
-            onRefresh={getAllGroups}
-          />
-        }
-      />
-
-      <FAB
+      {/* <FAB
         onPress={onOpen}
         visible={true}
-        // onPress={() => setVisible(true)}
         placement="right"
         // title="Show"
         style={{
@@ -86,15 +92,20 @@ const Groups = ({navigation}) => {
         }}
         icon={{name: 'add', color: 'white'}}
         color="#334C8C"
-      />
-
-      <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        <AddGroup navigation={navigation} onClose={onClose} />
-      </Modalize>
+      /> */}
     </View>
   );
 };
 
-export default Groups;
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 16,
+    position: 'absolute',
+  },
+})
 
-const styles = StyleSheet.create({});
+export default Groups;

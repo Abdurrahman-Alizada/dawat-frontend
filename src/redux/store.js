@@ -3,13 +3,15 @@ import userReducer from './reducers/user/user'
 import groupReducer from './reducers/groups/groups'
 import taskReducer from './reducers/tasks'
 import chatReducer from './reducers/groups/chat/chatSlice'
+import themeReducer from './reducers/groups/chat/chatSlice'
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     groups : groupReducer,
     tasks : taskReducer,
-    chat : chatReducer
+    chat : chatReducer,
+    theme:themeReducer
   },
   middleware: (getDefaultMiddleware) =>
   getDefaultMiddleware({

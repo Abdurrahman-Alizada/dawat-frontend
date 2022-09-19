@@ -6,17 +6,18 @@ export const addNewGroup = createAsyncThunk(
   'group/addNewGroup',
   async group => {
     return fetch(
-      'https://dawat-backend.herokuapp.com/api/group/addNewGroup/62fb751bc32b5a340888c625',
+      'https://dawat-backend.herokuapp.com/api/group/group',
       {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMDM2NzcwNThjMDM3MjhmYzBhNTU0ZiIsImlhdCI6MTY2MTE2NzQ3MywiZXhwIjoxNjYzNzU5NDczfQ.KHDR-Tv1tFYMyDR1DWah9PbXV0ES89pmhASPvNJpC-I"
         },
         body: JSON.stringify({
-          id: group.id,
+          // id: group.id,
           groupName: group.groupName,
-          totalMembers: group.totalMembers,
+          users: group.members,
         }),
       },
     )

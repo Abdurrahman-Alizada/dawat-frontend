@@ -1,56 +1,25 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import { StyleSheet, useWindowDimensions } from 'react-native';
-import CustomDrawer from '../Components/CustomDrawer';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import HomeScreen from './AppStack';
+import DrawerContent from '../Components/DrawerContent';
+const Drawer1 = createDrawerNavigator();
 
-const Drawer = createDrawerNavigator();
-
-
-const DrawerStack = () => {
-  const window = useWindowDimensions();
- 
+const DrawerStack = props => {
   return (
-    <Drawer.Navigator
-    drawerContentOptions={{activeBackgroundColor: '#5cbbff'}}
-    drawerType="back"
-    overlayColor="transparent"
-    drawerStyle={{
-      width: window.width * 0.75,
-      backgroundColor: '#FFFEFEFE',
-    }}
-    sceneContainerStyle={styles.drawerSceneContainer}
-    edgeWidth={0}
- 
-      drawerContent={props => <CustomDrawer {...props} />}
-      >
-      <Drawer.Screen
+    <Drawer1.Navigator drawerContent={() => <DrawerContent />}>
+      <Drawer1.Screen
+        options={{headerShown: false}}
         name="Home"
         component={HomeScreen}
-        options={{
-          drawerIcon: ({color}) => (
-            <Ionicons name="home-outline" size={22} color={color} />
-          ),
-        }}
       />
-    </Drawer.Navigator>
+      <Drawer1.Screen
+        name="Notifications"
+        options={{headerShown: false}}
+        component={HomeScreen}
+      />
+    </Drawer1.Navigator>
   );
 };
 
-const styles = StyleSheet.create({
-  drawerSceneContainer: {
-    elevation: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-  },
-});
-
-
 export default DrawerStack;
-

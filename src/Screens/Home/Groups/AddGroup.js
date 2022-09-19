@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Modal,
   View,
+  ImageBackground,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -14,6 +15,7 @@ import {Chip, Button, Input} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {addNewGroup} from '../../../redux/reducers/groups/groupThunk';
@@ -26,6 +28,45 @@ const validationSchema = Yup.object().shape({
 const AddGroup = ({navigation, onClose}) => {
   const [userId, setuserId] = React.useState(null);
 
+  const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [items, setItems] = useState([
+    {
+      label: 'Basit',
+      value: '6303618c8a24e03f142414f4',
+      icon: () => (
+        <ImageBackground
+          source={require('../../../assets/images/auth/checkInbox.png')}
+          style={{width: 35, height: 35}}
+          imageStyle={{borderRadius: 25}}
+        />
+      ),
+    },
+    {
+      label: 'Gulab',
+      value: '63036572f9005d3684d967d9',
+      icon: () => (
+        <ImageBackground
+          source={require('../../../assets/images/onboarding/1.png')}
+          style={{width: 35, height: 35}}
+          imageStyle={{borderRadius: 25}}
+        />
+      ),
+    },
+    {
+      label: 'Khan',
+      value: '6303677058c03728fc0a554f',
+      icon: () => (
+        <ImageBackground
+          source={require('../../../assets/images/onboarding/1.png')}
+          style={{width: 35, height: 35}}
+          imageStyle={{borderRadius: 25}}
+        />
+      ),
+    },
+
+  ]);
+
   useEffect(() => {
     const getUserInfo = async () => {
       let userId = await AsyncStorage.getItem('userId');
@@ -37,16 +78,15 @@ const AddGroup = ({navigation, onClose}) => {
 
   const dispatch = useDispatch();
 
-  const submitHandler = (values) => {
-     dispatch(
+  const submitHandler = values => {
+    console.log("values are", values, users)
+    dispatch(
       addNewGroup({
-        id: userId,
         groupName: values.groupName,
-        totalMembers: 4,
+        members: users,
       }),
     );
-    // navigation.navigate('HomeIndex');
-    onClose();
+    navigation.navigate('HomeIndex');
   };
 
   const [fileData, setfileData] = useState(null);
@@ -116,7 +156,7 @@ const AddGroup = ({navigation, onClose}) => {
   }
 
   return (
-    <View style={{padding: '5%'}}>
+    <View style={{padding: '5%', backgroundColor:"#fff", flex:1}}>
       <Formik
         initialValues={{
           groupName: '',
@@ -147,6 +187,39 @@ const AddGroup = ({navigation, onClose}) => {
                     ''
                   )
                 }
+              />
+            </View>
+
+            <View style={{marginBottom: '2%'}}>
+              <DropDownPicker
+               multiple={true}
+               min={0}
+               max={3}
+               open={open}
+                value={users}
+                items={items}
+                placeholder={'Choose a member'}
+                searchPlaceholder={'Search'}
+                setOpen={setOpen}
+                setValue={val => {
+                  setUsers(val)
+                }}
+                setItems={setItems}
+                listMode="MODAL"
+                searchable={true}
+                // addCustomItem={true}
+                loading={true}
+                searchContainerStyle={{
+                  borderBottomColor: '#dfdfdf',
+                }}
+                style={[styles.inputStyle]}
+                textStyle={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+                labelStyle={{
+                  fontWeight: 'bold'
+                }}
               />
             </View>
 
@@ -255,6 +328,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  inputStyle: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#DFE2E5',
+    borderRadius: 10,
   },
   modalView: {
     margin: 20,

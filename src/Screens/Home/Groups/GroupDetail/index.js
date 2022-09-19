@@ -87,7 +87,7 @@ const Tabs = () => {
 const Index = ({navigation}) => {
 
   useEffect(() => {
-   modalizeRef.current?.open();
+  //  modalizeRef.current?.open();
   }, []);
 
 
