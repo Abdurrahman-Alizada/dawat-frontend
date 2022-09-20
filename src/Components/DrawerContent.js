@@ -10,11 +10,14 @@ import {
   Text,
   TouchableRipple,
   Switch,
+  useTheme
 } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { PreferencesContext } from '../themeContext';
 export default function DrawerContent(props) {
   const [active, setActive] = React.useState('');
-
+  const theme = useTheme();
+  const { toggleTheme, isThemeDark } = React.useContext(PreferencesContext);
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
@@ -73,11 +76,11 @@ export default function DrawerContent(props) {
         </Drawer.Section>
 
         <Drawer.Section style={styles.drawerSection} title="Preferences">
-          <TouchableRipple onPress={props.toggleTheme}>
+          <TouchableRipple onPress={() => toggleTheme()}>
             <View style={styles.preference}>
               <Text>Dark Theme</Text>
               <View pointerEvents="none">
-                <Switch value={true} />
+                <Switch value={isThemeDark} />
               </View>
             </View>
           </TouchableRipple>

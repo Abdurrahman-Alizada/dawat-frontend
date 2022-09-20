@@ -6,16 +6,24 @@ import HomeIndex from '../Screens/Home/Groups/Index';
 import AddGroup from '../Screens/Home/Groups/AddGroup';
 import GroupDetail from '../Screens/Home/Groups/GroupDetail'
 const Stack = createStackNavigator();
+import AppBar from '../Components/Appbar';
 
 const AppStack = () => {
+  const [isSearch, setIsSearch] = React.useState(false);
+  
   return (
 
     <Stack.Navigator initialRouteName="HomeIndex">
     <Stack.Screen
       name="HomeIndex"
       component={HomeIndex}
-      options={{headerShown: false}}
-    />
+      // options={{headerShown: false}}
+      options={{
+        header: props => (
+          <AppBar isSearch={isSearch} setIsSearch={setIsSearch} />
+        ),
+      }}
+/>
     <Stack.Screen
       name="AddGroup"
       component={AddGroup}

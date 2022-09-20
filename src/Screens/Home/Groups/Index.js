@@ -3,14 +3,14 @@ import {StyleSheet, RefreshControl, View, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
 import Header from './Header';
-import { AnimatedFAB } from 'react-native-paper';
+import {AnimatedFAB} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {allGroups} from '../../../redux/reducers/groups/groupThunk';
 import {Provider} from 'react-native-paper';
 const Groups = ({navigation}) => {
   const [userId, setuserId] = React.useState(null);
-  const [isSearch, setIsSearch] = React.useState(false);
+  // const [isSearch, setIsSearch] = React.useState(false);
   const groupList = useSelector(state => state.groups);
   const animating = useSelector(state => state.groups.groupLoader);
   const dispatch = useDispatch();
@@ -33,29 +33,28 @@ const Groups = ({navigation}) => {
     navigation.navigate('AddGroup');
   };
 
-
   // fab
 
   const [isExtended, setIsExtended] = React.useState(true);
 
-  const onScroll = ({ nativeEvent }) => {
+  const onScroll = ({nativeEvent}) => {
     const currentScrollPosition =
       Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
 
     setIsExtended(currentScrollPosition <= 0);
   };
 
-  const fabStyle = { ["right"]: 16 };
+  const fabStyle = {['right']: 16};
   // end fab
 
   return (
     <View style={{backgroundColor: '#fff', flexGrow: 1}}>
       <Provider>
-        <Header
+        {/* <Header
           navigation={navigation}
           isSearch={isSearch}
           setIsSearch={setIsSearch}
-        />
+        /> */}
         <FlatList
           onScroll={onScroll}
           keyExtractor={item => item._id}
@@ -70,16 +69,20 @@ const Groups = ({navigation}) => {
           }
         />
       </Provider>
-     
+
       <AnimatedFAB
-       icon={'plus'}
+        icon={'plus'}
         label={'New Program'}
         extended={isExtended}
         onPress={() => onOpen()}
         visible={true}
         animateFrom={'right'}
         iconMode={'static'}
-        style={[styles.fabStyle,{justifyContent:"flex-end", alignItems:"flex-end"}, fabStyle]}
+        style={[
+          styles.fabStyle,
+          {justifyContent: 'flex-end', alignItems: 'flex-end'},
+          fabStyle,
+        ]}
       />
       {/* <FAB
         onPress={onOpen}
@@ -106,6 +109,6 @@ const styles = StyleSheet.create({
     right: 16,
     position: 'absolute',
   },
-})
+});
 
 export default Groups;
