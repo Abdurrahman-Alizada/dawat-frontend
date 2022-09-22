@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, RefreshControl, View, FlatList} from 'react-native';
+import {Text, StyleSheet, RefreshControl, View, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
 import Header from './Header';
-import {AnimatedFAB} from 'react-native-paper';
+import {ActivityIndicator, AnimatedFAB} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {allGroups} from '../../../redux/reducers/groups/groupThunk';
@@ -50,24 +50,43 @@ const Groups = ({navigation}) => {
   return (
     <View style={{backgroundColor: '#fff', flexGrow: 1}}>
       <Provider>
-        {/* <Header
-          navigation={navigation}
-          isSearch={isSearch}
-          setIsSearch={setIsSearch}
-        /> */}
-        <FlatList
-          onScroll={onScroll}
-          keyExtractor={item => item._id}
-          data={groupList.totalgroups}
-          renderItem={item => RenderItem(item, navigation)}
-          refreshControl={
-            <RefreshControl
-              //refresh control used for the Pull to Refresh
-              refreshing={animating}
-              onRefresh={getAllGroups}
-            />
-          }
-        />
+        {!animating ? (
+          <View style={{flex:1}}>
+            {groupList.totalgroups?.length > 0 ? (
+              <FlatList
+                onScroll={onScroll}
+                keyExtractor={item => item._id}
+                data={groupList.totalgroups}
+                renderItem={item => RenderItem(item, navigation)}
+                refreshControl={
+                  <RefreshControl
+                    //refresh control used for the Pull to Refresh
+                    refreshing={animating}
+                    onRefresh={getAllGroups}
+                  />
+                }
+              />
+            ) : (
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                }}>
+                <Text>No group yet</Text>
+              </View>
+            )}
+          </View>
+        ) : (
+          <View
+          style={{
+            alignSelf: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <ActivityIndicator animating={animating} />
+        </View>
+        )}
       </Provider>
 
       <AnimatedFAB
@@ -84,18 +103,6 @@ const Groups = ({navigation}) => {
           fabStyle,
         ]}
       />
-      {/* <FAB
-        onPress={onOpen}
-        visible={true}
-        placement="right"
-        // title="Show"
-        style={{
-          position: 'absolute',
-          zIndex: 1,
-        }}
-        icon={{name: 'add', color: 'white'}}
-        color="#334C8C"
-      /> */}
     </View>
   );
 };

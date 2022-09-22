@@ -2,7 +2,6 @@ import {
   TouchableOpacity,
   Text,
   Image,
-  Pressable,
   StyleSheet,
   Modal,
   View,
@@ -10,30 +9,30 @@ import {
 import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicons from 'react-native-vector-icons/AntDesign';
-import {Chip, Button, Input} from 'react-native-elements';
+import { Button, Input} from 'react-native-elements';
 
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
-import {useSelector, useDispatch} from 'react-redux';
-import {addGroup} from '../../../../../redux/reducers/groups/groups';
+import {useDispatch} from 'react-redux';
+import { addNewInviti } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 
 const validationSchema = Yup.object().shape({
-  groupName: Yup.string().required('Group name is required').label('groupName'),
-  groupDescription: Yup.string().label('groupName'),
+  invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
+  groupDescription: Yup.string().label('invitiDescription'),
 });
 
-const AddInviti = ({navigation}) => {
+const AddInviti = ({close}) => {
   const dispatch = useDispatch();
 
   const submitHandler = values => {
     dispatch(
-      addGroup({
-        name: values.groupName,
-        avatar_url: 'https://bootdey.com/img/Content/avatar/avatar6.png',
+      addNewInviti({
+        invitiName: values.invitiName,
+        invitiDescription: values.invitiDescription,
       }),
     );
-    navigation.navigate('HomeIndex');
+   close()
   };
 
   const [fileData, setfileData] = useState(null);
@@ -107,7 +106,8 @@ const AddInviti = ({navigation}) => {
     <View style={{ padding:'5%' }}>
       <Formik
         initialValues={{
-          groupName: '',
+          invitiName: '',
+          invitiDescription:''
         }}
         validationSchema={validationSchema}
         onSubmit={values => submitHandler(values)}>
@@ -123,13 +123,13 @@ const AddInviti = ({navigation}) => {
             <Input
             label="Enter invite name"
             placeholder="Gulab"
-            onChangeText={handleChange('groupName')}
-            onBlur={handleBlur('groupName')}
-            value={values.groupName}
+            onChangeText={handleChange('invitiName')}
+            onBlur={handleBlur('invitiName')}
+            value={values.invitiName}
             renderErrorMessage={true}
             errorMessage={
-                errors.groupName && touched.groupName ? (
-                <Text style={styles.error}>{errors.groupName}</Text>
+                errors.invitiName && touched.invitiName ? (
+                <Text style={styles.error}>{errors.invitiName}</Text>
                 ) : (
                 ''
                 )
@@ -139,9 +139,9 @@ const AddInviti = ({navigation}) => {
             <Input
               placeholder="Optional"
               label="Enter Description"
-              onChangeText={handleChange('groupDescription')}
-              onBlur={handleBlur('groupDescription')}
-              value={values.groupDescription}
+              onChangeText={handleChange('invitiDescription')}
+              onBlur={handleBlur('invitiDescription')}
+              value={values.invitiDescription}
             />
 
             {renderFileData()}

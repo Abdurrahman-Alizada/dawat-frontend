@@ -35,8 +35,8 @@ export const groupSlice = createSlice({
       state.groupLoader = true;
     },
     [allGroups.fulfilled]: (state, {payload}) => {
-      state.totalgroups = payload;
       console.log('fulfilled');
+      state.totalgroups = payload;
       state.groupLoader = false
     },
     [allGroups.rejected]: state => {

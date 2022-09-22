@@ -11,43 +11,41 @@ export const registerUser = createAsyncThunk(
       email,
       password,
       passwordConfirmation,
-    });
+    })
 
     console.log('data is..', data);
     // if (data.email) {
-      await AsyncStorage.setItem('isLoggedIn', 'login');
-      await AsyncStorage.setItem('id', data._id);
-      await AsyncStorage.setItem('token', data?.token);
-      await AsyncStorage.setItem('userId', data?._id);
-      await AsyncStorage.setItem('name', data?.name);
-      user.navigation.navigate({
+    await AsyncStorage.setItem('isLoggedIn', 'login');
+    await AsyncStorage.setItem('id', data._id);
+    await AsyncStorage.setItem('token', data?.token);
+    await AsyncStorage.setItem('userId', data?._id);
+    await AsyncStorage.setItem('name', data?.name);
+    await AsyncStorage.setItem('email', data?.email);
+    user.navigation
+      .navigate({
         name: 'Drawer',
         params: {
           user: 'jane',
         },
-      }).then(()=>{
-        console.log("navigate")
+      })
+      .then(() => {
+        console.log('navigate');
       });
-      return data;
-    // } else {
-    //   return null;
-    // }
+    return data;
   },
 );
 
-export const Logout = createAsyncThunk('user/Logout', async (navigation) => {
-  
-  console.log(AsyncStorage.getItem("isLoggedIn")) 
-    await AsyncStorage.setItem('isLoggedIn',"0");
-    await AsyncStorage.setItem('id', "");
-    await AsyncStorage.setItem('token', "");
-    await AsyncStorage.setItem('userId', "");
-    await AsyncStorage.setItem('name', "");
-    // navigation.navigation.navigate({
-    //   name: 'Auth',
-    //   params: {
-    //     user: 'jane',
-    //   },
-    // });
-   
+export const Logout = createAsyncThunk('user/Logout', async navigation => {
+  console.log(AsyncStorage.getItem('isLoggedIn'));
+  await AsyncStorage.setItem('isLoggedIn', '0');
+  await AsyncStorage.setItem('id', '');
+  await AsyncStorage.setItem('token', '');
+  await AsyncStorage.setItem('userId', '');
+  await AsyncStorage.setItem('name', '');
+  // navigation.navigation.navigate({
+  //   name: 'Auth',
+  //   params: {
+  //     user: 'jane',
+  //   },
+  // });
 });

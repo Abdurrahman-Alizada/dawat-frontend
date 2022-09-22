@@ -28,7 +28,7 @@ const MessagesList = ({onSwipeToReply}) => {
       ref={scrollViewRef} onContentSizeChange={() => {scrollViewRef.current?.scrollToEnd()}}
       
       >
-      {messages.map((message, index) => (
+      {messages?.map((message, index) => (
         <Message
           key={index}
           time={message.createdAt}

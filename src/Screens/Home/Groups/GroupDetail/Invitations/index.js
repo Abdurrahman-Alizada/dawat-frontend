@@ -1,83 +1,126 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Image, StyleSheet, Text, View, FlatList, Alert} from 'react-native';
-import RenderItem from './SingleInviti';
-import {FAB, Avatar} from 'react-native-elements';
+import {StyleSheet, View, FlatList, RefreshControl, Button} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
-import { allInvitations } from '../../../../../redux/reducers/groups/groupThunk'
-import CustomLoader from '../../../../../Components/CustomLoader';
-
+import {allInvitations} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {List, Avatar, FAB, Modal, ActivityIndicator} from 'react-native-paper';
+import AddCategory from './AddCategory';
 const modalHeight = height * 0.7;
 
 export default function Example() {
-  
-  // const [animating, setAnimating] = useState(false); //State for ActivityIndicator animation
-  const groupList = useSelector(state => state.groups);
-  const animating = useSelector(state=> state.groups.invitationsLoader) 
+  const invitationList = useSelector(state => state.invitations.invitations);
+  const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
-
-  useEffect(()=>{
-
-    const getAllPosts = ()=>{
-      dispatch(allInvitations())
-    }
-    getAllPosts()
-  },[])
+  const getAllInvitations = () => {
+    dispatch(allInvitations());
+    console.log("asdf", animating)
+  };
+  useEffect(() => {
+    getAllInvitations();
+  }, []);
 
   const FABHandler = () => {
     modalizeRef.current?.open();
   };
+  const close = () => {
+    modalizeRef.current?.close();
+  };
+  const [expanded, setExpanded] = React.useState(true);
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
   return (
-    <>
-      <Text style={styles.sectionHeader}>Invited</Text>
-      <FlatList
-        numColumns={2}
-        data={groupList.invitations}
-        style={styles.gridView}
-        renderItem={({item, section, index}) => <RenderItem item={item} />}
+    <View style={{flex: 1}}>
+      <Button
+        title="Add Category"
+        style={{marginHorizontal: '0%', padding: '2%'}}
+        icon="format-list-bulleted"
+        mode="contained-tonal"
+        onPress={() => showModal()}
       />
-      {/* <CustomLoader animating={animating} /> */}
+
+      {animating ? (
+        <View
+          style={{
+            alignSelf: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <ActivityIndicator animating={animating} />
+        </View>
+      ) : (
+        <List.Accordion
+          title="Invited"
+          left={props => <List.Icon {...props} icon="check-circle" />}
+          expanded={expanded}
+          onPress={() => setExpanded(!expanded)}>
+          <FlatList
+            data={invitationList}
+            keyExtractor={item => item._id}
+            renderItem={({item, section, index}) => (
+              <List.Item
+                title={item.invitiName}
+                description={item.invitiDescription}
+                left={props => (
+                  <Avatar.Icon
+                    size={30}
+                    icon="account-circle-outline"
+                    style={{alignSelf: 'center'}}
+                  />
+                )}
+                right={props => <List.Icon {...props} icon="check-circle" />}
+              />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={animating}
+                onRefresh={getAllInvitations}
+              />
+            }
+          />
+        </List.Accordion>
+      )}
 
       <FAB
+        icon="plus"
+        size="medium"
+        // variant='tertiary'
+        style={styles.fab}
         onPress={() => FABHandler()}
-        visible={true}
-        placement="right"
-        // title="Show"
-        style={{
-          position: 'absolute',
-          zIndex: 1,
-          paddingBottom: '5%',
-        }}
-        icon={{name: 'add', color: 'white'}}
-        color="#334C8C"
       />
 
-      <Modalize
-        ref={modalizeRef}
-        modalHeight={modalHeight}
-        //  snapPoint={400}
-        //  HeaderComponent={
-        //   <View style={{alignSelf:'flex-end', paddingHorizontal:'5%'}}>
-        //     <Text>Header</Text>
-        //   </View>
-        // }
-        // withHandle={false}
-      >
-        <AddInviti />
+      <Modalize ref={modalizeRef} modalHeight={modalHeight}>
+        <AddInviti close={close} />
       </Modalize>
-    </>
+
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={styles.containerStyle}>
+        <AddCategory />
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gridView: {
-    padding: 10,
-    flex: 1,
-    width: '100%',
+  containerStyle: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: '5%',
+    // flex:1,
+    // justifyContent: 'flex-start',
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
   sectionHeader: {
     fontSize: 20,

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import {useDispatch} from 'react-redux';
 import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
 
@@ -78,7 +77,6 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
             style={styles.input}
             value={message}
             onChangeText={text => setMessage(text)}
-            onFocus={() => AndroidKeyboardAdjust.setAdjustResize()}
           />
         </View>
         <TouchableOpacity
