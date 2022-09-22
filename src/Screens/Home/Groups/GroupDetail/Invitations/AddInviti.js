@@ -22,12 +22,13 @@ const validationSchema = Yup.object().shape({
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
-const AddInviti = ({close}) => {
+const AddInviti = ({close, groupId}) => {
   const dispatch = useDispatch();
 
   const submitHandler = values => {
     dispatch(
       addNewInviti({
+        groupId :groupId,
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
       }),

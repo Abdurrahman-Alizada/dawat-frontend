@@ -14,7 +14,7 @@ const modalHeight = height * 0.9;
 
 const Tab = createMaterialTopTabNavigator();
 
-const Tabs = () => {
+const Tabs = ({groupId}) => {
   return (
     <Tab.Navigator
       initialRouteName="invitations"
@@ -57,6 +57,7 @@ const Tabs = () => {
             </View>
           ),
         }}
+        initialParams={{groupId:groupId}}
         component={Invitations}
       />
 
@@ -131,10 +132,9 @@ const Tabs = () => {
   );
 };
 
-const Index = ({navigation}) => {
-  useEffect(() => {
-    //  modalizeRef.current?.open();
-  }, []);
+const Index = ({ route}) => {
+  
+  const {groupId } = route.params;
 
   const modalizeRef = useRef(null);
   const onOpen = () => {
@@ -149,7 +149,7 @@ const Index = ({navigation}) => {
     <View style={{flex: 1}}>
       {/* <Header navigation={navigation} title='title' onOpen={onOpen} /> */}
       <GroupHeader onOpen={onOpen} />
-      <Tabs />
+      <Tabs groupId={groupId} />
 
       <Modalize
         ref={modalizeRef}

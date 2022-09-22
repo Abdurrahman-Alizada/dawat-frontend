@@ -31,17 +31,17 @@ export const groupSlice = createSlice({
   extraReducers: {
     //get all groups
     [allGroups.pending]: state => {
-      console.log('pending');
+      console.log('pending allGroup');
       state.groupLoader = true;
     },
     [allGroups.fulfilled]: (state, {payload}) => {
-      console.log('fulfilled');
+      console.log('fulfilled allGroup');
       state.totalgroups = payload;
       state.groupLoader = false
     },
     [allGroups.rejected]: state => {
       state.groupLoader = false
-      console.log('rejected');
+      console.log('rejected allGroup');
     },
 
     // add group

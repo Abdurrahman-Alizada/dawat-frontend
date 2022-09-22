@@ -13,7 +13,6 @@ const SingleInviti = ({item}, navigation) => {
 
   return (
     <View style={[styles.itemContainer, {backgroundColor: "#999"}]}>
-    {/* <View style={[styles.itemContainer, {backgroundColor: item.invitationCode}]}> */}
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Avatar
           containerStyle={{height: 50, width: 50}}

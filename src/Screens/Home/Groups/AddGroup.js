@@ -29,7 +29,7 @@ const AddGroup = ({navigation, onClose}) => {
   const [userId, setuserId] = React.useState(null);
 
   const [open, setOpen] = useState(false);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([userId]);
   const [items, setItems] = useState([
     {
       label: 'Basit',
@@ -64,7 +64,6 @@ const AddGroup = ({navigation, onClose}) => {
         />
       ),
     },
-
   ]);
 
   useEffect(() => {
@@ -78,10 +77,12 @@ const AddGroup = ({navigation, onClose}) => {
 
   const dispatch = useDispatch();
 
-  const submitHandler = values => {
-    console.log("values are", values, users)
+  const submitHandler = async values => {
+    console.log('values are', values, users);
+    const token = await AsyncStorage.getItem('token');
     dispatch(
       addNewGroup({
+        token: token,
         groupName: values.groupName,
         members: users,
       }),
@@ -156,7 +157,7 @@ const AddGroup = ({navigation, onClose}) => {
   }
 
   return (
-    <View style={{padding: '5%', backgroundColor:"#fff", flex:1}}>
+    <View style={{padding: '5%', backgroundColor: '#fff', flex: 1}}>
       <Formik
         initialValues={{
           groupName: '',
@@ -192,17 +193,17 @@ const AddGroup = ({navigation, onClose}) => {
 
             <View style={{marginBottom: '2%'}}>
               <DropDownPicker
-               multiple={true}
-               min={0}
-               max={3}
-               open={open}
+                multiple={true}
+                min={0}
+                max={3}
+                open={open}
                 value={users}
                 items={items}
                 placeholder={'Choose a member'}
                 searchPlaceholder={'Search'}
                 setOpen={setOpen}
                 setValue={val => {
-                  setUsers(val)
+                  setUsers(val);
                 }}
                 setItems={setItems}
                 listMode="MODAL"
@@ -218,7 +219,7 @@ const AddGroup = ({navigation, onClose}) => {
                   fontWeight: '700',
                 }}
                 labelStyle={{
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
                 }}
               />
             </View>

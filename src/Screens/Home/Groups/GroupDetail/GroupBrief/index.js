@@ -8,8 +8,6 @@ import {
   Button,
   Icon,
 } from 'react-native-elements';
-// import Icon from 'react-native-v'
-import CountDown from 'react-native-countdown-component';
 
 const Index = () => {
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text

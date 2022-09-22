@@ -9,23 +9,22 @@ import {useSelector, useDispatch} from 'react-redux';
 import {allGroups} from '../../../redux/reducers/groups/groupThunk';
 import {Provider} from 'react-native-paper';
 const Groups = ({navigation}) => {
-  const [userId, setuserId] = React.useState(null);
-  // const [isSearch, setIsSearch] = React.useState(false);
+  const [token, setToken] = React.useState('');
   const groupList = useSelector(state => state.groups);
   const animating = useSelector(state => state.groups.groupLoader);
   const dispatch = useDispatch();
 
   const getUserInfo = async () => {
-    let userId = await AsyncStorage.getItem('userId');
-    setuserId(userId);
+    // console.log("token", token)
   };
 
-  const getAllGroups = () => {
-    dispatch(allGroups());
+  const getAllGroups = async () => {
+    let token = await AsyncStorage.getItem('token');
+    dispatch(allGroups({token}));
   };
 
   useEffect(() => {
-    getUserInfo();
+    // getUserInfo();
     getAllGroups();
   }, []);
 
@@ -51,7 +50,7 @@ const Groups = ({navigation}) => {
     <View style={{backgroundColor: '#fff', flexGrow: 1}}>
       <Provider>
         {!animating ? (
-          <View style={{flex:1}}>
+          <View style={{flex: 1}}>
             {groupList.totalgroups?.length > 0 ? (
               <FlatList
                 onScroll={onScroll}
@@ -79,13 +78,13 @@ const Groups = ({navigation}) => {
           </View>
         ) : (
           <View
-          style={{
-            alignSelf: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
-          <ActivityIndicator animating={animating} />
-        </View>
+            style={{
+              alignSelf: 'center',
+              justifyContent: 'center',
+              flex: 1,
+            }}>
+            <ActivityIndicator animating={animating} />
+          </View>
         )}
       </Provider>
 

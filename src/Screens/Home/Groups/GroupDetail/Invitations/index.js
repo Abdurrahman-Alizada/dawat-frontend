@@ -7,16 +7,19 @@ import {height} from '../../../../../GlobalStyles';
 import {allInvitations} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {List, Avatar, FAB, Modal, ActivityIndicator} from 'react-native-paper';
 import AddCategory from './AddCategory';
+import AsyncStorage from '@react-native-community/async-storage';
 const modalHeight = height * 0.7;
 
-export default function Example() {
+export default function Example({route}) {
+  const {groupId} = route.params
+
   const invitationList = useSelector(state => state.invitations.invitations);
   const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
-  const getAllInvitations = () => {
-    dispatch(allInvitations());
-    console.log("asdf", animating)
+  const getAllInvitations = async () => {
+    let token = await AsyncStorage.getItem('token')
+    dispatch(allInvitations({token,groupId}));
   };
   useEffect(() => {
     getAllInvitations();
@@ -95,7 +98,7 @@ export default function Example() {
       />
 
       <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        <AddInviti close={close} />
+        <AddInviti close={close} groupId={groupId} />
       </Modalize>
 
       <Modal
