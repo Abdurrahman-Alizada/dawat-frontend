@@ -6,7 +6,7 @@ import {
   View,
   FlatList,
   Alert,
-  TouchableWithoutFeedback,
+  Pressable,
 } from 'react-native';
 import {ListItem, CheckBox, Avatar} from 'react-native-elements';
 
@@ -65,15 +65,16 @@ const SingleGroup = ({item}, navigation) => {
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
       groupId: item._id,
+      groupName : item.groupName
     });
   };
 
   const onLongPressHandler = () => {
-    console.log(item._id);
+    console.log(item.groupName);
     Alert.alert('Hello', 'onlongPress');
   };
   return (
-    <TouchableWithoutFeedback
+    <Pressable
       onPress={onPressHandler}
       onLongPress={() => onLongPressHandler()}>
       <View style={[styles.itemContainer, {backgroundColor: '#999'}]}>
@@ -98,7 +99,7 @@ const SingleGroup = ({item}, navigation) => {
           </View>
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 

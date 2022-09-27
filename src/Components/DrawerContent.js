@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
 import {
@@ -16,21 +16,24 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {PreferencesContext} from '../themeContext';
 import {useDispatch} from 'react-redux';
 import {Logout} from '../redux/reducers/user/userThunk';
+
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function DrawerContent(props) {
   const [active, setActive] = React.useState('');
   const {toggleTheme, isThemeDark} = React.useContext(PreferencesContext);
   const dispatch = useDispatch();
-  const [name, setName] = useState("Abdur Rahman")
-  const [email, setEmail] = useState("abdurrahman@gmail.com")
+  const [name, setName] = useState('Abdur Rahman');
+  const [email, setEmail] = useState('abdurrahman@gmail.com');
   const getUserInfo = async () => {
-    const value = await AsyncStorage.getItem('email');
-    console.log("asfd",value)
+    const value = await AsyncStorage.getItem('name');
+    console.log('asfd', value);
+    setName(await AsyncStorage.getItem('name'));
+    setEmail(await AsyncStorage.getItem('email'));
   };
-  useEffect(()=>{
-    getUserInfo()
-  },[])
+  useEffect(() => {
+    getUserInfo();
+  }, []);
   const logout = () => {
     dispatch(Logout());
   };
@@ -42,21 +45,26 @@ export default function DrawerContent(props) {
             source={{
               uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
             }}
-            size={50}
+            size={70}
           />
-          <View>
           <Title style={styles.title}>{name}</Title>
           <Caption style={styles.caption}>{email}</Caption>
-          </View>
-        </View>
           {/* <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                20
+                202
               </Paragraph>
-              <Caption style={styles.caption}>Groups</Caption>
+              <Caption style={styles.caption}>Following</Caption>
+            </View>
+            <View style={styles.section}>
+              <Paragraph style={[styles.paragraph, styles.caption]}>
+                159
+              </Paragraph>
+              <Caption style={styles.caption}>Followers</Caption>
             </View>
           </View> */}
+        </View>
+
         <Drawer.Section title="General" style={styles.drawerSection}>
           <Drawer.Item
             icon="star"
@@ -123,13 +131,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userInfoSection: {
-    marginTop:"2%",
-    alignItems:"center",
-    justifyContent:"space-evenly",
-    flexDirection:"row",
+    paddingLeft: 20,
   },
   title: {
-
+    marginTop: "2%",
     fontWeight: 'bold',
   },
   caption: {

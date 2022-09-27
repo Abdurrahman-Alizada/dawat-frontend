@@ -14,6 +14,7 @@ export const chatSlice = createSlice({
       const newchat = {
         sender : action.payload.user,
         content : action.payload.content,
+        groupId : action.groupId
       }
       state.messages.push(newchat)
     },

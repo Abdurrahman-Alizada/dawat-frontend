@@ -57,7 +57,7 @@ const Tabs = ({groupId}) => {
             </View>
           ),
         }}
-        initialParams={{groupId:groupId}}
+        initialParams={{groupId: groupId}}
         component={Invitations}
       />
 
@@ -92,6 +92,7 @@ const Tabs = ({groupId}) => {
             </View>
           ),
         }}
+        initialParams={{groupId: groupId}}
         component={Tasks}
       />
 
@@ -126,15 +127,15 @@ const Tabs = ({groupId}) => {
             </View>
           ),
         }}
+        initialParams={{groupId: groupId}}
         component={Chat}
       />
     </Tab.Navigator>
   );
 };
 
-const Index = ({ route}) => {
-  
-  const {groupId } = route.params;
+const Index = ({route}) => {
+  const {groupId, groupName} = route.params;
 
   const modalizeRef = useRef(null);
   const onOpen = () => {
@@ -148,7 +149,7 @@ const Index = ({ route}) => {
   return (
     <View style={{flex: 1}}>
       {/* <Header navigation={navigation} title='title' onOpen={onOpen} /> */}
-      <GroupHeader onOpen={onOpen} />
+      <GroupHeader groupName={groupName} onOpen={onOpen} />
       <Tabs groupId={groupId} />
 
       <Modalize

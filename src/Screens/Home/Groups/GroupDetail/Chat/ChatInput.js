@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, {useState} from 'react';
 import {
   View,
@@ -13,7 +14,7 @@ import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
 
 import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
-const ChatInput = ({reply, closeReply, isLeft, username}) => {
+const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
   // chat
   const [message, setMessage] = useState('');
   const [localMessage, setLocalMessage]= useState('');
@@ -42,14 +43,19 @@ const ChatInput = ({reply, closeReply, isLeft, username}) => {
     };
   }, []);
 
-  const submitMessage = () => {
+
+  const submitMessage = async () => {
+    let token = await AsyncStorage.getItem("token");
+    let userId = await AsyncStorage.getItem("userId");
     dispatch(
       addNewMessage({
         content: message,
+        groupId:groupId,
+        addedBy : userId,
+        token:token,
       }),
     );
     ws.send(message);
-    setLocalMessage(message)
     setMessage('');
   };
   // end chat

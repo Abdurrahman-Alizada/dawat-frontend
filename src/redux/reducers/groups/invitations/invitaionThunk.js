@@ -32,7 +32,6 @@ export const addNewInviti = createAsyncThunk(
 export const allInvitations = createAsyncThunk(
   'group/invitations/allInvitations',
   async ({token,groupId}) => {
-    console.log("gour",groupId)
     return fetch(
       `https://dawat-backend.herokuapp.com/api/group/invitations/${groupId}`,
       {
@@ -45,7 +44,6 @@ export const allInvitations = createAsyncThunk(
     )
       .then(response => response.json())
       .then(json => {
-          console.log("invitaions ",json)
         return json;
       })
       .catch(error => {

@@ -10,7 +10,7 @@ import {
 } from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 
-const Header = ({isSearch, setIsSearch, onOpen}) => {
+const Header = ({isSearch, setIsSearch, onOpen, groupName}) => {
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
@@ -37,7 +37,10 @@ const Header = ({isSearch, setIsSearch, onOpen}) => {
           <Appbar.Header>
             {/* <Appbar.BackAction onPress={() => {}} /> */}
             <Appbar.BackAction onPress={() => navigation.goBack()} />
-            <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
+            <Appbar.Content
+              title={groupName}
+              titleStyle={{alignSelf: 'center'}}
+            />
             {/* <Appbar.Action
               icon="magnify"
               onPress={() => {
