@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import HomeScreen from './AppStack';
+import Profile from '../Screens/Drawer/Profile';
 import DrawerContent from '../Components/DrawerContent';
 const Drawer1 = createDrawerNavigator();
 
@@ -14,9 +15,10 @@ const DrawerStack = props => {
         component={HomeScreen}
       />
       <Drawer1.Screen
-        name="Notifications"
+        name="Profile"
         options={{headerShown: false}}
-        component={HomeScreen}
+        // options={{}}
+        component={Profile}
       />
     </Drawer1.Navigator>
   );

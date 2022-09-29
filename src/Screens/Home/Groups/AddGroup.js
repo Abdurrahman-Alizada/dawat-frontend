@@ -2,20 +2,30 @@ import {
   TouchableOpacity,
   Text,
   Image,
-  Pressable,
   StyleSheet,
   Modal,
   View,
+  ScrollView,
   ImageBackground,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo, useRef} from 'react';
+
+import axios from 'axios';
+import {instance} from '../../../redux/axios';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicons from 'react-native-vector-icons/AntDesign';
-import {Chip, Button, Input} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {
+  Badge,
+  List,
+  Avatar,
+  TextInput,
+  Button,
+  IconButton,
+} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {addNewGroup} from '../../../redux/reducers/groups/groupThunk';
@@ -29,56 +39,22 @@ const AddGroup = ({navigation, onClose}) => {
   const [userId, setuserId] = React.useState(null);
 
   const [open, setOpen] = useState(false);
-  const [users, setUsers] = useState([userId]);
-  const [items, setItems] = useState([
-    {
-      label: 'Basit',
-      value: '6303618c8a24e03f142414f4',
-      icon: () => (
-        <ImageBackground
-          source={require('../../../assets/images/auth/checkInbox.png')}
-          style={{width: 35, height: 35}}
-          imageStyle={{borderRadius: 25}}
-        />
-      ),
-    },
-    {
-      label: 'Gulab',
-      value: '63036572f9005d3684d967d9',
-      icon: () => (
-        <ImageBackground
-          source={require('../../../assets/images/onboarding/1.png')}
-          style={{width: 35, height: 35}}
-          imageStyle={{borderRadius: 25}}
-        />
-      ),
-    },
-    {
-      label: 'Khan',
-      value: '6303677058c03728fc0a554f',
-      icon: () => (
-        <ImageBackground
-          source={require('../../../assets/images/onboarding/1.png')}
-          style={{width: 35, height: 35}}
-          imageStyle={{borderRadius: 25}}
-        />
-      ),
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [usersList, setUsersList] = useState([]);
+
+  const [items, setItems] = useState([]);
+  const getUserInfo = async () => {
+    let userId = await AsyncStorage.getItem('userId');
+    setuserId(userId);
+  };
 
   useEffect(() => {
-    const getUserInfo = async () => {
-      let userId = await AsyncStorage.getItem('userId');
-      setuserId(userId);
-      console.log('user id is..', userId);
-    };
     getUserInfo();
   }, []);
 
   const dispatch = useDispatch();
 
   const submitHandler = async values => {
-    console.log('values are', values, users);
     const token = await AsyncStorage.getItem('token');
     dispatch(
       addNewGroup({
@@ -92,7 +68,7 @@ const AddGroup = ({navigation, onClose}) => {
 
   const [fileData, setfileData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [dropdonwSearchLoading, setDropdownSearchLoading] = useState(false);
   let openCamera = () => {
     setModalVisible(!modalVisible);
 
@@ -156,75 +132,170 @@ const AddGroup = ({navigation, onClose}) => {
     }
   }
 
+  const Item = props => {
+    const [include, setInclude] = useState(users.includes(props.item._id));
+    const index = users.indexOf(props.item._id);
+    const add = () => {
+      if (include) {
+        if (index !== -1 && index !== 0) {
+          users.splice(include, 1);
+          usersList.splice(include, 1);
+          // console.log('if ',index, props.item._id);
+        }else if(index == 0) {
+          users.shift();
+          usersList.shift();
+        }
+      } else {
+        setUsers([...users, props.item._id]);
+        setUsersList([...usersList, props.item]);
+        // console.log('else', index, props.item._id);
+      }
+      setInclude(!include);
+    };
+    return (
+      <View>
+        <List.Item
+          onPress={add}
+          title={props.item.name}
+          description={props.item.email}
+          left={props => (
+            <View>
+              <Avatar.Image
+                {...props}
+                size={50}
+                source={require('../../../assets/drawer/userImage.png')}
+              />
+              {include ? (
+                <List.Icon
+                  style={{position: 'absolute', right: -5, top: 10}}
+                  color={'#3ff'}
+                  icon="check-circle"
+                />
+              ) : null}
+            </View>
+          )}
+          // left={props => <List.Icon {...props} icon="folder" />}
+        />
+      </View>
+    );
+  };
+
   return (
     <View style={{padding: '5%', backgroundColor: '#fff', flex: 1}}>
-      <Formik
-        initialValues={{
-          groupName: '',
-        }}
-        validationSchema={validationSchema}
-        onSubmit={values => submitHandler(values)}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <View style={{marginVertical: '2%'}}>
-            <View>
-              <Input
-                label="Enter your Group name"
-                placeholder="Czn Marriage etc."
-                onChangeText={handleChange('groupName')}
-                onBlur={handleBlur('groupName')}
-                value={values.groupName}
-                renderErrorMessage={true}
-                errorMessage={
-                  errors.groupName && touched.groupName ? (
-                    <Text style={styles.error}>{errors.groupName}</Text>
-                  ) : (
-                    ''
-                  )
-                }
+      {users.length > 0 ? (
+        <ScrollView
+          horizontal={true}
+          style={{maxHeight: 60}}
+          contentContainerStyle={{}}
+          showsHorizontalScrollIndicator={false}>
+          {usersList.map((user, index) => (
+            <View style={{marginRight: 5}} key={user._id}>
+              <Avatar.Image
+                size={40}
+                source={require('../../../assets/drawer/userImage.png')}
               />
+              <Text style={{alignSelf: 'center'}}>{user.name}</Text>
+              {/* <Text style={{alignSelf: 'center', maxWidth:"30%", alignSelf:"flex-start"}} numberOfLines={1}>{user}</Text> */}
             </View>
+          ))}
+        </ScrollView>
+      ) : null}
+      <View style={{}}>
+        <Formik
+          initialValues={{
+            groupName: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={values => submitHandler(values)}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <View style={{marginVertical: '2%'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <IconButton
+                  style={{width: '10%'}}
+                  icon="camera"
+                  mode="outlined"
+                  size={20}
+                  onPress={() => setModalVisible()}
+                />
+                <TextInput
+                  error={errors.groupName && touched.groupName ? true : false}
+                  label="Group Name"
+                  mode="outlined"
+                  style={{marginVertical: '2%', width: '85%'}}
+                  onChangeText={handleChange('groupName')}
+                  onBlur={handleBlur('groupName')}
+                  value={values.groupName}
+                />
+              </View>
+              {errors.groupName && touched.groupName ? (
+                <Text style={styles.error}>{errors.groupName}</Text>
+              ) : null}
 
-            <View style={{marginBottom: '2%'}}>
-              <DropDownPicker
-                multiple={true}
-                min={0}
-                max={3}
-                open={open}
-                value={users}
-                items={items}
-                placeholder={'Choose a member'}
-                searchPlaceholder={'Search'}
-                setOpen={setOpen}
-                setValue={val => {
-                  setUsers(val);
-                }}
-                setItems={setItems}
-                listMode="MODAL"
-                searchable={true}
-                // addCustomItem={true}
-                loading={true}
-                searchContainerStyle={{
-                  borderBottomColor: '#dfdfdf',
-                }}
-                style={[styles.inputStyle]}
-                textStyle={{
-                  fontSize: 16,
-                  fontWeight: '700',
-                }}
-                labelStyle={{
-                  fontWeight: 'bold',
-                }}
-              />
-            </View>
+              <View style={{marginVertical: '5%'}}>
+                <DropDownPicker
+                  renderListItem={props => <Item {...props} />}
+                  open={open}
+                  value={users}
+                  items={items}
+                  placeholder={'Choose a member'}
+                  searchPlaceholder={'Search'}
+                  setOpen={setOpen}
+                  setItems={setItems}
+                  listMode="MODAL"
+                  searchable={true}
+                  loading={dropdonwSearchLoading}
+                  disableLocalSearch={true}
+                  searchContainerStyle={{
+                    borderBottomColor: '#dfdfdf',
+                  }}
+                  style={[styles.inputStyle]}
+                  textStyle={{
+                    fontSize: 16,
+                    fontWeight: '700',
+                  }}
+                  labelStyle={{
+                    fontWeight: 'bold',
+                  }}
+                  itemKey="_id"
+                  onChangeSearchText={async () => {
+                    setDropdownSearchLoading(true);
+                    instance
+                      .get('/api/account/allusers', {
+                        headers: {
+                          Authorization: `Bearer ${await AsyncStorage.getItem(
+                            'token',
+                          )}`,
+                        },
+                      })
+                      .then(items => {
+                        // console.log('dropdonw items', items.data);
+                        setItems(items.data);
+                      })
+                      .catch(err => {
+                        console.log('error in dropdown', err);
+                        //
+                      })
+                      .finally(() => {
+                        // Hide the loading animation
+                        setDropdownSearchLoading(false);
+                      });
+                  }}
+                />
+              </View>
 
-            {/* <Input
+              {/* <Input
               placeholder="Optional"
               label="Enter Description"
               onChangeText={handleChange('groupDescription')}
@@ -232,63 +303,45 @@ const AddGroup = ({navigation, onClose}) => {
               value={values.groupDescription}
             /> */}
 
-            {renderFileData()}
+              {renderFileData()}
 
-            <Button
-              onPress={() => setModalVisible(true)}
-              icon={{
-                name: 'image',
-                type: 'font-awesome',
-                size: 20,
-                color: '#333',
-              }}
-              title="Add Image "
-              titleStyle={{fontWeight: 'bold', color: '#333'}}
-              buttonStyle={{
-                backgroundColor: '#EDEEF0',
-                borderRadius: 10,
-                height: 50,
-              }}
-            />
-
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => {
-                setModalVisible(!modalVisible);
-              }}>
-              <View style={styles.centeredView}>
-                <View style={[styles.modalView, {width: 350, height: 340}]}>
-                  <TouchableOpacity
-                    onPress={openCamera}
-                    style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                    <Text style={styles.buttonTextStyle}>Choose File</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={openGallery}
-                    style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                    <Text style={styles.buttonTextStyle}>Open Gallery</Text>
-                  </TouchableOpacity>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                  <View style={[styles.modalView, {width: 350, height: 340}]}>
+                    <TouchableOpacity
+                      onPress={openCamera}
+                      style={[styles.buttonStyle, {marginHorizontal: 50}]}>
+                      <Text style={styles.buttonTextStyle}>Choose File</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={openGallery}
+                      style={[styles.buttonStyle, {marginHorizontal: 50}]}>
+                      <Text style={styles.buttonTextStyle}>Open Gallery</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </Modal>
+              </Modal>
 
-            <Button
-              onPress={handleSubmit}
-              title="Add "
-              titleStyle={{fontWeight: 'bold', width: '70%'}}
-              buttonStyle={{
-                backgroundColor: '#334C8C',
-                borderRadius: 10,
-                borderColor: '#C1C2B8',
-                borderWidth: 0.5,
-                height: 50,
-              }}
-            />
-          </View>
-        )}
-      </Formik>
+              <Button
+                mode="contained"
+                style={{
+                  marginTop: '2%',
+                  borderRadius: 5,
+                  backgroundColor: '#334C8C',
+                }}
+                onPress={handleSubmit}>
+                Sign in
+              </Button>
+            </View>
+          )}
+        </Formik>
+      </View>
     </View>
   );
 };
@@ -321,8 +374,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   error: {
+    marginLeft: '15%',
     color: 'red',
-    marginLeft: 20,
   },
 
   centeredView: {

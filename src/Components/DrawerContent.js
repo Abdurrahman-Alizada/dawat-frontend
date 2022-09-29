@@ -16,10 +16,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {PreferencesContext} from '../themeContext';
 import {useDispatch} from 'react-redux';
 import {Logout} from '../redux/reducers/user/userThunk';
+import { useNavigation } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function DrawerContent(props) {
+  const navigation = useNavigation();
+  
   const [active, setActive] = React.useState('');
   const {toggleTheme, isThemeDark} = React.useContext(PreferencesContext);
   const dispatch = useDispatch();
@@ -35,7 +38,7 @@ export default function DrawerContent(props) {
     getUserInfo();
   }, []);
   const logout = () => {
-    dispatch(Logout());
+    dispatch(Logout({navigation:navigation}));
   };
   return (
     <DrawerContentScrollView {...props}>
@@ -67,10 +70,13 @@ export default function DrawerContent(props) {
 
         <Drawer.Section title="General" style={styles.drawerSection}>
           <Drawer.Item
-            icon="star"
-            label="First Item"
+            icon="account"
+            label="Profile"
             active={active === 'first'}
-            onPress={() => setActive('first')}
+            onPress={() => {
+              setActive('first');
+              navigation.navigate("Profile")
+            }}
           />
           <Drawer.Item
             icon="star"
@@ -134,7 +140,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   title: {
-    marginTop: "2%",
+    marginTop: '2%',
     fontWeight: 'bold',
   },
   caption: {

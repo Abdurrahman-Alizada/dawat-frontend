@@ -21,7 +21,7 @@ export const registerUser = createAsyncThunk(
     await AsyncStorage.setItem('userId', data?._id);
     await AsyncStorage.setItem('name', data?.name);
     await AsyncStorage.setItem('email', data?.email);
-    user.navigation.navigate("Drawer")
+    user.navigation.navigate('Drawer');
     return data;
   },
 );
@@ -32,7 +32,7 @@ export const loginUser = createAsyncThunk('user/login', async user => {
     email,
     password,
   });
-  console.log('login data is..', data);
+  // console.log('login data is..', data);
   await AsyncStorage.setItem('isLoggedIn', 'login');
   await AsyncStorage.setItem('id', data._id);
   await AsyncStorage.setItem('token', data?.token);
@@ -42,18 +42,11 @@ export const loginUser = createAsyncThunk('user/login', async user => {
   navigation.navigate('Drawer');
 });
 export const Logout = createAsyncThunk('user/Logout', async navigation => {
-  console.log(AsyncStorage.getItem('isLoggedIn'));
+  console.log('navigataion', navigation);
   await AsyncStorage.setItem('isLoggedIn', '0');
   await AsyncStorage.setItem('id', '');
   await AsyncStorage.setItem('token', '');
   await AsyncStorage.setItem('userId', '');
   await AsyncStorage.setItem('name', '');
   navigation.navigate('Auth');
-
-  // navigation.navigation.navigate({
-  //   name: 'Auth',
-  //   params: {
-  //     user: 'jane',
-  //   },
-  // });
 });
