@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 
 import {useDispatch} from 'react-redux';
 import { addNewInviti } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
@@ -25,9 +26,11 @@ const validationSchema = Yup.object().shape({
 const AddInviti = ({close, groupId}) => {
   const dispatch = useDispatch();
 
-  const submitHandler = values => {
+  const submitHandler = async(values) => {
+    let token = await AsyncStorage.getItem("token");
     dispatch(
       addNewInviti({
+        token:token,
         groupId :groupId,
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
@@ -38,7 +41,6 @@ const AddInviti = ({close, groupId}) => {
 
   const [fileData, setfileData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newGroup, setNewGroup] = useState({name: '', avatar_url: ''});
 
   let openCamera = () => {
     setModalVisible(!modalVisible);

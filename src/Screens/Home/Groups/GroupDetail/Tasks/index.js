@@ -1,94 +1,125 @@
 import React, {useState, useRef} from 'react';
-import {Image, StyleSheet, Text, View, FlatList, Alert} from 'react-native';
-import renderItem from './SingleTask';
-// import {FAB} from 'react-native-elements';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Alert,
+  Pressable,
+} from 'react-native';
+import RenderItem from './SingleTask';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
-import {List, Avatar, FAB, Button} from 'react-native-paper';
+import {
+  FAB,
+  Portal,
+  Provider,
+  List,
+  Avatar,
+  Button,
+  Chip,
+} from 'react-native-paper';
 
 const modalHeight = height * 0.7;
 
 const Task = () => {
+  const [currentItem, setCurrentItem] = useState({});
+
   const groupList = useSelector(state => state.groups);
-
   const modalizeRef = useRef(null);
-
-  const FABHandler = () => {
+  const FABHandler = item => {
+    setCurrentItem(item);
     modalizeRef.current?.open();
+    console.log(item);
   };
-  const [expanded, setExpanded] = React.useState(true);
 
-  return(
-    <List.Section style={{flex: 1}}>
-      <List.Accordion
-        title="Invited"
-        left={props => <List.Icon {...props} icon="check-circle" />}
-        expanded={expanded}
-        onPress={() => setExpanded(!expanded)}>
-        <FlatList
-          // numColumns={2}
-          data={groupList.tasks}
-          // style={styles.gridView}
-          renderItem={({item, section, index}) => (
-            <List.Item
-              title="title"
-              description="description"
-              left={props => (
-                <Avatar.Icon
-                  size={30}
-                  icon="account-circle-outline"
-                  style={{alignSelf: 'center'}}
-                />
-              )}
-              // right={props =>   <List.Icon {...props} icon="check-circle-outline" /> }
-              right={props => <List.Icon {...props} icon="check-circle" />}
-            />
-          )}
-        />
-      </List.Accordion>
+  const [state, setState] = React.useState({open: false});
+  const onStateChange = ({open}) => setState({open});
+  const {open} = state;
 
-      <FAB
-        icon="plus"
-        size="medium"
-        // variant='tertiary'
-        style={styles.fab}
-        onPress={() => FABHandler()}
+  return (
+    <Provider style={{flex: 1}}>
+      <FlatList
+        data={groupList.tasks}
+        renderItem={({item}) => (
+          <Pressable onPress={() => FABHandler(item)}>
+            <RenderItem item={item} />
+          </Pressable>
+        )}
+      />
+      <FAB.Group
+        open={open}
+        icon={open ? 'calendar-today' : 'plus'}
+        actions={[
+          {icon: 'plus', onPress: () => console.log('Pressed add')},
+          {
+            icon: 'star',
+            label: 'Star',
+            onPress: () => console.log('Pressed star'),
+          },
+          {
+            icon: 'email',
+            label: 'Email',
+            onPress: () => console.log('Pressed email'),
+          },
+          {
+            icon: 'bell',
+            label: 'Remind',
+            onPress: () => console.log('Pressed notifications'),
+          },
+        ]}
+        onStateChange={onStateChange}
+        onPress={() => {
+          if (open) {
+            // do something if the speed dial is open
+          }
+        }}
       />
 
       <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        {/* <AddInviti /> */}
+        <View style={{padding: '2%'}}>
+          <View style={{padding: '2%'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon name="account-group-outline" size={25} color="#BABABA" />
+
+              <Text style={{fontSize: 18, marginLeft: '1%', color: '#BABABA'}}>
+                Responsible
+              </Text>
+            </View>
+            <View></View>
+          </View>
+
+          <View style={{flexDirection:"row",alignItems:"center", justifyContent:"space-between", padding: '2%'}}>
+            <View style={{flexDirection: 'row', alignItems: "flex-end", justifyContent:"space-evenly"}}>
+              <Icon name="checkbox-intermediate" size={25} color="#BABABA" />
+              <Text style={{fontFamily:"Poppins-Regular", fontSize: 14, marginLeft: '1%', color: '#BABABA'}}>
+                Status
+              </Text>
+            </View>
+            <View>
+              <Chip icon="check" onPress={() => console.log('Pressed')}>
+                Done
+              </Chip>
+            </View>
+          </View>
+
+          <View style={{ padding: '2%'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon name="timelapse" size={25} color="#BABABA" />
+              <Text style={{fontFamily:"Poppins", fontSize: 18, marginLeft: '1%', color: '#BABABA'}}>
+                Time Remaining
+              </Text>
+            </View>
+            <View>
+            </View>
+          </View>
+        </View>
       </Modalize>
-    </List.Section>
-  )
-
-  // return (
-  //   <View style={{backgroundColor: '#fff', flex: 1}}>
-  //     <FlatList
-  //       keyExtractor={item => item.id}
-  //       data={groupList.tasks}
-  //       renderItem={item => renderItem(item)}
-  //     />
-
-  //     <FAB
-  //       onPress={() => FABHandler()}
-  //       visible={true}
-  //       placement="right"
-  //       // title="Show"
-  //       style={{
-  //         position: 'absolute',
-  //         zIndex: 1,
-  //         paddingBottom: '5%',
-  //       }}
-  //       icon={{name: 'add', color: 'white'}}
-  //       color="#334C8C"
-  //     />
-  
-  //     <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-  //       {/* <AddInviti />    */}
-  //     </Modalize>
-  //   </View>
-  // );
+    </Provider>
+  );
 };
 
 export default Task;
@@ -100,5 +131,4 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-
 });

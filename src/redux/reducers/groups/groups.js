@@ -9,7 +9,7 @@ const initialState = {
   tasks: [
     {
       id: '0',
-      name: 'Amy Farha',
+      name: 'Task Name',
       checked : true,
       date: new Date(),
       description: 'Some random text..',

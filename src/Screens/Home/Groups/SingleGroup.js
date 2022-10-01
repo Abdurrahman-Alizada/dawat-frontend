@@ -8,7 +8,16 @@ import {
   Alert,
   Pressable,
 } from 'react-native';
-import {ListItem, CheckBox, Avatar} from 'react-native-elements';
+// import {ListItem, CheckBox, Avatar} from 'react-native-elements';
+import moment from 'moment';
+import {
+  Avatar,
+  Chip,
+  Card,
+  Paragraph,
+  IconButton,
+  Title,
+} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers) {
@@ -65,7 +74,7 @@ const SingleGroup = ({item}, navigation) => {
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
       groupId: item._id,
-      groupName : item.groupName
+      groupName: item.groupName,
     });
   };
 
@@ -73,32 +82,79 @@ const SingleGroup = ({item}, navigation) => {
     console.log(item.groupName);
     Alert.alert('Hello', 'onlongPress');
   };
+  const LeftContent = props => <Avatar.Icon {...props} icon="folder" />;
+
   return (
     <Pressable
       onPress={onPressHandler}
       onLongPress={() => onLongPressHandler()}>
-      <View style={[styles.itemContainer, {backgroundColor: '#999'}]}>
-        <View style={{alignItems: 'center'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Avatar
-              containerStyle={{height: 20, width: 20}}
-              avatarStyle={{borderRadius: 50}}
-              source={require('../../../assets/images/onboarding/1.png')}
-            />
-
-            <View style={{paddingHorizontal: '5%', width: '80%'}}>
-              <Text numberOfLines={1} style={styles.itemName}>
-                {item.groupName}
-              </Text>
-              {/* <Text style={styles.itemCode}>{item.invitiDescription}</Text> */}
+      <Card
+        mode="elevated"
+        style={{
+          marginTop: '3%',
+          marginHorizontal: '3%',
+          backgroundColor: '#fff',
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            // paddingHorizontal: '2%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Card.Content>
+            <Title>Card Title</Title>
+          </Card.Content>
+          <IconButton
+            icon="dots-horizontal"
+            iconColor={'#BDBDBD'}
+            size={30}
+            onPress={() => console.log('Pressed')}
+          />
+        </View>
+        <Card.Content>
+          <Paragraph>Card content</Paragraph>
+        </Card.Content>
+        <View
+          style={{
+            height: 1,
+            width: '100%',
+            marginVertical: '1%',
+            backgroundColor: '#BDBDBD',
+          }}></View>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row'}}>
+            <View style={{marginHorizontal: '1%'}}>
+              <Chip
+                mode="outlined"
+                icon="calendar-today"
+                onPress={() => console.log('Pressed')}>
+                12
+              </Chip>
+            </View>
+            <View style={{marginHorizontal: '1%'}}>
+              <Chip
+                mode="outlined"
+                icon="account-group-outline"
+                onPress={() => console.log('Pressed')}>
+                12
+              </Chip>
+            </View>
+            <View style={{marginHorizontal: '1%'}}>
+              <Chip
+                mode="outlined"
+                icon="message-text-outline"
+                onPress={() => console.log('Pressed')}>
+                12
+              </Chip>
             </View>
           </View>
-          <View style={styles.subtitleView}>
+
+          <Card.Actions style={{justifyContent: 'space-between'}}>
             <RenderGroupMembers groupMembers={item} />
-            <Text style={styles.ratingText}>5 months </Text>
-          </View>
+          </Card.Actions>
         </View>
-      </View>
+      </Card>
     </Pressable>
   );
 };
