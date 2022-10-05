@@ -1,23 +1,6 @@
-import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Alert,
-  Pressable,
-} from 'react-native';
-// import {ListItem, CheckBox, Avatar} from 'react-native-elements';
-import moment from 'moment';
-import {
-  Avatar,
-  Chip,
-  Card,
-  Paragraph,
-  IconButton,
-  Title,
-} from 'react-native-paper';
+import React, {useState} from 'react';
+import {Image, StyleSheet, Text, View, Alert, Pressable} from 'react-native';
+import {Chip, Card, Paragraph, IconButton, Title} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers) {
@@ -70,7 +53,14 @@ const RenderGroupMembers = ({groupMembers}) => {
   );
 };
 
-const SingleGroup = ({item}, navigation) => {
+const SingleGroup = ({
+  item,
+  navigation,
+  checked,
+  setChecked,
+  checkedItems,
+  setCheckedItems,
+}) => {
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
       groupId: item._id,
@@ -78,11 +68,25 @@ const SingleGroup = ({item}, navigation) => {
     });
   };
 
+  // logic for checked on longPress
+  const [include, setInclude] = useState(checkedItems?.includes(item._id));
+  const index = checkedItems?.indexOf(item._id);
+
   const onLongPressHandler = () => {
-    console.log(item.groupName);
-    Alert.alert('Hello', 'onlongPress');
+    setChecked(true);
+    if (include) {
+      if (index !== -1 && index !== 0) {
+        checkedItems.splice(include, 1);
+        // console.log('if ',index, props.item._id);
+      } else if (index == 0) {
+        checkedItems.shift();
+      }
+    } else {
+      setCheckedItems([...checkedItems, item._id]);
+    }
+    setInclude(!include);
   };
-  const LeftContent = props => <Avatar.Icon {...props} icon="folder" />;
+  // end logic for checked on longPress
 
   return (
     <Pressable
@@ -103,17 +107,29 @@ const SingleGroup = ({item}, navigation) => {
             justifyContent: 'space-between',
           }}>
           <Card.Content>
-            <Title>Card Title</Title>
+            <Title style={{fontFamily: 'Poppins-Regular'}}>
+              {item.groupName}
+            </Title>
           </Card.Content>
-          <IconButton
-            icon="dots-horizontal"
-            iconColor={'#BDBDBD'}
-            size={30}
-            onPress={() => console.log('Pressed')}
-          />
+
+          {checked && include ? (
+            <IconButton
+              icon="check-circle"
+              iconColor={'#BDBDBD'}
+              size={30}
+              onPress={() => console.log('Pressed')}
+            />
+          ) : (
+            <IconButton
+              icon="dots-horizontal"
+              iconColor={'#BDBDBD'}
+              size={30}
+              onPress={() => console.log('Pressed')}
+            />
+          )}
         </View>
         <Card.Content>
-          <Paragraph>Card content</Paragraph>
+          <Paragraph>{item.groupDescription}</Paragraph>
         </Card.Content>
         <View
           style={{

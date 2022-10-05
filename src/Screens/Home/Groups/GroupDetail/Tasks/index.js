@@ -9,7 +9,6 @@ import {
   Pressable,
 } from 'react-native';
 import RenderItem from './SingleTask';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
@@ -22,6 +21,7 @@ import {
   Button,
   Chip,
 } from 'react-native-paper';
+import TaskBrief from './TaskBrief';
 
 const modalHeight = height * 0.7;
 
@@ -80,43 +80,7 @@ const Task = () => {
       />
 
       <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        <View style={{padding: '2%'}}>
-          <View style={{padding: '2%'}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon name="account-group-outline" size={25} color="#BABABA" />
-
-              <Text style={{fontSize: 18, marginLeft: '1%', color: '#BABABA'}}>
-                Responsible
-              </Text>
-            </View>
-            <View></View>
-          </View>
-
-          <View style={{flexDirection:"row",alignItems:"center", justifyContent:"space-between", padding: '2%'}}>
-            <View style={{flexDirection: 'row', alignItems: "flex-end", justifyContent:"space-evenly"}}>
-              <Icon name="checkbox-intermediate" size={25} color="#BABABA" />
-              <Text style={{fontFamily:"Poppins-Regular", fontSize: 14, marginLeft: '1%', color: '#BABABA'}}>
-                Status
-              </Text>
-            </View>
-            <View>
-              <Chip icon="check" onPress={() => console.log('Pressed')}>
-                Done
-              </Chip>
-            </View>
-          </View>
-
-          <View style={{ padding: '2%'}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon name="timelapse" size={25} color="#BABABA" />
-              <Text style={{fontFamily:"Poppins", fontSize: 18, marginLeft: '1%', color: '#BABABA'}}>
-                Time Remaining
-              </Text>
-            </View>
-            <View>
-            </View>
-          </View>
-        </View>
+        <TaskBrief item={currentItem} />
       </Modalize>
     </Provider>
   );

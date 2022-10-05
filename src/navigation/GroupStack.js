@@ -17,12 +17,12 @@ const AppStack = () => {
     <Stack.Screen
       name="HomeIndex"
       component={HomeIndex}
-      // options={{headerShown: false}}
-      options={{
-        header: props => (
-          <AppBar isSearch={isSearch} setIsSearch={setIsSearch} />
-        ),
-      }}
+      options={{headerShown: false}}
+      // options={{
+      //   header: props => (
+      //     <AppBar isSearch={isSearch} setIsSearch={setIsSearch} />
+      //   ),
+      // }}
 />
     <Stack.Screen
       name="AddGroup"

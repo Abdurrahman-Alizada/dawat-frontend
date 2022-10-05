@@ -1,5 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {instance} from '../../axios';
+
 export const addNewGroup = createAsyncThunk(
   'group/addNewGroup',
   async group => {
@@ -19,6 +20,31 @@ export const addNewGroup = createAsyncThunk(
       .then(response => response.json())
       .then(json => {
         console.log("adlfkj",json)
+        return json;
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  },
+);
+
+export const deleteGroupForUser = createAsyncThunk(
+  'group/deleteGroupForUser',
+  async group => {
+    return fetch('https://dawat-backend.herokuapp.com/api/group/groupremove', {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + group.token,
+      },
+      body: JSON.stringify({
+        chatId: group.groupId,
+        userId: group.userId,
+      }),
+    })
+      .then(response => response.json())
+      .then(json => {
         return json;
       })
       .catch(error => {

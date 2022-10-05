@@ -336,7 +336,7 @@ const AddGroup = ({navigation, onClose}) => {
                   backgroundColor: '#334C8C',
                 }}
                 onPress={handleSubmit}>
-                Sign in
+                Add
               </Button>
             </View>
           )}

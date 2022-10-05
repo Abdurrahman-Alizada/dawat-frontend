@@ -2,20 +2,33 @@ import React, {useEffect, useState} from 'react';
 import {Text, StyleSheet, RefreshControl, View, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
-import Header from './Header';
 import {ActivityIndicator, AnimatedFAB} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {allGroups} from '../../../redux/reducers/groups/groupThunk';
 import {Provider} from 'react-native-paper';
+import Header from '../../../Components/Appbar';
+import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
+import {deleteGroupForUser} from '../../../redux/reducers/groups/groupThunk';
+
 const Groups = ({navigation}) => {
   const [token, setToken] = React.useState('');
   const groupList = useSelector(state => state.groups);
   const animating = useSelector(state => state.groups.groupLoader);
   const dispatch = useDispatch();
 
-  const getUserInfo = async () => {
-    // console.log("token", token)
+  // groups to delete
+  const addGrouptoDelete1 = async () => {
+    let token = await AsyncStorage.getItem('token');
+    let userId = await AsyncStorage.getItem('userId');
+
+    for (i = 0; i < checkedItems.length; i++) {
+      let groupId = checkedItems[i];
+      dispatch(deleteGroupForUser({token, userId, groupId}));
+    }
+   setCheckedItems([])
+   setChecked(false)
+   getAllGroups()
   };
 
   const getAllGroups = async () => {
@@ -24,7 +37,6 @@ const Groups = ({navigation}) => {
   };
 
   useEffect(() => {
-    // getUserInfo();
     getAllGroups();
   }, []);
 
@@ -45,10 +57,27 @@ const Groups = ({navigation}) => {
 
   const fabStyle = {['right']: 16};
   // end fab
+  const [isSearch, setIsSearch] = React.useState(false);
+
+  const [checked, setChecked] = React.useState(false);
+  const [checkedItems, setCheckedItems] = React.useState([]);
+  const checkedBack = ()=>{
+    setChecked(false)
+    setCheckedItems([])
+  }
 
   return (
-    <View style={{backgroundColor: '#fff', flexGrow: 1}}>
+    <View style={{backgroundColor: '#fff', flex: 1}}>
       <Provider>
+        {checked ? (
+          <GroupCheckedHeader
+            deleteF={addGrouptoDelete1}
+            checkedBack={checkedBack}
+          />
+        ) : (
+          <Header isSearch={isSearch} setIsSearch={setIsSearch} />
+        )}
+
         {!animating ? (
           <View style={{flex: 1}}>
             {groupList.totalgroups?.length > 0 ? (
@@ -56,7 +85,26 @@ const Groups = ({navigation}) => {
                 onScroll={onScroll}
                 keyExtractor={item => item._id}
                 data={groupList.totalgroups}
-                renderItem={item => RenderItem(item, navigation)}
+                renderItem={
+                  item => (
+                    <RenderItem
+                      item={item.item}
+                      navigation={navigation}
+                      checked={checked}
+                      setChecked={setChecked}
+                      checkedItems={checkedItems}
+                      setCheckedItems={setCheckedItems}
+                    />
+                  )
+                  // RenderItem(
+                  //   item,
+                  //   navigation,
+                  //   checked,
+                  //   setChecked,
+                  //   checkedItems,
+                  //   setCheckedItems,
+                  // )
+                }
                 refreshControl={
                   <RefreshControl
                     //refresh control used for the Pull to Refresh
