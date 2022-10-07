@@ -1,12 +1,9 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {
-  Text,
-  ScrollView,
   StyleSheet,
   View,
   FlatList,
   RefreshControl,
-  Button,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
@@ -122,9 +119,17 @@ export default function Example({route}) {
         onPress={() => FABHandler()}
       />
 
-      <Modalize ref={modalizeRef} modalHeight={modalHeight}>
+      {/* <Modalize ref={modalizeRef} modalHeight={modalHeight}>
         <AddInviti close={close} groupId={groupId} />
-      </Modalize>
+      </Modalize> */}
+    <Modal 
+     animationType="slide"
+     transparent={true}
+     visible={true}
+    
+    >
+    <AddInviti close={close} groupId={groupId} />
+    </Modal>
     </View>
   );
 }

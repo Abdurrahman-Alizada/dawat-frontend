@@ -9,34 +9,36 @@ import {
 import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicons from 'react-native-vector-icons/AntDesign';
-import { Button, Input} from 'react-native-elements';
-
+import {Button, Input} from 'react-native-elements';
+import {IconButton, TextInput} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
 import {useDispatch} from 'react-redux';
-import { addNewInviti } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {addNewInviti} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const validationSchema = Yup.object().shape({
-  invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
+  invitiName: Yup.string()
+    .required('Inviti name is required')
+    .label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
 const AddInviti = ({close, groupId}) => {
   const dispatch = useDispatch();
 
-  const submitHandler = async(values) => {
-    let token = await AsyncStorage.getItem("token");
+  const submitHandler = async values => {
+    let token = await AsyncStorage.getItem('token');
     dispatch(
       addNewInviti({
-        token:token,
-        groupId :groupId,
+        token: token,
+        groupId: groupId,
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
       }),
     );
-   close()
+    close();
   };
 
   const [fileData, setfileData] = useState(null);
@@ -106,11 +108,11 @@ const AddInviti = ({close, groupId}) => {
   }
 
   return (
-    <View style={{ padding:'5%' }}>
+    <View style={{backgroundColor:"#fff", margin:"5%", borderRadius:10, padding: '5%'}}>
       <Formik
         initialValues={{
           invitiName: '',
-          invitiDescription:''
+          invitiDescription: '',
         }}
         validationSchema={validationSchema}
         onSubmit={values => submitHandler(values)}>
@@ -123,48 +125,41 @@ const AddInviti = ({close, groupId}) => {
           touched,
         }) => (
           <View style={{marginVertical: '2%'}}>
-            <Input
-            label="Enter invite name"
-            placeholder="Gulab"
-            onChangeText={handleChange('invitiName')}
-            onBlur={handleBlur('invitiName')}
-            value={values.invitiName}
-            renderErrorMessage={true}
-            errorMessage={
-                errors.invitiName && touched.invitiName ? (
-                <Text style={styles.error}>{errors.invitiName}</Text>
-                ) : (
-                ''
-                )
-            }
+            <IconButton
+              style={{alignSelf: 'center'}}
+              icon="camera"
+              mode="outlined"
+              size={30}
+              onPress={() => setModalVisible()}
             />
-        
-            <Input
-              placeholder="Optional"
+
+            <TextInput
+              error={errors.invitiName && touched.invitiName ? true : false}
+              label="Enter invite name"
+              mode="outlined"
+              style={{marginVertical: '2%', width: '100%'}}
+              onChangeText={handleChange('invitiName')}
+              onBlur={handleBlur('invitiName')}
+              value={values.invitiName}
+            />
+            {errors.invitiName && touched.invitiName ? (
+              <Text style={styles.error}>{errors.invitiName}</Text>
+            ) : null}
+
+            <TextInput
+              error={errors.invitiDescription && touched.invitiDescription ? true : false}
               label="Enter Description"
+              mode="outlined"
+              style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiDescription')}
               onBlur={handleBlur('invitiDescription')}
               value={values.invitiDescription}
             />
+            {errors.invitiDescription && touched.invitiDescription ? (
+              <Text style={styles.error}>{errors.invitiDescription}</Text>
+            ) : null}
 
             {renderFileData()}
-
-            <Button
-              onPress={() => setModalVisible(true)}
-              icon={{
-                name: 'image',
-                type: 'font-awesome',
-                size: 20,
-                color: '#333',
-              }}
-              title="Add Image "
-              titleStyle={{fontWeight: 'bold', color: '#333'}}
-              buttonStyle={{
-                backgroundColor: '#EDEEF0',
-                borderRadius: 10,
-                height: 50,
-              }}
-            />
 
             <Modal
               animationType="slide"
