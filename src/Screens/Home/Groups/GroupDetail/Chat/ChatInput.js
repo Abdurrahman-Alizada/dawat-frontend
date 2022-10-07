@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  KeyboardAvoidingView,
   TextInput,
   Platform,
   TouchableOpacity,
@@ -15,16 +16,16 @@ import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
 import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
 const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
+  const dispatch = useDispatch();
   // chat
   const [message, setMessage] = useState('');
-  const [localMessage, setLocalMessage]= useState('');
+  const [localMessage, setLocalMessage] = useState('');
   let ws = React.useRef(
     new WebSocket('wss://dawat-backend.herokuapp.com/'),
   ).current;
   // https://dawat-backend.herokuapp.com/
   // gjb7gt.sse.codesandbox.io/
   React.useEffect(() => {
-
     ws.onopen = () => {
       console.log('connected to the server');
     };
@@ -37,30 +38,34 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
       console.log('error in socket', e);
     };
 
-    ws.onmessage = e => {
-      console.log(e.data);
-      dispatch(addChat({sender:"", content:e.data}))
+    ws.onmessage = async e => {
+      // console.log(e.data);
+      let userId = await AsyncStorage.getItem('userId');
+      let addedBy = {
+        _id: await AsyncStorage.getItem('userId'),
+        email: await AsyncStorage.getItem('email'),
+        name: await AsyncStorage.getItem("name")
+      };
+      dispatch(addChat({addedBy:addedBy, content:e.data}))
     };
   }, []);
 
-
   const submitMessage = async () => {
-    let token = await AsyncStorage.getItem("token");
-    let userId = await AsyncStorage.getItem("userId");
+    let token = await AsyncStorage.getItem('token');
+    let userId = await AsyncStorage.getItem('userId');
+    
+    ws.send(message);
     dispatch(
       addNewMessage({
         content: message,
-        groupId:groupId,
-        addedBy : userId,
-        token:token,
+        groupId: groupId,
+        addedBy: userId,
+        token: token,
       }),
     );
-    ws.send(message);
     setMessage('');
   };
   // end chat
-
-  const dispatch = useDispatch();
 
   return (
     <View style={[styles.container]}>
@@ -75,7 +80,7 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
           <Text style={styles.reply}>{reply}</Text>
         </View>
       ) : null}
-      <View style={styles.innerContainer}>
+      <KeyboardAvoidingView style={styles.innerContainer}>
         <View style={styles.inputAndMicrophone}>
           <TextInput
             multiline
@@ -98,7 +103,7 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
           }}>
           <Icon name="send" size={23} color="#fff" />
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

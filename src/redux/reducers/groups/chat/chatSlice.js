@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import {allMessages} from './chatThunk';
+import {allMessages, addNewMessage} from './chatThunk';
 
 const initialState = {   
     messages : [],
@@ -12,7 +12,7 @@ export const chatSlice = createSlice({
     addChat: (state, action) =>{
       console.log(action.payload)
       const newchat = {
-        sender : action.payload.user,
+        addedBy : action.payload.addedBy,
         content : action.payload.content,
         groupId : action.groupId
       }
@@ -33,7 +33,28 @@ export const chatSlice = createSlice({
         // state.groupLoader = false
         console.log('rejected');
       },
-  
+      
+
+      [addNewMessage.pending]: state => {
+        console.log('pending');
+        // state.groupLoader = true;
+      },
+      [addNewMessage.fulfilled]: (state, {payload}) => {
+        // state.groupLoader = false
+        // state.messages = payload;
+        console.log("messages is,", payload)
+        // const newchat = {
+        //   addedBy : payload.addedBy,
+        //   content : payload.content,
+        //   groupId : payload.group._id
+        // }
+        // state.messages.push(newchat)
+      },
+      [addNewMessage.rejected]: state => {
+        // state.groupLoader = false
+        console.log('rejected');
+      },
+   
   }
 })
 
