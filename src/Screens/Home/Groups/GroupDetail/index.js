@@ -2,7 +2,6 @@ import React, {useState, useRef, useEffect} from 'react';
 import {View, Text} from 'react-native';
 import Chat from './Chat';
 import Tasks from './Tasks';
-import Header from './Header';
 import Invitations from './Invitations';
 import {Badge} from 'react-native-elements';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -148,8 +147,7 @@ const Index = ({route}) => {
 
   return (
     <View style={{flex: 1}}>
-      {/* <Header navigation={navigation} title='title' onOpen={onOpen} /> */}
-      <GroupHeader groupName={groupName} onOpen={onOpen} />
+      <GroupHeader group={route.params} onOpen={onOpen} />
       <Tabs groupId={groupId} />
 
       <Modalize

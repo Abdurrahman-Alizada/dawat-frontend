@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {Text,StyleSheet, View, TouchableOpacity} from 'react-native';
 import {Header as HeaderRNE, Icon} from 'react-native-elements';
 import {width} from '../../../../GlobalStyles';
 import {SearchBar} from 'react-native-elements';
