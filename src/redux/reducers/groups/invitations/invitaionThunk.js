@@ -1,5 +1,22 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+
+// query
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+export const api = createApi({
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
+  reducerPath: 'pokemonApi',
+  endpoints: (build) => ({
+    getPokemonByName: build.query({
+      query: (name) => `pokemon/${name}`,
+    }),
+  }),
+})
+
+export const { useGetPokemonByNameQuery } = api
+//end query
+
 // return fetch('http://192.168.23.212:8000/api/group/addNewGroup/62fb751bc32b5a340888c625', {
 export const addNewInviti = createAsyncThunk(
   'group/inviti/addNewInviti',
