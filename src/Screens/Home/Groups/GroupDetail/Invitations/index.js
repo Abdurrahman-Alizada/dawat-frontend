@@ -37,8 +37,11 @@ export default function Example({route}) {
     getAllInvitations();
   }, []);
 
+  const [visible, setVisible]=useState(false)
+
+
   const FABHandler = () => {
-    modalizeRef.current?.open();
+   setVisible(true)
   };
   const close = () => {
     modalizeRef.current?.close();
@@ -124,11 +127,9 @@ export default function Example({route}) {
       </Modalize> */}
     <Modal 
      animationType="slide"
-     transparent={true}
-     visible={true}
-    
+     visible={visible}
     >
-    <AddInviti close={close} groupId={groupId} />
+    <AddInviti setVisible={setVisible} groupId={groupId} />
     </Modal>
     </View>
   );

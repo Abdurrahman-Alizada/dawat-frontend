@@ -10,7 +10,7 @@ import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicons from 'react-native-vector-icons/AntDesign';
 import {Button, Input} from 'react-native-elements';
-import {IconButton, TextInput} from 'react-native-paper';
+import {Avatar, IconButton, TextInput} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
@@ -25,7 +25,7 @@ const validationSchema = Yup.object().shape({
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
-const AddInviti = ({close, groupId}) => {
+const AddInviti = ({setVisible, groupId}) => {
   const dispatch = useDispatch();
 
   const submitHandler = async values => {
@@ -38,7 +38,7 @@ const AddInviti = ({close, groupId}) => {
         invitiDescription: values.invitiDescription,
       }),
     );
-    close();
+   setVisible(false)
   };
 
   const [fileData, setfileData] = useState(null);
@@ -56,6 +56,8 @@ const AddInviti = ({close, groupId}) => {
       setfileData(image);
       console.log(image);
     });
+    setModalVisible(false);
+
   };
 
   let openGallery = () => {
@@ -70,45 +72,45 @@ const AddInviti = ({close, groupId}) => {
       setfileData(image);
       console.log(image);
     });
+    setModalVisible(false);
+
   };
 
-  let removePicture = () => {
-    ImagePicker.clean()
-      .then(() => {
-        setfileData(null);
-        console.log('removed all tmp images from tmp directory');
-      })
-      .catch(e => {
-        alert(e);
-      });
-  };
+  // let removePicture = () => {
+  //   ImagePicker.clean()
+  //     .then(() => {
+  //       setfileData(null);
+  //       console.log('removed all tmp images from tmp directory');
+  //     })
+  //     .catch(e => {
+  //       alert(e);
+  //     });
+  // };
   function renderFileData() {
     if (fileData) {
       return (
-        <View style={styles.images}>
-          <Image source={{uri: fileData.path}} style={styles.images} />
-          <Ionicons
-            name="close"
-            color="black"
-            size={25}
-            onPress={removePicture}
-            style={{
-              position: 'absolute',
-              right: -5,
-              top: -5,
-              borderRadius: 50,
-              backgroundColor: '#fff',
-            }}
-          />
-        </View>
+        <Avatar.Image size={60} source={{uri: fileData.path}} />
       );
     } else {
-      return <View></View>;
+      return   <Avatar.Icon size={60} icon="account-circle-outline" />
     }
   }
 
   return (
-    <View style={{backgroundColor:"#fff", margin:"5%", borderRadius:10, padding: '5%'}}>
+    <View
+      style={{
+        backgroundColor: '#fff',
+        margin: '5%',
+        borderRadius: 10,
+        padding: '5%',
+      }}>
+      <IconButton
+        style={{position: 'absolute', right: 5}}
+        icon="close-circle-outline"
+        // mode="outlined"
+        size={30}
+        onPress={() => setVisible(false)}
+      />
       <Formik
         initialValues={{
           invitiName: '',
@@ -125,13 +127,19 @@ const AddInviti = ({close, groupId}) => {
           touched,
         }) => (
           <View style={{marginVertical: '2%'}}>
-            <IconButton
+            <TouchableOpacity
+              onPress={() => setModalVisible()}
+              style={{alignSelf: 'center'}}>
+              {renderFileData()}
+            </TouchableOpacity>
+
+            {/* <IconButton
               style={{alignSelf: 'center'}}
               icon="camera"
               mode="outlined"
               size={30}
               onPress={() => setModalVisible()}
-            />
+            /> */}
 
             <TextInput
               error={errors.invitiName && touched.invitiName ? true : false}
@@ -147,7 +155,11 @@ const AddInviti = ({close, groupId}) => {
             ) : null}
 
             <TextInput
-              error={errors.invitiDescription && touched.invitiDescription ? true : false}
+              error={
+                errors.invitiDescription && touched.invitiDescription
+                  ? true
+                  : false
+              }
               label="Enter Description"
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
@@ -159,9 +171,8 @@ const AddInviti = ({close, groupId}) => {
               <Text style={styles.error}>{errors.invitiDescription}</Text>
             ) : null}
 
-            {renderFileData()}
-
             <Modal
+              onBlur={() => setModalVisible(false)}
               animationType="slide"
               transparent={true}
               visible={modalVisible}
@@ -169,17 +180,32 @@ const AddInviti = ({close, groupId}) => {
                 setModalVisible(!modalVisible);
               }}>
               <View style={styles.centeredView}>
-                <View style={[styles.modalView, {width: 350, height: 340}]}>
-                  <TouchableOpacity
+                <View
+                  style={[
+                    styles.modalView,
+                    {position: 'absolute', width: '100%'},
+                  ]}>
+                  <IconButton
+                    style={{position: 'absolute', right: 5}}
+                    icon="close-circle-outline"
+                    // mode="outlined"
+                    size={30}
+                    onPress={() => setModalVisible(false)}
+                  />
+                  <IconButton
+                    style={{marginHorizontal: '2%'}}
+                    icon="camera-image"
+                    mode="outlined"
+                    size={40}
                     onPress={openCamera}
-                    style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                    <Text style={styles.buttonTextStyle}>Choose File</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
+                  />
+                  <IconButton
+                    style={{marginHorizontal: '2%'}}
+                    icon="image-outline"
+                    mode="outlined"
+                    size={40}
                     onPress={openGallery}
-                    style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                    <Text style={styles.buttonTextStyle}>Open Gallery</Text>
-                  </TouchableOpacity>
+                  />
                 </View>
               </View>
             </Modal>
@@ -237,22 +263,13 @@ const styles = StyleSheet.create({
 
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   modalView: {
-    margin: 20,
+    flexDirection: 'row',
     backgroundColor: 'white',
-    justifyContent: 'center',
-    borderRadius: 20,
-    width: 100,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    padding: '5%',
+    // justifyContent: 'center',
   },
 });
