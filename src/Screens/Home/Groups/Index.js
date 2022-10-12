@@ -5,47 +5,44 @@ import RenderItem from './SingleGroup';
 import {ActivityIndicator, AnimatedFAB} from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {allGroups} from '../../../redux/reducers/groups/groupThunk';
+import  {
+  groupApi,
+  useGetAllGroupsQuery,
+  useDeleteGroupForUserMutation,
+} from '../../../redux/reducers/groups/groupThunk';
 import {Provider} from 'react-native-paper';
 import Header from '../../../Components/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
-import {deleteGroupForUser} from '../../../redux/reducers/groups/groupThunk';
-
 const Groups = ({navigation}) => {
-  const [token, setToken] = React.useState('');
-  const groupList = useSelector(state => state.groups);
   const animating = useSelector(state => state.groups.groupLoader);
-  const dispatch = useDispatch();
+
+  // const [getAllGroups, {data: allGroups, isError, isLoading, error}] = useGetAllGroupsQuery();
+  const  {data: allGroups, isError, isLoading, error} = useGetAllGroupsQuery();
+  const [deleteGroupForUser, {isLoading: deleteLoading}] =
+    useDeleteGroupForUserMutation();
 
   // groups to delete
   const addGrouptoDelete1 = async () => {
-    let token = await AsyncStorage.getItem('token');
     let userId = await AsyncStorage.getItem('userId');
 
     for (i = 0; i < checkedItems.length; i++) {
       let groupId = checkedItems[i];
-      dispatch(deleteGroupForUser({token, userId, groupId}));
+      deleteGroupForUser({userId, groupId});
     }
-   setCheckedItems([])
-   setChecked(false)
-   getAllGroups()
+    setCheckedItems([]);
+    setChecked(false);
   };
-
-  const getAllGroups = async () => {
-    let token = await AsyncStorage.getItem('token');
-    dispatch(allGroups({token}));
-  };
-
-  useEffect(() => {
-    getAllGroups();
-  }, []);
 
   const onOpen = () => {
     navigation.navigate('AddGroup');
   };
 
-  // fab
+  //  const adkfj = groupApi.endpoints.getAllGroups.useQuery()
+  // const onRefreshHandler = ()=>{
+  // }
 
+  // fab
+  
   const [isExtended, setIsExtended] = React.useState(true);
 
   const onScroll = ({nativeEvent}) => {
@@ -61,10 +58,10 @@ const Groups = ({navigation}) => {
 
   const [checked, setChecked] = React.useState(false);
   const [checkedItems, setCheckedItems] = React.useState([]);
-  const checkedBack = ()=>{
-    setChecked(false)
-    setCheckedItems([])
-  }
+  const checkedBack = () => {
+    setChecked(false);
+    setCheckedItems([]);
+  };
 
   return (
     <View style={{backgroundColor: '#fff', flex: 1}}>
@@ -78,38 +75,28 @@ const Groups = ({navigation}) => {
           <Header isSearch={isSearch} setIsSearch={setIsSearch} />
         )}
 
-        {!animating ? (
+        {!isLoading ? (
           <View style={{flex: 1}}>
-            {groupList.totalgroups?.length > 0 ? (
+            {allGroups?.length > 0 ? (
               <FlatList
                 onScroll={onScroll}
                 keyExtractor={item => item._id}
-                data={groupList.totalgroups}
-                renderItem={
-                  item => (
-                    <RenderItem
-                      item={item.item}
-                      navigation={navigation}
-                      checked={checked}
-                      setChecked={setChecked}
-                      checkedItems={checkedItems}
-                      setCheckedItems={setCheckedItems}
-                    />
-                  )
-                  // RenderItem(
-                  //   item,
-                  //   navigation,
-                  //   checked,
-                  //   setChecked,
-                  //   checkedItems,
-                  //   setCheckedItems,
-                  // )
-                }
+                data={allGroups}
+                renderItem={item => (
+                  <RenderItem
+                    item={item.item}
+                    navigation={navigation}
+                    checked={checked}
+                    setChecked={setChecked}
+                    checkedItems={checkedItems}
+                    setCheckedItems={setCheckedItems}
+                  />
+                )}
                 refreshControl={
                   <RefreshControl
                     //refresh control used for the Pull to Refresh
-                    refreshing={animating}
-                    onRefresh={getAllGroups}
+                    refreshing={isLoading}
+                    // onRefresh={()=>adkfj()}
                   />
                 }
               />

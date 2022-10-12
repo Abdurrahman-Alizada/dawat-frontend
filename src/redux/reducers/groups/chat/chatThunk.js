@@ -1,6 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import { instance } from '../../../axios';
-// return fetch('http://192.168.23.212:8000/api/group/addNewGroup/62fb751bc32b5a340888c625', {
 export const addNewMessage = createAsyncThunk(
   'group/addNewMessage',
   async message => {

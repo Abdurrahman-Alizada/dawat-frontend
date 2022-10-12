@@ -28,7 +28,7 @@ import {
 } from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {addNewGroup} from '../../../redux/reducers/groups/groupThunk';
+import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),
@@ -54,15 +54,19 @@ const AddGroup = ({navigation, onClose}) => {
 
   const dispatch = useDispatch();
 
+  const [addGroup, {isLoading}] = useAddGroupMutation();
+
   const submitHandler = async values => {
-    const token = await AsyncStorage.getItem('token');
-    dispatch(
-      addNewGroup({
-        token: token,
-        groupName: values.groupName,
-        members: users,
-      }),
-    );
+    await addGroup({
+      groupName: values.groupName,
+      members: users,
+    })
+      .then(response => {
+        console.log('new created group is =>', response);
+      })
+      .catch(e => {
+        console.log(e);
+      });
     navigation.navigate('HomeIndex');
   };
 
@@ -141,7 +145,7 @@ const AddGroup = ({navigation, onClose}) => {
           users.splice(include, 1);
           usersList.splice(include, 1);
           // console.log('if ',index, props.item._id);
-        }else if(index == 0) {
+        } else if (index == 0) {
           users.shift();
           usersList.shift();
         }

@@ -1,57 +1,61 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {instance} from '../../axios';
 
-export const addNewGroup = createAsyncThunk(
-  'group/addNewGroup',
-  async group => {
-    return fetch('https://dawat-backend.herokuapp.com/api/group/group', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + group.token,
-      },
-      body: JSON.stringify({
-        // id: group.id,
-        groupName: group.groupName,
-        users: group.members,
+// query
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import AsyncStorage from '@react-native-community/async-storage';
+export const groupApi = createApi({
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://dawat-backend.herokuapp.com',
+    prepareHeaders: async (headers, {getState}) => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['Groups'],
+  reducerPath: 'groupApi',
+  endpoints: build => ({
+    getAllGroups: build.query({
+      query: () => `/api/group`,
+      providesTags: ['Groups'],
+    }),
+    addGroup: build.mutation({
+      query: group => ({
+        url: `/api/group/group`,
+        method: 'POST',
+        body: {
+          groupName: group.groupName,
+          users: group.members,
+        },
       }),
-    })
-      .then(response => response.json())
-      .then(json => {
-        console.log("adlfkj",json)
-        return json;
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  },
-);
+      invalidatesTags: ['Groups'],
+    }),
 
-export const deleteGroupForUser = createAsyncThunk(
-  'group/deleteGroupForUser',
-  async group => {
-    return fetch('https://dawat-backend.herokuapp.com/api/group/groupremove', {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + group.token,
-      },
-      body: JSON.stringify({
-        chatId: group.groupId,
-        userId: group.userId,
+    deleteGroupForUser: build.mutation({
+      query: group => ({
+        url: `/api/group/groupremove`,
+        method: 'PUT',
+        body: {
+          chatId: group.groupId,
+          userId: group.userId,
+        },
       }),
-    })
-      .then(response => response.json())
-      .then(json => {
-        return json;
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  },
-);
+      invalidatesTags: ['Groups'],
+    }),
+  }),
+});
+
+export const {
+  useGetAllGroupsQuery,
+  useAddGroupMutation,
+  useDeleteGroupForUserMutation,
+} = groupApi;
+
+// end query
+
 
 export const allGroups = createAsyncThunk(
   'group/allGroups',
