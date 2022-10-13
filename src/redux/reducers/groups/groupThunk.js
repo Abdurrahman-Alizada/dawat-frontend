@@ -57,30 +57,6 @@ export const {
 // end query
 
 
-export const allGroups = createAsyncThunk(
-  'group/allGroups',
-  async ({token}) => {
-    const data = await instance
-      .get('/api/group', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        // console.log("response is", response.data)
-        return response.data;
-      })
-      .catch(e => {
-        console.log('error in group is', e);
-      });
-    if (data.length > 0) {
-      return data;
-    } else {
-      return [];
-    }
-  },
-);
-
 export const allInvitations = createAsyncThunk(
   'group/allInvitations',
   async token => {

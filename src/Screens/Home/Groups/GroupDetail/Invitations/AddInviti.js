@@ -1,22 +1,17 @@
 import {
   TouchableOpacity,
   Text,
-  Image,
   StyleSheet,
   Modal,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
-import Ionicons from 'react-native-vector-icons/AntDesign';
-import {Button, Input} from 'react-native-elements';
-import {Avatar, IconButton, TextInput} from 'react-native-paper';
+import {Avatar, IconButton, TextInput, Button} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
-import {useDispatch} from 'react-redux';
-import {addNewInviti} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import AsyncStorage from '@react-native-community/async-storage';
+import {useAddInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
@@ -26,19 +21,21 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddInviti = ({setVisible, groupId}) => {
-  const dispatch = useDispatch();
+  const [addInviti, {isLoading}] = useAddInvitiMutation();
 
   const submitHandler = async values => {
-    let token = await AsyncStorage.getItem('token');
-    dispatch(
-      addNewInviti({
-        token: token,
-        groupId: groupId,
-        invitiName: values.invitiName,
-        invitiDescription: values.invitiDescription,
-      }),
-    );
-   setVisible(false)
+    await addInviti({
+      groupId: groupId,
+      invitiName: values.invitiName,
+      invitiDescription: values.invitiDescription,
+    })
+      .then(response => {
+        console.log('new created group is =>', response);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+    setVisible(false);
   };
 
   const [fileData, setfileData] = useState(null);
@@ -57,7 +54,6 @@ const AddInviti = ({setVisible, groupId}) => {
       console.log(image);
     });
     setModalVisible(false);
-
   };
 
   let openGallery = () => {
@@ -73,7 +69,6 @@ const AddInviti = ({setVisible, groupId}) => {
       console.log(image);
     });
     setModalVisible(false);
-
   };
 
   // let removePicture = () => {
@@ -88,11 +83,9 @@ const AddInviti = ({setVisible, groupId}) => {
   // };
   function renderFileData() {
     if (fileData) {
-      return (
-        <Avatar.Image size={60} source={{uri: fileData.path}} />
-      );
+      return <Avatar.Image size={60} source={{uri: fileData.path}} />;
     } else {
-      return   <Avatar.Icon size={60} icon="account-circle-outline" />
+      return <Avatar.Icon size={60} icon="account-circle-outline" />;
     }
   }
 
@@ -192,36 +185,43 @@ const AddInviti = ({setVisible, groupId}) => {
                     size={30}
                     onPress={() => setModalVisible(false)}
                   />
-                  <IconButton
-                    style={{marginHorizontal: '2%'}}
-                    icon="camera-image"
-                    mode="outlined"
-                    size={40}
-                    onPress={openCamera}
-                  />
-                  <IconButton
-                    style={{marginHorizontal: '2%'}}
-                    icon="image-outline"
-                    mode="outlined"
-                    size={40}
-                    onPress={openGallery}
-                  />
+                  <View style={{alignItems: 'center'}}>
+                    <IconButton
+                      style={{marginHorizontal: '2%'}}
+                      icon="camera-image"
+                      mode="outlined"
+                      size={40}
+                      onPress={openCamera}
+                    />
+                    <Text>Camera</Text>
+                  </View>
+                  <View style={{alignItems: 'center'}}>
+                    <IconButton
+                      style={{marginHorizontal: '2%'}}
+                      icon="image-outline"
+                      mode="outlined"
+                      size={40}
+                      onPress={openGallery}
+                    />
+                    <Text>Gallery</Text>
+                  </View>
                 </View>
               </View>
             </Modal>
-
             <Button
+              loading={isLoading}
+              mode="contained"
               onPress={handleSubmit}
-              title="Add "
-              titleStyle={{fontWeight: 'bold', width: '70%'}}
-              buttonStyle={{
+              style={{
                 backgroundColor: '#334C8C',
                 borderRadius: 10,
                 borderColor: '#C1C2B8',
                 borderWidth: 0.5,
-                height: 50,
-              }}
-            />
+                padding: '1%',
+                marginVertical: '2%',
+              }}>
+              Add
+            </Button>
           </View>
         )}
       </Formik>

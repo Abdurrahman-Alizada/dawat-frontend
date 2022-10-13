@@ -1,15 +1,13 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
+import {StyleSheet,Text, View, FlatList, RefreshControl} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
-import {allInvitations} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {
+  allInvitations,
+  useGetAllInvitationsQuery,
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {
   List,
   Avatar,
@@ -29,6 +27,11 @@ export default function Example({route}) {
   const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
+
+  const {data, isError, isLoading, error} = useGetAllInvitationsQuery({
+    groupId,
+  });
+
   const getAllInvitations = async () => {
     let token = await AsyncStorage.getItem('token');
     dispatch(allInvitations({token, groupId}));
@@ -37,11 +40,10 @@ export default function Example({route}) {
     getAllInvitations();
   }, []);
 
-  const [visible, setVisible]=useState(false)
-
+  const [visible, setVisible] = useState(false);
 
   const FABHandler = () => {
-   setVisible(true)
+    setVisible(true);
   };
   const close = () => {
     modalizeRef.current?.close();
@@ -61,7 +63,7 @@ export default function Example({route}) {
     <View style={{flex: 1}}>
       <View
         style={{
-          flexDirection:"row",
+          flexDirection: 'row',
           padding: '2%',
           width: '100%',
           justifyContent: 'space-between',
@@ -78,7 +80,7 @@ export default function Example({route}) {
         ))}
       </View>
 
-      {animating ? (
+      {isLoading ? (
         <View
           style={{
             alignSelf: 'center',
@@ -88,30 +90,36 @@ export default function Example({route}) {
           <ActivityIndicator animating={animating} />
         </View>
       ) : (
-        <FlatList
-          data={invitationList}
-          keyExtractor={item => item._id}
-          renderItem={({item, section, index}) => (
-            <List.Item
-              title={item.invitiName}
-              description={item.invitiDescription}
-              left={props => (
-                <Avatar.Icon
-                  size={30}
-                  icon="account-circle-outline"
-                  style={{alignSelf: 'center'}}
+        <View>
+          {data.length > 0 ? (
+            <FlatList
+              data={data}
+              keyExtractor={item => item._id}
+              renderItem={({item, section, index}) => (
+                <List.Item
+                  title={item.invitiName}
+                  description={item.invitiDescription}
+                  left={props => (
+                    <Avatar.Icon
+                      size={30}
+                      icon="account-circle-outline"
+                      style={{alignSelf: 'center'}}
+                    />
+                  )}
+                  right={props => <List.Icon {...props} icon="check-circle" />}
                 />
               )}
-              right={props => <List.Icon {...props} icon="check-circle" />}
+              refreshControl={
+                <RefreshControl
+                  refreshing={animating}
+                  onRefresh={getAllInvitations}
+                />
+              }
             />
+          ) : (
+            <Text>No Invitation yet</Text>
           )}
-          refreshControl={
-            <RefreshControl
-              refreshing={animating}
-              onRefresh={getAllInvitations}
-            />
-          }
-        />
+        </View>
       )}
 
       <FAB
@@ -122,15 +130,9 @@ export default function Example({route}) {
         onPress={() => FABHandler()}
       />
 
-      {/* <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        <AddInviti close={close} groupId={groupId} />
-      </Modalize> */}
-    <Modal 
-     animationType="slide"
-     visible={visible}
-    >
-    <AddInviti setVisible={setVisible} groupId={groupId} />
-    </Modal>
+      <Modal animationType="slide" visible={visible}>
+        <AddInviti setVisible={setVisible} groupId={groupId} />
+      </Modal>
     </View>
   );
 }

@@ -5,7 +5,7 @@ import taskReducer from './reducers/tasks';
 import chatReducer from './reducers/groups/chat/chatSlice';
 import invitationSlice from './reducers/groups/invitations/invitationSlice';
 
-import {api} from './reducers/groups/invitations/invitaionThunk';
+import {InvitaionsApi} from './reducers/groups/invitations/invitaionThunk';
 import {groupApi} from './reducers/groups/groupThunk';
 
 export const store = configureStore({
@@ -15,12 +15,12 @@ export const store = configureStore({
     tasks: taskReducer,
     chat: chatReducer,
     invitations: invitationSlice,
-    [api.reducerPath]: api.reducer,
+    [InvitaionsApi.reducerPath]: InvitaionsApi.reducer,
     [groupApi.reducerPath]: groupApi.reducer,
   },
 
   middleware: getdefaultMiddleware =>
     getdefaultMiddleware({
       serializableCheck: false,
-    }).concat([api.middleware, groupApi.middleware]),
+    }).concat([InvitaionsApi.middleware, groupApi.middleware]),
 });

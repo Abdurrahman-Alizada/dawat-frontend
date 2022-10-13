@@ -1,19 +1,47 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-// query
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import {instance} from '../../axios';
 
-export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
-  reducerPath: 'pokemonApi',
-  endpoints: (build) => ({
-    getPokemonByName: build.query({
-      query: (name) => `pokemon/${name}`,
+// query
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import AsyncStorage from '@react-native-community/async-storage';
+
+export const InvitaionsApi = createApi({
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://dawat-backend.herokuapp.com',
+    prepareHeaders: async (headers) => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['Invitations'],
+  reducerPath: 'InvitationsApi',
+  endpoints: build => ({
+    getAllInvitations: build.query({
+      query: ({groupId}) => `/api/group/invitations/${groupId}`,
+      providesTags: ['Invitations'],
+    }),
+    addInviti: build.mutation({
+      query: message => ({
+        url: `/api/group/invitations`,
+        method: 'POST',
+        body: {
+          invitiName: message.invitiName,
+          invitiDescription: message.invitiDescription,
+          groupId: message.groupId,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
     }),
   }),
-})
+});
 
-export const { useGetPokemonByNameQuery } = api
-//end query
+export const {
+  useGetAllInvitationsQuery,
+  useAddInvitiMutation,
+} = InvitaionsApi;
 
 export const addNewInviti = createAsyncThunk(
   'group/inviti/addNewInviti',
