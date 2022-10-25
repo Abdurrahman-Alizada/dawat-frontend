@@ -1,17 +1,14 @@
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Modal,
-  View,
-} from 'react-native';
+import {TouchableOpacity, Text, StyleSheet, Modal, View} from 'react-native';
 import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Avatar, IconButton, TextInput, Button} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 
-import {useAddInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {
+  useAddInvitiMutation,
+  useUpdateInvitiMutation,
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
@@ -20,8 +17,10 @@ const validationSchema = Yup.object().shape({
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
-const AddInviti = ({setVisible, groupId}) => {
+const AddInviti = ({setVisible, groupId, currentInviti}) => {
+
   const [addInviti, {isLoading}] = useAddInvitiMutation();
+  const [updateInviti, {isLoading : updateLoading}] = useUpdateInvitiMutation();
 
   const submitHandler = async values => {
     await addInviti({
@@ -34,6 +33,21 @@ const AddInviti = ({setVisible, groupId}) => {
       })
       .catch(e => {
         console.log(e);
+      });
+    setVisible(false);
+  };
+
+  const updateHandler = async values => {
+    await updateInviti({
+      invitiId: currentInviti?._id,
+      invitiName: values.invitiName,
+      invitiDescription: values.invitiDescription,
+    })
+      .then(response => {
+        console.log('group has been updated =>', response);
+      })
+      .catch(e => {
+        console.log("updateHandler error",e);
       });
     setVisible(false);
   };
@@ -106,8 +120,8 @@ const AddInviti = ({setVisible, groupId}) => {
       />
       <Formik
         initialValues={{
-          invitiName: '',
-          invitiDescription: '',
+          invitiName: currentInviti?.invitiName,
+          invitiDescription: currentInviti?.invitiDescription,
         }}
         validationSchema={validationSchema}
         onSubmit={values => submitHandler(values)}>
@@ -208,20 +222,37 @@ const AddInviti = ({setVisible, groupId}) => {
                 </View>
               </View>
             </Modal>
-            <Button
-              loading={isLoading}
-              mode="contained"
-              onPress={handleSubmit}
-              style={{
-                backgroundColor: '#334C8C',
-                borderRadius: 10,
-                borderColor: '#C1C2B8',
-                borderWidth: 0.5,
-                padding: '1%',
-                marginVertical: '2%',
-              }}>
-              Add
-            </Button>
+            {currentInviti?.invitiName ? (
+              <Button
+                loading={updateLoading}
+                mode="contained"
+                onPress={updateHandler}
+                style={{
+                  backgroundColor: '#334C8C',
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '1%',
+                  marginVertical: '2%',
+                }}>
+                Update
+              </Button>
+            ) : (
+              <Button
+                loading={isLoading}
+                mode="contained"
+                onPress={handleSubmit}
+                style={{
+                  backgroundColor: '#334C8C',
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '1%',
+                  marginVertical: '2%',
+                }}>
+                Add
+              </Button>
+            )}
           </View>
         )}
       </Formik>

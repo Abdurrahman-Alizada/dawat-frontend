@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {StyleSheet,Text, View, FlatList, RefreshControl} from 'react-native';
+import {StyleSheet, Text, View, FlatList, RefreshControl} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
@@ -22,8 +22,6 @@ const modalHeight = height * 0.7;
 
 export default function Example({route}) {
   const {groupId} = route.params;
-
-  const invitationList = useSelector(state => state.invitations.invitations);
   const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
@@ -41,12 +39,11 @@ export default function Example({route}) {
   }, []);
 
   const [visible, setVisible] = useState(false);
+  const [currentInviti, setCurrentInviti] = useState({});
 
-  const FABHandler = () => {
+  const FABHandler = (item) => {
+    setCurrentInviti(item ? item: { })
     setVisible(true);
-  };
-  const close = () => {
-    modalizeRef.current?.close();
   };
 
   const [chips, setChips] = useState([
@@ -95,17 +92,20 @@ export default function Example({route}) {
             <FlatList
               data={data}
               keyExtractor={item => item._id}
-              renderItem={({item, section, index}) => (
+              renderItem={({item}) => (
                 <List.Item
+                  onPress={()=>FABHandler(item)}
                   title={item.invitiName}
                   description={item.invitiDescription}
                   left={props => (
-                    <Avatar.Icon
-                      size={30}
-                      icon="account-circle-outline"
-                      style={{alignSelf: 'center'}}
+                    <Avatar.Image 
+                      size={45}
+                      style={{alignSelf:"center"}}
+                      avatarStyle={{borderRadius: 20}}
+                      source={require('../../../../../assets/drawer/userImage.png')}
                     />
                   )}
+                  style={{paddingVertical: '1%'}}
                   right={props => <List.Icon {...props} icon="check-circle" />}
                 />
               )}
@@ -131,7 +131,7 @@ export default function Example({route}) {
       />
 
       <Modal animationType="slide" visible={visible}>
-        <AddInviti setVisible={setVisible} groupId={groupId} />
+        <AddInviti setVisible={setVisible} groupId={groupId} currentInviti={currentInviti} />
       </Modal>
     </View>
   );

@@ -15,8 +15,8 @@ const SingleInviti = ({item}, navigation) => {
     <View style={[styles.itemContainer, {backgroundColor: "#999"}]}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Avatar
-          containerStyle={{height: 50, width: 50}}
-          avatarStyle={{borderRadius: 50}}
+          containerStyle={{height: 60, width: 60}}
+          avatarStyle={{borderRadius: 20}}
           source={require('../../../../../assets/images/onboarding/1.png')}
         />
 

@@ -39,7 +39,7 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
             <Appbar.BackAction onPress={() => navigation.goBack()} />
             <Appbar.Content
              onPress={()=>{
-              navigation.navigate("SingleGroupSettings")
+              navigation.navigate("SingleGroupSettings", {group:group})
              }}
              title={group.groupName}
               titleStyle={{alignSelf: 'center'}}

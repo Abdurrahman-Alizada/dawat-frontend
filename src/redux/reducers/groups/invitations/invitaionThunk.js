@@ -35,12 +35,25 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    updateInviti: build.mutation({
+      query: inviti => ({
+        url: `/api/group/invitations/update`,
+        method: 'PUT',
+        body: {
+          invitiId: inviti.invitiId,
+          invitiName: inviti.invitiName,
+          invitiDescription: inviti.invitiDescription,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
   }),
 });
 
 export const {
   useGetAllInvitationsQuery,
   useAddInvitiMutation,
+  useUpdateInvitiMutation
 } = InvitaionsApi;
 
 export const addNewInviti = createAsyncThunk(

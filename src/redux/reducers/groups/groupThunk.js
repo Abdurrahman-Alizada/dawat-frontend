@@ -34,6 +34,18 @@ export const groupApi = createApi({
       invalidatesTags: ['Groups'],
     }),
 
+    updateGroupInfo: build.mutation({
+      query: group => ({
+        url: `/api/group/rename`,
+        method: 'PUT',
+        body: {
+          chatId: group.groupId,
+          groupName: group.groupName,
+        },
+      }),
+      invalidatesTags: ['Groups'],
+    }),
+
     deleteGroupForUser: build.mutation({
       query: group => ({
         url: `/api/group/groupremove`,
@@ -52,10 +64,10 @@ export const {
   useGetAllGroupsQuery,
   useAddGroupMutation,
   useDeleteGroupForUserMutation,
+  useUpdateGroupInfoMutation
 } = groupApi;
 
 // end query
-
 
 export const allInvitations = createAsyncThunk(
   'group/allInvitations',

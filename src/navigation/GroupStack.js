@@ -5,12 +5,11 @@ import HomeIndex from '../Screens/Home/Groups/Index';
 import AddGroup from '../Screens/Home/Groups/AddGroup';
 import GroupDetail from '../Screens/Home/Groups/GroupDetail';
 import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSettings/Index';
+import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 
 const Stack = createStackNavigator();
-import AppBar from '../Components/Appbar';
 
 const AppStack = () => {
-  const [isSearch, setIsSearch] = React.useState(false);
 
   return (
     <Stack.Navigator initialRouteName="HomeIndex">
@@ -47,6 +46,15 @@ const AppStack = () => {
         options={{
           title: 'Single group settings',
           // headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="AddTask"
+        component={AddTask}
+        options={{
+          title: 'Add task',
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
