@@ -1,3 +1,9 @@
+// ==========================================
+//  Title:  AddInviti
+//  Author: Abdur Rahman
+//  createdAt:   25 Oct, 2022
+//  Modified by : -------
+// ==========================================
 import {TouchableOpacity, Text, StyleSheet, Modal, View} from 'react-native';
 import React, {useState} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -8,6 +14,7 @@ import * as Yup from 'yup';
 import {
   useAddInvitiMutation,
   useUpdateInvitiMutation,
+  useDeleteInvitiMutation
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 
 const validationSchema = Yup.object().shape({
@@ -18,11 +25,26 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddInviti = ({setVisible, groupId, currentInviti}) => {
-
   const [addInviti, {isLoading}] = useAddInvitiMutation();
-  const [updateInviti, {isLoading : updateLoading}] = useUpdateInvitiMutation();
+  const [updateInviti, {isLoading: updateLoading}] = useUpdateInvitiMutation();
+  const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
 
   const submitHandler = async values => {
+    currentInviti?._id ? updateHandler(values) : addHandler(values);
+  };
+  
+  const deleteHandler = async ()=>{
+    await deleteInviti({groupId:groupId, invitiId:currentInviti?._id})
+    .then(response => {
+      console.log('deleted group is =>', response);
+    })
+    .catch(e => {
+      console.log('error in deleteHandler', e);
+    });
+  setVisible(false)
+  }
+
+  const addHandler = async values => {
     await addInviti({
       groupId: groupId,
       invitiName: values.invitiName,
@@ -32,11 +54,10 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
         console.log('new created group is =>', response);
       })
       .catch(e => {
-        console.log(e);
+        console.log('error in addHandler', e);
       });
     setVisible(false);
   };
-
   const updateHandler = async values => {
     await updateInviti({
       invitiId: currentInviti?._id,
@@ -47,7 +68,7 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
         console.log('group has been updated =>', response);
       })
       .catch(e => {
-        console.log("updateHandler error",e);
+        console.log('error in updateHandler', e);
       });
     setVisible(false);
   };
@@ -140,14 +161,6 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
               {renderFileData()}
             </TouchableOpacity>
 
-            {/* <IconButton
-              style={{alignSelf: 'center'}}
-              icon="camera"
-              mode="outlined"
-              size={30}
-              onPress={() => setModalVisible()}
-            /> */}
-
             <TextInput
               error={errors.invitiName && touched.invitiName ? true : false}
               label="Enter invite name"
@@ -223,20 +236,29 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
               </View>
             </Modal>
             {currentInviti?.invitiName ? (
-              <Button
-                loading={updateLoading}
-                mode="contained"
-                onPress={updateHandler}
-                style={{
-                  backgroundColor: '#334C8C',
-                  borderRadius: 10,
-                  borderColor: '#C1C2B8',
-                  borderWidth: 0.5,
-                  padding: '1%',
-                  marginVertical: '2%',
-                }}>
-                Update
-              </Button>
+              <View>
+                <Button
+                  loading={updateLoading}
+                  mode="contained"
+                  onPress={handleSubmit}
+                  style={{
+                    backgroundColor: '#334C8C',
+                    borderRadius: 10,
+                    borderColor: '#C1C2B8',
+                    borderWidth: 0.5,
+                    padding: '1%',
+                    marginVertical: '2%',
+                  }}>
+                  Update
+                </Button>
+                <Button
+                  loading={deleteLoading}
+                  mode="contained"
+                  onPress={deleteHandler}
+                  style={styles.buttonStyle}>
+                  Delete
+                </Button>
+              </View>
             ) : (
               <Button
                 loading={isLoading}
@@ -269,10 +291,8 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    width: 240,
     borderRadius: 10,
-    marginVertical: '5%',
+    marginVertical: '2%',
   },
   buttonTextStyle: {
     color: '#FFFFFF',

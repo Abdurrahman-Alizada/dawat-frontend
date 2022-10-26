@@ -47,13 +47,25 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    deleteInviti: build.mutation({
+      query: inviti => ({
+        url: `/api/group/invitations/delete`,
+        method: 'DELETE',
+        body: {
+          invitiId: inviti.invitiId,
+          groupId: inviti.groupId,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
   }),
 });
 
 export const {
   useGetAllInvitationsQuery,
   useAddInvitiMutation,
-  useUpdateInvitiMutation
+  useUpdateInvitiMutation,
+  useDeleteInvitiMutation
 } = InvitaionsApi;
 
 export const addNewInviti = createAsyncThunk(
