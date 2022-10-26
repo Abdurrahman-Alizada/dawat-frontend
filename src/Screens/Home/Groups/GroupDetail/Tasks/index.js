@@ -1,40 +1,81 @@
+// ==========================================
+//  Title:  AddInviti
+//  Author: Abdur Rahman
+//  createdAt:   26 Oct, 2022
+//  Modified by : -------
+// ==========================================
+
 import React, {useState, useRef} from 'react';
-import {StyleSheet, FlatList, Pressable} from 'react-native';
+import {
+  StyleSheet,
+  FlatList,
+  Pressable,
+  View,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import RenderItem from './SingleTask';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
 import {FAB, Provider} from 'react-native-paper';
 import TaskBrief from './TaskBrief';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+
+import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 const modalHeight = height * 0.7;
 
-const Task = () => {
+const Task = ({route}) => {
+  const {groupId} = route.params;
+
   const navigation = useNavigation();
   const [currentItem, setCurrentItem] = useState({});
 
-  const groupList = useSelector(state => state.groups);
+  const {data, isError, isLoading, error} = useGetAllTasksQuery({
+    groupId,
+  });
+
   const modalizeRef = useRef(null);
   const FABHandler = () => {
-    navigation.navigate('AddTask');
+    navigation.navigate('AddTask',{groupId:groupId});
   };
 
-  const cardHandler = (item)=>{
-    setCurrentItem(item)
+  const cardHandler = item => {
+    setCurrentItem(item);
     modalizeRef.current?.open();
-  }
+  };
 
   return (
     <Provider style={{flex: 1}}>
-      <FlatList
-        data={groupList.tasks}
-        renderItem={({item}) => (
-          <Pressable onPress={() => cardHandler(item)}>
-            <RenderItem item={item} />
-          </Pressable>
-        )}
-      />
+      {isLoading ? (
+        <View
+          style={{
+            alignSelf: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <ActivityIndicator animating={isLoading} />
+        </View>
+      ) : data.length > 0 ? (
+        <FlatList
+          data={data}
+          renderItem={({item}) => (
+            <Pressable onPress={() => cardHandler(item)}>
+              <RenderItem item={item} />
+            </Pressable>
+          )}
+        />
+      ) : (
+        <View
+          style={{
+            alignSelf: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <Text>No Task yet</Text>
+        </View>
+      )}
 
       <FAB
         icon="plus"

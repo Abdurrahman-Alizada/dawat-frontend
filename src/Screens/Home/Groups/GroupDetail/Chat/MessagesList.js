@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import React, {useState, useRef, useEffect} from 'react';
-import {ScrollView} from 'react-native';
+import React, {useRef, useEffect} from 'react';
+import {ScrollView, Text} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {allMessages} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
@@ -19,7 +19,7 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
   };
   let userId = '';
   const getUser = async () => {
-  userId = await AsyncStorage.getItem('userId');
+    userId = await AsyncStorage.getItem('userId');
   };
   const getAllMessages = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -38,17 +38,23 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
       onContentSizeChange={() => {
         scrollViewRef.current?.scrollToEnd();
       }}>
-      {messages?.map((message, index) => (
-        <Message
-          key={index}
-          addedBy={message.addedBy}
-          time={message.createdAt}
-          userId={message.addedBy?._id}
-          message={message.content}
-          onSwipe={onSwipeToReply}
-          pic={message.pic}
-        />
-      ))}
+      {messages.length > 0 ? (
+        messages?.map((message, index) => (
+          <Message
+            key={index}
+            addedBy={message.addedBy}
+            time={message.createdAt}
+            userId={message.addedBy?._id}
+            message={message.content}
+            onSwipe={onSwipeToReply}
+            pic={message.pic}
+          />
+        ))
+      ) : (
+        <Text style={{alignSelf: 'center'}}>
+          Send message to start conversation
+        </Text>
+      )}
     </ScrollView>
   );
 };

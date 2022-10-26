@@ -7,29 +7,31 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {instance} from '../../../../../redux/axios';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {useAddInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import { useAddTaskMutation } from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 const validationSchema = Yup.object().shape({
   taskTitle: Yup.string().required('Task title is required').label('taskTitle'),
   taskDescription: Yup.string().label('taskDescription'),
 });
 
-const AddInviti = ({setVisible, groupId}) => {
-  const [addInviti, {isLoading}] = useAddInvitiMutation();
+const AddTask = ({ route, navigation }) => {
+  const {groupId} = route.params;
+
+  const [addTask, {isLoading}] = useAddTaskMutation();
 
   const submitHandler = async values => {
-    await addInviti({
+    await addTask({
+      taskName: values.taskTitle,
       groupId: groupId,
-      invitiName: values.invitiName,
-      invitiDescription: values.invitiDescription,
+      taskDescription: values.taskDescription,
     })
       .then(response => {
-        console.log('new created group is =>', response);
+        navigation.goBack()
+        console.log('new created task is =>', response);
       })
       .catch(e => {
         console.log(e);
       });
-    setVisible(false);
   };
 
   const [open, setOpen] = useState(false);
@@ -219,7 +221,7 @@ const AddInviti = ({setVisible, groupId}) => {
   );
 };
 
-export default AddInviti;
+export default AddTask;
 
 const styles = StyleSheet.create({
   buttonStyle: {

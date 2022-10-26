@@ -4,8 +4,6 @@ import {
   Divider,
   Avatar,
   Card,
-  ListItem,
-  Button,
   Icon,
 } from 'react-native-elements';
 
@@ -77,7 +75,6 @@ const Index = () => {
           flexDirection: 'row',
           justifyContent: 'space-around',
           marginBottom: '2%',
-          // backgroundColor:'#F77A55',
         }}>
         <Card>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -138,28 +135,6 @@ const Index = () => {
         </Card>
       </View>
       <Divider />
-
-      {/* <View style={{marginVertical: '2%'}}>
-        <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: '2%'}}>
-          Remaining Time
-        </Text>
-        <CountDown
-          size={30}
-          until={1000}
-          onFinish={() => alert('Finished')}
-          digitStyle={{
-            backgroundColor: '#FFF',
-            borderWidth: 2,
-            borderColor: '#1CC625',
-          }}
-          digitTxtStyle={{color: '#1CC625'}}
-          timeLabelStyle={{color: '#6c6399', fontWeight: 'bold'}}
-          separatorStyle={{color: '#1CC625'}}
-          timeToShow={['D', 'H', 'M', 'S']}
-          timeLabels={{m: 'Minutes', s: 'Seconds', h: 'Hours', d: 'Days'}}
-          // showSeparator
-        />
-      </View> */}
     </View>
   );
 };

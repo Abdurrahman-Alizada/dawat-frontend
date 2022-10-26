@@ -54,7 +54,7 @@ const AppStack = () => {
         component={AddTask}
         options={{
           title: 'Add task',
-          headerShown: false,
+          // headerShown: false,
         }}
       />
     </Stack.Navigator>

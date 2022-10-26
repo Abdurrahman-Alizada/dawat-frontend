@@ -1,23 +1,10 @@
-import React, {useState} from 'react';
-import {Pressable, Image, StyleSheet, Text, View, Alert} from 'react-native';
+import React from 'react';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  Card,
-  Paragraph,
-  IconButton,
-  FAB,
-  Portal,
-  Provider,
-  List,
-  Avatar,
-  Button,
-  Chip,
-} from 'react-native-paper';
-
+import {IconButton} from 'react-native-paper';
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers.responsibleAvatars) {
-    // console.log('hhhh', groupMembers.users.length);
     return (
       <View style={styles.groupMembersContent}>
         {groupMembers.responsibleAvatars.map((user, index) => (
@@ -61,82 +48,60 @@ const RenderGroupMembers = ({groupMembers}) => {
   return (
     <Image
       style={styles.memberImage}
-      source={require('../../../../../assets/images/onboarding/1.png')}
+      source={require('../../../../../assets/drawer/userImage.png')}
     />
   );
 };
 
 const SingleTask = ({item}, navigation) => {
-  const [state, setState] = React.useState({open: false});
-
-  const onStateChange = ({open}) => setState({open});
-
-  const {open} = state;
-
-  const onPressHandler = () => {
-    navigation.navigate('GroupDetail', {
-      groupId: item._id,
-      groupName: item.groupName,
-    });
-  };
-
-  const onLongPressHandler = () => {
-    console.log(item.groupName);
-    Alert.alert('Hello', 'onlongPress');
-  };
-
   return (
     <View>
       <View style={{padding: '2%'}}>
-        <View style={{padding: '2%'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="account-group-outline" size={25} color="#BABABA" />
-
-            <Text style={{fontSize: 18, marginLeft: '1%', color: '#BABABA'}}>
-              Responsible
-            </Text>
-          </View>
-          <View></View>
+        <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+          <IconButton
+            icon="square-edit-outline"
+            mode="outlined"
+            size={30}
+            onPress={() => setVisible(false)}
+          />
+          <IconButton
+            icon="delete-outline"
+            mode="outlined"
+            size={30}
+            onPress={() => setVisible(false)}
+          />
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '2%',
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="checkbox-intermediate" size={25} color="#BABABA" />
-            <Text
-              style={{
-                fontFamily: 'Poppins-Regular',
-                fontSize: 18,
-                marginLeft: '1%',
-                color: '#BABABA',
-              }}>
-              Status
-            </Text>
-          </View>
-          <View>
-            <Chip icon="check" onPress={() => console.log('Pressed')}>
-              Done
-            </Chip>
+        <View style={{padding: '2%'}}>
+          <View style={{flexDirection: 'row'}}>
+            <Icon name="account-group-outline" size={25} />
+            <View style={{marginLeft: '2%'}}>
+              <Text style={{fontSize: 18, marginBottom: '1%'}}>
+                Responsible
+              </Text>
+              <RenderGroupMembers groupMembers={item} />
+            </View>
           </View>
         </View>
 
         <View style={{padding: '2%'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="timelapse" size={25} color="#BABABA" />
-            <Text
-              style={{
-                fontFamily: 'Poppins-Regular',
-                fontSize: 18,
-                marginLeft: '1%',
-                color: '#BABABA',
-              }}>
-              Time Remaining
-            </Text>
+          <View style={{flexDirection: 'row'}}>
+            <Icon name="timelapse" size={25} />
+            <View style={{marginLeft: '2%'}}>
+              <Text
+                style={{
+                  fontSize: 18,
+                }}>
+                Time
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 14,
+                }}>
+                {moment(item.createdAt).fromNow()} -{' '}
+                {moment(item.updatedAt).to()}
+              </Text>
+            </View>
           </View>
           <View></View>
         </View>
@@ -225,8 +190,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   memberImage: {
-    height: 20,
-    width: 20,
+    height: 30,
+    width: 30,
     borderRadius: 50,
   },
 });

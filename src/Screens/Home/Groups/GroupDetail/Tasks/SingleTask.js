@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Pressable, Image, StyleSheet, Text, View, Alert} from 'react-native';
 import moment from 'moment';
-import { Chip, Card, Paragraph, IconButton} from 'react-native-paper';
+import {Chip, Card, Paragraph, IconButton} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers.responsibleAvatars) {
@@ -56,38 +56,18 @@ const RenderGroupMembers = ({groupMembers}) => {
 };
 
 const SingleTask = ({item}, navigation) => {
-  const [state, setState] = React.useState({ open: false });
-
-  const onStateChange = ({ open }) => setState({ open });
-
-  const { open } = state;
-  
-  const onPressHandler = () => {
-    navigation.navigate('GroupDetail', {
-      groupId: item._id,
-      groupName: item.groupName,
-    });
-  };
-
-  const onLongPressHandler = () => {
-    console.log(item.groupName);
-    Alert.alert('Hello', 'onlongPress');
-  };
-
   return (
     <View>
-      {/* <Pressable */}
-        {/* // onPress={onPressHandler}
-        // onLongPress={() => onLongPressHandler()}> */}
-        <Card mode="outlined" style={{margin: '3%', backgroundColor: '#fff'}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingHorizontal: '2%',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{}}>
+      <Card mode="outlined" style={{margin: '3%'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: '2%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <View style={{flexDirection: 'row'}}>
+            <View>
               <Chip
                 icon="check"
                 // mode="flat"
@@ -96,35 +76,29 @@ const SingleTask = ({item}, navigation) => {
                 Done
               </Chip>
             </View>
-
-            <IconButton
-              icon="dots-horizontal"
-              iconColor={'#BDBDBD'}
-              size={30}
-              onPress={() => console.log('Pressed')}
-            />
+            <Card.Title title={item.taskName} />
           </View>
-          <Card.Content>
-            <Paragraph>Card content</Paragraph>
-          </Card.Content>
-          <View
-            style={{
-              height: 1,
-              width: '100%',
-              backgroundColor: '#BDBDBD',
-            }}></View>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Card.Actions style={{justifyContent: 'space-between'}}>
-              <Paragraph>
-                {moment(20111031).fromNow()} - {moment(new Date()).to()}
-              </Paragraph>
-            </Card.Actions>
-            <Card.Actions style={{justifyContent: 'space-between'}}>
-              <RenderGroupMembers groupMembers={item} />
-            </Card.Actions>
-          </View>
-        </Card>
-      {/* </Pressable> */}
+        </View>
+        <Card.Content>
+          <Paragraph>{item.taskDescription}</Paragraph>
+        </Card.Content>
+        <View
+          style={{
+            height: 1,
+            width: '100%',
+            backgroundColor: '#BDBDBD',
+          }}></View>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <Card.Actions style={{justifyContent: 'space-between'}}>
+            <Paragraph>
+              {moment(item.createdAt).fromNow()} - {moment(item.updatedAt).to()}
+            </Paragraph>
+          </Card.Actions>
+          <Card.Actions style={{justifyContent: 'space-between'}}>
+            <RenderGroupMembers groupMembers={item} />
+          </Card.Actions>
+        </View>
+      </Card>
     </View>
   );
 };
