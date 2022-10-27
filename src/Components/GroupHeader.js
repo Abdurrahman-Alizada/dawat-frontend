@@ -1,14 +1,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {
-  Button,
-  Menu,
-  Divider,
-  Provider,
-  Appbar,
-  Searchbar,
-} from 'react-native-paper';
-import {useNavigation, DrawerActions} from '@react-navigation/native';
+import {Menu, Divider, Appbar, Searchbar} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
 
 const Header = ({isSearch, setIsSearch, onOpen, group}) => {
   const navigation = useNavigation();
@@ -38,10 +31,10 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
             {/* <Appbar.BackAction onPress={() => {}} /> */}
             <Appbar.BackAction onPress={() => navigation.goBack()} />
             <Appbar.Content
-             onPress={()=>{
-              navigation.navigate("SingleGroupSettings", {group:group})
-             }}
-             title={group.groupName}
+              onPress={() => {
+                navigation.navigate('SingleGroupSettings', {group: group});
+              }}
+              title={group.groupName}
               titleStyle={{alignSelf: 'center'}}
             />
             <Appbar.Action

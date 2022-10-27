@@ -31,25 +31,25 @@ export const TasksApi = createApi({
       }),
       invalidatesTags: ['Tasks'],
     }),
-    updateInviti: build.mutation({
-      query: inviti => ({
-        url: `/api/group/Tasks/update`,
+    updateTask: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/update`,
         method: 'PUT',
         body: {
-          invitiId: inviti.invitiId,
-          invitiName: inviti.invitiName,
-          invitiDescription: inviti.invitiDescription,
+          taskId: task.taskId,
+          taskName: task.taskName,
+          taskDescription: task.taskDescription,
         },
       }),
       invalidatesTags: ['Tasks'],
     }),
-    deleteInviti: build.mutation({
-      query: inviti => ({
-        url: `/api/group/Tasks/delete`,
+    deleteTask: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/delete`,
         method: 'DELETE',
         body: {
-          invitiId: inviti.invitiId,
-          groupId: inviti.groupId,
+          taskId: task.taskId,
+          groupId: task.groupId,
         },
       }),
       invalidatesTags: ['Tasks'],
@@ -60,6 +60,6 @@ export const TasksApi = createApi({
 export const {
   useGetAllTasksQuery,
   useAddTaskMutation,
-  useUpdateInvitiMutation,
-  useDeleteInvitiMutation
+  useUpdateTaskMutation,
+  useDeleteTaskMutation
 } = TasksApi;

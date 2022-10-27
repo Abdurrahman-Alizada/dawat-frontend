@@ -32,18 +32,6 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
   const submitHandler = async values => {
     currentInviti?._id ? updateHandler(values) : addHandler(values);
   };
-  
-  const deleteHandler = async ()=>{
-    await deleteInviti({groupId:groupId, invitiId:currentInviti?._id})
-    .then(response => {
-      console.log('deleted group is =>', response);
-    })
-    .catch(e => {
-      console.log('error in deleteHandler', e);
-    });
-  setVisible(false)
-  }
-
   const addHandler = async values => {
     await addInviti({
       groupId: groupId,
@@ -72,6 +60,16 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
       });
     setVisible(false);
   };
+  const deleteHandler = async ()=>{
+    await deleteInviti({groupId:groupId, invitiId:currentInviti?._id})
+    .then(response => {
+      console.log('deleted group is =>', response);
+    })
+    .catch(e => {
+      console.log('error in deleteHandler', e);
+    });
+  setVisible(false)
+  }
 
   const [fileData, setfileData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);

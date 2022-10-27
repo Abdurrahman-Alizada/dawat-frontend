@@ -3,6 +3,7 @@ import {Image, StyleSheet, Text, View} from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {IconButton} from 'react-native-paper';
+import {useDeleteTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers.responsibleAvatars) {
     return (
@@ -53,7 +54,19 @@ const RenderGroupMembers = ({groupMembers}) => {
   );
 };
 
-const SingleTask = ({item}, navigation) => {
+const SingleTask = ({item, closeModalize, navigation}) => {
+  const [deleteTask, {isLoading: deleteLoading}] = useDeleteTaskMutation();
+  const deleteHandler = async () => {
+    await deleteTask({groupId: item?.group?._id, taskId: item?._id})
+      .then(response => {
+        closeModalize();
+        console.log('deleted group is =>', response);
+      })
+      .catch(e => {
+        console.log('error in deleteHandler', e);
+      });
+  };
+
   return (
     <View>
       <View style={{padding: '2%'}}>
@@ -62,13 +75,17 @@ const SingleTask = ({item}, navigation) => {
             icon="square-edit-outline"
             mode="outlined"
             size={30}
-            onPress={() => setVisible(false)}
+            onPress={() => {
+              closeModalize();
+              navigation.navigate('AddTask', {task: item});
+            }}
           />
           <IconButton
+            selected={deleteLoading}
             icon="delete-outline"
             mode="outlined"
             size={30}
-            onPress={() => setVisible(false)}
+            onPress={deleteHandler}
           />
         </View>
         <View style={{padding: '2%'}}>

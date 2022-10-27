@@ -45,7 +45,9 @@ const Task = ({route}) => {
     setCurrentItem(item);
     modalizeRef.current?.open();
   };
-
+ const closeModalize = ()=>{
+  modalizeRef.current?.close();
+ }
   return (
     <Provider style={{flex: 1}}>
       {isLoading ? (
@@ -86,7 +88,7 @@ const Task = ({route}) => {
       />
 
       <Modalize ref={modalizeRef} modalHeight={modalHeight}>
-        <TaskBrief item={currentItem} />
+        <TaskBrief item={currentItem} closeModalize={closeModalize} navigation={navigation} />
       </Modalize>
     </Provider>
   );

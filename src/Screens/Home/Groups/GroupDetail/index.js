@@ -134,7 +134,7 @@ const Tabs = ({groupId}) => {
 };
 
 const Index = ({route}) => {
-  const {groupId, groupName} = route.params;
+  const {groupId} = route.params;
 
   const modalizeRef = useRef(null);
   const onOpen = () => {
