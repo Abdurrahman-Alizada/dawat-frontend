@@ -1,8 +1,8 @@
-import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import React, {useState, useCallback} from 'react';
+import {ToastAndroid, TouchableOpacity, Image, StyleSheet, Text, View} from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {IconButton} from 'react-native-paper';
+import {IconButton, Avatar} from 'react-native-paper';
 import {useDeleteTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers.responsibleAvatars) {
@@ -54,12 +54,18 @@ const RenderGroupMembers = ({groupMembers}) => {
   );
 };
 
-const SingleTask = ({item, closeModalize, navigation}) => {
+const TaskBrief = ({item, closeModalize, navigation}) => {
+ 
+  const showToast = (response) => {
+    ToastAndroid.show(`Task has been deleted`, ToastAndroid.SHORT);
+  };
+
   const [deleteTask, {isLoading: deleteLoading}] = useDeleteTaskMutation();
   const deleteHandler = async () => {
     await deleteTask({groupId: item?.group?._id, taskId: item?._id})
       .then(response => {
         closeModalize();
+        showToast();
         console.log('deleted group is =>', response);
       })
       .catch(e => {
@@ -67,6 +73,18 @@ const SingleTask = ({item, closeModalize, navigation}) => {
       });
   };
 
+  const [textShown, setTextShown] = useState(false); //To show ur remaining Text
+  const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
+  const toggleNumberOfLines = () => {
+    setTextShown(!textShown);
+  };
+
+  const onTextLayout = useCallback(
+    e => {
+      setLengthMore(e.nativeEvent.lines.length >= 2); //to check the text is more than 4 lines or not
+    },
+    [textShown],
+  );
   return (
     <View>
       <View style={{padding: '2%'}}>
@@ -88,9 +106,50 @@ const SingleTask = ({item, closeModalize, navigation}) => {
             onPress={deleteHandler}
           />
         </View>
+
+        <View style={{padding: '2%'}}>
+          <View
+            style={{
+              alignItems: 'flex-start',
+            }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Avatar.Image
+                size={40}
+                source={require('../../../../../assets/drawer/userImage.png')}
+              />
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight: 'bold',
+                  margin: '1%',
+                }}>
+                {item.taskName}
+              </Text>
+            </View>
+            <View style={{}}>
+              <Text
+                style={{textAlign: 'justify'}}
+                onTextLayout={onTextLayout}
+                numberOfLines={textShown ? undefined : 2}>
+                {item.taskDescription}
+              </Text>
+
+              {lengthMore ? (
+                <TouchableOpacity onPress={() => toggleNumberOfLines()}>
+                  <Text style={{fontWeight: 'bold'}}>
+                    {textShown ? 'Read less' : 'Read more'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <></>
+              )}
+            </View>
+          </View>
+        </View>
+
         <View style={{padding: '2%'}}>
           <View style={{flexDirection: 'row'}}>
-            <Icon name="account-group-outline" size={25} />
+            <Icon name="account-supervisor-circle" size={30} />
             <View style={{marginLeft: '2%'}}>
               <Text style={{fontSize: 18, marginBottom: '1%'}}>
                 Responsible
@@ -120,60 +179,13 @@ const SingleTask = ({item, closeModalize, navigation}) => {
               </Text>
             </View>
           </View>
-          <View></View>
         </View>
       </View>
-
-      {/* <Card mode="outlined" style={{margin: '3%', backgroundColor: '#fff'}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: '2%',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{}}>
-            <Chip
-              icon="check"
-              // mode="flat"
-              mode="outlined"
-              onPress={() => Alert.alert('Information chip pressed')}>
-              Done
-            </Chip>
-          </View>
-
-          <IconButton
-            icon="dots-horizontal"
-            iconColor={'#BDBDBD'}
-            size={30}
-            onPress={() => console.log('Pressed')}
-          />
-        </View>
-        <Card.Content>
-          <Paragraph>{item.name}</Paragraph>
-        </Card.Content>
-        <View
-          style={{
-            height: 1,
-            width: '100%',
-            backgroundColor: '#BDBDBD',
-          }}></View>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Card.Actions style={{justifyContent: 'space-between'}}>
-            <Paragraph>
-              {moment(item.date).fromNow()} - {moment(new Date()).to()}
-            </Paragraph>
-          </Card.Actions>
-          <Card.Actions style={{justifyContent: 'space-between'}}>
-            <RenderGroupMembers groupMembers={item} />
-          </Card.Actions>
-        </View>
-      </Card> */}
     </View>
   );
 };
 
-export default SingleTask;
+export default TaskBrief;
 
 const styles = StyleSheet.create({
   itemContainer: {

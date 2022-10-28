@@ -59,28 +59,9 @@ const SingleTask = ({item}, navigation) => {
   return (
     <View>
       <Card mode="outlined" style={{margin: '3%'}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            padding: '2%',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flexDirection: 'row'}}>
-            <View>
-              <Chip
-                icon="check"
-                // mode="flat"
-                mode="outlined"
-                onPress={() => Alert.alert('Information chip pressed')}>
-                Done
-              </Chip>
-            </View>
-            <Card.Title title={item.taskName} />
-          </View>
-        </View>
-        <Card.Content>
-          <Paragraph>{item.taskDescription}</Paragraph>
+        <Card.Title title={item.taskName} />
+        <Card.Content style={{width: '98%'}}>
+          <Paragraph numberOfLines={2}>{item.taskDescription}</Paragraph>
         </Card.Content>
         <View
           style={{

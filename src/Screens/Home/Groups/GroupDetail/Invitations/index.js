@@ -58,7 +58,7 @@ export default function Example({route}) {
 
   return (
     <View style={{flex: 1}}>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           padding: '2%',
@@ -75,7 +75,7 @@ export default function Example({route}) {
             </Chip>
           </View>
         ))}
-      </View>
+      </View> */}
 
       {isLoading ? (
         <View
