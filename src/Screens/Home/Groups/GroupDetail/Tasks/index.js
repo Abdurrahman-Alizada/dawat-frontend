@@ -48,7 +48,7 @@ const Task = ({route}) => {
  const closeModalize = ()=>{
   modalizeRef.current?.close();
  }
-  return (
+ return (
     <Provider style={{flex: 1}}>
       {isLoading ? (
         <View

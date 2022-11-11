@@ -1,14 +1,17 @@
-import {Text, StyleSheet, View} from 'react-native';
-import React, {useState} from 'react';
+import {Text, StyleSheet, View, Platform} from 'react-native';
+import React, {useState, useCallback} from 'react';
 import {TextInput, Button, Avatar, List, Appbar} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {instance} from '../../../../../redux/axios';
 import AsyncStorage from '@react-native-community/async-storage';
-
-import {useAddTaskMutation, useUpdateTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+  useAddTaskMutation,
+  useUpdateTaskMutation,
+} from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import moment from 'moment';
 const validationSchema = Yup.object().shape({
   taskTitle: Yup.string().required('Task title is required').label('taskTitle'),
   taskDescription: Yup.string().label('taskDescription'),
@@ -49,7 +52,6 @@ const AddTask = ({route, navigation}) => {
         console.log(e);
       });
   };
-
 
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
@@ -104,6 +106,12 @@ const AddTask = ({route, navigation}) => {
     );
   };
 
+  // date and time
+  const [showStartingDate, setShowStartingDate] = useState(false);
+  const [showDueDate, setShowDueDate] = useState(false);
+  const [startingDate, setStartingDate] = useState(new Date());
+  const [dueDate, setDueDate] = useState(new Date());
+
   return (
     <View>
       <Appbar.Header>
@@ -114,16 +122,14 @@ const AddTask = ({route, navigation}) => {
       </Appbar.Header>
       <View
         style={{
-          margin: '5%',
           borderRadius: 10,
-          padding: '5%',
+          padding: '4%',
         }}>
         <Formik
           initialValues={{
             taskTitle: route.params?.task?.taskName,
             taskDescription: route.params?.task?.taskDescription,
             status: '',
-            startDate: '',
             endDate: '',
           }}
           validationSchema={validationSchema}
@@ -139,7 +145,7 @@ const AddTask = ({route, navigation}) => {
             <View style={{marginVertical: '2%'}}>
               <TextInput
                 error={errors.taskTitle && touched.taskTitle ? true : false}
-                label="Enter task title"
+                label="What is to be done?"
                 mode="outlined"
                 style={{marginVertical: '2%', width: '100%'}}
                 onChangeText={handleChange('taskTitle')}
@@ -156,10 +162,10 @@ const AddTask = ({route, navigation}) => {
                     ? true
                     : false
                 }
-                label="Enter Description"
+                label="Some Description"
                 mode="outlined"
                 multiline
-                style={{marginVertical: '2%', width: '100%'}}
+                style={{marginVertical: '2%',maxHeight:200, width: '100%'}}
                 onChangeText={handleChange('taskDescription')}
                 onBlur={handleBlur('taskDescription')}
                 value={values.taskDescription}
@@ -181,10 +187,7 @@ const AddTask = ({route, navigation}) => {
                 searchable={true}
                 loading={dropdonwSearchLoading}
                 disableLocalSearch={true}
-                searchContainerStyle={{
-                  borderBottomColor: '#dfdfdf',
-                }}
-                style={[styles.inputStyle]}
+                style={{marginVertical: '2%'}}
                 textStyle={{
                   fontSize: 16,
                   fontWeight: '700',
@@ -217,6 +220,85 @@ const AddTask = ({route, navigation}) => {
                 }}
               />
 
+              {showStartingDate && (
+                <DateTimePicker
+                  value={startingDate}
+                  onChange={(evt, selectedDate) => {
+                    setStartingDate(selectedDate);
+                    setShowStartingDate(false);
+                  }}
+                />
+              )}
+
+              {showDueDate && (
+                <DateTimePicker
+                  value={dueDate}
+                  onChange={(evt, selectedDate) => {
+                    setDueDate(selectedDate);
+                    setShowDueDate(false);
+                  }}
+                />
+              )}
+
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{width: '48%'}}>
+                  <Text
+                    style={{
+                      borderRadius: 10,
+                      borderColor: '#C1C2B8',
+                      borderWidth: 0.5,
+                      padding: '2%',
+                      marginVertical: '2%',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}>
+                    {moment(startingDate).format('ll')}
+                  </Text>
+                  <Button
+                    disabled={showStartingDate}
+                    // loading={showDate}
+                    mode="contained"
+                    onPress={() => setShowStartingDate(true)}
+                    style={{
+                      borderRadius: 10,
+                      borderColor: '#C1C2B8',
+                      borderWidth: 0.5,
+                      // padding: '1%',
+                      marginVertical: '1%',
+                    }}>
+                    Starting date
+                  </Button>
+                </View>
+                <View style={{width: '48%'}}>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      borderColor: '#C1C2B8',
+                      borderWidth: 0.5,
+                      padding: '2%',
+                      marginVertical: '2%',
+                    }}>
+                    {moment(dueDate).format('ll')}
+                  </Text>
+                  <Button
+                    disabled={showDueDate}
+                    // loading={showDate}
+                    mode="contained"
+                    onPress={() => setShowDueDate(true)}
+                    style={{
+                      borderRadius: 10,
+                      borderColor: '#C1C2B8',
+                      borderWidth: 0.5,
+                      marginVertical: '2%',
+                    }}>
+                    Due date
+                  </Button>
+                </View>
+              </View>
+
               {route.params?.task ? (
                 <Button
                   disabled={updateLoading}
@@ -224,7 +306,7 @@ const AddTask = ({route, navigation}) => {
                   mode="contained"
                   onPress={handleSubmit}
                   style={{
-                    backgroundColor: '#334C8C',
+                    // backgroundColor: '#334C8C',
                     borderRadius: 10,
                     borderColor: '#C1C2B8',
                     borderWidth: 0.5,
@@ -240,7 +322,7 @@ const AddTask = ({route, navigation}) => {
                   mode="contained"
                   onPress={handleSubmit}
                   style={{
-                    backgroundColor: '#334C8C',
+                    // backgroundColor: '#334C8C',
                     borderRadius: 10,
                     borderColor: '#C1C2B8',
                     borderWidth: 0.5,

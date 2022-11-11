@@ -13,6 +13,17 @@ const styles = StyleSheet.create({
   },
 });
 
+// const c = [
+//   "#FFC4D0",
+//   "#BDBDFF",
+//   "#8BBBF2",
+//   "#F9CEDF",
+//   "#FCEECB",
+//   "#D7DDE9",
+//   "#CF99FF",
+//   '#4838D1'
+//  ]
+
 export const COLORS = {
   primary: '#282534',
   white: '#fff',
@@ -22,6 +33,7 @@ export const COLORS = {
   red: '#D70F64',
   orange: '#F77A55',
   blueLight: '#4838D1',
+  
   
 };
 

@@ -37,12 +37,6 @@ const Groups = ({navigation}) => {
     navigation.navigate('AddGroup');
   };
 
-  //  const adkfj = groupApi.endpoints.getAllGroups.useQuery()
-  // const onRefreshHandler = ()=>{
-  // }
-
-  // fab
-  
   const [isExtended, setIsExtended] = React.useState(true);
 
   const onScroll = ({nativeEvent}) => {

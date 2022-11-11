@@ -29,8 +29,18 @@ import {
 import {PreferencesContext} from './src/themeContext';
 
 export const App = () => {
+
+  const theme = {
+    ...PaperDefaultTheme,
+    fonts: {
+      ...PaperDefaultTheme.fonts,
+      medium: 'Ubuntu Bold',
+    },
+  };
+  
+
   const [isThemeDark, setIsThemeDark] = React.useState(false);
-  let paperTheme = isThemeDark ? PaperDarkTheme : PaperDefaultTheme;
+  let paperTheme = isThemeDark ? PaperDarkTheme : theme;
   let navTheme = isThemeDark ? NavigationDarkTheme : NavigationDefaultTheme;
 
   const toggleTheme = React.useCallback(() => {
@@ -44,6 +54,8 @@ export const App = () => {
     }),
     [toggleTheme, isThemeDark],
   );
+
+  
 
   return (
     <PreferencesContext.Provider value={preferences}>
