@@ -33,7 +33,6 @@ export const COLORS = {
   red: '#D70F64',
   orange: '#F77A55',
   blueLight: '#4838D1',
-  
 };
 
 export const lightPalette = {
