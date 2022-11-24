@@ -1,0 +1,324 @@
+// ==========================================
+//  Title:  AddInviti
+//  Author: Abdur Rahman
+//  createdAt:   25 Oct, 2022
+//  Modified by : -------
+// ==========================================
+import {TouchableOpacity, Text, StyleSheet, Modal, View} from 'react-native';
+import React, {useState} from 'react';
+import ImagePicker from 'react-native-image-crop-picker';
+import {Avatar, IconButton, TextInput, Button} from 'react-native-paper';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+
+import {
+  useAddInvitiMutation,
+  useUpdateInvitiMutation,
+  useDeleteInvitiMutation
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+
+const validationSchema = Yup.object().shape({
+  invitiName: Yup.string()
+    .required('Inviti name is required')
+    .label('invitiName'),
+  groupDescription: Yup.string().label('invitiDescription'),
+});
+
+const AddInviti = ({setVisible, groupId, currentInviti}) => {
+  const [addInviti, {isLoading}] = useAddInvitiMutation();
+  const [updateInviti, {isLoading: updateLoading}] = useUpdateInvitiMutation();
+  const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
+
+  const submitHandler = async values => {
+    currentInviti?._id ? updateHandler(values) : addHandler(values);
+  };
+  const addHandler = async values => {
+    await addInviti({
+      groupId: groupId,
+      invitiName: values.invitiName,
+      invitiDescription: values.invitiDescription,
+    })
+      .then(response => {
+        console.log('new created group is =>', response);
+      })
+      .catch(e => {
+        console.log('error in addHandler', e);
+      });
+    setVisible(false);
+  };
+  const updateHandler = async values => {
+    await updateInviti({
+      invitiId: currentInviti?._id,
+      invitiName: values.invitiName,
+      invitiDescription: values.invitiDescription,
+    })
+      .then(response => {
+        console.log('group has been updated =>', response);
+      })
+      .catch(e => {
+        console.log('error in updateHandler', e);
+      });
+    setVisible(false);
+  };
+  const deleteHandler = async ()=>{
+    await deleteInviti({groupId:groupId, invitiId:currentInviti?._id})
+    .then(response => {
+      console.log('deleted group is =>', response);
+    })
+    .catch(e => {
+      console.log('error in deleteHandler', e);
+    });
+  setVisible(false)
+  }
+
+  const [fileData, setfileData] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  let openCamera = () => {
+    setModalVisible(!modalVisible);
+
+    ImagePicker.openCamera({
+      // cropperCircleOverlay: true,
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      setfileData(image);
+      console.log(image);
+    });
+    setModalVisible(false);
+  };
+
+  let openGallery = () => {
+    setModalVisible(!modalVisible);
+
+    ImagePicker.openPicker({
+      // cropperCircleOverlay: true,
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      setfileData(image);
+      console.log(image);
+    });
+    setModalVisible(false);
+  };
+
+  // let removePicture = () => {
+  //   ImagePicker.clean()
+  //     .then(() => {
+  //       setfileData(null);
+  //       console.log('removed all tmp images from tmp directory');
+  //     })
+  //     .catch(e => {
+  //       alert(e);
+  //     });
+  // };
+  function renderFileData() {
+    if (fileData) {
+      return <Avatar.Image size={60} source={{uri: fileData.path}} />;
+    } else {
+      return <Avatar.Icon size={60} icon="account-circle-outline" />;
+    }
+  }
+
+  return (
+    <View
+      style={{
+        backgroundColor: '#fff',
+        margin: '5%',
+        borderRadius: 10,
+        padding: '5%',
+      }}>
+      <IconButton
+        style={{position: 'absolute', right: 5}}
+        icon="close-circle-outline"
+        // mode="outlined"
+        size={30}
+        onPress={() => setVisible(false)}
+      />
+      <Formik
+        initialValues={{
+          invitiName: currentInviti?.invitiName,
+          invitiDescription: currentInviti?.invitiDescription,
+        }}
+        validationSchema={validationSchema}
+        onSubmit={values => submitHandler(values)}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View style={{marginVertical: '2%'}}>
+            <TouchableOpacity
+              onPress={() => setModalVisible()}
+              style={{alignSelf: 'center'}}>
+              {renderFileData()}
+            </TouchableOpacity>
+
+            <TextInput
+              error={errors.invitiName && touched.invitiName ? true : false}
+              label="Enter invite name"
+              mode="outlined"
+              style={{marginVertical: '2%', width: '100%'}}
+              onChangeText={handleChange('invitiName')}
+              onBlur={handleBlur('invitiName')}
+              value={values.invitiName}
+            />
+            {errors.invitiName && touched.invitiName ? (
+              <Text style={styles.error}>{errors.invitiName}</Text>
+            ) : null}
+
+            <TextInput
+              error={
+                errors.invitiDescription && touched.invitiDescription
+                  ? true
+                  : false
+              }
+              label="Enter Description"
+              mode="outlined"
+              style={{marginVertical: '2%', width: '100%'}}
+              onChangeText={handleChange('invitiDescription')}
+              onBlur={handleBlur('invitiDescription')}
+              value={values.invitiDescription}
+            />
+            {errors.invitiDescription && touched.invitiDescription ? (
+              <Text style={styles.error}>{errors.invitiDescription}</Text>
+            ) : null}
+
+            <Modal
+              onBlur={() => setModalVisible(false)}
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => {
+                setModalVisible(!modalVisible);
+              }}>
+              <View style={styles.centeredView}>
+                <View
+                  style={[
+                    styles.modalView,
+                    {position: 'absolute', width: '100%'},
+                  ]}>
+                  <IconButton
+                    style={{position: 'absolute', right: 5}}
+                    icon="close-circle-outline"
+                    // mode="outlined"
+                    size={30}
+                    onPress={() => setModalVisible(false)}
+                  />
+                  <View style={{alignItems: 'center'}}>
+                    <IconButton
+                      style={{marginHorizontal: '2%'}}
+                      icon="camera-image"
+                      mode="outlined"
+                      size={40}
+                      onPress={openCamera}
+                    />
+                    <Text>Camera</Text>
+                  </View>
+                  <View style={{alignItems: 'center'}}>
+                    <IconButton
+                      style={{marginHorizontal: '2%'}}
+                      icon="image-outline"
+                      mode="outlined"
+                      size={40}
+                      onPress={openGallery}
+                    />
+                    <Text>Gallery</Text>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+            {currentInviti?.invitiName ? (
+              <View>
+                <Button
+                  loading={updateLoading}
+                  mode="contained"
+                  onPress={handleSubmit}
+                  style={{
+                    backgroundColor: '#334C8C',
+                    borderRadius: 10,
+                    borderColor: '#C1C2B8',
+                    borderWidth: 0.5,
+                    padding: '1%',
+                    marginVertical: '2%',
+                  }}>
+                  Update
+                </Button>
+                <Button
+                  loading={deleteLoading}
+                  mode="contained"
+                  onPress={deleteHandler}
+                  style={styles.buttonStyle}>
+                  Delete
+                </Button>
+              </View>
+            ) : (
+              <Button
+                loading={isLoading}
+                mode="contained"
+                onPress={handleSubmit}
+                style={{
+                  backgroundColor: '#334C8C',
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '1%',
+                  marginVertical: '2%',
+                }}>
+                Add
+              </Button>
+            )}
+          </View>
+        )}
+      </Formik>
+    </View>
+  );
+};
+
+export default AddInviti;
+
+const styles = StyleSheet.create({
+  buttonStyle: {
+    backgroundColor: '#D70F64',
+    color: '#FFFFFF',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginVertical: '2%',
+  },
+  buttonTextStyle: {
+    color: '#FFFFFF',
+    paddingVertical: 5,
+    fontSize: 18,
+    letterSpacing: 1,
+    fontWeight: 'bold',
+  },
+  images: {
+    alignSelf: 'center',
+    width: 150,
+    height: 150,
+    marginHorizontal: 30,
+  },
+  error: {
+    color: 'red',
+    marginLeft: 20,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalView: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    padding: '5%',
+    // justifyContent: 'center',
+  },
+});
