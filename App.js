@@ -27,7 +27,7 @@ import {
   Provider as PaperProvider,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
-
+import { lightPalette } from './src/GlobalStyles';
 export const App = () => {
   const theme = {
     ...PaperDefaultTheme,
@@ -35,6 +35,10 @@ export const App = () => {
       ...PaperDefaultTheme.fonts,
       medium: 'Ubuntu Bold',
     },
+    colors: {
+      ...PaperDefaultTheme.colors,
+      lightPalette
+    }
   };
 
   const [isThemeDark, setIsThemeDark] = React.useState(false);
