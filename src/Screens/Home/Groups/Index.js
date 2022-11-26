@@ -64,7 +64,7 @@ const Groups = ({navigation}) => {
   };
 
   return (
-    <View style={{backgroundColor: '#fff', flex: 1}}>
+    <View style={{flex: 1}}>
       <Provider>
         {checked ? (
           <GroupCheckedHeader
