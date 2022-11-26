@@ -16,6 +16,7 @@ import {
   useUpdateInvitiMutation,
   useDeleteInvitiMutation
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import { useNavigation } from '@react-navigation/native';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
@@ -25,6 +26,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddInviti = ({setVisible, groupId, currentInviti}) => {
+  
+  const navigation = useNavigation();
+  
   const [addInviti, {isLoading}] = useAddInvitiMutation();
   const [updateInviti, {isLoading: updateLoading}] = useUpdateInvitiMutation();
   const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
@@ -130,6 +134,16 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
         borderRadius: 10,
         padding: '5%',
       }}>
+      <IconButton
+        style={{position: 'absolute', left: 5}}
+        icon="card-account-details-outline"
+        size={30}
+        onPress={() => {
+          setVisible(false)
+          navigation.navigate("InvitiDetail", {currentInviti: currentInviti})
+        }}
+      />
+
       <IconButton
         style={{position: 'absolute', right: 5}}
         icon="close-circle-outline"
@@ -240,7 +254,6 @@ const AddInviti = ({setVisible, groupId, currentInviti}) => {
                   mode="contained"
                   onPress={handleSubmit}
                   style={{
-                    backgroundColor: '#334C8C',
                     borderRadius: 10,
                     borderColor: '#C1C2B8',
                     borderWidth: 0.5,
