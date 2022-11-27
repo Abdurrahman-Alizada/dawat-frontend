@@ -13,7 +13,6 @@ const InvitiDetails = ({route}) => {
   const [fileData, setfileData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [expanded, setExpanded] = React.useState(true);
-console.log("hello", route.params?.currentInviti?.addedBy?.name)
     function renderFileData() {
         if (fileData) {
           return <Avatar.Image size={80} source={{uri: fileData.path}} />;
@@ -84,51 +83,6 @@ console.log("hello", route.params?.currentInviti?.addedBy?.name)
             {errors.invitiDescription && touched.invitiDescription ? (
               <Text style={styles.error}>{errors.invitiDescription}</Text>
             ) : null}
-
-            {/* <Modal
-              onBlur={() => setModalVisible(false)}
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => {
-                setModalVisible(!modalVisible);
-              }}>
-              <View style={styles.centeredView}>
-                <View
-                  style={[
-                    styles.modalView,
-                    {position: 'absolute', width: '100%'},
-                  ]}>
-                  <IconButton
-                    style={{position: 'absolute', right: 5}}
-                    icon="close-circle-outline"
-                    // mode="outlined"
-                    size={30}
-                    onPress={() => setModalVisible(false)}
-                  />
-                  <View style={{alignItems: 'center'}}>
-                    <IconButton
-                      style={{marginHorizontal: '2%'}}
-                      icon="camera-image"
-                      mode="outlined"
-                      size={40}
-                      onPress={openCamera}
-                    />
-                    <Text>Camera</Text>
-                  </View>
-                  <View style={{alignItems: 'center'}}>
-                    <IconButton
-                      style={{marginHorizontal: '2%'}}
-                      icon="image-outline"
-                      mode="outlined"
-                      size={40}
-                      onPress={openGallery}
-                    />
-                    <Text>Gallery</Text>
-                  </View>
-                </View>
-              </View>
-            </Modal> */}
 
             <Button
                 mode="contained"

@@ -7,7 +7,7 @@ import GroupDetail from '../Screens/Home/Groups/GroupDetail';
 import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSettings/Index';
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/InvitiDetails';
-
+import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
 const Stack = createStackNavigator();
 
 const AppStack = () => {
@@ -59,13 +59,9 @@ const AppStack = () => {
         }}
       />
 
-    <Stack.Screen
-        name="InvitiDetail"
-        component={InvitiDetails}
-        options={{
-          title: 'Inviti details',
-          headerShown: false,
-        }}
+      <Stack.Screen
+        name="AddInviti"
+        component={AddInviti}
       />
     </Stack.Navigator>
   );

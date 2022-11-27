@@ -30,6 +30,8 @@ export const InvitaionsApi = createApi({
         body: {
           invitiName: message.invitiName,
           invitiDescription: message.invitiDescription,
+          invitiImageURL: message.invitiImageURL,
+          lastStatus : message.lastStatus,
           groupId: message.groupId,
         },
       }),
@@ -43,6 +45,7 @@ export const InvitaionsApi = createApi({
           invitiId: inviti.invitiId,
           invitiName: inviti.invitiName,
           invitiDescription: inviti.invitiDescription,
+          lastStatus: inviti.lastStatus
         },
       }),
       invalidatesTags: ['Invitations'],

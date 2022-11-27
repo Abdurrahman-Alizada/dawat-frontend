@@ -19,8 +19,11 @@ import {
 import AddCategory from './AddCategory';
 import AsyncStorage from '@react-native-community/async-storage';
 const modalHeight = height * 0.7;
+import { useNavigation } from '@react-navigation/native';
 
 export default function Example({route}) {
+  const navigation = useNavigation();
+
   const {groupId} = route.params;
   const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
@@ -37,13 +40,11 @@ export default function Example({route}) {
   useEffect(() => {
     getAllInvitations();
   }, []);
-
-  const [visible, setVisible] = useState(false);
-  const [currentInviti, setCurrentInviti] = useState({});
-
+  // useState update lately, and navigation navigate before the update of state, thats why I used useRef
+  const currentInviti = useRef({})
   const FABHandler = (item) => {
-    setCurrentInviti(item ? item: { })
-    setVisible(true);
+    currentInviti.current = item ? item : {}
+    navigation.navigate("AddInviti", { groupId:groupId, currentInviti:currentInviti.current})
   };
 
   const [chips, setChips] = useState([
@@ -102,7 +103,7 @@ export default function Example({route}) {
                       size={45}
                       style={{alignSelf:"center"}}
                       avatarStyle={{borderRadius: 20}}
-                      source={require('../../../../../assets/drawer/userImage.png')}
+                      source={item.invitiImageURL ? {uri:item.invitiImageURL} : require('../../../../../assets/drawer/userImage.png')}
                     />
                   )}
                   style={{paddingVertical: '1%'}}
@@ -129,10 +130,10 @@ export default function Example({route}) {
         style={styles.fab}
         onPress={() => FABHandler()}
       />
-
-      <Modal animationType="slide" visible={visible}>
+      
+      {/* <Modal animationType="slide" visible={visible}>
         <AddInviti setVisible={setVisible} groupId={groupId} currentInviti={currentInviti} />
-      </Modal>
+      </Modal> */}
     </View>
   );
 }
