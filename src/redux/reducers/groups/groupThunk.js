@@ -6,7 +6,7 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-community/async-storage';
 export const groupApi = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://dawat-backend.herokuapp.com',
+    baseUrl: 'https://dawat-backend.onrender.com',
     prepareHeaders: async (headers, {getState}) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
