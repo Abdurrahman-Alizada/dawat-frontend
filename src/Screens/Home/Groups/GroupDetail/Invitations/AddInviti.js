@@ -4,7 +4,7 @@
 //  createdAt:   25 Oct, 2022
 //  Modified by : -------
 // ==========================================
-import {TouchableOpacity, Text, StyleSheet, Modal, View, ScrollView} from 'react-native';
+import {TouchableOpacity, Text,SafeAreaView, StyleSheet, Modal, View, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 import ImagePicker from "react-native-image-crop-picker";
 import {Avatar, IconButton, TextInput, Button, List} from 'react-native-paper';
@@ -17,7 +17,7 @@ import {
   useUpdateInvitiMutation,
   useDeleteInvitiMutation
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-// import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
@@ -81,6 +81,7 @@ const AddInviti = ({route, navigation}) => {
       cropping: true,
     }).then(image => {
       setfileData(image);
+      setIsEditStart(true)
     });
     setModalVisible(false);
   };
@@ -98,7 +99,10 @@ const AddInviti = ({route, navigation}) => {
   function renderFileData() {
     if (fileData) {
       return <Avatar.Image size={60} source={{uri: fileData.path}} />;
-    } else {
+    } else if(currentInviti?.invitiImageURL){
+      return <Avatar.Image size={60} source={{uri: currentInviti?.invitiImageURL}} />;
+    }
+     else {
       return <Avatar.Icon size={60} icon="account-circle-outline" />;
     }
   }
@@ -122,44 +126,99 @@ const AddInviti = ({route, navigation}) => {
     data.append('file', photo)
     data.append('upload_preset', 'bzgif1or')
     data.append("cloud_name", "dblhm3cbq")
-    fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
-      method: "post",
-      body: data
-    }).then(res => res.json()).
-      then(async (data) => {
-        setInvitiImageURL(data.secure_url)
-        await addInviti({
-          groupId: groupId,
-          invitiName: values.invitiName,
-          invitiDescription: values.invitiDescription,
-          invitiImageURL:data.secure_url,
-          lastStatus: stauts,
-        })
-          .then(response => {
-            navigation.goBack()
+    // if user upload image from mobile then execute if otherwise else.
+    if(photo.uri){
+      fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
+        method: "post",
+        body: data
+      }).then(res => res.json()).
+        then(async (data) => {
+          setInvitiImageURL(data.secure_url)
+          await addInviti({
+            groupId: groupId,
+            invitiName: values.invitiName,
+            invitiDescription: values.invitiDescription,
+            invitiImageURL:data.secure_url,
+            lastStatus: stauts,
           })
-          .catch(e => {
-            console.log('error in addHandler', e);
-          });
-      }).catch(err => {
-       console.log("An Error Occured While Uploading", err)
+            .then(response => {
+              navigation.goBack()
+            })
+            .catch(e => {
+              console.log('error in addHandler', e);
+            });
+        }).catch(err => {
+         console.log("An Error Occured While Uploading", err)
+        })
+    }else{
+      await addInviti({
+        groupId: groupId,
+        invitiName: values.invitiName,
+        invitiDescription: values.invitiDescription,
+        invitiImageURL:"",
+        lastStatus: stauts,
       })
- 
+        .then(response => {
+          navigation.goBack()
+        })
+        .catch(e => {
+          console.log('error in addHandler', e);
+        });
+    }
   };
+
   const updateHandler = async values => {
-    await updateInviti({
-      invitiId: currentInviti?._id,
-      invitiName: values.invitiName,
-      invitiDescription: values.invitiDescription,
-      lastStatus:stauts
-    })
-      .then(response => {
-        console.log('group has been updated =>', response);
-        navigation.goBack()
+    
+    const uri = fileData?.path;
+    const type = fileData?.mime;
+    const name = values.invitiName;
+    const photo = {uri,type,name}
+    // cloudinaryUpload(source)
+    const data = new FormData()
+    data.append('file', photo)
+    data.append('upload_preset', 'bzgif1or')
+    data.append("cloud_name", "dblhm3cbq")
+    // if user upload image from mobile then execute if block otherwise else block.
+    if(photo.uri){
+      fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
+        method: "post",
+        body: data
+      }).then(res => res.json()).
+        then(async (data) => {
+          setInvitiImageURL(data.secure_url)
+          await updateInviti({
+            invitiId: currentInviti?._id,
+            invitiName: values.invitiName,
+            invitiDescription: values.invitiDescription,
+            invitiImageURL: data.secure_url,
+            lastStatus:stauts
+          })
+            .then(response => {
+              console.log('group has been updated  with image=>', response);
+              navigation.goBack()
+            })
+            .catch(e => {
+              console.log('error in updateHandler', e);
+            });
+        }).catch(err => {
+         console.log("An Error Occured While image Uploading in update function", err)
+        })
+    }else{
+      await updateInviti({
+        invitiId: currentInviti?._id,
+        invitiName: values.invitiName,
+        invitiDescription: values.invitiDescription,
+        invitiImageURL : currentInviti?.invitiImageURL,
+        lastStatus:stauts
       })
-      .catch(e => {
-        console.log('error in updateHandler', e);
-      });
+        .then(response => {
+          console.log('group has been updated without image=>', response);
+          navigation.goBack()
+        })
+        .catch(e => {
+          console.log('error in updateHandler', e);
+        });
+    }
   };
   const deleteHandler = async ()=>{
     await deleteInviti({groupId:groupId, invitiId:currentInviti?._id})
@@ -173,8 +232,7 @@ const AddInviti = ({route, navigation}) => {
 
 
   return (
-    <ScrollView
-      style={{ padding: '5%' }}>
+    <ScrollView nestedScrollEnabled = {true} style={{ marginVertical: '1%', paddingHorizontal:"5%",   }}>
       
       <Formik
         initialValues={{
@@ -237,8 +295,10 @@ const AddInviti = ({route, navigation}) => {
                 placeholder="Inviti Status"
                 value={stauts}
                 items={statuses}
+                listMode="SCROLLVIEW"
                 setOpen={setStautsDropdonwOpen}
                 setValue={setStatus}
+                onChangeValue={()=>setIsEditStart(true)}
                 setItems={setStatuses}
               />
 
@@ -320,7 +380,7 @@ const AddInviti = ({route, navigation}) => {
                   borderColor: '#C1C2B8',
                   borderWidth: 0.5,
                   padding: '1%',
-                  marginVertical: '2%',
+                  marginVertical: '10%',
                 }}>
                 Add
               </Button>
@@ -328,45 +388,69 @@ const AddInviti = ({route, navigation}) => {
           </View>
         )}
       </Formik>
-
      {currentInviti?.invitiName &&
-      <List.Accordion title="More">
+      <List.Accordion title="More" >
         <List.Subheader>Added by</List.Subheader>
         <View
           style={{
             borderRadius: 10,
-            textAlign: 'center',
             borderColor: '#C1C2B8',
             borderWidth: 0.5,
             padding: '2%',
-            marginVertical: '2%',
+            flexDirection:"row",
+            alignItems:"center",
+            justifyContent:"space-between"
           }}>
-          <List.Item title={ currentInviti?.addedBy?.name}  left={() =><View><Avatar.Icon size={30} icon="account-circle-outline" /></View> } />
-          <Text style={{paddingHorizontal:"15%"}}>at 3/12/2022</Text>
+            <View style={{flexDirection:"row", alignItems:"center"}}>
+            <View><Avatar.Icon size={30} icon="account-circle-outline" /></View>
+            <Text style={{marginHorizontal:"4%"}}>{currentInviti?.addedBy?.name}</Text>              
+            </View>
+              <Text style={{}}>{moment(currentInviti?.createdAt).fromNow()}
+              </Text>
         </View>
       
-        <List.Subheader>History</List.Subheader>
+      
+
+        <List.Subheader >History</List.Subheader>
           {currentInviti?.statuses?.map((Status, index)=>          
-          <View
+          <View 
           key={index}
           style={{
             borderRadius: 10,
-            textAlign: 'center',
             borderColor: '#C1C2B8',
             borderWidth: 0.5,
             padding: '2%',
-            marginVertical: '2%',
-          }}>
-          <List.Item title="Noman AKhtar"  left={() =><View><Avatar.Icon size={30} icon="account-circle-outline" /></View> } />
-          <Text style={{paddingHorizontal:"15%"}}>at 3/12/2022</Text>
-          </View>
+            marginVertical:"2%"
+          }}
+          >
+            <View
+            style={{
+              flexDirection:"row",
+              alignItems:"center",
+              justifyContent:"space-between",
+            }}>
+              <View style={{}}>
+                <Text style={{padding:"2%"}}>{Status.invitiStatus} by</Text>
+                <View style={{flexDirection:"row", alignItems:"center"}}>
+                <Avatar.Icon size={30} icon="account-circle-outline" />
+                <Text style={{marginHorizontal:"4%"}}>{Status.addedBy.name}</Text>              
+                </View>
+              </View>
+              <View style={{alignItems:"center"}}>
+              { Status.invitiStatus === "rejected" && <List.Icon style={{margin:0, padding:0}} icon="cancel" /> }
+              { Status.invitiStatus === "pending" &&  <List.Icon style={{margin:0, padding:0}} icon="clock-outline" /> }
+              { Status.invitiStatus === "invited" && <List.Icon style={{margin:0, padding:0}} icon="check" /> }
+             
+              <Text style={{alignSelf:"flex-end"}}>{moment(Status?.createdAt).fromNow()} </Text>
+              </View>
+            </View>
+         </View>
           )
 
           }
   
       </List.Accordion>
       }
-
     </ScrollView>
   );
 };

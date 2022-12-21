@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, View, Alert, Pressable} from 'react-native';
+import {Image, StyleSheet, Text, View, Alert, Pressable, TouchableOpacity} from 'react-native';
 import {Chip, Card, Paragraph, IconButton, Title} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
@@ -89,20 +89,18 @@ const SingleGroup = ({
   // end logic for checked on longPress
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={onPressHandler}
       onLongPress={() => onLongPressHandler()}>
       <Card
-        mode="elevated"
+        mode="outlined"
         style={{
           marginTop: '3%',
           marginHorizontal: '3%',
-          backgroundColor: '#fff',
         }}>
         <View
           style={{
             flexDirection: 'row',
-            // paddingHorizontal: '2%',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
@@ -171,7 +169,7 @@ const SingleGroup = ({
           </Card.Actions>
         </View>
       </Card>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

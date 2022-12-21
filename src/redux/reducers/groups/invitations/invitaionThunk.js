@@ -45,7 +45,8 @@ export const InvitaionsApi = createApi({
           invitiId: inviti.invitiId,
           invitiName: inviti.invitiName,
           invitiDescription: inviti.invitiDescription,
-          lastStatus: inviti.lastStatus
+          lastStatus: inviti.lastStatus,
+          invitiImageURL: inviti.invitiImageURL
         },
       }),
       invalidatesTags: ['Invitations'],

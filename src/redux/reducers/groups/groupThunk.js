@@ -1,10 +1,10 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {instance} from '../../axios';
 
 // query
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-community/async-storage';
+
 export const groupApi = createApi({
+
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://dawat-backend.onrender.com',
     prepareHeaders: async (headers, {getState}) => {
@@ -68,27 +68,3 @@ export const {
 } = groupApi;
 
 // end query
-
-export const allInvitations = createAsyncThunk(
-  'group/allInvitations',
-  async token => {
-    const data = await instance
-      .get('api/group/invitations/6314a23ffd34b28f7cc98c7f', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        // console.log("response is", response.data)
-        return response.data;
-      })
-      .catch(e => {
-        console.log('error in allInvitations is', e);
-      });
-    if (data.length > 0) {
-      return data;
-    } else {
-      return [];
-    }
-  },
-);

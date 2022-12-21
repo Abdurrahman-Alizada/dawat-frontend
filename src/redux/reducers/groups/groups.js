@@ -1,7 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {
-  allInvitations,
-} from './groupThunk';
 
 const initialState = {
   totalgroups: [],
@@ -33,26 +30,6 @@ export const groupSlice = createSlice({
     addGroupToDelete: (state, action) => {
       console.log('hello group', action.payload);
     },
-  },
-  extraReducers: {
-    //get all groups
-    
-
-    //get all invitations
-    [allInvitations.pending]: state => {
-      state.invitationsLoader = true;
-      console.log('pending');
-    },
-    [allInvitations.fulfilled]: (state, {payload}) => {
-      // console.log('invitaions ', payload);
-      state.invitationsLoader = false;
-      state.invitations = payload;
-    },
-    [allInvitations.rejected]: state => {
-      state.invitationsLoader = false;
-      console.log('rejected');
-    },
-
   },
 });
 
