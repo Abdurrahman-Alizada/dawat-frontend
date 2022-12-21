@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 export const InvitaionsApi = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://dawat-backend.herokuapp.com',
+    baseUrl: 'https://dawat-backend.onrender.com',
     prepareHeaders: async (headers) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
@@ -30,6 +30,8 @@ export const InvitaionsApi = createApi({
         body: {
           invitiName: message.invitiName,
           invitiDescription: message.invitiDescription,
+          invitiImageURL: message.invitiImageURL,
+          lastStatus : message.lastStatus,
           groupId: message.groupId,
         },
       }),
@@ -43,6 +45,8 @@ export const InvitaionsApi = createApi({
           invitiId: inviti.invitiId,
           invitiName: inviti.invitiName,
           invitiDescription: inviti.invitiDescription,
+          lastStatus: inviti.lastStatus,
+          invitiImageURL: inviti.invitiImageURL
         },
       }),
       invalidatesTags: ['Invitations'],
@@ -71,7 +75,7 @@ export const {
 export const addNewInviti = createAsyncThunk(
   'group/inviti/addNewInviti',
   async message => {
-    return fetch('https://dawat-backend.herokuapp.com/api/group/invitations', {
+    return fetch('https://dawat-backend.onrender.com/api/group/invitations', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -98,7 +102,7 @@ export const allInvitations = createAsyncThunk(
   'group/invitations/allInvitations',
   async ({token, groupId}) => {
     return fetch(
-      `https://dawat-backend.herokuapp.com/api/group/invitations/${groupId}`,
+      `https://dawat-backend.onrender.com/api/group/invitations/${groupId}`,
       {
         method: 'GET',
         headers: {

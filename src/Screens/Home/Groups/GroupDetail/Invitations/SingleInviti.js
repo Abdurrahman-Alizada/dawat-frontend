@@ -17,7 +17,7 @@ const SingleInviti = ({item}, navigation) => {
         <Avatar
           containerStyle={{height: 60, width: 60}}
           avatarStyle={{borderRadius: 20}}
-          source={require('../../../../../assets/images/onboarding/1.png')}
+          source={item.invitiImageURL ? invitiImageURL : require('../../../../../assets/images/onboarding/1.png')}
         />
 
         <View style={{paddingHorizontal: '5%', width: '80%'}}>

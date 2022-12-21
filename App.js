@@ -35,10 +35,6 @@ export const App = () => {
       ...PaperDefaultTheme.fonts,
       medium: 'Ubuntu Bold',
     },
-    colors: {
-      ...PaperDefaultTheme.colors,
-      lightPalette
-    }
   };
 
   const [isThemeDark, setIsThemeDark] = React.useState(false);

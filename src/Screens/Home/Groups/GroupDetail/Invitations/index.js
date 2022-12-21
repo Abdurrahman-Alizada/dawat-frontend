@@ -5,7 +5,6 @@ import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
 import {
-  allInvitations,
   useGetAllInvitationsQuery,
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {
@@ -19,31 +18,24 @@ import {
 import AddCategory from './AddCategory';
 import AsyncStorage from '@react-native-community/async-storage';
 const modalHeight = height * 0.7;
+import { useNavigation } from '@react-navigation/native';
 
 export default function Example({route}) {
+  const navigation = useNavigation();
+
   const {groupId} = route.params;
-  const animating = useSelector(state => state.invitations.invitationLoader);
   const modalizeRef = useRef(null);
   const dispatch = useDispatch();
 
-  const {data, isError, isLoading, error} = useGetAllInvitationsQuery({
+  const {data, isError, isLoading, error, isFetching, refetch, getAllInvitations} = useGetAllInvitationsQuery({
     groupId,
   });
 
-  const getAllInvitations = async () => {
-    let token = await AsyncStorage.getItem('token');
-    dispatch(allInvitations({token, groupId}));
-  };
-  useEffect(() => {
-    getAllInvitations();
-  }, []);
-
-  const [visible, setVisible] = useState(false);
-  const [currentInviti, setCurrentInviti] = useState({});
-
+  // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
+  const currentInviti = useRef({})
   const FABHandler = (item) => {
-    setCurrentInviti(item ? item: { })
-    setVisible(true);
+    currentInviti.current = item ? item : {}
+    navigation.navigate("AddInviti", { groupId:groupId, currentInviti:currentInviti.current})
   };
 
   const [chips, setChips] = useState([
@@ -57,7 +49,7 @@ export default function Example({route}) {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1,}}>
       {/* <View
         style={{
           flexDirection: 'row',
@@ -84,10 +76,10 @@ export default function Example({route}) {
             justifyContent: 'center',
             flex: 1,
           }}>
-          <ActivityIndicator animating={animating} />
+          <ActivityIndicator animating={isLoading} />
         </View>
       ) : (
-        <View>
+        <View style={{flex:1}}>
           {data.length > 0 ? (
             <FlatList
               data={data}
@@ -102,17 +94,25 @@ export default function Example({route}) {
                       size={45}
                       style={{alignSelf:"center"}}
                       avatarStyle={{borderRadius: 20}}
-                      source={require('../../../../../assets/drawer/userImage.png')}
+                      source={item.invitiImageURL ? {uri:item.invitiImageURL} : require('../../../../../assets/drawer/male-user.png')}
                     />
                   )}
                   style={{paddingVertical: '1%'}}
-                  right={props => <List.Icon {...props} icon="check-circle" />}
+                  right={
+                  (props) =>{
+                    
+                    if(item.lastStatus.invitiStatus === "invited") return <List.Icon {...props} icon="check" />
+                    if(item.lastStatus.invitiStatus === "pending") return <List.Icon {...props} icon="clock-outline" />
+                    else if(item.lastStatus.invitiStatus === "rejected") return <List.Icon {...props} icon="cancel" />
+                    
+                  } 
+                }
                 />
               )}
               refreshControl={
                 <RefreshControl
-                  refreshing={animating}
-                  onRefresh={getAllInvitations}
+                  refreshing={isFetching}
+                  onRefresh={refetch}
                 />
               }
             />
@@ -129,10 +129,10 @@ export default function Example({route}) {
         style={styles.fab}
         onPress={() => FABHandler()}
       />
-
-      <Modal animationType="slide" visible={visible}>
+      
+      {/* <Modal animationType="slide" visible={visible}>
         <AddInviti setVisible={setVisible} groupId={groupId} currentInviti={currentInviti} />
-      </Modal>
+      </Modal> */}
     </View>
   );
 }

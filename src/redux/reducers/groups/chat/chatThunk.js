@@ -3,7 +3,7 @@ import { instance } from '../../../axios';
 export const addNewMessage = createAsyncThunk(
   'group/addNewMessage',
   async message => {
-    return fetch('https://dawat-backend.herokuapp.com/api/group/message', {
+    return fetch('https://dawat-backend.onrender.com/api/group/message', {
       method: 'POST',
       headers: {
         Accept: 'application/json',

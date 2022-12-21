@@ -8,7 +8,6 @@ export const invitationSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {},
-  extraReducers: {},
 });
 
 // Action creators are generated for each case reducer function

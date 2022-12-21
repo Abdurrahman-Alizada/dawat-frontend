@@ -21,7 +21,7 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
   const [message, setMessage] = useState('');
   const [localMessage, setLocalMessage] = useState('');
   let ws = React.useRef(
-    new WebSocket('wss://dawat-backend.herokuapp.com/'),
+    new WebSocket('wss://dawat-backend.onrender.com/'),
   ).current;
   // https://dawat-backend.herokuapp.com/
   // gjb7gt.sse.codesandbox.io/
