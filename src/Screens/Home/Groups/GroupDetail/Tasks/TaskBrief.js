@@ -2,7 +2,7 @@ import React, {useState, useCallback} from 'react';
 import {ToastAndroid, TouchableOpacity, Image, StyleSheet, Text, View} from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {IconButton, Avatar} from 'react-native-paper';
+import {IconButton, Avatar, List} from 'react-native-paper';
 import {useDeleteTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 const RenderGroupMembers = ({groupMembers}) => {
   if (groupMembers.responsibleAvatars) {
@@ -107,79 +107,77 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
           />
         </View>
 
-        <View style={{padding: '2%'}}>
-          <View
-            style={{
-              alignItems: 'flex-start',
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Avatar.Image
-                size={40}
-                source={require('../../../../../assets/drawer/userImage.png')}
+
+          <List.Item
+            title={item.taskName}
+            description={item.taskDescription}
+            left={props => (
+              <Avatar.Image 
+                size={45}
+                style={{alignSelf:"center"}}
+                avatarStyle={{borderRadius: 20}}
+                source={item.taskImageURL ? {uri:item.taskImageURL} : require('../../../../../assets/drawer/male-user.png')}
               />
-              <Text
-                style={{
-                  fontSize: 22,
-                  fontWeight: 'bold',
-                  margin: '1%',
-                }}>
-                {item.taskName}
-              </Text>
-            </View>
-            <View style={{}}>
-              <Text
-                style={{textAlign: 'justify'}}
-                onTextLayout={onTextLayout}
-                numberOfLines={textShown ? undefined : 2}>
-                {item.taskDescription}
-              </Text>
+            )}
+          />
 
-              {lengthMore ? (
-                <TouchableOpacity onPress={() => toggleNumberOfLines()}>
-                  <Text style={{fontWeight: 'bold'}}>
-                    {textShown ? 'Read less' : 'Read more'}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <></>
-              )}
-            </View>
-          </View>
-        </View>
-
-        <View style={{padding: '2%'}}>
-          <View style={{flexDirection: 'row'}}>
-            <Icon name="account-supervisor-circle" size={30} />
-            <View style={{marginLeft: '2%'}}>
-              <Text style={{fontSize: 18, marginBottom: '1%'}}>
+        <List.Section>
+          <View style={{paddingHorizontal:"2%"}}>
+            {/* <List.Subheader >Responsible</List.Subheader> */}
+            <Text
+              style={{
+                // borderRadius: 10,
+                // borderColor: '#C1C2B8',
+                // borderWidth: 0.5,
+                paddingVertical: '2%',
+                // marginVertical: '2%',
+                // fontWeight: 'bold',
+                // textAlign: 'center',
+              }}>
                 Responsible
-              </Text>
-              <RenderGroupMembers groupMembers={item} />
-            </View>
+            </Text>
+            <RenderGroupMembers groupMembers={item} />
           </View>
-        </View>
 
-        <View style={{padding: '2%'}}>
-          <View style={{flexDirection: 'row'}}>
-            <Icon name="timelapse" size={25} />
-            <View style={{marginLeft: '2%'}}>
+          <View style={{flexDirection:"row", justifyContent:"space-between",  }}>
+      
+            <View style={{width:"48%", alignItems:"center"}}>
+            <List.Subheader >Starting Time</List.Subheader>
               <Text
                 style={{
-                  fontSize: 18,
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '2%',
+                  width:"100%",
+                  marginVertical: '2%',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
                 }}>
-                Time
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: 14,
-                }}>
-                {moment(item.createdAt).fromNow()} -{' '}
-                {moment(item.updatedAt).to()}
+                {moment(item.createdAt).format('ll')}
               </Text>
             </View>
+      
+            <View style={{width:"48%", alignItems:"center"}}>
+            <List.Subheader >End Time</List.Subheader>
+              <Text
+                style={{
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '2%',
+                  width:"100%",
+                  marginVertical: '2%',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                {moment(item.createdAt).format('ll')}
+              </Text>
+            </View>
+
           </View>
-        </View>
+        </List.Section>
+
       </View>
     </View>
   );

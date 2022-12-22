@@ -1,4 +1,4 @@
-import {Text, StyleSheet, View, Platform} from 'react-native';
+import {Text, StyleSheet, View, Platform, ScrollView} from 'react-native';
 import React, {useState, useCallback} from 'react';
 import {TextInput, Button, Avatar, List, Appbar} from 'react-native-paper';
 import {Formik} from 'formik';
@@ -174,6 +174,26 @@ const AddTask = ({route, navigation}) => {
                 <Text style={styles.error}>{errors.taskDescription}</Text>
               ) : null}
 
+            
+              {users.length > 0 ? (
+                <ScrollView
+                  horizontal={true}
+                  style={{maxHeight: 60}}
+                  contentContainerStyle={{}}
+                  showsHorizontalScrollIndicator={false}>
+                  {usersList.map((user, index) => (
+                    <View style={{marginRight: 5}} key={user._id}>
+                      <Avatar.Image
+                        size={40}
+                        source={require('../../../../../assets/drawer/userImage.png')}
+                      />
+                      <Text style={{alignSelf: 'center'}}>{user.name}</Text>
+                      {/* <Text style={{alignSelf: 'center', maxWidth:"30%", alignSelf:"flex-start"}} numberOfLines={1}>{user}</Text> */}
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : null}
+
               <DropDownPicker
                 renderListItem={props => <Item {...props} />}
                 open={open}
@@ -219,8 +239,9 @@ const AddTask = ({route, navigation}) => {
                     });
                 }}
               />
+            
 
-{showStartingDate && (
+            {showStartingDate && (
                 <DateTimePicker
                   value={startingDate}
                   onChange={(evt, selectedDate) => {

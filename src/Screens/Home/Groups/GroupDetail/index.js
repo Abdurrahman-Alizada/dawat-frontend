@@ -153,6 +153,7 @@ const Index = ({route}) => {
       <Modalize
         ref={modalizeRef}
         // modalHeight={modalHeight}
+        adjustToContentHeight={true}
         snapPoint={500}>
         <GroupBrief />
       </Modalize>
