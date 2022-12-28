@@ -1,14 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 import {ScrollView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-// import LoginWithFacebook from './LoginWithFacebook';
-// import LoginWithGoogle from './LoginWithGoogle';
 import * as Yup from 'yup';
-import {TextInput, Button} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
-import {loginUser} from '../../../redux/reducers/user/userThunk';
+import {TextInput, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import { useLoginUserMutation } from '../../../redux/reducers/user/userThunk';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -22,20 +20,48 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginScreen = ({navigation}) => {
-  const dispatch = useDispatch();
-  const submitHandler = values => {
-    dispatch(
-      loginUser({
-        email: values.email,
-        password: values.password,
-        navigation : navigation
-      })
-    )
+
+  const [visible, setVisible] = useState(false);
+
+  const [loginUser, {isLoading, isError, error}] = useLoginUserMutation();
+
+  const submitHandler = async values => {
+   
+    const { data } = await loginUser({ email: values.email, password: values.password})
+
+    if(data?._id){
+      await AsyncStorage.setItem('isLoggedIn', 'login');
+      await AsyncStorage.setItem('id', data._id);
+      await AsyncStorage.setItem('token', data?.token);
+      await AsyncStorage.setItem('userId', data?._id);
+      await AsyncStorage.setItem('name', data?.name);
+      await AsyncStorage.setItem('email', data?.email);
+      console.log('user has been logged in =>', data);
+      navigation.navigate("Drawer");
+    }
+    if(!data?._id && isError){
+      console.log("error in login ", error)  
+      setVisible(true)
+    }
+
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      <Portal>
+        <Dialog visible={visible} onDismiss={()=>setVisible(true)}>
+            <Dialog.Title>Login Error</Dialog.Title>
+            <Dialog.Content>
+              <Paragraph>Something went wrong {error?.data?.message}</Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={()=>setVisible(false)}>Ok</Button>
+            </Dialog.Actions>
+          </Dialog>
+      </Portal>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{alignItems: 'flex-start', marginTop: 5}}>
           <Icon size={28} name="times" />
@@ -53,48 +79,20 @@ const LoginScreen = ({navigation}) => {
           Welcome back! Sign in to continue!{' '}
         </Text>
 
-        {/* <View>
-          <LoginWithGoogle />
-
-          <LoginWithFacebook />
-
-          <Button
-            title="Sign in With Apple"
-            icon={{
-              name: 'apple',
-              type: 'font-awesome',
-              size: 30,
-              color: '#fff',
-            }}
-            iconContainerStyle={{width: '20%'}}
-            titleStyle={{fontWeight: 'bold', width: '70%'}}
-            buttonStyle={{
-              backgroundColor: '#1E293B',
-              borderRadius: 10,
-              borderColor: '#C1C2B8',
-              borderWidth: 0.5,
-              height: 50,
-            }}
-          />
-        </View> */}
-
-        {/* <Text
-          style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-            alignSelf: 'center',
-            marginVertical: '2%',
-          }}>
-          or
-        </Text> */}
-
         <Formik
           initialValues={{
             email: '',
             password: '',
           }}
           validationSchema={validationSchema}
-          onSubmit={values => submitHandler(values)}>
+          onSubmit={ (values, actions) => {
+            submitHandler(values)
+               actions.resetForm({
+                  email: '',
+                  password: '',
+               })
+            } 
+          }>
           {({
             handleChange,
             handleBlur,
@@ -131,6 +129,7 @@ const LoginScreen = ({navigation}) => {
                 null
               )}
               <Button
+              loading={isLoading}
                 mode="contained"
                 style={{
                   marginTop: '2%',
@@ -154,8 +153,8 @@ const LoginScreen = ({navigation}) => {
               <Button
                 mode="outlined"
                 style={{marginTop: '2%', borderRadius: 5}}
-                onPress={() => navigation.navigate('Register')}
-                // onPress={() => console.log('asdf')}
+                onPress={() => navigation.navigate('SignUpwithEmail')}
+                // onPress={() => navigation.navigate('Register')}
               >
                 Create account
               </Button>

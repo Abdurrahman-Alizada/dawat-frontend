@@ -10,13 +10,9 @@ import {
   Text,
   TouchableRipple,
   Switch,
-  useTheme,
 } from 'react-native-paper';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PreferencesContext} from '../themeContext';
-import {useDispatch} from 'react-redux';
-import {Logout} from '../redux/reducers/user/userThunk';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,DrawerActions } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -25,20 +21,25 @@ export default function DrawerContent(props) {
   
   const [active, setActive] = React.useState('');
   const {toggleTheme, isThemeDark} = React.useContext(PreferencesContext);
-  const dispatch = useDispatch();
   const [name, setName] = useState('Abdur Rahman');
   const [email, setEmail] = useState('abdurrahman@gmail.com');
   const getUserInfo = async () => {
     const value = await AsyncStorage.getItem('name');
-    console.log('asfd', value);
     setName(await AsyncStorage.getItem('name'));
     setEmail(await AsyncStorage.getItem('email'));
+    console.log('User name', value);
   };
   useEffect(() => {
     getUserInfo();
   }, []);
-  const logout = () => {
-    dispatch(Logout({navigation:navigation}));
+  const logout = async () => {
+    await AsyncStorage.setItem('isLoggedIn', '0');
+    await AsyncStorage.setItem('id', '');
+    await AsyncStorage.setItem('token', '');
+    await AsyncStorage.setItem('userId', '');
+    await AsyncStorage.setItem('name', '');
+    navigation.dispatch(DrawerActions.closeDrawer())
+    navigation.navigate('Auth');
   };
   return (
     <DrawerContentScrollView {...props}>
@@ -52,20 +53,20 @@ export default function DrawerContent(props) {
           />
           <Title style={styles.title}>{name}</Title>
           <Caption style={styles.caption}>{email}</Caption>
-          {/* <View style={styles.row}>
+          <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                202
+                8
               </Paragraph>
-              <Caption style={styles.caption}>Following</Caption>
+              <Caption style={styles.caption}>Groups</Caption>
             </View>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                159
+                23
               </Paragraph>
-              <Caption style={styles.caption}>Followers</Caption>
+              <Caption style={styles.caption}>Tasks to do</Caption>
             </View>
-          </View> */}
+          </View>
         </View>
 
         <Drawer.Section title="General" style={styles.drawerSection}>
@@ -75,7 +76,7 @@ export default function DrawerContent(props) {
             active={active === 'first'}
             onPress={() => {
               setActive('first');
-              navigation.navigate("Profile")
+              // navigation.navigate("Profile")
             }}
           />
           <Drawer.Item
@@ -85,21 +86,6 @@ export default function DrawerContent(props) {
             onPress={() => setActive('second')}
           />
         </Drawer.Section>
-
-        {/* <Drawer.Section style={styles.drawerSection}>
-          <Drawer.CollapsedItem icon="inbox" label="Inbox" />
-          <DrawerItem
-            icon={() => (
-              <MaterialCommunityIcons
-                name="account-outline"
-                color="#000"
-                size={23}
-              />
-            )}
-            label="Profile"
-            onPress={() => {}}
-          />
-        </Drawer.Section> */}
 
         <Drawer.Section style={styles.drawerSection} title="Preferences">
           <TouchableRipple onPress={() => toggleTheme()}>

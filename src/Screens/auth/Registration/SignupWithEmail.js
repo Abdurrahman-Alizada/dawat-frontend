@@ -1,16 +1,13 @@
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import React, {useState} from 'react';
+import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {Input, Button} from 'react-native-elements';
+import {TextInput, Dialog, Paragraph, Portal} from 'react-native-paper';
 
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
-
-import {registerUser} from '../../../redux/reducers/user/userThunk';
-import {successFun} from '../../../redux/reducers/user/user'
-
-import CustomLoader from '../../../Components/CustomLoader';
+import { useRegisterUserMutation } from '../../../redux/reducers/user/userThunk';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').label('Name'),
@@ -30,33 +27,55 @@ const validationSchema = Yup.object().shape({
 
 const SignupWithEmail = () => {
   const navigation = useNavigation();
+  
+  const [visible, setVisible] = useState(false);
+  const [registerUser, {isLoading, isError, error}] = useRegisterUserMutation();
 
-  const [animating, setAnimating] = useState(false); //State for ActivityIndicator animation
-  const loader = a => {
-    setAnimating(a);
-  };
+  const submitHandler =async values => {
+    console.log("hello value", values)
+    const { data } = await registerUser({ 
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      passwordConfirmation: values.passwordConfirmation,
+    })
 
-  const dispatch = useDispatch();
-  const submitHandler = values => {
-    dispatch(
-      registerUser({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-        passwordConfirmation: values.passwordConfirmation,
-        navigation : navigation 
-      })
-    )
+      console.log("hello data", data)
+
+      if(data?._id){
+      await AsyncStorage.setItem('isLoggedIn', 'login');
+      await AsyncStorage.setItem('id', data._id);
+      await AsyncStorage.setItem('token', data?.token);
+      await AsyncStorage.setItem('userId', data?._id);
+      // await AsyncStorage.setItem('name', data?.name);
+      // await AsyncStorage.setItem('email', data?.email);
+      console.log('user has been register =>', data);
+      navigation.navigate("Drawer");
+    }
+    if(!data?._id && isError){
+      console.log("error in login ", error)  
+      setVisible(true)
+    }
+
   };
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff', padding: '2%'}}>
-      <CustomLoader animating={animating} />
 
       <Text style={{fontSize: 18, margin: '2%', fontWeight: '500'}}>
         Enter your detail
       </Text>
-
+      <Portal>
+        <Dialog visible={visible} onDismiss={()=>setVisible(true)}>
+            <Dialog.Title>Login Error</Dialog.Title>
+            <Dialog.Content>
+              <Paragraph>Something went wrong {error?.data?.message}</Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={()=>setVisible(false)}>Ok</Button>
+            </Dialog.Actions>
+          </Dialog>
+      </Portal>
       <ScrollView>
         <Formik
           initialValues={{

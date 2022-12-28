@@ -117,7 +117,9 @@ export default function Example({route}) {
               }
             />
           ) : (
-            <Text>No Invitation yet</Text>
+            <View style={{flex:1, alignItems:"center", justifyContent:"center"}}>
+              <Text >No Invitation yet</Text>
+            </View>
           )}
         </View>
       )}
