@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import {Pressable, Image, StyleSheet, Text, View, Alert} from 'react-native';
+import {TouchableOpacity, Image, StyleSheet, Text, View, Alert} from 'react-native';
 import moment from 'moment';
-import {Chip, Card, Paragraph, IconButton} from 'react-native-paper';
+import {Badge, Card, Paragraph, IconButton, Title} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
-  if (groupMembers.responsibleAvatars) {
-    // console.log('hhhh', groupMembers.users.length);
+  // console.log('hhhh', groupMembers.responsibles);
+  if (groupMembers.responsibles) {
     return (
       <View style={styles.groupMembersContent}>
-        {groupMembers.responsibleAvatars.map((user, index) => (
+        {groupMembers.responsibles.map((user, index) => (
           <View key={index}>
             {index < 3 ? (
               <View>
@@ -23,7 +23,7 @@ const RenderGroupMembers = ({groupMembers}) => {
             )}
           </View>
         ))}
-        {groupMembers.responsibleAvatars.length > 3 ? (
+        {groupMembers.responsibles.length > 3 ? (
           <View
             style={{
               justifyContent: 'center',
@@ -38,7 +38,7 @@ const RenderGroupMembers = ({groupMembers}) => {
                 paddingHorizontal: '1%',
                 fontWeight: 'bold',
               }}>
-              +{groupMembers.responsibleAvatars.length - 3}
+              +{groupMembers.responsibles.length - 3}
             </Text>
           </View>
         ) : (
@@ -55,24 +55,50 @@ const RenderGroupMembers = ({groupMembers}) => {
   );
 };
 
-const SingleTask = ({item}, navigation) => {
+const SingleTask = ({item, cardHandler}, navigation) => {
   return (
     <View>
-      <Card mode="outlined" style={{margin: '3%'}}>
-        <Card.Title title={item.taskName} />
-        <Card.Content style={{width: '98%'}}>
-          <Paragraph numberOfLines={2}>{item.taskDescription}</Paragraph>
+       <TouchableOpacity
+      onPress={()=>cardHandler(item)}
+      // onLongPress={() => onLongPressHandler()}
+      >
+      <Card
+        mode="outlined"
+        style={{
+          marginTop: '3%',
+          marginHorizontal: '3%',
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Card.Content>
+            <Title style={{fontFamily: 'Poppins-Regular'}}>
+              {item.taskName}
+            </Title>
+          </Card.Content>
+          
+         {item.priority.priority === "High" && <Badge style={{marginHorizontal:5}}></Badge>}
+         {item.priority.priority === "Normal" && <Badge style={{marginHorizontal:5, backgroundColor:"#34f"}}></Badge>}
+         {item.priority.priority === "Low" && <Badge style={{marginHorizontal:5, backgroundColor:"#ed3"}}></Badge>}
+
+        </View>
+        <Card.Content>
+          <Paragraph>{item.taskDescription}</Paragraph>
         </Card.Content>
         <View
           style={{
             height: 1,
             width: '100%',
+            marginVertical: '1%',
             backgroundColor: '#BDBDBD',
           }}></View>
         <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
           <Card.Actions style={{justifyContent: 'space-between'}}>
             <Paragraph>
-              {moment(item.createdAt).fromNow()} - {moment(item.updatedAt).to()}
+              {moment(item.startingDate).fromNow()} - {moment(item.dueDate).to()}
             </Paragraph>
           </Card.Actions>
           <Card.Actions style={{justifyContent: 'space-between'}}>
@@ -80,6 +106,8 @@ const SingleTask = ({item}, navigation) => {
           </Card.Actions>
         </View>
       </Card>
+    </TouchableOpacity>
+  
     </View>
   );
 };

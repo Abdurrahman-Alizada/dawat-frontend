@@ -29,14 +29,7 @@ import {
 import {PreferencesContext} from './src/themeContext';
 import { lightPalette } from './src/GlobalStyles';
 export const App = () => {
-  // const theme = {
-  //   ...PaperDefaultTheme,
-  //   fonts: {
-  //     ...PaperDefaultTheme.fonts,
-  //     medium: 'Ubuntu Bold',
-  //   },
-  // };
-
+ 
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   const CombinedDarkTheme = {

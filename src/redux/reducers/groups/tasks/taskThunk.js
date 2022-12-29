@@ -28,7 +28,10 @@ export const TasksApi = createApi({
           taskDescription: task.taskDescription,
           groupId: task.groupId,
           statuses:[],
-          responsibles:[]
+          responsibles:task.responsibles,
+          startingDate: task.startDate,
+          dueDate: task.dueDate,
+          priority: task.prority    
         },
       }),
       invalidatesTags: ['Tasks'],

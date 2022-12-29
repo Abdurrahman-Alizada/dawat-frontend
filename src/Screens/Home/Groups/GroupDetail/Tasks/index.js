@@ -63,9 +63,9 @@ const Task = ({route}) => {
         <FlatList
           data={data}
           renderItem={({item}) => (
-            <TouchableOpacity onPress={() => cardHandler(item)}>
-              <RenderItem item={item} />
-            </TouchableOpacity>
+            // <TouchableOpacity onPress={() => cardHandler(item)}>
+              <RenderItem item={item} cardHandler={cardHandler} />
+            // </TouchableOpacity>
           )}
         />
       ) : (
