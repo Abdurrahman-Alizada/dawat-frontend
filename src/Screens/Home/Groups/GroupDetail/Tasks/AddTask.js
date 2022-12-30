@@ -63,6 +63,13 @@ const AddTask = ({route, navigation}) => {
   const [usersList, setUsersList] = useState([]);
   const [items, setItems] = useState([]);
   const [dropdonwSearchLoading, setDropdownSearchLoading] = useState(false);
+ // date and time
+ const [startDate, setStartDate] = useState(new Date())
+ const [openStartingDate, setOpenStartingDate] = useState(false)
+ const [dueDate, setDueDate] = useState(new Date())
+ const [openDueDate, setOpenDueDate] = useState(false)
+ //  priority
+ const [prority,setPriority] = useState("low")
 
   const Item = props => {
     const [include, setInclude] = useState(users.includes(props.item._id));
@@ -110,13 +117,6 @@ const AddTask = ({route, navigation}) => {
       </View>
     );
   };
- // date and time
- const [startDate, setStartDate] = useState(new Date())
- const [openStartingDate, setOpenStartingDate] = useState(false)
- const [dueDate, setDueDate] = useState(new Date())
- const [openDueDate, setOpenDueDate] = useState(false)
- //  priority
- const [prority,setPriority] = useState("low")
 
  return (
     <View>
@@ -210,7 +210,7 @@ const AddTask = ({route, navigation}) => {
                 searchPlaceholder={'Search'}
                 setOpen={setOpen}
                 setItems={setItems}
-                listMode="FLATLIST"
+                listMode="MODAL"
                 searchable={true}
                 loading={dropdonwSearchLoading}
                 disableLocalSearch={true}
@@ -234,6 +234,7 @@ const AddTask = ({route, navigation}) => {
                       },
                     })
                     .then(items => {
+                      console.log("hello users",typeof items.data)
                       setItems(items.data);
                     })
                     .catch(err => {

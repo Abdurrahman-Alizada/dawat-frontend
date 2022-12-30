@@ -53,14 +53,7 @@ const RenderGroupMembers = ({groupMembers}) => {
   );
 };
 
-const SingleGroup = ({
-  item,
-  navigation,
-  checked,
-  setChecked,
-  checkedItems,
-  setCheckedItems,
-}) => {
+const SingleGroup = ({ item, navigation, checked, setChecked, checkedItems, setCheckedItems,}) => {
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
       groupId: item._id,

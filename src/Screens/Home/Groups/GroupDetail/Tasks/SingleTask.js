@@ -4,8 +4,8 @@ import moment from 'moment';
 import {Badge, Card, Paragraph, IconButton, Title} from 'react-native-paper';
 
 const RenderGroupMembers = ({groupMembers}) => {
-  // console.log('hhhh', groupMembers.responsibles);
   if (groupMembers.responsibles) {
+    // console.log('hhhh', groupMembers.responsibles);
     return (
       <View style={styles.groupMembersContent}>
         {groupMembers.responsibles.map((user, index) => (
@@ -98,7 +98,7 @@ const SingleTask = ({item, cardHandler}, navigation) => {
         <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
           <Card.Actions style={{justifyContent: 'space-between'}}>
             <Paragraph>
-              {moment(item.startingDate).fromNow()} - {moment(item.dueDate).to()}
+              Due - {moment(item.dueDate).format("lll")}
             </Paragraph>
           </Card.Actions>
           <Card.Actions style={{justifyContent: 'space-between'}}>
