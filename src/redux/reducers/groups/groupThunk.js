@@ -51,7 +51,7 @@ export const groupApi = createApi({
         url: `/api/group/groupremove`,
         method: 'PUT',
         body: {
-          chatId: group.groupId,
+          chatId: group.chatId,
           userId: group.userId,
         },
       }),

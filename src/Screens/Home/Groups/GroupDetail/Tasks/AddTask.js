@@ -1,5 +1,5 @@
 import { Text, StyleSheet, View, Platform, ScrollView,TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ToggleButton, TextInput, Button, Avatar, List, Appbar} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
@@ -13,7 +13,7 @@ import moment from 'moment';
 
 const validationSchema = Yup.object().shape({
   taskTitle: Yup.string().required('Task title is required').label('taskTitle'),
-  taskDescription: Yup.string().label('taskDescription'),
+  taskDescription: Yup.string().required('Please add some description').label('taskDescription'),
 });
 
 const AddTask = ({route, navigation}) => {
@@ -71,6 +71,33 @@ const AddTask = ({route, navigation}) => {
  //  priority
  const [prority,setPriority] = useState("low")
 
+ const onChangeSearchText= async () => {
+  setDropdownSearchLoading(true);
+  instance
+    .get('/api/account/allusers', {
+      headers: {
+        Authorization: `Bearer ${await AsyncStorage.getItem(
+          'token',
+        )}`,
+      },
+    })
+    .then(items => {
+      console.log("hello users",typeof items.data)
+      setItems(items.data);
+    })
+    .catch(err => {
+      console.log('error in dropdown', err);
+      //
+    })
+    .finally(() => {
+      // Hide the loading animation
+      setDropdownSearchLoading(false);
+    });
+}
+
+useEffect(()=>{
+  onChangeSearchText()
+},[])
   const Item = props => {
     const [include, setInclude] = useState(users.includes(props.item._id));
     const index = users.indexOf(props.item._id);
@@ -223,29 +250,28 @@ const AddTask = ({route, navigation}) => {
                   fontWeight: 'bold',
                 }}
                 itemKey="_id"
-                onChangeSearchText={async () => {
-                  setDropdownSearchLoading(true);
-                  instance
-                    .get('/api/account/allusers', {
-                      headers: {
-                        Authorization: `Bearer ${await AsyncStorage.getItem(
-                          'token',
-                        )}`,
-                      },
-                    })
-                    .then(items => {
-                      console.log("hello users",typeof items.data)
-                      setItems(items.data);
-                    })
-                    .catch(err => {
-                      console.log('error in dropdown', err);
-                      //
-                    })
-                    .finally(() => {
-                      // Hide the loading animation
-                      setDropdownSearchLoading(false);
-                    });
-                }}
+                // onChangeSearchText={async () => {
+                //   setDropdownSearchLoading(true);
+                //   instance
+                //     .get('/api/account/allusers', {
+                //       headers: {
+                //         Authorization: `Bearer ${await AsyncStorage.getItem(
+                //           'token',
+                //         )}`,
+                //       },
+                //     })
+                //     .then(items => {
+                //       setItems(items.data);
+                //     })
+                //     .catch(err => {
+                //       console.log('error in dropdown', err);
+                //       //
+                //     })
+                //     .finally(() => {
+                //       // Hide the loading animation
+                //       setDropdownSearchLoading(false);
+                //     });
+                // }}
               />
             
 

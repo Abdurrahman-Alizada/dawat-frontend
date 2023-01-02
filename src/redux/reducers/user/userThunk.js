@@ -2,7 +2,6 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 
-import {instance} from '../../axios';
 // register new user
 
 export const userApi = createApi({

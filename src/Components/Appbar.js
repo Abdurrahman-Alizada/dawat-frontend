@@ -8,11 +8,11 @@ import {
   Appbar,
   Searchbar,
 } from 'react-native-paper';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
+import {useNavigation, DrawerActions} from '@react-navigation/native';
 
-const Header = ({ isSearch, setIsSearch}) => {
-    const navigation = useNavigation();
-    //search
+const Header = ({isSearch, setIsSearch}) => {
+  const navigation = useNavigation();
+  //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
     setSearch(search);
@@ -35,28 +35,38 @@ const Header = ({ isSearch, setIsSearch}) => {
       {!isSearch ? (
         <View>
           <Appbar.Header>
-          {/* <Appbar.BackAction onPress={() => {}} /> */}
-          <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
-          <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
-          <Appbar.Action
-            icon="magnify"
-            onPress={() => {
-              setIsSearch(!isSearch);
-            }}
-          />
-          {/* <Appbar.Action icon={MORE_ICON} onPress={() => {}} /> */}
+            {/* <Appbar.BackAction onPress={() => {}} /> */}
+            <Appbar.Action
+              icon="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            />
+            <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
+            <Appbar.Action
+              icon="magnify"
+              onPress={() => {
+                setIsSearch(!isSearch);
+              }}
+            />
+            {/* <Appbar.Action icon={MORE_ICON} onPress={() => {}} /> */}
 
-              <Menu
-                visible={visible}
-                onDismiss={closeMenu}
-                anchor={<Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />}>
-                <Menu.Item onPress={() => {}} title="Item 1" />
-                <Menu.Item onPress={() => {}} title="Item 2" />
-                <Divider />
-                <Menu.Item onPress={() => {}} title="Item 3" />
-              </Menu>
-
-        </Appbar.Header>
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
+              }>
+              <Menu.Item
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('Profile');
+                }}
+                title="Profile"
+              />
+              <Menu.Item onPress={() => {}} title="Item 2" />
+              <Divider />
+              <Menu.Item onPress={() => {}} title="Item 3" />
+            </Menu>
+          </Appbar.Header>
         </View>
       ) : (
         <View>

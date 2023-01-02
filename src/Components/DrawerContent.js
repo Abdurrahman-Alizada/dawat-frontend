@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
 import {
@@ -19,8 +19,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   
-  const [active, setActive] = React.useState('');
-  const {toggleTheme, isThemeDark} = React.useContext(PreferencesContext);
+  const [active, setActive] = useState('');
+  const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const [name, setName] = useState('Abdur Rahman');
   const [email, setEmail] = useState('abdurrahman@gmail.com');
   const getUserInfo = async () => {
@@ -70,20 +70,15 @@ export default function DrawerContent(props) {
         </View>
 
         <Drawer.Section title="General" style={styles.drawerSection}>
-          <Drawer.Item
-            icon="account"
-            label="Profile"
-            active={active === 'first'}
-            onPress={() => {
-              setActive('first');
-              // navigation.navigate("Profile")
-            }}
-          />
+          
           <Drawer.Item
             icon="star"
-            label="Second Item"
-            active={active === 'second'}
-            onPress={() => setActive('second')}
+            label="Social"
+            active={active === 'social'}
+            onPress={() => {
+              setActive('social')
+              navigation.navigate("Social")
+            }}
           />
         </Drawer.Section>
 

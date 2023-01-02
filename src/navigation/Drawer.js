@@ -2,23 +2,22 @@ import React, {useEffect} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import HomeScreen from './AppStack';
-import Profile from '../Screens/Drawer/Profile';
 import DrawerContent from '../Components/DrawerContent';
 const Drawer1 = createDrawerNavigator();
+import Social from '../Screens/Drawer/Social';
 
 const DrawerStack = props => {
   return (
-    <Drawer1.Navigator drawerContent={() => <DrawerContent />}>
+    <Drawer1.Navigator  drawerContent={() => <DrawerContent />}>
       <Drawer1.Screen
         options={{headerShown: false}}
         name="Home"
         component={HomeScreen}
       />
       <Drawer1.Screen
-        name="Profile"
+        name="Social"
         options={{headerShown: false}}
-        // options={{}}
-        component={Profile}
+        component={Social}
       />
     </Drawer1.Navigator>
   );

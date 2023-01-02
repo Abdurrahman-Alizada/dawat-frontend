@@ -22,8 +22,10 @@ import {
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import {
-  DarkTheme as PaperDarkTheme,
-  DefaultTheme as PaperDefaultTheme,
+  // DarkTheme as PaperDarkTheme,
+  MD3DarkTheme as PaperDarkTheme,
+  MD3LightTheme as PaperDefaultTheme,
+
   Provider as PaperProvider,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
@@ -36,10 +38,7 @@ export const App = () => {
     ...PaperDarkTheme,
     ...NavigationDarkTheme,
     colors: { ...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors },
-      fonts: {
-      ...PaperDefaultTheme.fonts,
-      medium: 'Ubuntu Bold',
-    },
+      
   };
 
   const CombinedDefaultTheme = {
@@ -48,11 +47,6 @@ export const App = () => {
     colors: { 
       ...PaperDefaultTheme?.colors, 
       ...NavigationDefaultTheme.colors,  
-      // ...lightPalette
-    },
-    fonts: {
-      ...PaperDefaultTheme.fonts,
-      medium: 'Ubuntu Bold',
     },
   };
 
