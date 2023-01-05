@@ -9,6 +9,7 @@ import {
   Searchbar,
 } from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Header = ({isSearch, setIsSearch}) => {
   const navigation = useNavigation();
@@ -56,9 +57,9 @@ const Header = ({isSearch, setIsSearch}) => {
                 <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
               }>
               <Menu.Item
-                onPress={() => {
+                onPress={async () => {
                   closeMenu();
-                  navigation.navigate('Profile');
+                  navigation.navigate('Profile',{id: await AsyncStorage.getItem("id")});
                 }}
                 title="Profile"
               />
@@ -87,30 +88,5 @@ const Header = ({isSearch, setIsSearch}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#397af8',
-    marginBottom: 20,
-    width: '100%',
-    paddingVertical: 15,
-  },
-  heading: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  headerRight: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  subheaderText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Header;

@@ -16,7 +16,6 @@ import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 const Groups = ({navigation}) => {
   const animating = useSelector(state => state.groups.groupLoader);
 
-  // const [getAllGroups, {data: allGroups, isError, isLoading, error}] = useGetAllGroupsQuery();
   const  {data: allGroups, isError, isLoading, error} = useGetAllGroupsQuery();
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
     useDeleteGroupForUserMutation();

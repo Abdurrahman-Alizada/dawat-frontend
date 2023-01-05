@@ -16,7 +16,7 @@ export const userApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['User','Groups'],
+  tagTypes: ['User','Groups', 'CurrentLoginUser'],
   reducerPath: 'userApi',
   endpoints: build => ({
     
@@ -45,12 +45,16 @@ export const userApi = createApi({
       }),
       invalidatesTags: ['User','Groups'],
     }),
-
+    getCurrentLoginUser: build.query({
+      query: (id) => `/api/account/users/${id}`,
+      providesTags: ['User'],
+    }),
   }),
 });
 
 export const {
  useLoginUserMutation,
- useRegisterUserMutation
+ useRegisterUserMutation,
+ useGetCurrentLoginUserQuery
 } = userApi;
 
