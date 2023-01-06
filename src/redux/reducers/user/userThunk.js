@@ -49,12 +49,47 @@ export const userApi = createApi({
       query: (id) => `/api/account/users/${id}`,
       providesTags: ['User'],
     }),
+    // update user information - start
+    updateName : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateName`,
+        method: 'PATCH',
+        body: {
+          name : user.name,
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    updateEmail : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateEmail`,
+        method: 'PATCH',
+        body: {
+          email : user.email,
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    updatePassword : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updatePassword`,
+        method: 'PATCH',
+        body: {
+          oldPassword : user.oldPassword,
+          newPassword : user.newPassword
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
   }),
 });
 
 export const {
  useLoginUserMutation,
  useRegisterUserMutation,
- useGetCurrentLoginUserQuery
+ useUpdateNameMutation,
+ useGetCurrentLoginUserQuery,
+ useUpdateEmailMutation,
+ useUpdatePasswordMutation
 } = userApi;
 

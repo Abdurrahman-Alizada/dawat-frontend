@@ -7,20 +7,68 @@ import {
   IconButton,
   TextInput,
   ActivityIndicator,
-  Button
+  Button,
+  Snackbar
 } from 'react-native-paper';
-import {useGetCurrentLoginUserQuery} from '../../../../redux/reducers/user/userThunk';
+import {
+  useGetCurrentLoginUserQuery,
+  useUpdateNameMutation,
+  useUpdateEmailMutation,
+  useUpdatePasswordMutation,
+} from '../../../../redux/reducers/user/userThunk';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default ProfileIndex = ({route}) => {
-  const [editNam, setEditName] = useState(false);
-  const [editEmail, setEditEmail] = useState(false);
-
   const {
     data: user,
     isError,
     error,
     isLoading,
   } = useGetCurrentLoginUserQuery(route.params?.id);
+
+  const [editNam, setEditName] = useState(false);
+  const [name, setName] = useState('');
+
+  const [editEmail, setEditEmail] = useState(false);
+  const [email, setEmail] = useState(false);
+
+  const [editPassword, setEditPassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [updateName, {isLoading: updateNameLoading}] = useUpdateNameMutation();
+  const [updateEmail, {isLoading: updateEmailLoading}] = useUpdateEmailMutation();
+  const [updatePassword, {isLoading: updatePasswordLoading}] = useUpdatePasswordMutation();
+
+  const [snakeBarMessage, setSnakeBarMessage] = useState("")
+  const [showSnakeBar, setShowSnakeBar] = useState(false);
+  const editNameHandler = async () => {
+    const id = await AsyncStorage.getItem('id');
+    updateName({id: id, name: name}).then(() => {
+      setEditName(false);
+      setSnakeBarMessage("Name has been updated successfully")
+      setShowSnakeBar(true);
+    });
+  };
+  const editEmailHandler = async () => {
+    const id = await AsyncStorage.getItem('id');
+    updateEmail({id: id, email: email}).then(() => {
+      setEditEmail(false);
+      setSnakeBarMessage("Email has been updated successfully")
+      setShowSnakeBar(true)
+    });
+  };
+  const editPasswordHandler = async () => {
+    const id = await AsyncStorage.getItem('id');
+    updatePassword({id: id, oldPassword: oldPassword, newPassword: newPassword}).then((result) => {
+      // console.log("updated user is: ", result)
+      setEditPassword(false);
+      setNewPassword("")
+      setOldPassword("")
+      setSnakeBarMessage("Password has been updated successfully")
+      setShowSnakeBar(true)
+    });
+  };
 
   return (
     <SafeAreaView style={{flexGrow: 1}}>
@@ -61,8 +109,8 @@ export default ProfileIndex = ({route}) => {
                     mode="outlined"
                     size={20}
                     onPress={() => {
-                      setEditEmail(false)
-                      setEditName(true)
+                      setEditEmail(false);
+                      setEditName(true);
                     }}
                   />
                 )}
@@ -79,8 +127,26 @@ export default ProfileIndex = ({route}) => {
                     mode="outlined"
                     size={20}
                     onPress={() => {
-                      setEditName(false)
-                      setEditEmail(true)
+                      setEditName(false);
+                      setEditEmail(true);
+                    }}
+                  />
+                )}
+              />
+              <List.Subheader>Password</List.Subheader>
+
+              <List.Item
+                title="*******"
+                left={props => <List.Icon {...props} icon="account-lock-outline" />}
+                right={() => (
+                  <IconButton
+                    icon="pencil"
+                    mode="outlined"
+                    size={20}
+                    onPress={() => {
+                      setEditName(false);
+                      setEditEmail(false);
+                      setEditPassword(true)
                     }}
                   />
                 )}
@@ -100,47 +166,112 @@ export default ProfileIndex = ({route}) => {
       </View>
 
       {editNam && (
-        <View style={{padding:"2%", backgroundColor:"#fff"}}>
-
+        <View style={{padding: '2%', backgroundColor: '#fff'}}>
           <TextInput
             label="Enter name"
             autoFocus={true}
             mode="outlined"
-            // value={currentContact.note}
-            // onChangeText={(text) => setAttribute("note", text)}
+            value={name}
+            onChangeText={text => setName(text)}
           />
-          <View style={{flexDirection:"row", marginVertical:"2%", alignSelf:"flex-end"}}>
-          <Button icon="close" mode="text"  onPress={() => setEditName(false)}>
-            cancel
-          </Button>
-          <Button icon="check" mode="text"  onPress={() => setEditName(false)}>
-            Ok
-          </Button>
-
+          <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: '2%',
+              alignSelf: 'flex-end',
+            }}>
+            <Button icon="close" mode="text" onPress={() => setEditName(false)}>
+              cancel
+            </Button>
+            <Button
+              icon="check"
+              mode="text"
+              loading={updateNameLoading}
+              onPress={() => editNameHandler()}>
+              Ok
+            </Button>
           </View>
         </View>
       )}
-            {editEmail && (
-        <View style={{padding:"2%", backgroundColor:"#fff"}}>
 
+      {editEmail && (
+        <View style={{padding: '2%', backgroundColor: '#fff'}}>
           <TextInput
             label="Enter email"
             autoFocus={true}
             mode="outlined"
-            // value={currentContact.note}
-            // onChangeText={(text) => setAttribute("note", text)}
+            value={email}
+            onChangeText={text => setEmail(text)}
           />
-          <View style={{flexDirection:"row", marginVertical:"2%", alignSelf:"flex-end"}}>
-          <Button icon="close" mode="text"  onPress={() => setEditEmail(false)}>
-            cancel
-          </Button>
-          <Button icon="check" mode="text"  onPress={() => setEditEmail(false)}>
-            Ok
-          </Button>
-
+          <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: '2%',
+              alignSelf: 'flex-end',
+            }}>
+            <Button
+              icon="close"
+              mode="text"
+              onPress={() => setEditEmail(false)}>
+              cancel
+            </Button>
+            <Button
+              icon="check"
+              mode="text"
+              loading={updateEmailLoading}
+              onPress={() => editEmailHandler()}>
+              Ok
+            </Button>
           </View>
         </View>
       )}
+
+    {editPassword && (
+        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+          <TextInput
+            label="Enter old password"
+            autoFocus={true}
+            mode="outlined"
+            value={oldPassword}
+            onChangeText={text => setOldPassword(text)}
+          />
+          <TextInput
+            label="Enter new password"
+            style={{marginTop:"2%",}}
+            mode="outlined"
+            value={newPassword}
+            onChangeText={text => setNewPassword(text)}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: '2%',
+              alignSelf: 'flex-end',
+            }}>
+            <Button
+              icon="close"
+              mode="text"
+              onPress={() => setEditPassword(false)}>
+              cancel
+            </Button>
+            <Button
+              icon="check"
+              mode="text"
+              loading={updatePasswordLoading}
+              onPress={() => editPasswordHandler()}>
+              Ok
+            </Button>
+          </View>
+        </View>
+    )}
+
+      <Snackbar
+        visible={showSnakeBar}
+        onDismiss={()=>setShowSnakeBar(false)}
+        duration={4000}
+        >
+         {snakeBarMessage}
+      </Snackbar>
     </SafeAreaView>
   );
 };
