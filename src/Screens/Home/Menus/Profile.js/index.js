@@ -422,22 +422,7 @@ export default ProfileIndex = ({route}) => {
 };
 
 const styles = StyleSheet.create({
-  buttonStyle: {
-    backgroundColor: '#D70F64',
-    color: '#FFFFFF',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginVertical: '2%',
-  },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 5,
-    fontSize: 18,
-    letterSpacing: 1,
-    fontWeight: 'bold',
-  },
+ 
   images: {
     alignSelf: 'center',
     width: 150,
