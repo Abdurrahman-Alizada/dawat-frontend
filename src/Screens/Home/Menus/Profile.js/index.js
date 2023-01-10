@@ -1,4 +1,4 @@
-import {Text, View, SafeAreaView} from 'react-native';
+import {Text, View, SafeAreaView, StyleSheet, Modal} from 'react-native';
 import React, {useState} from 'react';
 import Header from '../../../../Components/ProfileScreenHeader';
 import {
@@ -8,15 +8,18 @@ import {
   TextInput,
   ActivityIndicator,
   Button,
-  Snackbar
+  Snackbar,
 } from 'react-native-paper';
 import {
   useGetCurrentLoginUserQuery,
   useUpdateNameMutation,
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
+  useUpdateImageURLMutation
 } from '../../../../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
+import ImagePicker from 'react-native-image-crop-picker';
+import AvatarModal from './AvatarModal';
 
 export default ProfileIndex = ({route}) => {
   const {
@@ -33,20 +36,22 @@ export default ProfileIndex = ({route}) => {
   const [email, setEmail] = useState(false);
 
   const [editPassword, setEditPassword] = useState(false);
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
 
   const [updateName, {isLoading: updateNameLoading}] = useUpdateNameMutation();
   const [updateEmail, {isLoading: updateEmailLoading}] = useUpdateEmailMutation();
   const [updatePassword, {isLoading: updatePasswordLoading}] = useUpdatePasswordMutation();
+  const [updateImageURL, {isLoading: updateImageURLLoading}] = useUpdateImageURLMutation();
 
-  const [snakeBarMessage, setSnakeBarMessage] = useState("")
+  const [snakeBarMessage, setSnakeBarMessage] = useState('');
   const [showSnakeBar, setShowSnakeBar] = useState(false);
+ 
   const editNameHandler = async () => {
     const id = await AsyncStorage.getItem('id');
     updateName({id: id, name: name}).then(() => {
       setEditName(false);
-      setSnakeBarMessage("Name has been updated successfully")
+      setSnakeBarMessage('Name has been updated successfully');
       setShowSnakeBar(true);
     });
   };
@@ -54,21 +59,61 @@ export default ProfileIndex = ({route}) => {
     const id = await AsyncStorage.getItem('id');
     updateEmail({id: id, email: email}).then(() => {
       setEditEmail(false);
-      setSnakeBarMessage("Email has been updated successfully")
-      setShowSnakeBar(true)
+      setSnakeBarMessage('Email has been updated successfully');
+      setShowSnakeBar(true);
     });
   };
   const editPasswordHandler = async () => {
     const id = await AsyncStorage.getItem('id');
-    updatePassword({id: id, oldPassword: oldPassword, newPassword: newPassword}).then((result) => {
+    updatePassword({
+      id: id,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    }).then(result => {
       // console.log("updated user is: ", result)
       setEditPassword(false);
-      setNewPassword("")
-      setOldPassword("")
-      setSnakeBarMessage("Password has been updated successfully")
-      setShowSnakeBar(true)
+      setNewPassword('');
+      setOldPassword('');
+      setSnakeBarMessage('Password has been updated successfully');
+      setShowSnakeBar(true);
     });
   };
+
+  // image uploading - start
+  const [modalVisible, setModalVisible] = useState(false);
+  const [fileData, setfileData] = useState(null);
+  const [avatarURL, setAvatarURL] = useState("");
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+
+  let openGallery = () => {
+    setModalVisible(!modalVisible);
+    ImagePicker.openPicker({
+      cropperCircleOverlay: true,
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      setfileData(image);
+    });
+    setModalVisible(false);
+  };
+
+  const imageUploadHandler =async ()=>{
+    console.log("helo", avatarURL)
+    const id = await AsyncStorage.getItem('id');
+    if(avatarURL){
+      updateImageURL({id: id, imageURL:avatarURL}).then(async (res) => {
+        console.log(res)
+        setAvatarURL(res.imageURL)
+        await AsyncStorage.setItem("imageURL", res.imageURL)
+        setSnakeBarMessage('Profile image has been updated successfully');
+        setShowSnakeBar(true);
+      }).catch((err)=>{
+        setSnakeBarMessage('Something went wrong while uploading image');
+      })
+    }
+
+  }
 
   return (
     <SafeAreaView style={{flexGrow: 1}}>
@@ -81,20 +126,52 @@ export default ProfileIndex = ({route}) => {
               paddingVertical: '2%',
             }}>
             <View>
-              <Avatar.Image
-                source={{
-                  uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-                }}
-                style={{alignSelf: 'center'}}
-                size={130}
-              />
-              <IconButton
-                style={{position: 'absolute', left: '55%', top: 75}}
-                icon="camera"
-                mode="contained"
-                size={28}
-                onPress={() => console.log('Pressed')}
-              />
+              {fileData ? (
+                <Avatar.Image
+                  source={{uri: fileData.path}}
+                  style={{alignSelf: 'center'}}
+                  size={130}
+                />
+              ) : (
+                <View>
+                  {avatarURL === '' && !user?.imageURL  ? (
+                    <Avatar.Icon
+                      icon="account-circle-outline"
+                      style={{alignSelf: 'center'}}
+                      size={130}
+                    />
+                  ) : (
+                    <View>
+                      {
+                        user?.imageURL ? 
+                        <Avatar.Image
+                          source={{uri: user?.imageURL}}
+                          style={{alignSelf: 'center'}}
+                          size={130}
+                        />
+                        : 
+                        <Avatar.Image
+                          source={{uri: avatarURL}}
+                          style={{alignSelf: 'center'}}
+                          size={130}
+                        />
+                      }
+                    </View>
+                  )}
+                </View>
+              )}
+              {
+                updateImageURLLoading ?
+                <></>
+                :
+                <IconButton
+                  style={{position: 'absolute', left: '55%', top: 75}}
+                  icon="camera"
+                  mode="contained"
+                  size={28}
+                  onPress={() => setModalVisible(true)}
+                />
+              }
             </View>
 
             <View style={{padding: '5%'}}>
@@ -137,7 +214,9 @@ export default ProfileIndex = ({route}) => {
 
               <List.Item
                 title="*******"
-                left={props => <List.Icon {...props} icon="account-lock-outline" />}
+                left={props => (
+                  <List.Icon {...props} icon="account-lock-outline" />
+                )}
                 right={() => (
                   <IconButton
                     icon="pencil"
@@ -146,12 +225,12 @@ export default ProfileIndex = ({route}) => {
                     onPress={() => {
                       setEditName(false);
                       setEditEmail(false);
-                      setEditPassword(true)
+                      setEditPassword(true);
                     }}
                   />
                 )}
               />
-            </View>
+             </View>
           </List.Section>
         ) : (
           <View
@@ -226,7 +305,7 @@ export default ProfileIndex = ({route}) => {
         </View>
       )}
 
-    {editPassword && (
+      {editPassword && (
         <View style={{padding: '2%', backgroundColor: '#fff'}}>
           <TextInput
             label="Enter old password"
@@ -237,7 +316,7 @@ export default ProfileIndex = ({route}) => {
           />
           <TextInput
             label="Enter new password"
-            style={{marginTop:"2%",}}
+            style={{marginTop: '2%'}}
             mode="outlined"
             value={newPassword}
             onChangeText={text => setNewPassword(text)}
@@ -263,15 +342,122 @@ export default ProfileIndex = ({route}) => {
             </Button>
           </View>
         </View>
-    )}
+      )}
+
+
 
       <Snackbar
         visible={showSnakeBar}
-        onDismiss={()=>setShowSnakeBar(false)}
-        duration={4000}
-        >
-         {snakeBarMessage}
+        onDismiss={() => setShowSnakeBar(false)}
+        duration={4000}>
+        {snakeBarMessage}
       </Snackbar>
+
+      <Modal
+        onBlur={() => setModalVisible(false)}
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View
+            style={[styles.modalView, {position: 'absolute', width: '100%'}]}>
+            <IconButton
+              style={{position: 'absolute', right: 5}}
+              icon="close-circle-outline"
+              // mode="outlined"
+              size={30}
+              onPress={() => setModalVisible(false)}
+            />
+            {/* <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="camera-image"
+                mode="outlined"
+                size={40}
+                onPress={openCamera}
+              />
+              <Text>Camera</Text>
+            </View> */}
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="image-outline"
+                mode="outlined"
+                size={40}
+                onPress={openGallery}
+              />
+              <Text>Gallery</Text>
+            </View>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="account-circle-outline"
+                mode="outlined"
+                size={40}
+                onPress={() => {
+                  setModalVisible(false);
+                  setAvatarModalVisible(true);
+                }}
+              />
+              <Text>Avatars</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {avatarModalVisible && (
+        <AvatarModal
+          avatarModalVisible={avatarModalVisible}
+          setAvatarModalVisible={setAvatarModalVisible}
+          setAvatarURL={setAvatarURL}
+          setfileData={setfileData}
+          imageUploadHandler={imageUploadHandler}
+        />
+      )}
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonStyle: {
+    backgroundColor: '#D70F64',
+    color: '#FFFFFF',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginVertical: '2%',
+  },
+  buttonTextStyle: {
+    color: '#FFFFFF',
+    paddingVertical: 5,
+    fontSize: 18,
+    letterSpacing: 1,
+    fontWeight: 'bold',
+  },
+  images: {
+    alignSelf: 'center',
+    width: 150,
+    height: 150,
+    marginHorizontal: 30,
+  },
+  error: {
+    color: 'red',
+    marginLeft: 20,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalView: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    padding: '5%',
+    // justifyContent: 'center',
+  },
+});

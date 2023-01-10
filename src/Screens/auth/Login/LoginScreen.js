@@ -36,6 +36,7 @@ const LoginScreen = ({navigation}) => {
       await AsyncStorage.setItem('userId', data?._id);
       await AsyncStorage.setItem('name', data?.name);
       await AsyncStorage.setItem('email', data?.email);
+      await AsyncStorage.setItem('imageURL', data?.imageURL ? data?.imageURL : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png');
       console.log('user has been logged in =>', data);
       navigation.navigate("Drawer");
     }

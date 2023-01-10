@@ -81,6 +81,16 @@ export const userApi = createApi({
       }),
       invalidatesTags: ['User','Groups'],
     }),
+    updateImageURL : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateImageURL`,
+        method: 'PATCH',
+        body: {
+          imageURL: user.imageURL
+        },
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -90,6 +100,7 @@ export const {
  useUpdateNameMutation,
  useGetCurrentLoginUserQuery,
  useUpdateEmailMutation,
- useUpdatePasswordMutation
+ useUpdatePasswordMutation,
+ useUpdateImageURLMutation
 } = userApi;
 

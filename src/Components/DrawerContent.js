@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState, useContext, useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
 import {
@@ -13,7 +13,7 @@ import {
 } from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
 import { useNavigation,DrawerActions } from '@react-navigation/native';
-
+import { useGetCurrentLoginUserQuery } from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function DrawerContent(props) {
@@ -22,22 +22,35 @@ export default function DrawerContent(props) {
   const [active, setActive] = useState('');
   const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const [name, setName] = useState('Abdur Rahman');
+  const id = useRef(null);
   const [email, setEmail] = useState('abdurrahman@gmail.com');
+  const [imageURL, setImageURL] = useState('');
   const getUserInfo = async () => {
-    const value = await AsyncStorage.getItem('name');
-    setName(await AsyncStorage.getItem('name'));
-    setEmail(await AsyncStorage.getItem('email'));
-    console.log('User name', value);
+    // const value = await AsyncStorage.getItem('name');
+    // setName(await AsyncStorage.getItem('name'));
+    // setEmail(await AsyncStorage.getItem('email'));
+    // setImageURL(await AsyncStorage.getItem('imageURL'));
+    id.current = await AsyncStorage.getItem("userId")
+    // console.log('User name', value);
   };
   useEffect(() => {
     getUserInfo();
   }, []);
+
+  const {
+    data: user,
+    isError,
+    error,
+    isLoading,
+  } = useGetCurrentLoginUserQuery(id.current);
+
   const logout = async () => {
     await AsyncStorage.setItem('isLoggedIn', '0');
     await AsyncStorage.setItem('id', '');
     await AsyncStorage.setItem('token', '');
     await AsyncStorage.setItem('userId', '');
     await AsyncStorage.setItem('name', '');
+    await AsyncStorage.setItem('ImageURL', '');
     navigation.dispatch(DrawerActions.closeDrawer())
     navigation.navigate('Auth');
   };
@@ -47,16 +60,16 @@ export default function DrawerContent(props) {
         <View style={styles.userInfoSection}>
           <Avatar.Image
             source={{
-              uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
+              uri:user?.imageURL ? user?.imageURL : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
             }}
             size={70}
           />
-          <Title style={styles.title}>{name}</Title>
-          <Caption style={styles.caption}>{email}</Caption>
+          <Title style={styles.title}>{user?.name}</Title>
+          <Caption style={styles.caption}>{user?.email}</Caption>
           <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                8
+                {user?.groups?.length}
               </Paragraph>
               <Caption style={styles.caption}>Groups</Caption>
             </View>
