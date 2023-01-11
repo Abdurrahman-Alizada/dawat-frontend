@@ -1,5 +1,5 @@
 import {Text, View, SafeAreaView, StyleSheet, Modal} from 'react-native';
-import React, {useState} from 'react';
+import React, {useState,useRef} from 'react';
 import Header from '../../../../Components/ProfileScreenHeader';
 import {
   Avatar,
@@ -82,37 +82,92 @@ export default ProfileIndex = ({route}) => {
   // image uploading - start
   const [modalVisible, setModalVisible] = useState(false);
   const [fileData, setfileData] = useState(null);
+  const fileDataRef = useRef(null);
   const [avatarURL, setAvatarURL] = useState("");
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   let openGallery = () => {
     setModalVisible(!modalVisible);
     ImagePicker.openPicker({
-      cropperCircleOverlay: true,
+      // cropperCircleOverlay: true,
       width: 300,
       height: 400,
       cropping: true,
     }).then(image => {
+      setAvatarURL("");
+      fileDataRef.current = image
       setfileData(image);
+      imageUploadHandler();
     });
     setModalVisible(false);
   };
 
+  let openCamera = () => {
+    setModalVisible(!modalVisible);
+
+    ImagePicker.openCamera({
+      // cropperCircleOverlay: true,
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log("image", image)
+      setAvatarURL("");
+      fileDataRef.current = image
+      setfileData(image);
+      imageUploadHandler();
+      });
+    setModalVisible(false);
+  };
   const imageUploadHandler =async ()=>{
-    console.log("helo", avatarURL)
     const id = await AsyncStorage.getItem('id');
+    
+    if(fileDataRef.current){
+      console.log("hello if 2 asdfa",avatarURL, fileDataRef.current)
+      const uri = fileDataRef.current?.path;
+      const type = fileDataRef.current?.mime;
+      const name = user?.name ? user?.name : "user-profile";
+      const photo = {uri,type,name}
+      const data = new FormData()
+      data.append('file', photo)
+      data.append('upload_preset', 'bzgif1or')
+      data.append("cloud_name", "dblhm3cbq")
+      console.log("helllo image=>", data._parts)
+      fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
+        method: "post",
+        body: data
+      }).then(res => res.json()).
+        then(async (data) => {
+          updateImageURL({id: id, imageURL:data.secure_url})
+          .then(async (res) => {
+            setSnakeBarMessage('Profile image has been updated successfully');
+            setShowSnakeBar(true);
+            fileDataRef.current = null
+            setfileData(null)
+            return;
+          }).catch((err)=>{
+            setSnakeBarMessage('Something went wrong while updating profile image');
+            fileDataRef.current = null
+            setfileData(null)
+            return;
+          })
+        }).catch(err => {
+          console.log("An Error Occured While Uploading profile image", err)
+          fileDataRef.current = null
+          setfileData(null)
+          return;
+        })
+    }
+
     if(avatarURL){
+      console.log("hello if 1 asdfa",avatarURL, fileData)
       updateImageURL({id: id, imageURL:avatarURL}).then(async (res) => {
-        console.log(res)
-        setAvatarURL(res.imageURL)
-        await AsyncStorage.setItem("imageURL", res.imageURL)
         setSnakeBarMessage('Profile image has been updated successfully');
         setShowSnakeBar(true);
       }).catch((err)=>{
         setSnakeBarMessage('Something went wrong while uploading image');
       })
     }
-
   }
 
   return (
@@ -126,9 +181,9 @@ export default ProfileIndex = ({route}) => {
               paddingVertical: '2%',
             }}>
             <View>
-              {fileData ? (
+              {fileDataRef.current ? (
                 <Avatar.Image
-                  source={{uri: fileData.path}}
+                  source={{uri: fileDataRef.current?.path}}
                   style={{alignSelf: 'center'}}
                   size={130}
                 />
@@ -162,7 +217,10 @@ export default ProfileIndex = ({route}) => {
               )}
               {
                 updateImageURLLoading ?
-                <></>
+                <ActivityIndicator 
+                style={{position: 'absolute', left: '55%', top: 75}}
+                size="large"
+                animating={updateImageURLLoading} />
                 :
                 <IconButton
                   style={{position: 'absolute', left: '55%', top: 75}}
@@ -371,7 +429,7 @@ export default ProfileIndex = ({route}) => {
               size={30}
               onPress={() => setModalVisible(false)}
             />
-            {/* <View style={{alignItems: 'center'}}>
+            <View style={{alignItems: 'center'}}>
               <IconButton
                 style={{marginHorizontal: '2%'}}
                 icon="camera-image"
@@ -380,7 +438,7 @@ export default ProfileIndex = ({route}) => {
                 onPress={openCamera}
               />
               <Text>Camera</Text>
-            </View> */}
+            </View>
             <View style={{alignItems: 'center'}}>
               <IconButton
                 style={{marginHorizontal: '2%'}}
@@ -414,6 +472,7 @@ export default ProfileIndex = ({route}) => {
           setAvatarModalVisible={setAvatarModalVisible}
           setAvatarURL={setAvatarURL}
           setfileData={setfileData}
+          fileDataRef = {fileDataRef}
           imageUploadHandler={imageUploadHandler}
         />
       )}

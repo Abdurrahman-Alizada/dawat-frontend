@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Modal, TouchableOpacity} from 'react-native';
 import {Divider, IconButton, Avatar} from 'react-native-paper';
-
 const AvatarModal = props => {
-  const [avatarsURL, setAvatarsURL] = useState([
+  
+  const avatarsURL = [
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329065/avatars-for-user-profile/Tiger_kcfhtn.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329065/avatars-for-user-profile/Raccon_ju44tn.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329064/avatars-for-user-profile/Panda_qek53a.png',
@@ -18,7 +18,8 @@ const AvatarModal = props => {
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Chicken_tqtvm0.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329062/avatars-for-user-profile/Cat_a3abro.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
-  ]);
+  ];
+  
   const [selectedAvatar, setSelectedAvatar] = useState('');
   return (
     <Modal
@@ -39,7 +40,6 @@ const AvatarModal = props => {
           size={30}
           onPress={() => {
             props?.imageUploadHandler();
-            props?.setfileData(null);
             props.setAvatarModalVisible(false);
           }}
         />
@@ -56,6 +56,8 @@ const AvatarModal = props => {
         {avatarsURL.map((avatarURL, index) => (
           <TouchableOpacity
             onPress={() => {
+              props?.setfileData(null);
+              props.fileDataRef.current = null;
               setSelectedAvatar(avatarURL);
               props.setAvatarURL(avatarURL);
             }}

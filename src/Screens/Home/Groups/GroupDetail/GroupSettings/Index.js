@@ -77,7 +77,7 @@ const Index = ({route, navigation}) => {
         </View>
       </List.Section>
 
-      <List.Section style={{marginVertical: '2%', backgroundColor: '#fff'}}>
+      <List.Section style={{margin: '2%',padding:"2%", backgroundColor: '#fff'}}>
       <List.Subheader>Group members</List.Subheader>
       <List.Item
           // onPress={handleLeave}
@@ -93,7 +93,7 @@ const Index = ({route, navigation}) => {
             left={() =>  
             <Avatar.Image
               source={{
-                uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
+                uri: member.imageURL ? member.imageURL : 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
               }}
               size={50}
             />
@@ -104,7 +104,7 @@ const Index = ({route, navigation}) => {
         }
       </List.Section>
 
-      <List.Section style={{marginVertical: '2%', backgroundColor: '#fff'}}>
+      <List.Section style={{margin: '2%',padding:"2%", backgroundColor: '#fff'}}>
         <List.Item
           onPress={handleLeave}
           title="Leave group"
