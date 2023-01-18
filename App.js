@@ -1,4 +1,4 @@
-import React,{useCallback, useMemo} from 'react';
+import React,{useCallback, useMemo, useEffect} from 'react';
 import {StyleSheet} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -13,6 +13,7 @@ import {Provider} from 'react-redux';
 const Stack = createStackNavigator();
 
 import {LogBox } from 'react-native';
+import SplashScreen123 from 'react-native-splash-screen'
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
 
@@ -64,6 +65,9 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
+  useEffect(()=>{
+    SplashScreen123.hide();
+  },[])
   return (
     <PreferencesContext.Provider value={preferences}>
       <Provider store={store}>

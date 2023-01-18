@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import { View} from 'react-native';
 import {
-  Button,
   Menu,
   Divider,
-  Provider,
   Appbar,
   Searchbar,
 } from 'react-native-paper';
@@ -57,15 +55,15 @@ const Header = ({isSearch, setIsSearch}) => {
                 <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
               }>
               <Menu.Item
+                leadingIcon="account-outline"
                 onPress={async () => {
                   closeMenu();
                   navigation.navigate('Profile',{id: await AsyncStorage.getItem("id")});
                 }}
                 title="Profile"
               />
-              <Menu.Item onPress={() => {}} title="Item 2" />
               <Divider />
-              <Menu.Item onPress={() => {}} title="Item 3" />
+              <Menu.Item leadingIcon="cog-outline" onPress={() => {}} title="Settings" />
             </Menu>
           </Appbar.Header>
         </View>

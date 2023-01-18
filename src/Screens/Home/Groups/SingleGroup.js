@@ -1,62 +1,30 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, View, Alert, Pressable, TouchableOpacity} from 'react-native';
-import {Chip, Card, Paragraph, IconButton, Title} from 'react-native-paper';
+import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {
+  Chip,
+  Card,
+  Paragraph,
+  IconButton,
+  Title,
+  List,
+  Avatar,
+  Checkbox,
+  ActivityIndicator,
+  Divider,
+} from 'react-native-paper';
 
-const RenderGroupMembers = ({groupMembers}) => {
-  if (groupMembers) {
-    // console.log('hhhh', groupMembers.users.length);
-    return (
-      <View style={styles.groupMembersContent}>
-        {groupMembers.users.map((user, index) => (
-          <View key={index}>
-            {index < 3 ? (
-              <View>
-                <Image
-                  style={styles.memberImage}
-                  source={require('../../../assets/drawer/userImage.png')}
-                />
-              </View>
-            ) : (
-              <></>
-            )}
-          </View>
-        ))}
-        {groupMembers.users.length > 3 ? (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderWidth: 1.5,
-              borderRadius: 50,
-              borderColor: '#20232a',
-            }}>
-            <Text
-              style={{
-                fontSize: 10,
-                paddingHorizontal: '1%',
-                fontWeight: 'bold',
-              }}>
-              +{groupMembers.users.length - 3}
-            </Text>
-          </View>
-        ) : (
-          <></>
-        )}
-      </View>
-    );
-  }
-  return (
-    <Image
-      style={styles.memberImage}
-      source={require('../../../assets/images/onboarding/1.png')}
-    />
-  );
-};
-
-const SingleGroup = ({ item, navigation, checked, setChecked, checkedItems, setCheckedItems,}) => {
+const SingleGroup = ({
+  item,
+  navigation,
+  checked,
+  setChecked,
+  checkedItems,
+  setCheckedItems,
+  deleteLoading,
+}) => {
   const onPressHandler = () => {
     navigation.navigate('GroupDetail', {
-      group:item,
+      group: item,
       groupId: item._id,
       groupName: item.groupName,
     });
@@ -86,83 +54,28 @@ const SingleGroup = ({ item, navigation, checked, setChecked, checkedItems, setC
     <TouchableOpacity
       onPress={onPressHandler}
       onLongPress={() => onLongPressHandler()}>
-      <Card
-        mode="outlined"
-        style={{
-          marginTop: '3%',
-          marginHorizontal: '3%',
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Card.Content>
-            <Title style={{fontFamily: 'Poppins-Regular'}}>
-              {item.groupName}
-            </Title>
-          </Card.Content>
-
-          {checked && include ? (
-            <IconButton
-              icon="check-circle"
-              iconColor={'#BDBDBD'}
-              size={30}
-              onPress={() => console.log('Pressed')}
-            />
-          ) : (
-            <IconButton
-              icon="dots-horizontal"
-              iconColor={'#BDBDBD'}
-              size={30}
-              onPress={() => console.log('Pressed')}
-            />
-          )}
-        </View>
-        <Card.Content>
-          <Paragraph>{item.groupDescription}</Paragraph>
-        </Card.Content>
-        <View
-          style={{
-            height: 1,
-            width: '100%',
-            marginVertical: '1%',
-            backgroundColor: '#BDBDBD',
-          }}></View>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <View style={{flexDirection: 'row'}}>
-            <View style={{marginHorizontal: '1%'}}>
-              <Chip
-                mode="outlined"
-                icon="calendar-today"
-                onPress={() => console.log('Pressed')}>
-                12
-              </Chip>
-            </View>
-            <View style={{marginHorizontal: '1%'}}>
-              <Chip
-                mode="outlined"
-                icon="account-group-outline"
-                onPress={() => console.log('Pressed')}>
-                12
-              </Chip>
-            </View>
-            <View style={{marginHorizontal: '1%'}}>
-              <Chip
-                mode="outlined"
-                icon="message-text-outline"
-                onPress={() => console.log('Pressed')}>
-                12
-              </Chip>
-            </View>
+      <List.Item
+        title={item.groupName}
+        description={item.groupDescription}
+        left={props => <Avatar.Text style={props.style} label="A" size={40} />}
+        right={() => (
+          <View>
+            {checked && (
+              <View>
+                {!deleteLoading ? (
+                  <Checkbox
+                    status={checked && include ? 'checked' : 'unchecked'}
+                    onPress={onLongPressHandler}
+                  />
+                ) : (
+                  <ActivityIndicator animating={deleteLoading} />
+                )}
+              </View>
+            )}
           </View>
-
-          <Card.Actions style={{justifyContent: 'space-between'}}>
-            <RenderGroupMembers groupMembers={item} />
-          </Card.Actions>
-        </View>
-      </Card>
+        )}
+      />
+     {/* <Divider/> */}
     </TouchableOpacity>
   );
 };

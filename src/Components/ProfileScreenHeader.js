@@ -6,14 +6,6 @@ import {useNavigation} from '@react-navigation/native';
 const Header = ({ onOpen, group}) => {
   const navigation = useNavigation();
   
-  // "more menu"
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const [visible, setVisible] = React.useState(false);
-
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-  // end more menu
   return (
     <>
         <View>

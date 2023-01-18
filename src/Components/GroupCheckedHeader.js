@@ -42,7 +42,7 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack}) => {
             anchor={
               <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
             }>
-            <Menu.Item onPress={() => {}} title="Profile" />
+            <Menu.Item onPress={() => {}} title="item 1" />
             <Menu.Item onPress={() => {}} title="Item 2" />
             <Divider />
             <Menu.Item onPress={() => {}} title="Item 3" />

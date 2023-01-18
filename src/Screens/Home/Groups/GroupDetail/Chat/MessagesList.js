@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, {useRef, useEffect} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text, View, Image} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {allMessages} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
@@ -53,7 +53,10 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
           ))}
         </ScrollView>
       ) : (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Image 
+          source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
+          />
           <Text>Send message to start conversation</Text>
         </View>
       )}

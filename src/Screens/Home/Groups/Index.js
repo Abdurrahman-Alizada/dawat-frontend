@@ -16,17 +16,16 @@ import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 const Groups = ({navigation}) => {
   const animating = useSelector(state => state.groups.groupLoader);
 
-  const  {data: allGroups, isError, isLoading, error} = useGetAllGroupsQuery();
+  const  {data: allGroups, isError, isLoading, error, isFetching, refetch} = useGetAllGroupsQuery();
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
     useDeleteGroupForUserMutation();
 
   // groups to delete
   const addGrouptoDelete1 = async () => {
     let userId = await AsyncStorage.getItem('userId');
-
     for (i = 0; i < checkedItems.length; i++) {
       let groupId = checkedItems[i];
-      deleteGroupForUser({userId, groupId});
+      deleteGroupForUser({userId: userId , chatId: groupId});
     }
     setCheckedItems([]);
     setChecked(false);
@@ -93,10 +92,9 @@ const Groups = ({navigation}) => {
                 )}
                 refreshControl={
                   <RefreshControl
-                    //refresh control used for the Pull to Refresh
-                    refreshing={isLoading}
-                    // onRefresh={()=>adkfj()}
-                  />
+                  refreshing={isFetching}
+                  onRefresh={refetch}
+                />
                 }
               />
             ) : (

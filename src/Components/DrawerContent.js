@@ -82,18 +82,7 @@ export default function DrawerContent(props) {
           </View>
         </View>
 
-        <Drawer.Section title="General" style={styles.drawerSection}>
-          
-          <Drawer.Item
-            icon="star"
-            label="Social"
-            active={active === 'social'}
-            onPress={() => {
-              setActive('social')
-              navigation.navigate("Social")
-            }}
-          />
-        </Drawer.Section>
+      
 
         <Drawer.Section style={styles.drawerSection} title="Preferences">
           <TouchableRipple onPress={() => toggleTheme()}>
@@ -104,14 +93,7 @@ export default function DrawerContent(props) {
               </View>
             </View>
           </TouchableRipple>
-          <TouchableRipple onPress={() => {}}>
-            <View style={styles.preference}>
-              <Text>RTL</Text>
-              <View pointerEvents="none">
-                <Switch value={true} />
-              </View>
-            </View>
-          </TouchableRipple>
+         
         </Drawer.Section>
 
         <Drawer.Item
