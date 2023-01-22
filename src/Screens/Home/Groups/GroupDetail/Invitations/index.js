@@ -17,6 +17,7 @@ import {
 } from 'react-native-paper';
 import AddCategory from './AddCategory';
 import AsyncStorage from '@react-native-community/async-storage';
+import InvitaionsList from '../../../../Skeletons/InvitationsList';
 const modalHeight = height * 0.7;
 import { useNavigation } from '@react-navigation/native';
 
@@ -72,11 +73,9 @@ export default function Example({route}) {
       {isLoading ? (
         <View
           style={{
-            alignSelf: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
-          <ActivityIndicator animating={isLoading} />
+            margin:"3%"
+         }}>
+            <InvitaionsList />
         </View>
       ) : (
             <FlatList
