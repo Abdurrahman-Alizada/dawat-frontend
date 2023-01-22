@@ -3,7 +3,6 @@ import {Text, StyleSheet, RefreshControl, View, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
 import {ActivityIndicator, AnimatedFAB} from 'react-native-paper';
-
 import {useSelector, useDispatch} from 'react-redux';
 import  {
   groupApi,
@@ -13,6 +12,8 @@ import  {
 import {Provider} from 'react-native-paper';
 import Header from '../../../Components/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
+import GroupsList from '../../Skeletons/Groups';
+
 const Groups = ({navigation}) => {
   const animating = useSelector(state => state.groups.groupLoader);
 
@@ -34,13 +35,6 @@ const Groups = ({navigation}) => {
   const onOpen = () => {
     navigation.navigate('AddGroup');
   };
-
-  //  const adkfj = groupApi.endpoints.getAllGroups.useQuery()
-  // const onRefreshHandler = ()=>{
-  // }
-
-  // fab
-  
   const [isExtended, setIsExtended] = React.useState(true);
 
   const onScroll = ({nativeEvent}) => {
@@ -105,11 +99,9 @@ const Groups = ({navigation}) => {
         ) : (
           <View
             style={{
-              alignSelf: 'center',
-              justifyContent: 'center',
-              flex: 1,
+            margin:"3%"
             }}>
-            <ActivityIndicator animating={animating} />
+              <GroupsList />
           </View>
         )}
       </Provider>
