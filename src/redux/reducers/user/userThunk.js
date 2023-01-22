@@ -1,52 +1,106 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
-import {instance} from '../../axios';
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+
 // register new user
-export const registerUser = createAsyncThunk(
-  'user/registerUser',
-  async user => {
-    const {name, email, password, passwordConfirmation} = user;
-    const {data} = await instance.post('/api/account/register', {
-      name,
-      email,
-      password,
-      passwordConfirmation,
-    });
 
-    console.log('register data is..', data);
-    // if (data.email) {
-    await AsyncStorage.setItem('isLoggedIn', 'login');
-    await AsyncStorage.setItem('id', data._id);
-    await AsyncStorage.setItem('token', data?.token);
-    await AsyncStorage.setItem('userId', data?._id);
-    await AsyncStorage.setItem('name', data?.name);
-    await AsyncStorage.setItem('email', data?.email);
-    user.navigation.navigate('Drawer');
-    return data;
-  },
-);
+export const userApi = createApi({
 
-export const loginUser = createAsyncThunk('user/login', async user => {
-  const {email, password, navigation} = user;
-  const {data} = await instance.post('/api/account/login', {
-    email,
-    password,
-  });
-  // console.log('login data is..', data);
-  await AsyncStorage.setItem('isLoggedIn', 'login');
-  await AsyncStorage.setItem('id', data._id);
-  await AsyncStorage.setItem('token', data?.token);
-  await AsyncStorage.setItem('userId', data?._id);
-  await AsyncStorage.setItem('name', data?.name);
-  await AsyncStorage.setItem('email', data?.email);
-  navigation.navigate('Drawer');
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://dawat-backend.onrender.com',
+    prepareHeaders: async (headers, {getState}) => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['User','Groups', 'CurrentLoginUser'],
+  reducerPath: 'userApi',
+  endpoints: build => ({
+    
+    registerUser : build.mutation({
+      query: user => ({
+        url: `/api/account/register`,
+        method: 'POST',
+        body: {
+          name : user.name,
+          email : user.email,
+          password : user.password,
+          passwordConfirmation : user.passwordConfirmation,
+        },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    loginUser : build.mutation({
+      query: user => ({
+        url: `/api/account/login`,
+        method: 'POST',
+        body: {
+          email : user.email,
+          password : user.password,
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    getCurrentLoginUser: build.query({
+      query: (id) => `/api/account/users/${id}`,
+      providesTags: ['User'],
+    }),
+    // update user information - start
+    updateName : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateName`,
+        method: 'PATCH',
+        body: {
+          name : user.name,
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    updateEmail : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateEmail`,
+        method: 'PATCH',
+        body: {
+          email : user.email,
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    updatePassword : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updatePassword`,
+        method: 'PATCH',
+        body: {
+          oldPassword : user.oldPassword,
+          newPassword : user.newPassword
+        },
+      }),
+      invalidatesTags: ['User','Groups'],
+    }),
+    updateImageURL : build.mutation({
+      query: user => ({
+        url: `/api/account/users/${user.id}/updateImageURL`,
+        method: 'PATCH',
+        body: {
+          imageURL: user.imageURL
+        },
+      }),
+      invalidatesTags: ['User'],
+    }),
+  }),
 });
-export const Logout = createAsyncThunk('user/Logout', async navigation => {
-  console.log('navigataion', navigation);
-  await AsyncStorage.setItem('isLoggedIn', '0');
-  await AsyncStorage.setItem('id', '');
-  await AsyncStorage.setItem('token', '');
-  await AsyncStorage.setItem('userId', '');
-  await AsyncStorage.setItem('name', '');
-  navigation.navigate('Auth');
-});
+
+export const {
+ useLoginUserMutation,
+ useRegisterUserMutation,
+ useUpdateNameMutation,
+ useGetCurrentLoginUserQuery,
+ useUpdateEmailMutation,
+ useUpdatePasswordMutation,
+ useUpdateImageURLMutation
+} = userApi;
+

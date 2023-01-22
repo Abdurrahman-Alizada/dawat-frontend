@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Menu, Divider, Appbar, Searchbar} from 'react-native-paper';
+import {StyleSheet, View,TouchableOpacity} from 'react-native';
+import {Menu, Divider, Appbar, Searchbar,Avatar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 
 const Header = ({isSearch, setIsSearch, onOpen, group}) => {
@@ -27,15 +27,14 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
     <>
       {!isSearch ? (
         <View>
-          <Appbar.Header>
-            {/* <Appbar.BackAction onPress={() => {}} /> */}
+          <Appbar.Header >
             <Appbar.BackAction onPress={() => navigation.goBack()} />
+            
             <Appbar.Content
               onPress={() => {
                 navigation.navigate('SingleGroupSettings', {group: group});
               }}
               title={group.groupName}
-              titleStyle={{alignSelf: 'center'}}
             />
             <Appbar.Action
               icon="briefcase-outline"
@@ -44,17 +43,17 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
               }}
             />
 
-            <Menu
+            {/* <Menu
               visible={visible}
               onDismiss={closeMenu}
               anchor={
                 <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
               }>
-              <Menu.Item onPress={() => {}} title="Item 1" />
+              <Menu.Item onPress={() => {}} title="item 1" />
               <Menu.Item onPress={() => {}} title="Item 2" />
               <Divider />
               <Menu.Item onPress={() => {}} title="Item 3" />
-            </Menu>
+            </Menu> */}
           </Appbar.Header>
         </View>
       ) : (

@@ -32,7 +32,7 @@ import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),
-  groupDescription: Yup.string().label('groupName'),
+  groupDescription: Yup.string().label('groupDescription'),
 });
 
 const AddGroup = ({navigation, onClose}) => {
@@ -56,23 +56,12 @@ const AddGroup = ({navigation, onClose}) => {
 
   const [addGroup, {isLoading}] = useAddGroupMutation();
 
-  const submitHandler = async values => {
-    await addGroup({
-      groupName: values.groupName,
-      members: users,
-    })
-      .then(response => {
-        console.log('new created group is =>', response);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-    navigation.navigate('HomeIndex');
-  };
-
   const [fileData, setfileData] = useState(null);
+  const fileDataRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [dropdonwSearchLoading, setDropdownSearchLoading] = useState(false);
+  const [isAddButtonDisable, setIsAddButtonDisable] = useState(false);
+
   let openCamera = () => {
     setModalVisible(!modalVisible);
 
@@ -83,6 +72,7 @@ const AddGroup = ({navigation, onClose}) => {
       cropping: true,
     }).then(image => {
       setfileData(image);
+      fileDataRef.current = image;
       console.log(image);
     });
   };
@@ -97,6 +87,7 @@ const AddGroup = ({navigation, onClose}) => {
       cropping: true,
     }).then(image => {
       setfileData(image);
+      fileDataRef.current = image;
       console.log(image);
     });
   };
@@ -111,30 +102,70 @@ const AddGroup = ({navigation, onClose}) => {
         alert(e);
       });
   };
-  function renderFileData() {
-    if (fileData) {
-      return (
-        <View style={styles.images}>
-          <Image source={{uri: fileData.path}} style={styles.images} />
-          <Ionicons
-            name="close"
-            color="black"
-            size={25}
-            onPress={removePicture}
-            style={{
-              position: 'absolute',
-              right: -5,
-              top: -5,
-              borderRadius: 50,
-              backgroundColor: '#fff',
-            }}
-          />
-        </View>
-      );
-    } else {
-      return <View></View>;
+ 
+  const submitHandler = async values => {
+    setIsAddButtonDisable(true);
+    
+    if(fileDataRef.current){
+      const uri = fileDataRef.current?.path;
+      const type = fileDataRef.current?.mime;
+      const name = values.groupName;
+      const photo = {uri,type,name}
+      const data = new FormData()
+      data.append('file', photo)
+      data.append('upload_preset', 'bzgif1or')
+      data.append("cloud_name", "dblhm3cbq")
+      fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
+        method: "post",
+        body: data
+      }).then(res => res.json()).
+        then(async (data) => {
+          
+          await addGroup({
+            groupName: values.groupName,
+            groupDescription : values.groupDescription,
+            imageURL: data.secure_url,
+            isChat:true,
+            isTasks:true,
+            isInvitations: true,
+            isMute:false,
+            members: users,
+          })
+            .then(response => {
+              console.log('new created group is =>', response);
+            })
+            .catch(e => {
+              console.log(e);
+            });
+          navigation.navigate('HomeIndex');
+
+        }).catch(err => {
+          console.log("An Error Occured While Uploading group image", err)
+          fileDataRef.current = null
+          setfileData(null)
+          return;
+        })
     }
-  }
+
+    await addGroup({
+      groupName: values.groupName,
+      groupDescription : values.groupDescription,
+      imageURL: "",
+      isChat:true,
+      isTasks:true,
+      isInvitations: true,
+      isMute:false,
+      members: users,
+    })
+      .then(response => {
+        console.log('new created group is =>', response);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+    navigation.navigate('HomeIndex');
+
+  };
 
   const Item = props => {
     const [include, setInclude] = useState(users.includes(props.item._id));
@@ -185,7 +216,7 @@ const AddGroup = ({navigation, onClose}) => {
   };
 
   return (
-    <View style={{padding: '5%', backgroundColor: '#fff', flex: 1}}>
+    <View style={{padding: '5%'}}>
       {users.length > 0 ? (
         <ScrollView
           horizontal={true}
@@ -208,6 +239,7 @@ const AddGroup = ({navigation, onClose}) => {
         <Formik
           initialValues={{
             groupName: '',
+            groupDescription:'',
           }}
           validationSchema={validationSchema}
           onSubmit={values => submitHandler(values)}>
@@ -220,31 +252,59 @@ const AddGroup = ({navigation, onClose}) => {
             touched,
           }) => (
             <View style={{marginVertical: '2%'}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <IconButton
-                  style={{width: '10%'}}
-                  icon="camera"
-                  mode="outlined"
-                  size={20}
-                  onPress={() => setModalVisible()}
-                />
-                <TextInput
-                  error={errors.groupName && touched.groupName ? true : false}
-                  label="Group Name"
-                  mode="outlined"
-                  style={{marginVertical: '2%', width: '85%'}}
-                  onChangeText={handleChange('groupName')}
-                  onBlur={handleBlur('groupName')}
-                  value={values.groupName}
-                />
+              <View>
+                {fileData ? (
+                  <Avatar.Image
+                    source={{uri: fileData.path}}
+                    style={{alignSelf: 'center'}}
+                    size={100}
+                  />
+                ) : (
+                  <View>
+                    <Avatar.Icon
+                      icon="account-circle-outline"
+                      style={{alignSelf: 'center'}}
+                      size={100}
+                    />
+
+                  </View>
+                )
+              }
+              <IconButton
+                style={{position: 'absolute', left: '52%', top: 55}}
+                icon="camera"
+                mode="contained"
+                size={25}
+                onPress={() => setModalVisible(true)}
+              />
               </View>
+
+              <TextInput
+              style={{marginTop:"4%"}}
+                error={errors.groupName && touched.groupName ? true : false}
+                label="Group Name"
+                mode="outlined"
+                // style={{marginVertical: '2%', width: '85%'}}
+                onChangeText={handleChange('groupName')}
+                onBlur={handleBlur('groupName')}
+                value={values.groupName}
+              />
               {errors.groupName && touched.groupName ? (
                 <Text style={styles.error}>{errors.groupName}</Text>
+              ) : null}
+
+              <TextInput
+              style={{marginTop:"4%"}}
+                error={errors.groupDescription && touched.groupDescription ? true : false}
+                label="Group Description"
+                mode="outlined"
+                // style={{marginVertical: '2%', width: '85%'}}
+                onChangeText={handleChange('groupDescription')}
+                onBlur={handleBlur('groupDescription')}
+                value={values.groupDescription}
+              />
+              {errors.groupDescription && touched.groupDescription ? (
+                <Text style={styles.error}>{errors.groupDescription}</Text>
               ) : null}
 
               <View style={{marginVertical: '5%'}}>
@@ -299,45 +359,13 @@ const AddGroup = ({navigation, onClose}) => {
                 />
               </View>
 
-              {/* <Input
-              placeholder="Optional"
-              label="Enter Description"
-              onChangeText={handleChange('groupDescription')}
-              onBlur={handleBlur('groupDescription')}
-              value={values.groupDescription}
-            /> */}
-
-              {renderFileData()}
-
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                  setModalVisible(!modalVisible);
-                }}>
-                <View style={styles.centeredView}>
-                  <View style={[styles.modalView, {width: 350, height: 340}]}>
-                    <TouchableOpacity
-                      onPress={openCamera}
-                      style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                      <Text style={styles.buttonTextStyle}>Choose File</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={openGallery}
-                      style={[styles.buttonStyle, {marginHorizontal: 50}]}>
-                      <Text style={styles.buttonTextStyle}>Open Gallery</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Modal>
-
+            
               <Button
+              disabled={isAddButtonDisable}
+              loading={isLoading}
                 mode="contained"
                 style={{
                   marginTop: '2%',
-                  borderRadius: 5,
-                  backgroundColor: '#334C8C',
                 }}
                 onPress={handleSubmit}>
                 Add
@@ -346,6 +374,47 @@ const AddGroup = ({navigation, onClose}) => {
           )}
         </Formik>
       </View>
+      <Modal
+        onBlur={() => setModalVisible(false)}
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View
+            style={[styles.modalView, {position: 'absolute', width: '100%'}]}>
+            <IconButton
+              style={{position: 'absolute', right: 5}}
+              icon="close-circle-outline"
+              // mode="outlined"
+              size={30}
+              onPress={() => setModalVisible(false)}
+            />
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="camera-image"
+                mode="outlined"
+                size={40}
+                onPress={openCamera}
+              />
+              <Text>Camera</Text>
+            </View>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="image-outline"
+                mode="outlined"
+                size={40}
+                onPress={openGallery}
+              />
+              <Text>Gallery</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -353,24 +422,6 @@ const AddGroup = ({navigation, onClose}) => {
 export default AddGroup;
 
 const styles = StyleSheet.create({
-  buttonStyle: {
-    backgroundColor: '#D70F64',
-    color: '#FFFFFF',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    width: 240,
-    borderRadius: 10,
-    marginVertical: '5%',
-  },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 5,
-    fontSize: 18,
-    letterSpacing: 1,
-    fontWeight: 'bold',
-  },
   images: {
     alignSelf: 'center',
     width: 150,
@@ -378,35 +429,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   error: {
-    marginLeft: '15%',
     color: 'red',
+    marginLeft: 20,
   },
 
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  inputStyle: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#DFE2E5',
-    borderRadius: 10,
-  },
   modalView: {
-    margin: 20,
+    flexDirection: 'row',
     backgroundColor: 'white',
-    justifyContent: 'center',
-    borderRadius: 20,
-    width: 100,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    padding: '5%',
+    // justifyContent: 'center',
   },
 });

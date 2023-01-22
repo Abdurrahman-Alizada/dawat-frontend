@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React,{useCallback, useMemo, useEffect} from 'react';
+import {StyleSheet} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import SplashScreen from './src/Screens/SplashScreen/SplashScreen';
@@ -12,7 +12,8 @@ import {Provider} from 'react-redux';
 
 const Stack = createStackNavigator();
 
-import {LogBox, Appearance } from 'react-native';
+import {LogBox } from 'react-native';
+import SplashScreen123 from 'react-native-splash-screen'
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
 
@@ -22,30 +23,41 @@ import {
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import {
+  // DarkTheme as PaperDarkTheme,
   MD3DarkTheme as PaperDarkTheme,
-  DefaultTheme as PaperDefaultTheme,
+  MD3LightTheme as PaperDefaultTheme,
+
   Provider as PaperProvider,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
 import { lightPalette } from './src/GlobalStyles';
 export const App = () => {
-  const theme = {
+ 
+  const [isThemeDark, setIsThemeDark] = React.useState(false);
+
+  const CombinedDarkTheme = {
+    ...PaperDarkTheme,
+    ...NavigationDarkTheme,
+    colors: { ...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors },
+      
+  };
+
+  const CombinedDefaultTheme = {
     ...PaperDefaultTheme,
-    fonts: {
-      ...PaperDefaultTheme.fonts,
-      medium: 'Ubuntu Bold',
+    ...NavigationDefaultTheme,
+    colors: { 
+      ...PaperDefaultTheme?.colors, 
+      ...NavigationDefaultTheme.colors,  
     },
   };
 
-  const [isThemeDark, setIsThemeDark] = React.useState(false);
-  let paperTheme = isThemeDark ? PaperDarkTheme : theme;
-  let navTheme = isThemeDark ? NavigationDarkTheme : NavigationDefaultTheme;
+  let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
 
-  const toggleTheme = React.useCallback(() => {
+  const toggleTheme = useCallback(() => {
     return setIsThemeDark(!isThemeDark);
   }, [isThemeDark]);
 
-  const preferences = React.useMemo(
+  const preferences = useMemo(
     () => ({
       toggleTheme,
       isThemeDark,
@@ -53,11 +65,14 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
+  useEffect(()=>{
+    SplashScreen123.hide();
+  },[])
   return (
     <PreferencesContext.Provider value={preferences}>
       <Provider store={store}>
-        <PaperProvider theme={paperTheme}>
-          <NavigationContainer theme={navTheme}>
+        <PaperProvider theme={theme}>
+          <NavigationContainer theme={theme}>
             <Stack.Navigator initialRouteName="SplashScreen">
               {/* SplashScreen which will come once for 5 Seconds */}
               <Stack.Screen

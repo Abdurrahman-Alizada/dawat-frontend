@@ -2,7 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import GroupStack from './GroupStack'
-import NotificationStack from './NotificationStack'
+import Profile from '../Screens/Home/Menus/Profile.js/index';
 
 const Stack = createStackNavigator();
 
@@ -18,8 +18,8 @@ const AppStack = () => {
     />
 
     <Stack.Screen
-      name="NotificationStack"
-      component={NotificationStack}
+      name="Profile"
+      component={Profile}
       options={{headerShown: false}}
     />
 

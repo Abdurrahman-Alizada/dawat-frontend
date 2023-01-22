@@ -79,11 +79,14 @@ export default function Example({route}) {
           <ActivityIndicator animating={isLoading} />
         </View>
       ) : (
-        <View style={{flex:1}}>
-          {data.length > 0 ? (
             <FlatList
               data={data}
               keyExtractor={item => item._id}
+              ListEmptyComponent={()=> 
+                <View style={{marginTop:"50%", alignItems: 'center'}}>
+                <Text>No invitation</Text>
+              </View>
+              }
               renderItem={({item}) => (
                 <List.Item
                   onPress={()=>FABHandler(item)}
@@ -91,8 +94,8 @@ export default function Example({route}) {
                   description={item.invitiDescription}
                   left={props => (
                     <Avatar.Image 
+                      style={props.style}
                       size={45}
-                      style={{alignSelf:"center"}}
                       avatarStyle={{borderRadius: 20}}
                       source={item.invitiImageURL ? {uri:item.invitiImageURL} : require('../../../../../assets/drawer/male-user.png')}
                     />
@@ -116,10 +119,6 @@ export default function Example({route}) {
                 />
               }
             />
-          ) : (
-            <Text>No Invitation yet</Text>
-          )}
-        </View>
       )}
 
       <FAB

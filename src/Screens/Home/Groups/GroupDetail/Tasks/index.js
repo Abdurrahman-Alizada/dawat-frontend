@@ -9,7 +9,7 @@ import React, {useState, useRef} from 'react';
 import {
   StyleSheet,
   FlatList,
-  Pressable,
+  TouchableOpacity,
   View,
   Text,
   ActivityIndicator,
@@ -63,9 +63,9 @@ const Task = ({route}) => {
         <FlatList
           data={data}
           renderItem={({item}) => (
-            <Pressable onPress={() => cardHandler(item)}>
-              <RenderItem item={item} />
-            </Pressable>
+            // <TouchableOpacity onPress={() => cardHandler(item)}>
+              <RenderItem item={item} cardHandler={cardHandler} />
+            // </TouchableOpacity>
           )}
         />
       ) : (
@@ -87,7 +87,7 @@ const Task = ({route}) => {
         onPress={() => FABHandler()}
       />
 
-      <Modalize ref={modalizeRef} modalHeight={modalHeight}>
+      <Modalize ref={modalizeRef} adjustToContentHeight={true} >
         <TaskBrief item={currentItem} closeModalize={closeModalize} navigation={navigation} />
       </Modalize>
     </Provider>

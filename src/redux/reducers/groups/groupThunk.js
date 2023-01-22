@@ -28,6 +28,12 @@ export const groupApi = createApi({
         method: 'POST',
         body: {
           groupName: group.groupName,
+          groupDescription:group.groupDescription,
+          imageURL:group.imageURL,
+          isChat:group.isChat,
+          isTasks:group.isTasks,
+          isInvitations:group.isInvitations,
+          isMute:group.isMute,
           users: group.members,
         },
       }),
@@ -51,7 +57,7 @@ export const groupApi = createApi({
         url: `/api/group/groupremove`,
         method: 'PUT',
         body: {
-          chatId: group.groupId,
+          chatId: group.chatId,
           userId: group.userId,
         },
       }),

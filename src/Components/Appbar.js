@@ -1,18 +1,17 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import { View} from 'react-native';
 import {
-  Button,
   Menu,
   Divider,
-  Provider,
   Appbar,
   Searchbar,
 } from 'react-native-paper';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
+import {useNavigation, DrawerActions} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const Header = ({ isSearch, setIsSearch}) => {
-    const navigation = useNavigation();
-    //search
+const Header = ({isSearch, setIsSearch}) => {
+  const navigation = useNavigation();
+  //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
     setSearch(search);
@@ -35,28 +34,38 @@ const Header = ({ isSearch, setIsSearch}) => {
       {!isSearch ? (
         <View>
           <Appbar.Header>
-          {/* <Appbar.BackAction onPress={() => {}} /> */}
-          <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
-          <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
-          <Appbar.Action
-            icon="magnify"
-            onPress={() => {
-              setIsSearch(!isSearch);
-            }}
-          />
-          {/* <Appbar.Action icon={MORE_ICON} onPress={() => {}} /> */}
+            {/* <Appbar.BackAction onPress={() => {}} /> */}
+            <Appbar.Action
+              icon="menu"
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            />
+            <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
+            <Appbar.Action
+              icon="magnify"
+              onPress={() => {
+                setIsSearch(!isSearch);
+              }}
+            />
+            {/* <Appbar.Action icon={MORE_ICON} onPress={() => {}} /> */}
 
-              <Menu
-                visible={visible}
-                onDismiss={closeMenu}
-                anchor={<Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />}>
-                <Menu.Item onPress={() => {}} title="Item 1" />
-                <Menu.Item onPress={() => {}} title="Item 2" />
-                <Divider />
-                <Menu.Item onPress={() => {}} title="Item 3" />
-              </Menu>
-
-        </Appbar.Header>
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
+              }>
+              <Menu.Item
+                leadingIcon="account-outline"
+                onPress={async () => {
+                  closeMenu();
+                  navigation.navigate('Profile',{id: await AsyncStorage.getItem("id")});
+                }}
+                title="Profile"
+              />
+              <Divider />
+              <Menu.Item leadingIcon="cog-outline" onPress={() => {}} title="Settings" />
+            </Menu>
+          </Appbar.Header>
         </View>
       ) : (
         <View>
@@ -77,30 +86,5 @@ const Header = ({ isSearch, setIsSearch}) => {
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#397af8',
-    marginBottom: 20,
-    width: '100%',
-    paddingVertical: 15,
-  },
-  heading: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  headerRight: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  subheaderText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Header;

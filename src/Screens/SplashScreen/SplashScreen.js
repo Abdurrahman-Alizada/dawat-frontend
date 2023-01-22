@@ -34,7 +34,6 @@ const SplashScreen = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    setTimeout(async () => {
       //Check if user_id is set or not If not then send for Authentication else send to Home Screen
       AsyncStorage.getItem('isLoggedIn')
         .then(value => {
@@ -45,7 +44,6 @@ const SplashScreen = ({navigation}) => {
         .catch(err => {
           console.log(err);
         });
-    }, 1000);
   }, []);
 
   return (
@@ -74,7 +72,7 @@ const SplashScreen = ({navigation}) => {
         />
       </View>
 
-      <Text
+      {/* <Text
         style={{
           color: '#3E3F41',
           fontSize: 38,
@@ -82,7 +80,7 @@ const SplashScreen = ({navigation}) => {
           letterSpacing: 1,
         }}>
         Dawat
-      </Text>
+      </Text> */}
     </View>
   );
 };

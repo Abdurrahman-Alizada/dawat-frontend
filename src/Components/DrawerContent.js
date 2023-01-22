@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext, useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
 import {
@@ -10,35 +10,49 @@ import {
   Text,
   TouchableRipple,
   Switch,
-  useTheme,
 } from 'react-native-paper';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PreferencesContext} from '../themeContext';
-import {useDispatch} from 'react-redux';
-import {Logout} from '../redux/reducers/user/userThunk';
-import { useNavigation } from '@react-navigation/native';
-
+import { useNavigation,DrawerActions } from '@react-navigation/native';
+import { useGetCurrentLoginUserQuery } from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   
-  const [active, setActive] = React.useState('');
-  const {toggleTheme, isThemeDark} = React.useContext(PreferencesContext);
-  const dispatch = useDispatch();
+  const [active, setActive] = useState('');
+  const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const [name, setName] = useState('Abdur Rahman');
+  const id = useRef(null);
   const [email, setEmail] = useState('abdurrahman@gmail.com');
+  const [imageURL, setImageURL] = useState('');
   const getUserInfo = async () => {
-    const value = await AsyncStorage.getItem('name');
-    console.log('asfd', value);
-    setName(await AsyncStorage.getItem('name'));
-    setEmail(await AsyncStorage.getItem('email'));
+    // const value = await AsyncStorage.getItem('name');
+    // setName(await AsyncStorage.getItem('name'));
+    // setEmail(await AsyncStorage.getItem('email'));
+    // setImageURL(await AsyncStorage.getItem('imageURL'));
+    id.current = await AsyncStorage.getItem("userId")
+    // console.log('User name', value);
   };
   useEffect(() => {
     getUserInfo();
   }, []);
-  const logout = () => {
-    dispatch(Logout({navigation:navigation}));
+
+  const {
+    data: user,
+    isError,
+    error,
+    isLoading,
+  } = useGetCurrentLoginUserQuery(id.current);
+
+  const logout = async () => {
+    await AsyncStorage.setItem('isLoggedIn', '0');
+    await AsyncStorage.setItem('id', '');
+    await AsyncStorage.setItem('token', '');
+    await AsyncStorage.setItem('userId', '');
+    await AsyncStorage.setItem('name', '');
+    await AsyncStorage.setItem('ImageURL', '');
+    navigation.dispatch(DrawerActions.closeDrawer())
+    navigation.navigate('Auth');
   };
   return (
     <DrawerContentScrollView {...props}>
@@ -46,60 +60,29 @@ export default function DrawerContent(props) {
         <View style={styles.userInfoSection}>
           <Avatar.Image
             source={{
-              uri: 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
+              uri:user?.imageURL ? user?.imageURL : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
             }}
             size={70}
           />
-          <Title style={styles.title}>{name}</Title>
-          <Caption style={styles.caption}>{email}</Caption>
-          {/* <View style={styles.row}>
+          <Title style={styles.title}>{user?.name}</Title>
+          <Caption style={styles.caption}>{user?.email}</Caption>
+          <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                202
+                {user?.groups?.length}
               </Paragraph>
-              <Caption style={styles.caption}>Following</Caption>
+              <Caption style={styles.caption}>Groups</Caption>
             </View>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
-                159
+                23
               </Paragraph>
-              <Caption style={styles.caption}>Followers</Caption>
+              <Caption style={styles.caption}>Tasks to do</Caption>
             </View>
-          </View> */}
+          </View>
         </View>
 
-        <Drawer.Section title="General" style={styles.drawerSection}>
-          <Drawer.Item
-            icon="account"
-            label="Profile"
-            active={active === 'first'}
-            onPress={() => {
-              setActive('first');
-              navigation.navigate("Profile")
-            }}
-          />
-          <Drawer.Item
-            icon="star"
-            label="Second Item"
-            active={active === 'second'}
-            onPress={() => setActive('second')}
-          />
-        </Drawer.Section>
-
-        {/* <Drawer.Section style={styles.drawerSection}>
-          <Drawer.CollapsedItem icon="inbox" label="Inbox" />
-          <DrawerItem
-            icon={() => (
-              <MaterialCommunityIcons
-                name="account-outline"
-                color="#000"
-                size={23}
-              />
-            )}
-            label="Profile"
-            onPress={() => {}}
-          />
-        </Drawer.Section> */}
+      
 
         <Drawer.Section style={styles.drawerSection} title="Preferences">
           <TouchableRipple onPress={() => toggleTheme()}>
@@ -110,14 +93,7 @@ export default function DrawerContent(props) {
               </View>
             </View>
           </TouchableRipple>
-          <TouchableRipple onPress={() => {}}>
-            <View style={styles.preference}>
-              <Text>RTL</Text>
-              <View pointerEvents="none">
-                <Switch value={true} />
-              </View>
-            </View>
-          </TouchableRipple>
+         
         </Drawer.Section>
 
         <Drawer.Item

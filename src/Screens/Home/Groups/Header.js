@@ -48,7 +48,7 @@ const Header = ({navigation, isSearch, setIsSearch}, props) => {
                 visible={visible}
                 onDismiss={closeMenu}
                 anchor={<Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />}>
-                <Menu.Item onPress={() => {}} title="Item 1" />
+                <Menu.Item onPress={() => {}} title="Profile" />
                 <Menu.Item onPress={() => {}} title="Item 2" />
                 <Divider />
                 <Menu.Item onPress={() => {}} title="Item 3" />

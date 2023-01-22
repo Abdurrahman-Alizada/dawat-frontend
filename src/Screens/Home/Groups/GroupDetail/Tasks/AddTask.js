@@ -1,19 +1,19 @@
-import {Text, StyleSheet, View, Platform} from 'react-native';
-import React, {useState, useCallback} from 'react';
-import {TextInput, Button, Avatar, List, Appbar} from 'react-native-paper';
+import { Text, StyleSheet, View, Platform, ScrollView,TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ToggleButton, TextInput, Button, Avatar, List, Appbar} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {instance} from '../../../../../redux/axios';
 import AsyncStorage from '@react-native-community/async-storage';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker'
 
 import {useAddTaskMutation, useUpdateTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 import moment from 'moment';
 
 const validationSchema = Yup.object().shape({
   taskTitle: Yup.string().required('Task title is required').label('taskTitle'),
-  taskDescription: Yup.string().label('taskDescription'),
+  taskDescription: Yup.string().required('Please add some description').label('taskDescription'),
 });
 
 const AddTask = ({route, navigation}) => {
@@ -24,10 +24,15 @@ const AddTask = ({route, navigation}) => {
     route.params?.task ? updateHandler(values) : addHandler(values);
   };
   const addHandler = async values => {
+    // console.log("hello", values.taskTitle,groupId,values.taskDescription, users,startDate, dueDate,prority)
     await addTask({
       taskName: values.taskTitle,
       groupId: groupId,
       taskDescription: values.taskDescription,
+      responsibles: users,
+      startingDate: startDate,
+      dueDate: dueDate,
+      prority:prority
     })
       .then(response => {
         navigation.goBack();
@@ -56,10 +61,43 @@ const AddTask = ({route, navigation}) => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [usersList, setUsersList] = useState([]);
-
   const [items, setItems] = useState([]);
   const [dropdonwSearchLoading, setDropdownSearchLoading] = useState(false);
+ // date and time
+ const [startDate, setStartDate] = useState(new Date())
+ const [openStartingDate, setOpenStartingDate] = useState(false)
+ const [dueDate, setDueDate] = useState(new Date())
+ const [openDueDate, setOpenDueDate] = useState(false)
+ //  priority
+ const [prority,setPriority] = useState("low")
 
+ const onChangeSearchText= async () => {
+  setDropdownSearchLoading(true);
+  instance
+    .get('/api/account/allusers', {
+      headers: {
+        Authorization: `Bearer ${await AsyncStorage.getItem(
+          'token',
+        )}`,
+      },
+    })
+    .then(items => {
+      console.log("hello users",typeof items.data)
+      setItems(items.data);
+    })
+    .catch(err => {
+      console.log('error in dropdown', err);
+      //
+    })
+    .finally(() => {
+      // Hide the loading animation
+      setDropdownSearchLoading(false);
+    });
+}
+
+useEffect(()=>{
+  onChangeSearchText()
+},[])
   const Item = props => {
     const [include, setInclude] = useState(users.includes(props.item._id));
     const index = users.indexOf(props.item._id);
@@ -106,12 +144,8 @@ const AddTask = ({route, navigation}) => {
       </View>
     );
   };
- // date and time
- const [showStartingDate, setShowStartingDate] = useState(false);
- const [showDueDate, setShowDueDate] = useState(false);
- const [startingDate, setStartingDate] = useState(new Date());
- const [dueDate, setDueDate] = useState(new Date());
-  return (
+
+ return (
     <View>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
@@ -174,6 +208,26 @@ const AddTask = ({route, navigation}) => {
                 <Text style={styles.error}>{errors.taskDescription}</Text>
               ) : null}
 
+            
+              {users.length > 0 ? (
+                <ScrollView
+                  horizontal={true}
+                  style={{maxHeight: 60}}
+                  contentContainerStyle={{}}
+                  showsHorizontalScrollIndicator={false}>
+                  {usersList.map((user, index) => (
+                    <View style={{marginRight: 5}} key={user._id}>
+                      <Avatar.Image
+                        size={40}
+                        source={require('../../../../../assets/drawer/userImage.png')}
+                      />
+                      <Text style={{alignSelf: 'center'}}>{user.name}</Text>
+                      {/* <Text style={{alignSelf: 'center', maxWidth:"30%", alignSelf:"flex-start"}} numberOfLines={1}>{user}</Text> */}
+                    </View>
+                  ))}
+                </ScrollView>
+              ) : null}
+
               <DropDownPicker
                 renderListItem={props => <Item {...props} />}
                 open={open}
@@ -183,7 +237,7 @@ const AddTask = ({route, navigation}) => {
                 searchPlaceholder={'Search'}
                 setOpen={setOpen}
                 setItems={setItems}
-                listMode="FLATLIST"
+                listMode="MODAL"
                 searchable={true}
                 loading={dropdonwSearchLoading}
                 disableLocalSearch={true}
@@ -196,109 +250,106 @@ const AddTask = ({route, navigation}) => {
                   fontWeight: 'bold',
                 }}
                 itemKey="_id"
-                onChangeSearchText={async () => {
-                  setDropdownSearchLoading(true);
-                  instance
-                    .get('/api/account/allusers', {
-                      headers: {
-                        Authorization: `Bearer ${await AsyncStorage.getItem(
-                          'token',
-                        )}`,
-                      },
-                    })
-                    .then(items => {
-                      setItems(items.data);
-                    })
-                    .catch(err => {
-                      console.log('error in dropdown', err);
-                      //
-                    })
-                    .finally(() => {
-                      // Hide the loading animation
-                      setDropdownSearchLoading(false);
-                    });
-                }}
+                // onChangeSearchText={async () => {
+                //   setDropdownSearchLoading(true);
+                //   instance
+                //     .get('/api/account/allusers', {
+                //       headers: {
+                //         Authorization: `Bearer ${await AsyncStorage.getItem(
+                //           'token',
+                //         )}`,
+                //       },
+                //     })
+                //     .then(items => {
+                //       setItems(items.data);
+                //     })
+                //     .catch(err => {
+                //       console.log('error in dropdown', err);
+                //       //
+                //     })
+                //     .finally(() => {
+                //       // Hide the loading animation
+                //       setDropdownSearchLoading(false);
+                //     });
+                // }}
               />
+            
 
-{showStartingDate && (
-                <DateTimePicker
-                  value={startingDate}
-                  onChange={(evt, selectedDate) => {
-                    setStartingDate(selectedDate);
-                    setShowStartingDate(false);
-                  }}
-                />
-              )}
+           <DatePicker 
+           date={startDate} 
+           open={openStartingDate}
+           modal
+          onConfirm={(date) => {
+            setStartDate(date);
+            setOpenStartingDate(false);
+          }}
+          onCancel={() => {
+            setOpenStartingDate(false);
+          }}
+           />
 
-              {showDueDate && (
-                <DateTimePicker
-                  value={dueDate}
-                  onChange={(evt, selectedDate) => {
-                    setDueDate(selectedDate);
-                    setShowDueDate(false);
-                  }}
-                />
-              )}
-
-              <View
-                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View style={{width: '48%'}}>
-                  <Text
+        <DatePicker 
+           date={dueDate} 
+           open={openDueDate}
+           modal
+          onConfirm={(date) => {
+            setDueDate(date);
+            setOpenDueDate(false);
+          }}
+          onCancel={() => {
+            setOpenDueDate(false);
+          }}
+           />
+            
+             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                
+                <View style={{width: '48%', marginTop:"2%"}}>
+                  <Text style={{fontWeight:"bold"}}>Starting Timing</Text>
+                  <TouchableOpacity
+                    onPress={() => setOpenStartingDate(true)}
                     style={{
                       borderRadius: 10,
                       borderColor: '#C1C2B8',
                       borderWidth: 0.5,
-                      padding: '2%',
-                      marginVertical: '2%',
-                      fontWeight: 'bold',
+                      padding: '4%',
+                      marginVertical: '4%',
                       textAlign: 'center',
                     }}>
-                    {moment(startingDate).format('ll')}
-                  </Text>
-                  <Button
-                    disabled={showStartingDate}
-                    // loading={showDate}
-                    mode="contained"
-                    onPress={() => setShowStartingDate(true)}
+                   <Text style={{fontWeight: 'bold',}}> 
+                    {moment(startDate).format('lll')} {' '} 
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={{width: '48%', marginTop:"2%"}}>
+                  <Text style={{fontWeight:"bold"}}>Due Timing</Text>
+                  <TouchableOpacity
+                    onPress={() => setOpenDueDate(true)}
                     style={{
                       borderRadius: 10,
                       borderColor: '#C1C2B8',
                       borderWidth: 0.5,
-                      // padding: '1%',
-                      marginVertical: '1%',
-                    }}>
-                    Starting date
-                  </Button>
-                </View>
-                <View style={{width: '48%'}}>
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                      borderRadius: 10,
+                      padding: '4%',
+                      marginVertical: '4%',
                       textAlign: 'center',
-                      borderColor: '#C1C2B8',
-                      borderWidth: 0.5,
-                      padding: '2%',
-                      marginVertical: '2%',
                     }}>
-                    {moment(dueDate).format('ll')}
-                  </Text>
-                  <Button
-                    disabled={showDueDate}
-                    // loading={showDate}
-                    mode="contained"
-                    onPress={() => setShowDueDate(true)}
-                    style={{
-                      borderRadius: 10,
-                      borderColor: '#C1C2B8',
-                      borderWidth: 0.5,
-                      marginVertical: '2%',
-                    }}>
-                    Due date
-                  </Button>
+                   <Text style={{fontWeight: 'bold',}}> 
+                    {moment(dueDate).format('lll')} {' '} 
+                    </Text>
+                  </TouchableOpacity>
                 </View>
+                
               </View>
 
+          <View style={{marginVertical:"4%"}}>
+          <Text style={{fontWeight:"bold", marginVertical:"2%"}}>Priority</Text>
+          <ToggleButton.Row onValueChange={value => setPriority(value)} value={prority}>
+            <ToggleButton style={{width:"33%"}} icon={()=><Text>Low</Text>} value="Low" />
+            <ToggleButton style={{width:"33%"}} icon={()=><Text>Normal</Text>} value="Normal" />
+            <ToggleButton style={{width:"33%"}} icon={()=><Text>High</Text>} value="High" />
+          </ToggleButton.Row>
+
+          </View>
               {route.params?.task ? (
                 <Button
                   disabled={updateLoading}
@@ -341,43 +392,7 @@ const AddTask = ({route, navigation}) => {
 export default AddTask;
 
 const styles = StyleSheet.create({
-  buttonStyle: {
-    backgroundColor: '#D70F64',
-    color: '#FFFFFF',
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    width: 240,
-    borderRadius: 10,
-    marginVertical: '5%',
-  },
-  buttonTextStyle: {
-    color: '#FFFFFF',
-    paddingVertical: 5,
-    fontSize: 18,
-    letterSpacing: 1,
-    fontWeight: 'bold',
-  },
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
   error: {
     color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
   },
 });

@@ -1,0 +1,6 @@
+{
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "dev"
+    ],
+    "java.compile.nullAnalysis.mode": "automatic"
+}
