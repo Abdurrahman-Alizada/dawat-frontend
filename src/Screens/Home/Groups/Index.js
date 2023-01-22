@@ -75,11 +75,15 @@ const Groups = ({navigation}) => {
 
         {!isLoading ? (
           <View style={{flex: 1}}>
-            {allGroups?.length > 0 ? (
               <FlatList
                 onScroll={onScroll}
                 keyExtractor={item => item._id}
                 data={allGroups}
+                ListEmptyComponent={()=> 
+                  <View style={{marginTop:"60%", alignItems: 'center'}}>
+                  <Text>No Group yet</Text>
+                </View>
+                }
                 renderItem={item => (
                   <RenderItem
                     item={item.item}
@@ -97,16 +101,6 @@ const Groups = ({navigation}) => {
                 />
                 }
               />
-            ) : (
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                  flex: 1,
-                }}>
-                <Text>No group yet</Text>
-              </View>
-            )}
           </View>
         ) : (
           <View

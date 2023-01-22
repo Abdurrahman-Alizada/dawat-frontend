@@ -72,7 +72,7 @@ const SplashScreen = ({navigation}) => {
         />
       </View>
 
-      <Text
+      {/* <Text
         style={{
           color: '#3E3F41',
           fontSize: 38,
@@ -80,7 +80,7 @@ const SplashScreen = ({navigation}) => {
           letterSpacing: 1,
         }}>
         Dawat
-      </Text>
+      </Text> */}
     </View>
   );
 };

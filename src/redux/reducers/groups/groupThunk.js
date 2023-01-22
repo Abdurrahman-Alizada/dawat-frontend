@@ -28,6 +28,12 @@ export const groupApi = createApi({
         method: 'POST',
         body: {
           groupName: group.groupName,
+          groupDescription:group.groupDescription,
+          imageURL:group.imageURL,
+          isChat:group.isChat,
+          isTasks:group.isTasks,
+          isInvitations:group.isInvitations,
+          isMute:group.isMute,
           users: group.members,
         },
       }),

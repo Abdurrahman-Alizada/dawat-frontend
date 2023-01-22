@@ -57,7 +57,14 @@ const SingleGroup = ({
       <List.Item
         title={item.groupName}
         description={item.groupDescription}
-        left={props => <Avatar.Text style={props.style} label="A" size={40} />}
+        left={props =><View> 
+          {item.imageURL ?
+          <Avatar.Image style={props.style}  source={{uri:item.imageURL}}     size={40} /> 
+        :
+        <Avatar.Text style={props.style}  label={item.groupName.charAt(0)}  size={40} /> 
+        }
+          </View>
+          }
         right={() => (
           <View>
             {checked && (

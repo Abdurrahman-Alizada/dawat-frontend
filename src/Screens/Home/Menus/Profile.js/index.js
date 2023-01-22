@@ -123,7 +123,6 @@ export default ProfileIndex = ({route}) => {
     const id = await AsyncStorage.getItem('id');
     
     if(fileDataRef.current){
-      console.log("hello if 2 asdfa",avatarURL, fileDataRef.current)
       const uri = fileDataRef.current?.path;
       const type = fileDataRef.current?.mime;
       const name = user?.name ? user?.name : "user-profile";
@@ -160,7 +159,6 @@ export default ProfileIndex = ({route}) => {
     }
 
     if(avatarURL){
-      console.log("hello if 1 asdfa",avatarURL, fileData)
       updateImageURL({id: id, imageURL:avatarURL}).then(async (res) => {
         setSnakeBarMessage('Profile image has been updated successfully');
         setShowSnakeBar(true);

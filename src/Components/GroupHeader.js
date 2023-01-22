@@ -4,7 +4,6 @@ import {Menu, Divider, Appbar, Searchbar,Avatar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 
 const Header = ({isSearch, setIsSearch, onOpen, group}) => {
-  console.log("group is", group.group?.users)
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
