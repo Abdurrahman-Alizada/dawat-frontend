@@ -6,14 +6,7 @@
 // ==========================================
 
 import React, {useState, useRef} from 'react';
-import {
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  View,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import {StyleSheet, FlatList, View, Text, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
@@ -21,10 +14,8 @@ import {height} from '../../../../../GlobalStyles';
 import {FAB, Provider} from 'react-native-paper';
 import TaskBrief from './TaskBrief';
 import {useNavigation} from '@react-navigation/native';
-
+import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-
-const modalHeight = height * 0.7;
 
 const Task = ({route}) => {
   const {groupId} = route.params;
@@ -32,51 +23,44 @@ const Task = ({route}) => {
   const navigation = useNavigation();
   const [currentItem, setCurrentItem] = useState({});
 
-  const {data, isError, isLoading, error} = useGetAllTasksQuery({
-    groupId,
-  });
+  const {data, isError, isLoading, error, isFetching, refetch} =
+    useGetAllTasksQuery({
+      groupId,
+    });
 
   const modalizeRef = useRef(null);
   const FABHandler = () => {
-    navigation.navigate('AddTask',{groupId:groupId});
+    navigation.navigate('AddTask', {groupId: groupId});
   };
 
   const cardHandler = item => {
     setCurrentItem(item);
     modalizeRef.current?.open();
   };
- const closeModalize = ()=>{
-  modalizeRef.current?.close();
- }
+  const closeModalize = () => {
+    modalizeRef.current?.close();
+  };
   return (
     <Provider style={{flex: 1}}>
       {isLoading ? (
-        <View
-          style={{
-            alignSelf: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
-          <ActivityIndicator animating={isLoading} />
+        <View style={{padding: '4%'}}>
+          <TasksSkeleton />
         </View>
-      ) : data.length > 0 ? (
+      ) : (
         <FlatList
           data={data}
-          renderItem={({item}) => (
-            // <TouchableOpacity onPress={() => cardHandler(item)}>
-              <RenderItem item={item} cardHandler={cardHandler} />
-            // </TouchableOpacity>
+          ListEmptyComponent={() => (
+            <View style={{marginTop: '60%', alignItems: 'center'}}>
+              <Text>No task yet</Text>
+            </View>
           )}
+          renderItem={({item}) => (
+            <RenderItem item={item} cardHandler={cardHandler} />
+          )}
+          refreshControl={
+            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+          }
         />
-      ) : (
-        <View
-          style={{
-            alignSelf: 'center',
-            justifyContent: 'center',
-            flex: 1,
-          }}>
-          <Text>No Task yet</Text>
-        </View>
       )}
 
       <FAB
@@ -87,8 +71,12 @@ const Task = ({route}) => {
         onPress={() => FABHandler()}
       />
 
-      <Modalize ref={modalizeRef} adjustToContentHeight={true} >
-        <TaskBrief item={currentItem} closeModalize={closeModalize} navigation={navigation} />
+      <Modalize ref={modalizeRef} adjustToContentHeight={true}>
+        <TaskBrief
+          item={currentItem}
+          closeModalize={closeModalize}
+          navigation={navigation}
+        />
       </Modalize>
     </Provider>
   );

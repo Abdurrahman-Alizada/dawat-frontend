@@ -15,7 +15,8 @@ import {PreferencesContext} from '../themeContext';
 import { useNavigation,DrawerActions } from '@react-navigation/native';
 import { useGetCurrentLoginUserQuery } from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import UserInDrawer from '../Screens/Skeletons/UserInDrawer';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   
@@ -57,6 +58,11 @@ export default function DrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
+        {
+          isLoading ? 
+          <UserInDrawer />
+          :
+
         <View style={styles.userInfoSection}>
           <Avatar.Image
             source={{
@@ -81,19 +87,17 @@ export default function DrawerContent(props) {
             </View>
           </View>
         </View>
-
-      
+        }
 
         <Drawer.Section style={styles.drawerSection} title="Preferences">
-          <TouchableRipple onPress={() => toggleTheme()}>
-            <View style={styles.preference}>
-              <Text>Dark Theme</Text>
-              <View pointerEvents="none">
-                <Switch value={isThemeDark} />
-              </View>
-            </View>
-          </TouchableRipple>
-         
+
+          <Drawer.Item
+          icon={isThemeDark ? "white-balance-sunny" : "weather-night"}
+          label={isThemeDark ? "Light Theme" : "Dark Theme"}
+          right={()=><Switch value={isThemeDark} onValueChange={() => toggleTheme()} />}
+          active={active === 'first'}
+          style={{}}
+        />         
         </Drawer.Section>
 
         <Drawer.Item
