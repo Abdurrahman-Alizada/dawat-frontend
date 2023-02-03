@@ -1,4 +1,5 @@
 import React from 'react';
+import GeneralAppbar from '../Components/GeneralAppbar'
 import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeIndex from '../Screens/Home/Groups/Index';
@@ -13,23 +14,19 @@ const Stack = createStackNavigator();
 const AppStack = () => {
 
   return (
-    <Stack.Navigator initialRouteName="HomeIndex">
+    <Stack.Navigator initialRouteName="HomeIndex" >
       <Stack.Screen
         name="HomeIndex"
         component={HomeIndex}
         options={{headerShown: false}}
-        // options={{
-        //   header: props => (
-        //     <AppBar isSearch={isSearch} setIsSearch={setIsSearch} />
-        //   ),
-        // }}
       />
       <Stack.Screen
         name="AddGroup"
         component={AddGroup}
         options={{
           title: 'Add Your Group',
-          //   headerShown: false
+          // headerShown:false
+          header: (props) => <GeneralAppbar title="Add group" {...props} />,
         }}
       />
       <Stack.Screen
@@ -46,7 +43,7 @@ const AppStack = () => {
         component={SingleGroupSettings}
         options={{
           title: 'Single group settings',
-          // headerShown: false,
+          header: (props) => <GeneralAppbar title="Single group settings" {...props} />,
         }}
       />
 
@@ -62,6 +59,10 @@ const AppStack = () => {
       <Stack.Screen
         name="AddInviti"
         component={AddInviti}
+        options={{
+          // headerShown:false
+          header: (props) => <GeneralAppbar title="Add inviti" {...props} />,
+        }}
       />
     </Stack.Navigator>
   );

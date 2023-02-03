@@ -1,6 +1,5 @@
 import {
   TouchableOpacity,
-  Text,
   Image,
   StyleSheet,
   Modal,
@@ -9,22 +8,23 @@ import {
   ImageBackground,
 } from 'react-native';
 import React, {useState, useEffect, useMemo, useRef} from 'react';
-
-import axios from 'axios';
 import {instance} from '../../../redux/axios';
 import ImagePicker from 'react-native-image-crop-picker';
-import Ionicons from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {
-  Badge,
+  Text,
   List,
   Avatar,
   TextInput,
-  Button,
+  Checkbox,
   IconButton,
+  Card,
+  FAB,
+  Badge,
+  useTheme,
 } from 'react-native-paper';
 
 import {useSelector, useDispatch} from 'react-redux';
@@ -102,33 +102,33 @@ const AddGroup = ({navigation, onClose}) => {
         alert(e);
       });
   };
- 
+
   const submitHandler = async values => {
     setIsAddButtonDisable(true);
-    
-    if(fileDataRef.current){
+
+    if (fileDataRef.current) {
       const uri = fileDataRef.current?.path;
       const type = fileDataRef.current?.mime;
       const name = values.groupName;
-      const photo = {uri,type,name}
-      const data = new FormData()
-      data.append('file', photo)
-      data.append('upload_preset', 'bzgif1or')
-      data.append("cloud_name", "dblhm3cbq")
-      fetch("https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload", {
-        method: "post",
-        body: data
-      }).then(res => res.json()).
-        then(async (data) => {
-          
+      const photo = {uri, type, name};
+      const data = new FormData();
+      data.append('file', photo);
+      data.append('upload_preset', 'bzgif1or');
+      data.append('cloud_name', 'dblhm3cbq');
+      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
+        method: 'post',
+        body: data,
+      })
+        .then(res => res.json())
+        .then(async data => {
           await addGroup({
             groupName: values.groupName,
-            groupDescription : values.groupDescription,
+            groupDescription: values.groupDescription,
             imageURL: data.secure_url,
-            isChat:true,
-            isTasks:true,
+            isChat: true,
+            isTasks: true,
             isInvitations: true,
-            isMute:false,
+            isMute: false,
             members: users,
           })
             .then(response => {
@@ -138,23 +138,23 @@ const AddGroup = ({navigation, onClose}) => {
               console.log(e);
             });
           navigation.navigate('HomeIndex');
-
-        }).catch(err => {
-          console.log("An Error Occured While Uploading group image", err)
-          fileDataRef.current = null
-          setfileData(null)
-          return;
         })
+        .catch(err => {
+          console.log('An Error Occured While Uploading group image', err);
+          fileDataRef.current = null;
+          setfileData(null);
+          return;
+        });
     }
 
     await addGroup({
       groupName: values.groupName,
-      groupDescription : values.groupDescription,
-      imageURL: "",
-      isChat:true,
-      isTasks:true,
+      groupDescription: values.groupDescription,
+      imageURL: '',
+      isChat: true,
+      isTasks: true,
       isInvitations: true,
-      isMute:false,
+      isMute: false,
       members: users,
     })
       .then(response => {
@@ -164,12 +164,21 @@ const AddGroup = ({navigation, onClose}) => {
         console.log(e);
       });
     navigation.navigate('HomeIndex');
-
   };
 
-  const Item = props => {
-    const [include, setInclude] = useState(users.includes(props.item._id));
-    const index = users.indexOf(props.item._id);
+  const removeItem = id => {
+    const index = users.indexOf(id);
+    if (index !== -1 && index !== 0) {
+      users.splice(index, 1);
+      usersList.splice(index, 1);
+    } else if (index == 0) {
+      users.shift();
+      usersList.shift();
+    }
+  };
+  const Item = itemProps => {
+    const [include, setInclude] = useState(users.includes(itemProps.item._id));
+    const index = users.indexOf(itemProps.item._id);
     const add = () => {
       if (include) {
         if (index !== -1 && index !== 0) {
@@ -181,8 +190,8 @@ const AddGroup = ({navigation, onClose}) => {
           usersList.shift();
         }
       } else {
-        setUsers([...users, props.item._id]);
-        setUsersList([...usersList, props.item]);
+        setUsers([...users, itemProps.item._id]);
+        setUsersList([...usersList, itemProps.item]);
         // console.log('else', index, props.item._id);
       }
       setInclude(!include);
@@ -191,189 +200,222 @@ const AddGroup = ({navigation, onClose}) => {
       <View>
         <List.Item
           onPress={add}
-          title={props.item.name}
-          description={props.item.email}
+          title={itemProps.item.name}
+          description={itemProps.item.email}
           left={props => (
             <View>
               <Avatar.Image
                 {...props}
+                variant="image"
                 size={50}
-                source={require('../../../assets/drawer/userImage.png')}
+                source={
+                  itemProps.item?.imageURL
+                    ? {uri: itemProps.item?.imageURL}
+                    : require('../../../assets/drawer/userImage.png')
+                }
               />
-              {include ? (
-                <List.Icon
-                  style={{position: 'absolute', right: -5, top: 10}}
-                  color={'#3ff'}
-                  icon="check-circle"
-                />
-              ) : null}
             </View>
           )}
-          // left={props => <List.Icon {...props} icon="folder" />}
+          right={props => (
+            <Checkbox
+              {...props}
+              status={include ? 'checked' : 'unchecked'}
+              onPress={add}
+            />
+          )}
         />
       </View>
     );
   };
 
+  const theme = useTheme();
+
   return (
-    <View style={{padding: '5%'}}>
-      {users.length > 0 ? (
-        <ScrollView
-          horizontal={true}
-          style={{maxHeight: 60}}
-          contentContainerStyle={{}}
-          showsHorizontalScrollIndicator={false}>
-          {usersList.map((user, index) => (
-            <View style={{marginRight: 5}} key={user._id}>
-              <Avatar.Image
-                size={40}
-                source={require('../../../assets/drawer/userImage.png')}
-              />
-              <Text style={{alignSelf: 'center'}}>{user.name}</Text>
-              {/* <Text style={{alignSelf: 'center', maxWidth:"30%", alignSelf:"flex-start"}} numberOfLines={1}>{user}</Text> */}
-            </View>
-          ))}
-        </ScrollView>
-      ) : null}
-      <View style={{}}>
-        <Formik
-          initialValues={{
-            groupName: '',
-            groupDescription:'',
-          }}
-          validationSchema={validationSchema}
-          onSubmit={values => submitHandler(values)}>
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-          }) => (
-            <View style={{marginVertical: '2%'}}>
+    <View style={{flex: 1}}>
+      <Formik
+        initialValues={{
+          groupName: '',
+          groupDescription: '',
+        }}
+        validationSchema={validationSchema}
+        onSubmit={values => submitHandler(values)}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View
+            style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
+            {!open && (
               <View>
-                {fileData ? (
-                  <Avatar.Image
-                    source={{uri: fileData.path}}
-                    style={{alignSelf: 'center'}}
-                    size={100}
-                  />
-                ) : (
-                  <View>
-                    <Avatar.Icon
-                      icon="account-circle-outline"
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                  {fileData ? (
+                    <Avatar.Image
+                      source={{uri: fileData.path}}
                       style={{alignSelf: 'center'}}
                       size={100}
                     />
+                  ) : (
+                    <View>
+                      <Avatar.Icon
+                        icon="account-circle-outline"
+                        style={{alignSelf: 'center'}}
+                        size={100}
+                      />
+                    </View>
+                  )}
+                </TouchableOpacity>
 
-                  </View>
-                )
-              }
-              <IconButton
-                style={{position: 'absolute', left: '52%', top: 55}}
-                icon="camera"
-                mode="contained"
-                size={25}
-                onPress={() => setModalVisible(true)}
-              />
-              </View>
-
-              <TextInput
-              style={{marginTop:"4%"}}
-                error={errors.groupName && touched.groupName ? true : false}
-                label="Group Name"
-                mode="outlined"
-                // style={{marginVertical: '2%', width: '85%'}}
-                onChangeText={handleChange('groupName')}
-                onBlur={handleBlur('groupName')}
-                value={values.groupName}
-              />
-              {errors.groupName && touched.groupName ? (
-                <Text style={styles.error}>{errors.groupName}</Text>
-              ) : null}
-
-              <TextInput
-              style={{marginTop:"4%"}}
-                error={errors.groupDescription && touched.groupDescription ? true : false}
-                label="Group Description"
-                mode="outlined"
-                // style={{marginVertical: '2%', width: '85%'}}
-                onChangeText={handleChange('groupDescription')}
-                onBlur={handleBlur('groupDescription')}
-                value={values.groupDescription}
-              />
-              {errors.groupDescription && touched.groupDescription ? (
-                <Text style={styles.error}>{errors.groupDescription}</Text>
-              ) : null}
-
-              <View style={{marginVertical: '5%'}}>
-                <DropDownPicker
-                  renderListItem={props => <Item {...props} />}
-                  open={open}
-                  value={users}
-                  items={items}
-                  placeholder={'Choose a member'}
-                  searchPlaceholder={'Search'}
-                  setOpen={setOpen}
-                  setItems={setItems}
-                  listMode="MODAL"
-                  searchable={true}
-                  loading={dropdonwSearchLoading}
-                  disableLocalSearch={true}
-                  searchContainerStyle={{
-                    borderBottomColor: '#dfdfdf',
-                  }}
-                  style={[styles.inputStyle]}
-                  textStyle={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                  }}
-                  labelStyle={{
-                    fontWeight: 'bold',
-                  }}
-                  itemKey="_id"
-                  onChangeSearchText={async () => {
-                    setDropdownSearchLoading(true);
-                    instance
-                      .get('/api/account/allusers', {
-                        headers: {
-                          Authorization: `Bearer ${await AsyncStorage.getItem(
-                            'token',
-                          )}`,
-                        },
-                      })
-                      .then(items => {
-                        // console.log('dropdonw items', items.data);
-                        setItems(items.data);
-                      })
-                      .catch(err => {
-                        console.log('error in dropdown', err);
-                        //
-                      })
-                      .finally(() => {
-                        // Hide the loading animation
-                        setDropdownSearchLoading(false);
-                      });
-                  }}
+                <TextInput
+                  style={{marginTop: '4%'}}
+                  error={errors.groupName && touched.groupName ? true : false}
+                  label="Group Name"
+                  mode="outlined"
+                  // style={{marginVertical: '2%', width: '85%'}}
+                  onChangeText={handleChange('groupName')}
+                  onBlur={handleBlur('groupName')}
+                  value={values.groupName}
                 />
-              </View>
+                {errors.groupName && touched.groupName ? (
+                  <Text style={styles.error}>{errors.groupName}</Text>
+                ) : null}
 
-            
-              <Button
-              disabled={isAddButtonDisable}
-              loading={isLoading}
-                mode="contained"
-                style={{
-                  marginTop: '2%',
+                <TextInput
+                  style={{marginTop: '4%'}}
+                  error={
+                    errors.groupDescription && touched.groupDescription
+                      ? true
+                      : false
+                  }
+                  label="Group Description"
+                  mode="outlined"
+                  // style={{marginVertical: '2%', width: '85%'}}
+                  onChangeText={handleChange('groupDescription')}
+                  onBlur={handleBlur('groupDescription')}
+                  value={values.groupDescription}
+                />
+                {errors.groupDescription && touched.groupDescription ? (
+                  <Text style={styles.error}>{errors.groupDescription}</Text>
+                ) : null}
+              </View>
+            )}
+            <View style={{marginVertical: open ? '0%' : '5%'}}>
+              {users.length > 0 ? (
+                <Card style={{marginBottom: open ? '2%' : '5%'}}>
+                  {/* <Card.Title title="Card Title" /> */}
+                  <Card.Content>
+                    <ScrollView
+                      horizontal={true}
+                      contentContainerStyle={{}}
+                      showsHorizontalScrollIndicator={false}>
+                      {usersList.map(user => (
+                        <TouchableOpacity
+                        onPress={()=>setOpen(true)}
+                          style={{marginRight: 5, alignItems: 'center'}}
+                          key={user._id}>
+                          {
+                           user?.imageURL ?
+                          <Avatar.Image
+                            size={50}
+                            source={{uri: user?.imageURL}}
+                          />
+                          :
+                          <Avatar.Icon 
+                          size={50}
+                          icon="account-outline"
+                          />
+                          }
+                          <Text style={{}} maxLength={10}>
+                            {user.name.length > 5
+                              ? user.name.substring(0, 6) + '..'
+                              : user.name}
+                          </Text>
+                            {/* <Badge onPress={()=>removeItem(user._id)} style={{position:"absolute", right:"-10%", backgroundColor:theme.colors.background}} >
+                          <Text style={{fontWeight:"bold"}}>X</Text>
+                          </Badge> */}
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </Card.Content>
+                </Card>
+               ) : null}
+              
+              <DropDownPicker
+                renderListItem={props => <Item {...props} />}
+                // multiple={true}
+                open={open}
+                value={users}
+                items={items}
+                placeholder={'Choose members'}
+                searchPlaceholder={'Search'}
+                setOpen={setOpen}
+                setItems={setItems}
+                listMode="MODAL"
+                searchable={true}
+                maxHeight="60%"
+                dropDownDirection="BOTTOM"
+                loading={dropdonwSearchLoading}
+                disableLocalSearch={true}
+                itemKey="_id"
+                onChangeSearchText={async () => {
+                  setDropdownSearchLoading(true);
+                  instance
+                    .get('/api/account/allusers', {
+                      headers: {
+                        Authorization: `Bearer ${await AsyncStorage.getItem(
+                          'token',
+                        )}`,
+                      },
+                    })
+                    .then(items => {
+                      setItems(items.data);
+                    })
+                    .catch(err => {
+                      console.log('error in dropdown', err);
+                      //
+                    })
+                    .finally(() => {
+                      // Hide the loading animation
+                      setDropdownSearchLoading(false);
+                    });
                 }}
-                onPress={handleSubmit}>
-                Add
-              </Button>
+                // styles
+                style={{
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.onSurface,
+                }}
+                searchTextInputStyle={{
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.onSurface,
+                  color: theme.colors.onSurface,
+
+                }}
+                textStyle={{
+                  fontSize: 16,
+                  color: theme.colors.onSurface,
+                }}
+                dropDownContainerStyle={{
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.onSurface,
+                }}
+              />
             </View>
-          )}
-        </Formik>
-      </View>
+
+            <FAB
+              icon="check"
+              label="Add"
+              style={styles.fab}
+              disabled={isAddButtonDisable}
+              loading={isAddButtonDisable}
+              onPress={handleSubmit}
+            />
+          </View>
+        )}
+      </Formik>
+
       <Modal
         onBlur={() => setModalVisible(false)}
         animationType="slide"
@@ -428,9 +470,14 @@ const styles = StyleSheet.create({
     height: 150,
     marginHorizontal: 30,
   },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
   error: {
     color: 'red',
-    marginLeft: 20,
   },
 
   centeredView: {

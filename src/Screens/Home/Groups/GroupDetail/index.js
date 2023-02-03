@@ -1,131 +1,45 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {View, Text} from 'react-native';
+import React, { useRef} from 'react';
+import {View} from 'react-native';
 import Chat from './Chat';
 import Tasks from './Tasks';
 import Invitations from './Invitations';
-import {Badge} from 'react-native-elements';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../GlobalStyles';
-const modalHeight = height * 0.9;
+import { useTheme } from 'react-native-paper';
 
 const Tab = createMaterialTopTabNavigator();
 
 const Tabs = ({groupId}) => {
+  const theme = useTheme();
+
   return (
     <Tab.Navigator
-      initialRouteName="invitations"
+      initialRouteName="Invitations"
       style={{}}
       screenOptions={{
-        tabBarActiveTintColor: '#ffffff',
-        tabBarLabelStyle: {fontSize: 16, fontWeight: 'bold'},
-        // tabBarItemStyle: { width: 100 },
-        tabBarStyle: {backgroundColor: '#6c6399'},
-        tabBarIndicatorStyle: {backgroundColor: '#fff'},
+        // tabBarActiveTintColor: '#ffffff',
+        tabBarLabelStyle: {fontSize: 15, fontWeight: 'bold', textTransform:"none"},
+        // tabBarStyle:{backgroundColor: "#f7eaf7" }
+        tabBarStyle:{backgroundColor: theme.colors.elevation.level2}
+        // tabBarIndicatorStyle: {backgroundColor: '#fff'},
       }}>
       <Tab.Screen
-        name="invitations"
-        options={{
-          tabBarLabel: ({focused}) => (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginRight: '5%',
-                  fontWeight: 'bold',
-                  color: focused ? '#fff' : 'powderblue',
-                }}>
-                Invitations
-              </Text>
-              <Badge
-                value="3"
-                status="success"
-                badgeStyle={{
-                  backgroundColor: focused ? '#fff' : 'powderblue',
-                  color: '#333',
-                }}
-                textStyle={{color: '#333', fontWeight: 'bold'}}
-              />
-            </View>
-          ),
-        }}
+        name="Invitations"
         initialParams={{groupId: groupId}}
         component={Invitations}
       />
 
       <Tab.Screen
-        name="tasks"
-        options={{
-          tabBarLabel: ({focused}) => (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginRight: '5%',
-                  fontWeight: 'bold',
-                  color: focused ? '#fff' : 'powderblue',
-                }}>
-                Tasks
-              </Text>
-              <Badge
-                value="3"
-                status="success"
-                badgeStyle={{
-                  backgroundColor: focused ? '#fff' : 'powderblue',
-                  color: '#333',
-                }}
-                textStyle={{color: '#333', fontWeight: 'bold'}}
-              />
-            </View>
-          ),
-        }}
+        name="Tasks"
         initialParams={{groupId: groupId}}
         component={Tasks}
       />
 
       <Tab.Screen
-        name="chat"
-        options={{
-          tabBarLabel: ({focused}) => (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  marginRight: '5%',
-                  fontWeight: 'bold',
-                  color: focused ? '#fff' : 'powderblue',
-                }}>
-                Chats
-              </Text>
-              <Badge
-                value="3"
-                status="success"
-                badgeStyle={{
-                  backgroundColor: focused ? '#fff' : 'powderblue',
-                  color: '#333',
-                }}
-                textStyle={{color: '#333', fontWeight: 'bold'}}
-              />
-            </View>
-          ),
-        }}
+        name="Chat"
         initialParams={{groupId: groupId}}
         component={Chat}
       />
@@ -144,6 +58,8 @@ const Index = ({route}) => {
   const onClose = () => {
     modalizeRef.current?.close();
   };
+
+  const theme = useTheme();
 
   return (
     <View style={{flex: 1}}>

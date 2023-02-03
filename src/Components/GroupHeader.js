@@ -27,7 +27,7 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
     <>
       {!isSearch ? (
         <View>
-          <Appbar.Header >
+          <Appbar.Header elevated={true} >
             <Appbar.BackAction onPress={() => navigation.goBack()} />
             
             <Appbar.Content

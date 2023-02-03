@@ -15,7 +15,8 @@ import {PreferencesContext} from '../themeContext';
 import { useNavigation,DrawerActions } from '@react-navigation/native';
 import { useGetCurrentLoginUserQuery } from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import UserInDrawer from '../Screens/Skeletons/UserInDrawer';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   
@@ -45,6 +46,7 @@ export default function DrawerContent(props) {
   } = useGetCurrentLoginUserQuery(id.current);
 
   const logout = async () => {
+    setActive("logout")
     await AsyncStorage.setItem('isLoggedIn', '0');
     await AsyncStorage.setItem('id', '');
     await AsyncStorage.setItem('token', '');
@@ -57,6 +59,11 @@ export default function DrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
+        {
+          isLoading ? 
+          <UserInDrawer />
+          :
+
         <View style={styles.userInfoSection}>
           <Avatar.Image
             source={{
@@ -81,25 +88,21 @@ export default function DrawerContent(props) {
             </View>
           </View>
         </View>
+        }
 
-      
+        <Drawer.Section style={styles.drawerSection} >
 
-        <Drawer.Section style={styles.drawerSection} title="Preferences">
-          <TouchableRipple onPress={() => toggleTheme()}>
-            <View style={styles.preference}>
-              <Text>Dark Theme</Text>
-              <View pointerEvents="none">
-                <Switch value={isThemeDark} />
-              </View>
-            </View>
-          </TouchableRipple>
-         
+          <Drawer.Item
+          icon="weather-night"
+          label="Dark Mode"
+          right={()=><Switch value={isThemeDark} onValueChange={() => toggleTheme()} />}
+        />         
         </Drawer.Section>
 
         <Drawer.Item
           icon="logout"
           label="Logout"
-          active={active === 'first'}
+          active={active === 'logout'}
           onPress={() => logout()}
           style={{}}
         />

@@ -9,12 +9,13 @@ import {
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const Header = ({isSearch, setIsSearch}) => {
+const Header = ({isSearch, setIsSearch,searchFilterFunction}) => {
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
     setSearch(search);
+    searchFilterFunction(search)
   };
   const BlurHandler = () => {
     setIsSearch(!isSearch);
@@ -33,20 +34,19 @@ const Header = ({isSearch, setIsSearch}) => {
     <>
       {!isSearch ? (
         <View>
-          <Appbar.Header>
+          <Appbar.Header elevated={true}>
             {/* <Appbar.BackAction onPress={() => {}} /> */}
             <Appbar.Action
               icon="menu"
               onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             />
-            <Appbar.Content title="Title" titleStyle={{alignSelf: 'center'}} />
+            <Appbar.Content title="App Name" titleStyle={{alignSelf: 'center'}} />
             <Appbar.Action
               icon="magnify"
               onPress={() => {
                 setIsSearch(!isSearch);
               }}
             />
-            {/* <Appbar.Action icon={MORE_ICON} onPress={() => {}} /> */}
 
             <Menu
               visible={visible}
@@ -70,15 +70,16 @@ const Header = ({isSearch, setIsSearch}) => {
       ) : (
         <View>
           <Searchbar
-            placeholder="Search anything"
+            placeholder="Search..."
             onChangeText={updateSearch}
             value={search}
+            icon="arrow-left"
+            onIconPress={BlurHandler}
             cancelButtonTitle="cancel"
             autoFocus
-            onBlur={BlurHandler}
-            cancel={() => {
-              console.log('hello');
-            }}
+            elevation={2}
+            // loading={true}
+            // onBlur={BlurHandler}
           />
         </View>
       )}

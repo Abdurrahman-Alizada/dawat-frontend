@@ -57,14 +57,9 @@ const RenderGroupMembers = ({groupMembers}) => {
 
 const SingleTask = ({item, cardHandler}, navigation) => {
   return (
-    <View>
-       <TouchableOpacity
-      onPress={()=>cardHandler(item)}
-      // onLongPress={() => onLongPressHandler()}
-      >
       <Card
-        mode="outlined"
-        style={{
+      onPress={()=>cardHandler(item)}
+      style={{
           marginTop: '3%',
           marginHorizontal: '3%',
         }}>
@@ -106,42 +101,13 @@ const SingleTask = ({item, cardHandler}, navigation) => {
           </Card.Actions>
         </View>
       </Card>
-    </TouchableOpacity>
-  
-    </View>
   );
 };
 
 export default SingleTask;
 
 const styles = StyleSheet.create({
-  itemContainer: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    justifyContent: 'flex-start',
-    borderRadius: 5,
-    paddingVertical: '1%',
-    paddingHorizontal: '2%',
-    height: 100,
-    alignItems: 'baseline',
-  },
-  itemName: {
-    fontSize: 13,
-    color: '#282F3E',
-    fontWeight: '600',
-  },
-
-  itemDate: {
-    fontSize: 13,
-    color: '#282F3E',
-    fontWeight: 'bold',
-  },
-  itemDesc: {
-    fontSize: 13,
-    color: '#282F3E',
-    // fontWeight: 'bold',
-  },
+ 
   groupMembersContent: {
     flexDirection: 'row',
   },

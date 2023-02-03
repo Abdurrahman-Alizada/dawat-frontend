@@ -24,7 +24,6 @@ const AddTask = ({route, navigation}) => {
     route.params?.task ? updateHandler(values) : addHandler(values);
   };
   const addHandler = async values => {
-    // console.log("hello", values.taskTitle,groupId,values.taskDescription, users,startDate, dueDate,prority)
     await addTask({
       taskName: values.taskTitle,
       groupId: groupId,
@@ -82,7 +81,6 @@ const AddTask = ({route, navigation}) => {
       },
     })
     .then(items => {
-      console.log("hello users",typeof items.data)
       setItems(items.data);
     })
     .catch(err => {
@@ -147,7 +145,7 @@ useEffect(()=>{
 
  return (
     <View>
-      <Appbar.Header>
+      <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
           title={route.params?.task ? 'Update Task' : 'Add Task'}

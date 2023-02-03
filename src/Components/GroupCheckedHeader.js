@@ -35,48 +35,11 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack}) => {
               deleteF();
             }}
           />
-
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            anchor={
-              <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
-            }>
-            <Menu.Item onPress={() => {}} title="item 1" />
-            <Menu.Item onPress={() => {}} title="Item 2" />
-            <Divider />
-            <Menu.Item onPress={() => {}} title="Item 3" />
-          </Menu>
         </Appbar.Header>
       </View>
     </>
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#397af8',
-    marginBottom: 20,
-    width: '100%',
-    paddingVertical: 15,
-  },
-  heading: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  headerRight: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  subheaderText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Header;
