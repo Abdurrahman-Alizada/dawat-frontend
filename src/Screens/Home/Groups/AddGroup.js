@@ -420,8 +420,6 @@ const AddGroup = ({navigation, onClose}) => {
         onBlur={() => setModalVisible(false)}
         animationType="slide"
         transparent={true}
-        backdropOpacity={1}
-        
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
