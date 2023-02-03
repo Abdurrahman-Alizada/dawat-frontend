@@ -1,11 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Text, StyleSheet, RefreshControl, View, FlatList} from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import {Text, StyleSheet, RefreshControl, View, FlatList, StatusBar} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
-import {ActivityIndicator, AnimatedFAB} from 'react-native-paper';
-import {useSelector, useDispatch} from 'react-redux';
+import { AnimatedFAB, useTheme} from 'react-native-paper';
 import  {
-  groupApi,
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
 } from '../../../redux/reducers/groups/groupThunk';
@@ -13,13 +11,12 @@ import {Provider} from 'react-native-paper';
 import Header from '../../../Components/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 import GroupsList from '../../Skeletons/Groups';
+import {PreferencesContext} from '../../../themeContext';
 
 const Groups = ({navigation}) => {
-  const animating = useSelector(state => state.groups.groupLoader);
 
   const  {data: allGroups, isError, isLoading, error, isFetching, refetch} = useGetAllGroupsQuery();
-  const [deleteGroupForUser, {isLoading: deleteLoading}] =
-    useDeleteGroupForUserMutation();
+  const [deleteGroupForUser, {isLoading: deleteLoading}] = useDeleteGroupForUserMutation();
 
   // groups to delete
   const addGrouptoDelete1 = async () => {
@@ -46,17 +43,49 @@ const Groups = ({navigation}) => {
 
   const fabStyle = {['right']: 16};
   // end fab
-  const [isSearch, setIsSearch] = React.useState(false);
 
-  const [checked, setChecked] = React.useState(false);
-  const [checkedItems, setCheckedItems] = React.useState([]);
+  // search - start
+  const [listEmptyText, setListEmptyText] = useState("No Group yet")
+  const [isSearch, setIsSearch] = useState(false);
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
+  const [masterDataSource, setMasterDataSource] = useState([]);
+  
+  const searchFilterFunction = (text) => {
+    setMasterDataSource(allGroups)
+    setFilteredDataSource(allGroups)
+    if (text) {
+      const newData = masterDataSource?.filter((item)=> {
+          const itemData = item.groupName ? item.groupName.toUpperCase() : ''.toUpperCase();
+          const textData = text.toUpperCase();
+          return itemData.indexOf(textData) > -1;
+      });
+      if(!newData?.length){
+        setListEmptyText("Nothing find. Please enter some other text")
+      }  
+      setFilteredDataSource(newData);
+    } else {
+      setFilteredDataSource(masterDataSource);
+    }
+  };
+
+  useEffect(()=>{
+    searchFilterFunction(null)
+  },[allGroups])
+  // checked on long Press
+  const [checked, setChecked] = useState(false);
+  const [checkedItems, setCheckedItems] = useState([]);
   const checkedBack = () => {
     setChecked(false);
     setCheckedItems([]);
   };
 
+  const theme = useTheme()
+  const {isThemeDark} = useContext(PreferencesContext);
+
   return (
     <View style={{flex: 1}}>
+      <StatusBar backgroundColor={theme.colors.elevation.level2} barStyle={isThemeDark ? "light-content" : "dark-content"} />
+    
       <Provider>
         {checked ? (
           <GroupCheckedHeader
@@ -64,7 +93,7 @@ const Groups = ({navigation}) => {
             checkedBack={checkedBack}
           />
         ) : (
-          <Header isSearch={isSearch} setIsSearch={setIsSearch} />
+          <Header isSearch={isSearch} setIsSearch={setIsSearch} searchFilterFunction={searchFilterFunction} />
         )}
 
         {!isLoading ? (
@@ -72,10 +101,10 @@ const Groups = ({navigation}) => {
               <FlatList
                 onScroll={onScroll}
                 keyExtractor={item => item._id}
-                data={allGroups}
+                data={isSearch ? filteredDataSource : allGroups}
                 ListEmptyComponent={()=> 
                   <View style={{marginTop:"60%", alignItems: 'center'}}>
-                  <Text>No Group yet</Text>
+                  <Text>{listEmptyText}</Text>
                 </View>
                 }
                 renderItem={item => (
@@ -86,6 +115,7 @@ const Groups = ({navigation}) => {
                     setChecked={setChecked}
                     checkedItems={checkedItems}
                     setCheckedItems={setCheckedItems}
+                    setIsSearch={setIsSearch}
                   />
                 )}
                 refreshControl={

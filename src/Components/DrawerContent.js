@@ -46,6 +46,7 @@ export default function DrawerContent(props) {
   } = useGetCurrentLoginUserQuery(id.current);
 
   const logout = async () => {
+    setActive("logout")
     await AsyncStorage.setItem('isLoggedIn', '0');
     await AsyncStorage.setItem('id', '');
     await AsyncStorage.setItem('token', '');
@@ -89,21 +90,19 @@ export default function DrawerContent(props) {
         </View>
         }
 
-        <Drawer.Section style={styles.drawerSection} title="Preferences">
+        <Drawer.Section style={styles.drawerSection} >
 
           <Drawer.Item
-          icon={isThemeDark ? "white-balance-sunny" : "weather-night"}
-          label={isThemeDark ? "Light Theme" : "Dark Theme"}
+          icon="weather-night"
+          label="Dark Mode"
           right={()=><Switch value={isThemeDark} onValueChange={() => toggleTheme()} />}
-          active={active === 'first'}
-          style={{}}
         />         
         </Drawer.Section>
 
         <Drawer.Item
           icon="logout"
           label="Logout"
-          active={active === 'first'}
+          active={active === 'logout'}
           onPress={() => logout()}
           style={{}}
         />

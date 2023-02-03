@@ -1,17 +1,6 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import {
-  Chip,
-  Card,
-  Paragraph,
-  IconButton,
-  Title,
-  List,
-  Avatar,
-  Checkbox,
-  ActivityIndicator,
-  Divider,
-} from 'react-native-paper';
+import {View} from 'react-native';
+import {List, Avatar, Checkbox, ActivityIndicator} from 'react-native-paper';
 
 const SingleGroup = ({
   item,
@@ -21,8 +10,10 @@ const SingleGroup = ({
   checkedItems,
   setCheckedItems,
   deleteLoading,
+  setIsSearch
 }) => {
   const onPressHandler = () => {
+    setIsSearch(false)
     navigation.navigate('GroupDetail', {
       group: item,
       groupId: item._id,
@@ -51,83 +42,46 @@ const SingleGroup = ({
   // end logic for checked on longPress
 
   return (
-    <TouchableOpacity
+    <List.Item
       onPress={onPressHandler}
-      onLongPress={() => onLongPressHandler()}>
-      <List.Item
-        title={item.groupName}
-        description={item.groupDescription}
-        left={props =><View> 
-          {item.imageURL ?
-          <Avatar.Image style={props.style}  source={{uri:item.imageURL}}     size={40} /> 
-        :
-        <Avatar.Text style={props.style}  label={item.groupName.charAt(0)}  size={40} /> 
-        }
-          </View>
-          }
-        right={() => (
-          <View>
-            {checked && (
-              <View>
-                {!deleteLoading ? (
-                  <Checkbox
-                    status={checked && include ? 'checked' : 'unchecked'}
-                    onPress={onLongPressHandler}
-                  />
-                ) : (
-                  <ActivityIndicator animating={deleteLoading} />
-                )}
-              </View>
-            )}
-          </View>
-        )}
-      />
-     {/* <Divider/> */}
-    </TouchableOpacity>
+      onLongPress={() => onLongPressHandler()}
+      title={item.groupName}
+      description={item.groupDescription}
+      left={props => (
+        <View>
+          {item.imageURL ? (
+            <Avatar.Image
+              style={props.style}
+              source={{uri: item.imageURL}}
+              size={40}
+            />
+          ) : (
+            <Avatar.Text
+              style={props.style}
+              label={item.groupName.charAt(0)}
+              size={40}
+            />
+          )}
+        </View>
+      )}
+      right={() => (
+        <View>
+          {checked && (
+            <View>
+              {!deleteLoading ? (
+                <Checkbox
+                  status={checked && include ? 'checked' : 'unchecked'}
+                  onPress={onLongPressHandler}
+                />
+              ) : (
+                <ActivityIndicator animating={deleteLoading} />
+              )}
+            </View>
+          )}
+        </View>
+      )}
+    />
   );
 };
 
 export default SingleGroup;
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    width: '96%',
-    margin: '2%',
-    justifyContent: 'flex-start',
-    borderRadius: 5,
-    padding: '1%',
-    height: 90,
-    alignItems: 'baseline',
-  },
-  itemName: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  itemCode: {
-    fontWeight: '600',
-    fontSize: 12,
-    color: '#fff',
-  },
-
-  subtitleView: {
-    flexDirection: 'row',
-    paddingTop: 5,
-  },
-  mainImage: {
-    height: 19.21,
-    width: 100,
-  },
-  ratingText: {
-    paddingLeft: 10,
-    color: 'grey',
-  },
-  groupMembersContent: {
-    flexDirection: 'row',
-  },
-  memberImage: {
-    height: 20,
-    width: 20,
-    borderRadius: 50,
-  },
-});
