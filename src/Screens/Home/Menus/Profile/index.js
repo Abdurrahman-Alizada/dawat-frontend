@@ -98,7 +98,9 @@ export default ProfileIndex = ({route}) => {
       fileDataRef.current = image
       setfileData(image);
       imageUploadHandler();
-    });
+    }).catch((e)=>{
+      console.log("Error in image selection",e)
+    })
     setModalVisible(false);
   };
 
@@ -116,7 +118,9 @@ export default ProfileIndex = ({route}) => {
       fileDataRef.current = image
       setfileData(image);
       imageUploadHandler();
-      });
+      }).catch((e)=>{
+        console.log("Error in image selection",e)
+      })
     setModalVisible(false);
   };
   const imageUploadHandler =async ()=>{
@@ -167,6 +171,7 @@ export default ProfileIndex = ({route}) => {
       })
     }
   }
+  // image uploading - end
 
   return (
     <SafeAreaView style={{flexGrow: 1}}>

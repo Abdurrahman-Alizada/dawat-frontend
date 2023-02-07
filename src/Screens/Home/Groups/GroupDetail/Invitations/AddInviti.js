@@ -51,7 +51,9 @@ const AddInviti = ({route, navigation}) => {
     }).then(image => {
       setfileData(image);
       setIsEditStart(true)
-    });
+    }).catch((e)=>{
+      console.log("Error in image selection",e)
+    })
     setModalVisible(false);
   };
 
@@ -82,7 +84,9 @@ const AddInviti = ({route, navigation}) => {
     }).then(image => {
       setfileData(image);
       setIsEditStart(true)
-    });
+    }).catch((e)=>{
+      console.log("Error in image selection",e)
+    })
     setModalVisible(false);
   };
 

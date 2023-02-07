@@ -1,13 +1,11 @@
 import {
   TouchableOpacity,
-  Image,
   StyleSheet,
   Modal,
   View,
   ScrollView,
-  ImageBackground,
 } from 'react-native';
-import React, {useState, useEffect, useMemo, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {instance} from '../../../redux/axios';
 import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -70,11 +68,15 @@ const AddGroup = ({navigation, onClose}) => {
       width: 300,
       height: 400,
       cropping: true,
-    }).then(image => {
-      setfileData(image);
-      fileDataRef.current = image;
-      console.log(image);
-    });
+    })
+      .then(image => {
+        setfileData(image);
+        fileDataRef.current = image;
+        console.log(image);
+      })
+      .catch(e => {
+        console.log('Error in image selection', e);
+      });
   };
 
   let openGallery = () => {
@@ -85,11 +87,15 @@ const AddGroup = ({navigation, onClose}) => {
       width: 300,
       height: 400,
       cropping: true,
-    }).then(image => {
-      setfileData(image);
-      fileDataRef.current = image;
-      console.log(image);
-    });
+    })
+      .then(image => {
+        setfileData(image);
+        fileDataRef.current = image;
+        console.log(image);
+      })
+      .catch(e => {
+        console.log('Error in image selection', e);
+      });
   };
 
   let removePicture = () => {
@@ -313,27 +319,23 @@ const AddGroup = ({navigation, onClose}) => {
                       showsHorizontalScrollIndicator={false}>
                       {usersList.map(user => (
                         <TouchableOpacity
-                        onPress={()=>setOpen(true)}
+                          onPress={() => setOpen(true)}
                           style={{marginRight: 5, alignItems: 'center'}}
                           key={user._id}>
-                          {
-                           user?.imageURL ?
-                          <Avatar.Image
-                            size={50}
-                            source={{uri: user?.imageURL}}
-                          />
-                          :
-                          <Avatar.Icon 
-                          size={50}
-                          icon="account-outline"
-                          />
-                          }
+                          {user?.imageURL ? (
+                            <Avatar.Image
+                              size={50}
+                              source={{uri: user?.imageURL}}
+                            />
+                          ) : (
+                            <Avatar.Icon size={50} icon="account-outline" />
+                          )}
                           <Text style={{}} maxLength={10}>
                             {user.name.length > 5
                               ? user.name.substring(0, 6) + '..'
                               : user.name}
                           </Text>
-                            {/* <Badge onPress={()=>removeItem(user._id)} style={{position:"absolute", right:"-10%", backgroundColor:theme.colors.background}} >
+                          {/* <Badge onPress={()=>removeItem(user._id)} style={{position:"absolute", right:"-10%", backgroundColor:theme.colors.background}} >
                           <Text style={{fontWeight:"bold"}}>X</Text>
                           </Badge> */}
                         </TouchableOpacity>
@@ -341,8 +343,8 @@ const AddGroup = ({navigation, onClose}) => {
                     </ScrollView>
                   </Card.Content>
                 </Card>
-               ) : null}
-              
+              ) : null}
+
               <DropDownPicker
                 renderListItem={props => <Item {...props} />}
                 // multiple={true}
@@ -391,7 +393,6 @@ const AddGroup = ({navigation, onClose}) => {
                   backgroundColor: theme.colors.background,
                   borderColor: theme.colors.onSurface,
                   color: theme.colors.onSurface,
-
                 }}
                 textStyle={{
                   fontSize: 16,
