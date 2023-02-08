@@ -50,9 +50,9 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
         <Appbar
           elevated={true}
           style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-         <View>
-          <Appbar.BackAction onPress={() => navigation.goBack()} />
-         </View>
+          <View>
+            <Appbar.BackAction onPress={() => navigation.goBack()} />
+          </View>
 
           <TouchableOpacity
             onPress={() => {
@@ -61,16 +61,23 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
             style={{
               flexDirection: 'row',
               width: '70%',
-              alignItems: "flex-end",
+              alignItems: 'flex-end',
               justifyContent: 'flex-start',
             }}>
             <Avatar.Image
               size={40}
-              source={currentViewingGroup.imageURL ? {uri: currentViewingGroup.imageURL} : require('../assets/drawer/male-user.png')}
+              source={
+                currentViewingGroup.imageURL
+                  ? {uri: currentViewingGroup.imageURL}
+                  : require('../assets/drawer/male-user.png')
+              }
+              // source={require('../assets/drawer/male-user.png')}
             />
             <View style={{marginLeft: 5}}>
               <Text style={{fontSize: 18, fontWeight: '700'}}>
-                {currentViewingGroup.groupName}
+                {currentViewingGroup.groupName?.length > 18
+                  ? `${currentViewingGroup.groupName.substring(0, 18)}...`
+                  : currentViewingGroup.groupName}
               </Text>
               <Text
                 style={{
@@ -98,7 +105,6 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
               }}
             />
           </View>
-
         </Appbar>
       ) : (
         <View>

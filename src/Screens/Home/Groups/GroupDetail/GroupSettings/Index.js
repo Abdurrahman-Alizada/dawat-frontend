@@ -22,7 +22,7 @@ import {
   Searchbar,
   FAB,
   Portal,
-  useTheme
+  useTheme,
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
@@ -33,32 +33,38 @@ import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from '../../../Menus/Profile/AvatarModal';
 import {instance} from '../../../../../redux/axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
 // imports end
 
 const Index = ({route, navigation}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
+  const currentViewingGroup = useSelector(
+    state => state.groups?.currentViewingGroup,
+  );
   // component state - start
-  const {users, groupName, _id, groupDescription} = route?.params?.group?.group;
+  // const {users, groupName, _id, groupDescription} = route?.params?.group?.group;
+  const {users, groupName, _id, groupDescription} = currentViewingGroup;
   const [memberUsers, setMemberUsers] = useState(users);
   const [name, setName] = useState(groupName);
   const [description, setDescription] = useState(groupDescription);
   const [userId, setUserId] = useState('');
-  
+
   // image uploading state
   const [modalVisible, setModalVisible] = useState(false);
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
-  const [avatarURL, setAvatarURL] = useState(
-    route?.params?.group?.group.imageURL,
-  );
+  // const [avatarURL, setAvatarURL] = useState( route?.params?.group?.group.imageURL,);
+  const [avatarURL, setAvatarURL] = useState(currentViewingGroup.imageURL);
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   // snakebar
   const [snakeBarMessage, setSnakeBarMessage] = useState('');
   const [showSnakeBar, setShowSnakeBar] = useState(false);
 
-  // edit data 
+  // edit data
   const [editGroupName, seteditGroupName] = useState(false);
   const [editGroupDescription, setEditGroupDescription] = useState(false);
 
@@ -69,7 +75,7 @@ const Index = ({route, navigation}) => {
 
   const [selectedMembers, setSelectedMembers] = useState([]);
   const modalizeRef = useRef(null);
-  
+
   // show more for description
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text
   const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
@@ -81,11 +87,13 @@ const Index = ({route, navigation}) => {
 
   // redux toolkit - start
   const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
-  const [deleteGroupForUser, {isLoading: deleteLoading}] = useDeleteGroupForUserMutation();
-  const [addUserToGroup, {isLoading: addUserLoading}] = useAddUserToGroupMutation();
+  const [deleteGroupForUser, {isLoading: deleteLoading}] =
+    useDeleteGroupForUserMutation();
+  const [addUserToGroup, {isLoading: addUserLoading}] =
+    useAddUserToGroupMutation();
   // redux toolkit - end
-    
-  // functions - start 
+
+  // functions - start
   const handleSubmit = () => {
     updateGroupInfo({
       groupId: _id,
@@ -94,6 +102,7 @@ const Index = ({route, navigation}) => {
       imageURL: avatarURL,
     })
       .then(res => {
+        dispatch(handleCurrentViewingGroup(res.data));
         setSnakeBarMessage('Group information has been updated');
         setShowSnakeBar(true);
         seteditGroupName(false);
@@ -129,11 +138,8 @@ const Index = ({route, navigation}) => {
       userId: userId,
     })
       .then(res => {
-        let remainingItems = memberUsers.filter(item => {
-          return item._id !== userId;
-        });
-        setMemberUsers(remainingItems);
-        navigation.setParams((route.params.group.group = res.data));
+        dispatch(handleCurrentViewingGroup(res.data));
+        setMemberUsers(res.data.users);
         setShowSnakeBar(false);
       })
       .catch(e => {
@@ -188,7 +194,7 @@ const Index = ({route, navigation}) => {
       });
     setModalVisible(false);
   };
-  
+
   const imageUploadHandler = async () => {
     const id = await AsyncStorage.getItem('id');
 
@@ -214,6 +220,7 @@ const Index = ({route, navigation}) => {
             imageURL: avatarURL,
           })
             .then(res => {
+              dispatch(handleCurrentViewingGroup(res.data));
               setSnakeBarMessage('Group information has been updated');
               setShowSnakeBar(true);
               seteditGroupName(false);
@@ -240,6 +247,7 @@ const Index = ({route, navigation}) => {
         imageURL: avatarURL,
       })
         .then(res => {
+          dispatch(handleCurrentViewingGroup(res.data));
           setSnakeBarMessage('Group information has been updated');
           setShowSnakeBar(true);
           seteditGroupName(false);
@@ -259,6 +267,7 @@ const Index = ({route, navigation}) => {
         userId: selectedMembers[i],
       })
         .then(res => {
+          dispatch(handleCurrentViewingGroup(res.data));
           setMemberUsers(res.data?.users);
           setVisible(false);
         })
@@ -295,17 +304,14 @@ const Index = ({route, navigation}) => {
 
   // functions - end
 
-  
   // components - start
   const HeaderComponentFlatList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const searchMemberForGroup = queryText => {
-      
       setSearchQuery(queryText);
       let remainingItems = allMembers.filter(item => {
         return item.name !== queryText;
       });
-      
     };
 
     return (
@@ -417,9 +423,10 @@ const Index = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={{flexGrow: 1}}>
-      <View style={{ flex: 1}}>
+      <View style={{flex: 1}}>
         <ScrollView>
-          <List.Section style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+          <List.Section
+            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
             <TouchableOpacity
               onPress={() => {
                 seteditGroupName(false);
@@ -537,7 +544,8 @@ const Index = ({route, navigation}) => {
             </View>
           </List.Section>
 
-          <List.Section style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+          <List.Section
+            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
             <List.Subheader>Group members</List.Subheader>
             <List.Item
               onPress={() => {
@@ -579,12 +587,15 @@ const Index = ({route, navigation}) => {
             ))}
           </List.Section>
 
-          <List.Section style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+          <List.Section
+            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
             <List.Item
               onPress={handleLeave}
               title="Leave group"
-              left={() => <List.Icon color={theme.colors.error} icon="logout" />}
-              titleStyle={{color:theme.colors.error}}
+              left={() => (
+                <List.Icon color={theme.colors.error} icon="logout" />
+              )}
+              titleStyle={{color: theme.colors.error}}
               // right={() =>
               //   deleteLoading ? (
               //     <ActivityIndicator animating={true} size="small" />
@@ -604,8 +615,8 @@ const Index = ({route, navigation}) => {
 
       {/* add member portal - start*/}
       <Portal>
-      {/* <View style={{position:"absolute"}}> */}
-      {/* <Modalize
+        {/* <View style={{position:"absolute"}}> */}
+        {/* <Modalize
         ref={modalizeRef}
         HeaderComponent={<HeaderComponentFlatList />}
         withHandle={false}
@@ -626,15 +637,15 @@ const Index = ({route, navigation}) => {
           // ListHeaderComponent : HeaderComponentFlatList
         }}
       /> */}
-      {/* </View> */}
+        {/* </View> */}
 
         <Modal
           visible={visible}
           animationType="slide"
           // style={{backgroundColor:theme.colors.surface, maxHeight:"80%", justifyContent:"flex-end",bottom}}
           onDismiss={() => setVisible(false)}>
-            <HeaderComponentFlatList />
-            {/* <FlatList
+          <HeaderComponentFlatList />
+          {/* <FlatList
               keyExtractor={item => item._id}
               data={allMembers}
               // ListHeaderComponent={HeaderComponentFlatList}
@@ -652,12 +663,13 @@ const Index = ({route, navigation}) => {
               }
             /> */}
 
-            {/* scrollview */}
-            <ScrollView contentContainerStyle={{backgroundColor:theme.colors.surface}}>
-              {allMembers.map((item, index) => (
-                <RenderListItemForScrollView item={item} key={index} />
-              ))}
-            </ScrollView>
+          {/* scrollview */}
+          <ScrollView
+            contentContainerStyle={{backgroundColor: theme.colors.surface}}>
+            {allMembers.map((item, index) => (
+              <RenderListItemForScrollView item={item} key={index} />
+            ))}
+          </ScrollView>
           <FAB
             icon={
               addUserLoading
@@ -679,7 +691,11 @@ const Index = ({route, navigation}) => {
 
       <Snackbar
         visible={showSnakeBar}
-        icon={deleteLoading ? () => <ActivityIndicator animating={true} size="small" /> : "check"}
+        icon={
+          deleteLoading
+            ? () => <ActivityIndicator animating={true} size="small" />
+            : 'check'
+        }
         onIconPress={() => console.log('hello')}
         onDismiss={() => setShowSnakeBar(false)}
         duration={4000}>
@@ -688,11 +704,13 @@ const Index = ({route, navigation}) => {
       </Snackbar>
 
       {editGroupName && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.surfaceVariant}}>
           <TextInput
             autoFocus={true}
             label="Group name"
             mode="outlined"
+            // activeOutlineColor={theme.colors.background}
+            // activeOutlineColor={theme.colors.onBackground}
             value={name}
             onChangeText={text => {
               setName(text);
@@ -767,18 +785,23 @@ const Index = ({route, navigation}) => {
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        <TouchableOpacity 
-        onPress={()=>setModalVisible(false)}
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          backgroundColor:theme.colors.backdrop          
-        }}
-        
-        >
+        <TouchableOpacity
+          onPress={() => setModalVisible(false)}
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            backgroundColor: theme.colors.backdrop,
+          }}>
           <View
-            style={[styles.modalView, {position: 'absolute', width: '100%', backgroundColor:theme.colors.surface}]}>
+            style={[
+              styles.modalView,
+              {
+                position: 'absolute',
+                width: '100%',
+                backgroundColor: theme.colors.surface,
+              },
+            ]}>
             <IconButton
               style={{position: 'absolute', right: 5}}
               icon="close-circle-outline"
@@ -855,7 +878,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-
   },
   modalView: {
     flexDirection: 'row',

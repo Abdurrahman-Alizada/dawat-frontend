@@ -1,42 +1,68 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {StyleSheet, Text, View, FlatList, RefreshControl} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  FlatList,
+  RefreshControl,
+  Share,
+  Linking,
+} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
-import {
-  useGetAllInvitationsQuery,
-} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import {
   List,
   Avatar,
   FAB,
+  Text,
   Modal,
   Chip,
   ActivityIndicator,
+  useTheme,
+  Banner,
 } from 'react-native-paper';
 import AddCategory from './AddCategory';
 import AsyncStorage from '@react-native-community/async-storage';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
-const modalHeight = height * 0.7;
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import InvitiBrief from './InvitiBrief';
+import {handleCurrentInviti} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 
 export default function Example({route}) {
   const navigation = useNavigation();
 
   const {groupId} = route.params;
   const modalizeRef = useRef(null);
+  const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
+  const isExportBanner = useSelector(
+    state => state.invitations?.isExportBanner,
+  );
 
-  const {data, isError, isLoading, error, isFetching, refetch, getAllInvitations} = useGetAllInvitationsQuery({
+  const {
+    data,
+    isError,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+    getAllInvitations,
+  } = useGetAllInvitationsQuery({
     groupId,
   });
 
   // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
-  const currentInviti = useRef({})
-  const FABHandler = (item) => {
-    currentInviti.current = item ? item : {}
-    navigation.navigate("AddInviti", { groupId:groupId, currentInviti:currentInviti.current})
+  const currentInviti = useRef({});
+  const FABHandler = item => {
+    currentInviti.current = item ? item : {};
+    navigation.navigate('AddInviti', {
+      groupId: groupId,
+      currentInviti: currentInviti.current,
+    });
   };
 
   const [chips, setChips] = useState([
@@ -49,8 +75,23 @@ export default function Example({route}) {
     setSelectedChips([...selectedChips, id]);
   };
 
+  const BriefHandler = (item) => {
+    dispatch(handleCurrentInviti(item));
+    onBriefOpen();
+  };
+
+  const onBriefOpen = item => {
+    invitiBriefModalizeRef.current?.open();
+  };
+
+  const onBriefClose = () => {
+    invitiBriefModalizeRef.current?.close();
+  };
+
+  const theme = useTheme();
+
   return (
-    <View style={{flex: 1,}}>
+    <View style={{flex: 1, backgroundColor:theme.colors.surface}}>
       {/* <View
         style={{
           flexDirection: 'row',
@@ -70,54 +111,67 @@ export default function Example({route}) {
         ))}
       </View> */}
 
+      <Banner
+        visible={isExportBanner}
+        actions={[
+          {
+            label: 'Understood',
+            onPress: () => dispatch(handleIsExportBanner(false)),
+          },
+        ]}
+        icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
+        Invitaions List of this group has been exported in Downlaod folder
+        successfully
+      </Banner>
+
       {isLoading ? (
         <View
           style={{
-            margin:"3%"
-         }}>
-            <InvitaionsList />
+            margin: '3%',
+          }}>
+          <InvitaionsList />
         </View>
       ) : (
-            <FlatList
-              data={data}
-              keyExtractor={item => item._id}
-              ListEmptyComponent={()=> 
-                <View style={{marginTop:"50%", alignItems: 'center'}}>
-                <Text>No invitation</Text>
-              </View>
-              }
-              renderItem={({item}) => (
-                <List.Item
-                  onPress={()=>FABHandler(item)}
-                  title={item.invitiName}
-                  description={item.invitiDescription}
-                  left={props => (
-                    <Avatar.Image 
-                      style={props.style}
-                      size={45}
-                      avatarStyle={{borderRadius: 20}}
-                      source={item.invitiImageURL ? {uri:item.invitiImageURL} : require('../../../../../assets/drawer/male-user.png')}
-                    />
-                  )}
-                  style={{paddingVertical: '1%'}}
-                  right={
-                  (props) =>{
-                    
-                    if(item.lastStatus.invitiStatus === "invited") return <List.Icon {...props} icon="check" />
-                    if(item.lastStatus.invitiStatus === "pending") return <List.Icon {...props} icon="clock-outline" />
-                    else if(item.lastStatus.invitiStatus === "rejected") return <List.Icon {...props} icon="cancel" />
-                    
-                  } 
-                }
+        <FlatList
+          data={data}
+          keyExtractor={item => item._id}
+          ListEmptyComponent={() => (
+            <View style={{marginTop: '50%', alignItems: 'center'}}>
+              <Text>No invitation</Text>
+            </View>
+          )}
+          renderItem={({item}) => (
+            <List.Item
+              onPress={()=>BriefHandler(item)}
+              title={item.invitiName}
+              description={item.invitiDescription}
+              left={props => (
+                <Avatar.Image
+                  style={props.style}
+                  size={45}
+                  avatarStyle={{borderRadius: 20}}
+                  source={
+                    item.invitiImageURL
+                      ? {uri: item.invitiImageURL}
+                      : require('../../../../../assets/drawer/male-user.png')
+                  }
                 />
               )}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isFetching}
-                  onRefresh={refetch}
-                />
-              }
+              style={{paddingVertical: '1%'}}
+              right={props => {
+                if (item.lastStatus.invitiStatus === 'invited')
+                  return <List.Icon {...props} icon="check" />;
+                if (item.lastStatus.invitiStatus === 'pending')
+                  return <List.Icon {...props} icon="clock-outline" />;
+                else if (item.lastStatus.invitiStatus === 'rejected')
+                  return <List.Icon {...props} icon="cancel" />;
+              }}
             />
+          )}
+          refreshControl={
+            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+          }
+        />
       )}
 
       <FAB
@@ -127,10 +181,13 @@ export default function Example({route}) {
         style={styles.fab}
         onPress={() => FABHandler()}
       />
-      
-      {/* <Modal animationType="slide" visible={visible}>
-        <AddInviti setVisible={setVisible} groupId={groupId} currentInviti={currentInviti} />
-      </Modal> */}
+     
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surface}}
+        ref={invitiBriefModalizeRef}
+        snapPoint={400}>
+        <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
+      </Modalize>
     </View>
   );
 }

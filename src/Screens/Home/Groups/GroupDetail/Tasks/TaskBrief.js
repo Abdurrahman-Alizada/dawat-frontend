@@ -86,7 +86,6 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
     [textShown],
   );
   return (
-    <View>
       <View style={{padding: '2%'}}>
         <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
           <IconButton
@@ -120,66 +119,7 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
               />
             )}
           />
-
-        <List.Section>
-          <View style={{paddingHorizontal:"2%"}}>
-            {/* <List.Subheader >Responsible</List.Subheader> */}
-            <Text
-              style={{
-                // borderRadius: 10,
-                // borderColor: '#C1C2B8',
-                // borderWidth: 0.5,
-                paddingVertical: '2%',
-                // marginVertical: '2%',
-                // fontWeight: 'bold',
-                // textAlign: 'center',
-              }}>
-                Responsible
-            </Text>
-            <RenderGroupMembers groupMembers={item} />
-          </View>
-
-          <View style={{flexDirection:"row", justifyContent:"space-between",  }}>
-      
-            <View style={{width:"48%", alignItems:"center"}}>
-            <List.Subheader >Starting Time</List.Subheader>
-              <Text
-                style={{
-                  borderRadius: 10,
-                  borderColor: '#C1C2B8',
-                  borderWidth: 0.5,
-                  padding: '2%',
-                  width:"100%",
-                  marginVertical: '2%',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                {moment(item.createdAt).format('ll')}
-              </Text>
-            </View>
-      
-            <View style={{width:"48%", alignItems:"center"}}>
-            <List.Subheader >End Time</List.Subheader>
-              <Text
-                style={{
-                  borderRadius: 10,
-                  borderColor: '#C1C2B8',
-                  borderWidth: 0.5,
-                  padding: '2%',
-                  width:"100%",
-                  marginVertical: '2%',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                {moment(item.createdAt).format('ll')}
-              </Text>
-            </View>
-
-          </View>
-        </List.Section>
-
       </View>
-    </View>
   );
 };
 

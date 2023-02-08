@@ -7,7 +7,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
 import {Modalize} from 'react-native-modalize';
-import { useTheme } from 'react-native-paper';
+import { useTheme, Banner } from 'react-native-paper';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -67,9 +67,10 @@ const Index = ({route}) => {
       <Tabs groupId={groupId} />
 
       <Modalize
+        modalStyle={{backgroundColor:theme.colors.surface}}
         ref={modalizeRef}
         snapPoint={400}>
-        <GroupBrief />
+        <GroupBrief group={route.params.group} onClose={onClose} />
       </Modalize>
     </View>
   );
