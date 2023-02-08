@@ -1,13 +1,15 @@
 import React, {useCallback, useState} from 'react';
 import {TouchableOpacity, StyleSheet, Text, View} from 'react-native';
-import {
-  Divider,
-  Avatar,
-  Card,
-  Icon,
-} from 'react-native-elements';
+import {Button, Avatar, List} from 'react-native-paper';
+import RNFS from 'react-native-fs';
+import {jsonToCSV} from 'react-native-csv';
+import {useSelector, useDispatch} from 'react-redux';
+import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 
-const Index = () => {
+const Index = ({group, onClose}) => {
+  const dispatch = useDispatch();
+
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text
   const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
   const toggleNumberOfLines = () => {
@@ -24,36 +26,91 @@ const Index = () => {
     [textShown],
   );
 
-  const postDescription =
-    "Lorem Ipsum is simply dummy text of the printing and  of the pri of the printing and  of the printing and nting and  of the printing and  of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Aldus PageMaker including versions of Lorem Ipsum.";
+  const currentViewingGroup = useSelector(
+    state => state.groups?.currentViewingGroup,
+  );
 
+  const {
+    data,
+    isError,
+    isLoading,
+    error,
+    isFetching,
+    refetch,
+    getAllInvitations,
+  } = useGetAllInvitationsQuery({
+    groupId: currentViewingGroup._id,
+  });
+
+  const [exportLoading, setExportLoading] = useState(false);
+  const exportCSV = () => {
+    const jsonData = data.map(user => {
+      return {
+        'Inviti name': user.invitiName,
+        'Inviti contact': user.email,
+        'Added by': user.addedBy.name,
+        'Last status': user.lastStatus.invitiStatus,
+        'Last status updated by': user.lastStatus.addedBy.name,
+      };
+    });
+    const results = jsonToCSV(jsonData);
+    const path =
+      RNFS.DownloadDirectoryPath + `/${currentViewingGroup.groupName}.csv`;
+    RNFS.writeFile(path, results, 'utf8')
+      .then(success => {
+        console.log('FILE WRITTEN!');
+        setExportLoading(false);
+        onClose();
+        dispatch(handleIsExportBanner(true));
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
+  };
   return (
-    <View style={{paddingHorizontal: '9%', paddingVertical: '5%'}}>
+    <View style={{paddingHorizontal: '5%', paddingVertical: '5%'}}>
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           marginBottom: '5%',
         }}>
-        <Avatar
-          containerStyle={{height: 40, width: 40, marginRight: '5%'}}
-          avatarStyle={{borderRadius: 50}}
-          source={{
-            uri: 'https://media.istockphoto.com/photos/red-tailed-black-cockatoo-picture-id1159108632?b=1&k=20&m=1159108632&s=170667a&w=0&h=Jkf4rYZNDawLV-8ER33bYLFHbXyAiNRGXIa9tx03mBI=',
-          }}
-        />
+        {/* <Avatar.Image
+          size={40}
+          style={{marginRight: '3%'}}
+          source={
+            currentViewingGroup.imageURL
+              ? {uri: currentViewingGroup.imageURL}
+              : require('../../../../../assets/drawer/male-user.png')
+          }
+        /> */}
 
-        <View style={{}}>
+<List.Item
+        title={currentViewingGroup.groupName}
+        description={currentViewingGroup.groupDescription}
+        left={props => (
+          <Avatar.Image
+            {...props}
+            size={45}
+            source={
+              currentViewingGroup.imageURL
+                ? {uri: currentViewingGroup.imageURL}
+                : require('../../../../../assets/drawer/male-user.png')
+            }
+          />
+        )}
+      />
+        {/* <View style={{}}>
           <Text
             style={{fontSize: 16, fontWeight: 'bold', marginVertical: '1%'}}>
-            Group Name
+            {currentViewingGroup.groupName}
           </Text>
 
           <Text
             onTextLayout={onTextLayout}
             numberOfLines={textShown ? undefined : 2}
             style={{}}>
-            {postDescription}
+            {currentViewingGroup.groupDescription}
           </Text>
 
           {lengthMore ? (
@@ -65,10 +122,10 @@ const Index = () => {
           ) : (
             <></>
           )}
-        </View>
+        </View> */}
       </View>
 
-      <Divider />
+      {/* <Divider />
 
       <View
         style={{
@@ -133,8 +190,16 @@ const Index = () => {
             </Text>
           </View>
         </Card>
-      </View>
-      <Divider />
+      </View> */}
+      {/* <Divider /> */}
+      <Button
+        loading={exportLoading}
+        onPress={exportCSV}
+        mode="contained"
+        icon={'download'}
+        style={{marginTop: '5%'}}>
+        Downlaod Invitations list
+      </Button>
     </View>
   );
 };

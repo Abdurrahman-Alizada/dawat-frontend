@@ -6,8 +6,9 @@
 // ==========================================
 
 import React, {useState, useRef} from 'react';
-import {StyleSheet, FlatList, View, Text, RefreshControl} from 'react-native';
+import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
+import {Text} from 'react-native-paper'
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {height} from '../../../../../GlobalStyles';
@@ -71,7 +72,12 @@ const Task = ({route}) => {
         onPress={() => FABHandler()}
       />
 
-      <Modalize ref={modalizeRef} adjustToContentHeight={true}>
+      <Modalize ref={modalizeRef} 
+      // adjustToContentHeight={true}
+      snapPoint={300}
+      handlePosition="inside"
+      modalHeight={500}
+      >
         <TaskBrief
           item={currentItem}
           closeModalize={closeModalize}
