@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {List, Avatar, Checkbox, ActivityIndicator} from 'react-native-paper';
+import { useDispatch } from 'react-redux';
+import {handleCurrentViewingGroup} from '../../../redux/reducers/groups/groups';
 
 const SingleGroup = ({
   item,
@@ -12,8 +14,11 @@ const SingleGroup = ({
   deleteLoading,
   setIsSearch
 }) => {
+  const dispatch = useDispatch()
+
   const onPressHandler = () => {
     setIsSearch(false)
+    dispatch(handleCurrentViewingGroup(item));
     navigation.navigate('GroupDetail', {
       group: item,
       groupId: item._id,

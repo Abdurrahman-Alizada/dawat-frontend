@@ -1,9 +1,30 @@
 import React, {useState} from 'react';
-import {StyleSheet, View,TouchableOpacity} from 'react-native';
-import {Menu, Divider, Appbar, Searchbar,Avatar} from 'react-native-paper';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {
+  Menu,
+  Divider,
+  Appbar,
+  Searchbar,
+  Avatar,
+  Text,
+} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 
 const Header = ({isSearch, setIsSearch, onOpen, group}) => {
+  const currentViewingGroup = useSelector(
+    state => state.groups?.currentViewingGroup,
+  );
+
+  const getMembersOfGroup = () => {
+    let membersText = currentViewingGroup.users?.map(user => {
+      return user.name;
+    });
+    return membersText.toString().length < 25
+      ? membersText.toString()
+      : `${membersText.toString().substring(0, 25)}...`;
+  };
+
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
@@ -26,36 +47,59 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
   return (
     <>
       {!isSearch ? (
-        <View>
-          <Appbar.Header elevated={true} >
-            <Appbar.BackAction onPress={() => navigation.goBack()} />
-            
-            <Appbar.Content
-              onPress={() => {
-                navigation.navigate('SingleGroupSettings', {group: group});
-              }}
-              title={group.groupName}
+        <Appbar
+          elevated={true}
+          style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+         <View>
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+         </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('SingleGroupSettings', {group: group});
+            }}
+            style={{
+              flexDirection: 'row',
+              width: '70%',
+              alignItems: "flex-end",
+              justifyContent: 'flex-start',
+            }}>
+            <Avatar.Image
+              size={40}
+              source={currentViewingGroup.imageURL ? {uri: currentViewingGroup.imageURL} : require('../assets/drawer/male-user.png')}
             />
+            <View style={{marginLeft: 5}}>
+              <Text style={{fontSize: 18, fontWeight: '700'}}>
+                {currentViewingGroup.groupName}
+              </Text>
+              <Text
+                style={{
+                  width: '100%',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                  flexDirection: 'row',
+                  // marginLeft: 5,
+                }}>
+                {getMembersOfGroup()}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <View
+            style={{
+              maxWidth: '20%',
+              alignSelf: 'flex-end',
+              justifyContent: 'flex-end',
+            }}>
             <Appbar.Action
               icon="briefcase-outline"
               onPress={() => {
                 onOpen();
               }}
             />
+          </View>
 
-            {/* <Menu
-              visible={visible}
-              onDismiss={closeMenu}
-              anchor={
-                <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
-              }>
-              <Menu.Item onPress={() => {}} title="item 1" />
-              <Menu.Item onPress={() => {}} title="Item 2" />
-              <Divider />
-              <Menu.Item onPress={() => {}} title="Item 3" />
-            </Menu> */}
-          </Appbar.Header>
-        </View>
+        </Appbar>
       ) : (
         <View>
           <Searchbar
@@ -74,31 +118,5 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#397af8',
-    marginBottom: 20,
-    width: '100%',
-    paddingVertical: 15,
-  },
-  heading: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  headerRight: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  subheaderText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Header;
