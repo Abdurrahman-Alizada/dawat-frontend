@@ -16,6 +16,8 @@ import {LogBox } from 'react-native';
 import SplashScreen123 from 'react-native-splash-screen'
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
+LogBox.ignoreLogs(['Possible Unhandled']);
+LogBox.ignoreLogs(['This synthetic event is reused for performance reasons.']);
 
 import {
   NavigationContainer,

@@ -2,7 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import GroupStack from './GroupStack'
-import Profile from '../Screens/Home/Menus/Profile.js/index';
+import Profile from '../Screens/Home/Menus/Profile/index';
 
 const Stack = createStackNavigator();
 

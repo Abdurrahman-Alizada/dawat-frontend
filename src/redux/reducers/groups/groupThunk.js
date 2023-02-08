@@ -47,6 +47,8 @@ export const groupApi = createApi({
         body: {
           chatId: group.groupId,
           groupName: group.groupName,
+          groupDescription : group.groupDescription,
+          imageURL:group.imageURL
         },
       }),
       invalidatesTags: ['Groups'],
@@ -63,6 +65,18 @@ export const groupApi = createApi({
       }),
       invalidatesTags: ['Groups'],
     }),
+    addUserToGroup: build.mutation({
+      query: group => ({
+        url: `/api/group/groupadd`,
+        method: 'PUT',
+        body: {
+          chatId: group.chatId,
+          userId: group.userId,
+        },
+      }),
+      invalidatesTags: ['Groups'],
+      providesTags:['Groups']
+    }),
   }),
 });
 
@@ -70,6 +84,7 @@ export const {
   useGetAllGroupsQuery,
   useAddGroupMutation,
   useDeleteGroupForUserMutation,
+  useAddUserToGroupMutation,
   useUpdateGroupInfoMutation
 } = groupApi;
 
