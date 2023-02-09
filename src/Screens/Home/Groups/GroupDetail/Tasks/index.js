@@ -75,7 +75,7 @@ const Task = ({route}) => {
       <Modalize ref={modalizeRef} 
       // adjustToContentHeight={true}
       snapPoint={300}
-      // handlePosition="inside"
+      handlePosition="inside"
       modalHeight={500}
       >
         <TaskBrief
