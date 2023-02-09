@@ -1,14 +1,29 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, Image, StyleSheet, Text, View, Alert} from 'react-native';
+import {
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+} from 'react-native';
 import moment from 'moment';
-import {Badge, Card, Paragraph, IconButton, Title} from 'react-native-paper';
+import {
+  Badge,
+  Card,
+  Paragraph,
+  IconButton,
+  List,
+  Title,
+} from 'react-native-paper';
 
-const RenderGroupMembers = ({groupMembers}) => {
-  if (groupMembers.responsibles) {
-    // console.log('hhhh', groupMembers.responsibles);
+const RenderGroupMembers = ({task}) => {
+  console.log('hello', task.responsibles);
+  if (task.responsibles) {
+    // console.log('hhhh', task.responsibles);
     return (
       <View style={styles.groupMembersContent}>
-        {groupMembers.responsibles.map((user, index) => (
+        {task.responsibles.map((user, index) => (
           <View key={index}>
             {index < 3 ? (
               <View>
@@ -23,7 +38,7 @@ const RenderGroupMembers = ({groupMembers}) => {
             )}
           </View>
         ))}
-        {groupMembers.responsibles.length > 3 ? (
+        {task.responsibles.length > 3 ? (
           <View
             style={{
               justifyContent: 'center',
@@ -38,7 +53,7 @@ const RenderGroupMembers = ({groupMembers}) => {
                 paddingHorizontal: '1%',
                 fontWeight: 'bold',
               }}>
-              +{groupMembers.responsibles.length - 3}
+              +{task.responsibles.length - 3}
             </Text>
           </View>
         ) : (
@@ -57,12 +72,8 @@ const RenderGroupMembers = ({groupMembers}) => {
 
 const SingleTask = ({item, cardHandler}, navigation) => {
   return (
-      <Card
-      onPress={()=>cardHandler(item)}
-      style={{
-          marginTop: '3%',
-          marginHorizontal: '3%',
-        }}>
+    <List.Section title={moment(item.dueDate).format('lll')}>
+      <Card onPress={() => cardHandler(item)}>
         <View
           style={{
             flexDirection: 'row',
@@ -74,40 +85,35 @@ const SingleTask = ({item, cardHandler}, navigation) => {
               {item.taskName}
             </Title>
           </Card.Content>
-          
-         {item.priority.priority === "High" && <Badge style={{marginHorizontal:5}}></Badge>}
-         {item.priority.priority === "Normal" && <Badge style={{marginHorizontal:5, backgroundColor:"#34f"}}></Badge>}
-         {item.priority.priority === "Low" && <Badge style={{marginHorizontal:5, backgroundColor:"#ed3"}}></Badge>}
 
+          {item.priority.priority === 'High' && (
+            <Badge style={{marginHorizontal: 5}}></Badge>
+          )}
+          {item.priority.priority === 'Normal' && (
+            <Badge
+              style={{marginHorizontal: 5, backgroundColor: '#34f'}}></Badge>
+          )}
+          {item.priority.priority === 'Low' && (
+            <Badge
+              style={{marginHorizontal: 5, backgroundColor: '#ed3'}}></Badge>
+          )}
         </View>
         <Card.Content>
           <Paragraph>{item.taskDescription}</Paragraph>
         </Card.Content>
-        <View
-          style={{
-            height: 1,
-            width: '100%',
-            marginVertical: '1%',
-            backgroundColor: '#BDBDBD',
-          }}></View>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Card.Actions style={{justifyContent: 'space-between'}}>
-            <Paragraph>
-              Due - {moment(item.dueDate).format("lll")}
-            </Paragraph>
-          </Card.Actions>
-          <Card.Actions style={{justifyContent: 'space-between'}}>
-            <RenderGroupMembers groupMembers={item} />
-          </Card.Actions>
-        </View>
+
+        <Card.Actions style={{justifyContent: 'space-between'}}>
+          <RenderGroupMembers task={item} />
+        </Card.Actions>
+        {/* </View> */}
       </Card>
+    </List.Section>
   );
 };
 
 export default SingleTask;
 
 const styles = StyleSheet.create({
- 
   groupMembersContent: {
     flexDirection: 'row',
   },
