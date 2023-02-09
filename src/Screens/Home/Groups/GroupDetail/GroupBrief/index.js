@@ -1,11 +1,13 @@
 import React, {useCallback, useState} from 'react';
 import {TouchableOpacity, StyleSheet, Text, View} from 'react-native';
-import {Button, Avatar, List} from 'react-native-paper';
+import {Button, Avatar, List, Snackbar} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 import {jsonToCSV} from 'react-native-csv';
 import {useSelector, useDispatch} from 'react-redux';
 import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import moment from 'moment';
+import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 
 const Index = ({group, onClose}) => {
   const dispatch = useDispatch();
@@ -44,6 +46,46 @@ const Index = ({group, onClose}) => {
 
   const [exportLoading, setExportLoading] = useState(false);
   const exportCSV = () => {
+     saveCSV();
+    // check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+    //   .then(result => {
+    //     switch (result) {
+    //       case RESULTS.UNAVAILABLE:
+    //         console.log(
+    //           'This feature is not available (on this device / in this context)',
+    //         );
+    //         break;
+    //       case RESULTS.DENIED:
+    //         console.log(
+    //           'The permission has not been requested / is denied but requestable',
+    //         );
+    //         request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+    //           .then(result => {
+    //             console.log(result)
+    //             if(result.data)
+    //             saveCSV()
+    //           })
+    //           .catch(error => {
+    //             console.log(error.message);
+    //           });
+    //         break;
+    //       case RESULTS.LIMITED:
+    //         console.log('The permission is limited: some actions are possible');
+    //         break;
+    //       case RESULTS.GRANTED:
+    //         saveCSV();
+    //         break;
+    //       case RESULTS.BLOCKED:
+    //         console.log('The permission is denied and not requestable anymore');
+    //         break;
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.log(error.message);
+    //   });
+  };
+
+  const saveCSV = async () => {
     const jsonData = data.map(user => {
       return {
         'Inviti name': user.invitiName,
@@ -54,8 +96,11 @@ const Index = ({group, onClose}) => {
       };
     });
     const results = jsonToCSV(jsonData);
-    const path =
-      RNFS.DownloadDirectoryPath + `/${currentViewingGroup.groupName}.csv`;
+    const date = moment(new Date()).format(' d_MMM_YYYY_hh_mm_ss_A')
+    const path = RNFS.DownloadDirectoryPath + `/${currentViewingGroup.groupName}${date}.csv`;
+
+   console.log(await RNFS.exists(path))
+
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
         console.log('FILE WRITTEN!');
@@ -64,28 +109,18 @@ const Index = ({group, onClose}) => {
         dispatch(handleIsExportBanner(true));
       })
       .catch(err => {
+        setSnackbarMessage('something went wrong');
+        setShowSnackbar(true);
         console.log(err.message);
       });
   };
-  return (
-    <View style={{paddingHorizontal: '5%', paddingVertical: '5%'}}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: '5%',
-        }}>
-        {/* <Avatar.Image
-          size={40}
-          style={{marginRight: '3%'}}
-          source={
-            currentViewingGroup.imageURL
-              ? {uri: currentViewingGroup.imageURL}
-              : require('../../../../../assets/drawer/male-user.png')
-          }
-        /> */}
 
-<List.Item
+  const [SnackbarMessage, setSnackbarMessage] = useState('');
+  const [showSnackBar, setShowSnackbar] = useState(false);
+
+  return (
+    <View style={{padding: '5%'}}>
+      <List.Item
         title={currentViewingGroup.groupName}
         description={currentViewingGroup.groupDescription}
         left={props => (
@@ -100,98 +135,7 @@ const Index = ({group, onClose}) => {
           />
         )}
       />
-        {/* <View style={{}}>
-          <Text
-            style={{fontSize: 16, fontWeight: 'bold', marginVertical: '1%'}}>
-            {currentViewingGroup.groupName}
-          </Text>
 
-          <Text
-            onTextLayout={onTextLayout}
-            numberOfLines={textShown ? undefined : 2}
-            style={{}}>
-            {currentViewingGroup.groupDescription}
-          </Text>
-
-          {lengthMore ? (
-            <TouchableOpacity onPress={() => toggleNumberOfLines()}>
-              <Text style={styles.seeMore}>
-                {textShown ? 'Read less...' : 'Read more...'}
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <></>
-          )}
-        </View> */}
-      </View>
-
-      {/* <Divider />
-
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          marginBottom: '2%',
-        }}>
-        <Card>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold'}}> Invitations</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="check" color="#000" />
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              {' '}
-              83
-              <Text style={{fontSize: 10, fontWeight: 'bold'}}>
-                {' '}
-                Invited
-              </Text>{' '}
-            </Text>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="radio-button-unchecked" color="#000" />
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              {' '}
-              83
-              <Text style={{fontSize: 10, fontWeight: 'bold'}}>
-                {' '}
-                Remaining
-              </Text>{' '}
-            </Text>
-          </View>
-        </Card>
-
-        <Card>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{fontSize: 16, fontWeight: 'bold'}}> Tasks</Text>
-          </View>
-
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="check" color="#000" />
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              {' '}
-              83
-              <Text style={{fontSize: 10, fontWeight: 'bold'}}>
-                {' '}
-                Completed
-              </Text>{' '}
-            </Text>
-          </View>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="pending" color="#000" />
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              {' '}
-              83
-              <Text style={{fontSize: 10, fontWeight: 'bold'}}>
-                {' '}
-                pending
-              </Text>{' '}
-            </Text>
-          </View>
-        </Card>
-      </View> */}
-      {/* <Divider /> */}
       <Button
         loading={exportLoading}
         onPress={exportCSV}
@@ -200,6 +144,19 @@ const Index = ({group, onClose}) => {
         style={{marginTop: '5%'}}>
         Downlaod Invitations list
       </Button>
+
+      <Snackbar
+        visible={showSnackBar}
+        duration={3000}
+        onDismiss={() => setShowSnackbar(false)}
+        action={{
+          label: 'Ok',
+          onPress: () => {
+            setShowSnackbar(false);
+          },
+        }}>
+        {SnackbarMessage}
+      </Snackbar>
     </View>
   );
 };
