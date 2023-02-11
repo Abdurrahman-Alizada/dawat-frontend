@@ -4,7 +4,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import HomeScreen from './AppStack';
 import DrawerContent from '../Components/DrawerContent';
 const Drawer1 = createDrawerNavigator();
-import Social from '../Screens/Drawer/Social';
+import MakeFriends from './MakeFriendsStack';
 
 const DrawerStack = props => {
   return (
@@ -15,9 +15,9 @@ const DrawerStack = props => {
         component={HomeScreen}
       />
       <Drawer1.Screen
-        name="Social"
+        name="MakeFriends"
         options={{headerShown: false}}
-        component={Social}
+        component={MakeFriends}
       />
     </Drawer1.Navigator>
   );

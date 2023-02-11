@@ -6,6 +6,7 @@ const initialState = {
   password: '',
   success: false,
   loading: false,
+  currentLoginUser : {},
   users: [],
 };
 
@@ -13,14 +14,15 @@ export const UserSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    successFun: state => {
-      return state.success;
+    handleCurrentLoaginUser: (state, action) => {
+      state.currentLoginUser = action.payload
     },
+    
   },
 
 });
 
 // Action creators are generated for each case reducer function
-export const {successFun} = UserSlice.actions;
+export const {handleCurrentLoaginUser} = UserSlice.actions;
 
 export default UserSlice.reducer;

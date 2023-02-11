@@ -41,6 +41,7 @@ export const App = () => {
     ...PaperDarkTheme,
     ...NavigationDarkTheme,
     colors: { ...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors },
+   roundness: 1
       
   };
 
@@ -51,6 +52,7 @@ export const App = () => {
       ...PaperDefaultTheme?.colors, 
       ...NavigationDefaultTheme.colors,  
     },
+   roundness: 1
   };
 
   let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
