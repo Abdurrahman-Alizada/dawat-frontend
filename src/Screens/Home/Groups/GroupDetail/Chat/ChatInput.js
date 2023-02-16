@@ -2,22 +2,21 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, {useState} from 'react';
 import {
   View,
-  // Text,
+  Text,
   StyleSheet,
   KeyboardAvoidingView,
-  // TextInput,
+  TextInput,
   Platform,
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch} from 'react-redux';
 import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
+
 import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
-import {useTheme, TextInput, Text} from 'react-native-paper';
 
 const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
   const dispatch = useDispatch();
-  const theme = useTheme();
   // chat
   const [message, setMessage] = useState('');
   const [localMessage, setLocalMessage] = useState('');
@@ -45,16 +44,16 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
       let addedBy = {
         _id: await AsyncStorage.getItem('userId'),
         email: await AsyncStorage.getItem('email'),
-        name: await AsyncStorage.getItem('name'),
+        name: await AsyncStorage.getItem("name")
       };
-      dispatch(addChat({addedBy: addedBy, content: e.data}));
+      dispatch(addChat({addedBy:addedBy, content:e.data}))
     };
   }, []);
 
   const submitMessage = async () => {
     let token = await AsyncStorage.getItem('token');
     let userId = await AsyncStorage.getItem('userId');
-
+    
     ws.send(message);
     dispatch(
       addNewMessage({
@@ -69,17 +68,11 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
   // end chat
 
   return (
-    <View style={{backgroundColor: theme.colors.surfaceVariant}}>
+    <View style={[styles.container]}>
       {reply ? (
-        <View
-          style={{
-            paddingHorizontal: 10,
-            marginHorizontal: 10,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-          }}>
+        <View style={styles.replyContainer}>
           <TouchableOpacity onPress={closeReply} style={styles.closeReply}>
-            <Icon name="close" color={theme.colors.onSurface} size={20} />
+            <Icon name="close" color="#000" size={20} />
           </TouchableOpacity>
           <Text style={styles.title}>
             Response to {isLeft ? username : 'Me'}
@@ -90,25 +83,21 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
       <KeyboardAvoidingView style={styles.innerContainer}>
         <View style={styles.inputAndMicrophone}>
           <TextInput
+            multiline
             placeholder={'Type something...'}
-            style={{width: '100%'}}
+            style={styles.input}
             value={message}
             onChangeText={text => setMessage(text)}
-            // dense={true}
-            multiline
-            numberOfLines={3}
-            mode="outlined"
           />
         </View>
         <TouchableOpacity
           disabled={message ? false : true}
           onPress={submitMessage}
           style={{
-            backgroundColor: message ? theme.colors.primary : '#d4cfcf',
+            backgroundColor: message ? '#003153' : '#d4cfcf',
             borderRadius: 50,
             height: 40,
             width: 40,
-            marginTop:5,
             alignItems: 'center',
             justifyContent: 'center',
           }}>
@@ -152,10 +141,12 @@ const styles = StyleSheet.create({
   },
   inputAndMicrophone: {
     flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
     flex: 3,
     marginRight: 10,
     paddingVertical: Platform.OS === 'ios' ? 10 : 0,
     borderRadius: 30,
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
   input: {

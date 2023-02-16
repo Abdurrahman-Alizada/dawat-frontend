@@ -14,12 +14,16 @@ import {
   Card,
   Paragraph,
   IconButton,
+  Divider,
   List,
+  useTheme,
   Title,
   Avatar,
+  Chip,
 } from 'react-native-paper';
 
 const RenderGroupMembers = ({task}) => {
+  const theme = useTheme();
   if (task.responsibles) {
     return (
       <View style={styles.groupMembersContent}>
@@ -57,7 +61,11 @@ const RenderGroupMembers = ({task}) => {
           </View>
         ) : (
           <View>
-            {task.responsibles.length < 1 && <Text style={{}}>No participant</Text>}
+            {task.responsibles.length < 1 && (
+              <Text style={{color: theme.colors.onSurface}}>
+                No participant
+              </Text>
+            )}
           </View>
         )}
       </View>
@@ -66,6 +74,29 @@ const RenderGroupMembers = ({task}) => {
 };
 
 const SingleTask = ({item, cardHandler}, navigation) => {
+  const theme = useTheme();
+  const TitleForChip = () => {
+    if (item.priority.priority === 'Normal') {
+      return 'Normal Priority';
+    } else if (item.priority.priority === 'High') {
+      return 'High Priority';
+    } else if (item.priority.priority === 'Low') {
+      return 'Low Priority';
+    } else {
+      return 'No Priority';
+    }
+  };
+  const getIconForChip = () => {
+    if (item.priority.priority === 'Normal') {
+      return 'alpha-n-circle-outline';
+    } else if (item.priority.priority === 'High') {
+      return 'alpha-h-circle-outline';
+    } else if (item.priority.priority === 'Low') {
+      return 'alpha-l-circle-outline';
+    } else {
+      return 'alpha-n-circle-outline';
+    }
+  };
   return (
     <View>
       <View
@@ -76,15 +107,20 @@ const SingleTask = ({item, cardHandler}, navigation) => {
           justifyContent: 'space-between',
           alignItems: 'flex-start',
         }}>
-        <View style={{width:"90%"}}>
+        <View style={{width: '90%'}}>
           <View
             style={{
               marginTop: '2%',
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Text style={{fontWeight: '800', fontSize: 16}}>
-              {item.taskName} 
+            <Text
+              style={{
+                fontWeight: '800',
+                fontSize: 16,
+                color: theme.colors.onSurface,
+              }}>
+              {item.taskName}
             </Text>
           </View>
           <View
@@ -93,8 +129,15 @@ const SingleTask = ({item, cardHandler}, navigation) => {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Icon size={13} name="clock" style={{marginRight: 15}} />
-            <Text style={{fontSize:13}}>{moment(item.dueDate).format('llll')}</Text>
+            <Icon
+              size={13}
+              name="clock"
+              style={{marginRight: 15}}
+              color={theme.colors.onSurface}
+            />
+            <Text style={{fontSize: 13, color: theme.colors.onSurface}}>
+              {moment(item.dueDate).format('llll')}
+            </Text>
           </View>
           <View
             style={{
@@ -102,18 +145,24 @@ const SingleTask = ({item, cardHandler}, navigation) => {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Icon size={13} name="users" style={{marginRight: 10}} />
+            <Icon
+              size={13}
+              name="users"
+              style={{marginRight: 10}}
+              color={theme.colors.onSurface}
+            />
             <RenderGroupMembers task={item} />
           </View>
         </View>
-        <IconButton
-          icon="dots-vertical"
-          size={20}
-          onPress={() => cardHandler(item)}
-        />
-      </View>
+          <IconButton
+            icon="dots-vertical"
+            size={20}
+            onPress={() => cardHandler(item)}
+          />
 
-      {/* <Card onPress={() => cardHandler(item)}>
+      </View>
+      <Divider />
+      {/* 
 
           {item.priority.priority === 'High' && (
             <Badge style={{marginHorizontal: 5}}></Badge>
@@ -126,7 +175,6 @@ const SingleTask = ({item, cardHandler}, navigation) => {
             <Badge
               style={{marginHorizontal: 5, backgroundColor: '#ed3'}}></Badge>
           )}
-        </View>
 */}
     </View>
   );
