@@ -49,7 +49,7 @@ const Social = ({navigation}) => {
       });
   };
 
-  const [value, setValue] = useState('pending');
+  const [value, setValue] = useState('requested');
 
   return (
     <View>

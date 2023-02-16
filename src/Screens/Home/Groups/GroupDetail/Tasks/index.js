@@ -9,10 +9,8 @@ import React, {useState, useRef} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper'
-import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
-import {height} from '../../../../../GlobalStyles';
-import {FAB, Provider} from 'react-native-paper';
+import {FAB, useTheme} from 'react-native-paper';
 import TaskBrief from './TaskBrief';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
@@ -22,6 +20,7 @@ const Task = ({route}) => {
   const {groupId} = route.params;
 
   const navigation = useNavigation();
+  const theme = useTheme();
   const [currentItem, setCurrentItem] = useState({});
 
   const {data, isError, isLoading, error, isFetching, refetch} =
@@ -42,7 +41,7 @@ const Task = ({route}) => {
     modalizeRef.current?.close();
   };
   return (
-    <Provider style={{flex: 1}}>
+    <View style={{flex:1, backgroundColor:theme.colors.surface}}>
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />
@@ -84,7 +83,7 @@ const Task = ({route}) => {
           navigation={navigation}
         />
       </Modalize>
-    </Provider>
+    </View>
   );
 };
 

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {View, Modal, TouchableOpacity} from 'react-native';
-import {Divider, IconButton, Avatar} from 'react-native-paper';
+import {View, ScrollView, Modal, TouchableOpacity} from 'react-native';
+import {Divider, IconButton, Avatar, useTheme} from 'react-native-paper';
 const AvatarModal = props => {
-  
+  const theme = useTheme();
+
   const avatarsURL = [
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329065/avatars-for-user-profile/Tiger_kcfhtn.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329065/avatars-for-user-profile/Raccon_ju44tn.png',
@@ -19,13 +20,17 @@ const AvatarModal = props => {
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329062/avatars-for-user-profile/Cat_a3abro.png',
     'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
   ];
-  
+
   const [selectedAvatar, setSelectedAvatar] = useState('');
   return (
-    <Modal
-      visible={props.avatarModalVisible}
-      style={{alignItems: 'flex-start', flex: 1, margin: '2%'}}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+    <Modal visible={props.avatarModalVisible}>
+     <View style={{flex:1, backgroundColor:theme.colors.surface}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor: theme.colors.surface,
+        }}>
         <IconButton
           style={{}}
           icon="arrow-left"
@@ -36,19 +41,20 @@ const AvatarModal = props => {
         <IconButton
           style={{}}
           icon="check"
-        //   mode="outlined"
+          //   mode="outlined"
           size={30}
           onPress={() => {
-            props?.imageUploadHandler();
+            props?.imageUploadHandler && props?.imageUploadHandler();
             props.setAvatarModalVisible(false);
           }}
         />
       </View>
       <Divider />
 
-      <View
-        style={{
-          margin: '1%',
+      <ScrollView
+        contentContainerStyle={{
+          backgroundColor: theme.colors.surface,
+          padding: '1%',
           flexWrap: 'wrap',
           flexDirection: 'row',
           justifyContent: 'space-evenly',
@@ -84,6 +90,8 @@ const AvatarModal = props => {
             />
           </TouchableOpacity>
         ))}
+        
+      </ScrollView>
       </View>
     </Modal>
   );

@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeIndex from '../Screens/Home/Groups/Index';
 import AddGroup from '../Screens/Home/Groups/AddGroup';
+import AddGroupMembers from '../Screens/Home/Groups/AddGroupMembers';
 import GroupDetail from '../Screens/Home/Groups/GroupDetail';
 import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSettings/Index';
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
@@ -27,6 +28,14 @@ const AppStack = () => {
           title: 'Add Your Group',
           // headerShown:false
           header: (props) => <GeneralAppbar title="Add group" {...props} />,
+        }}
+      />
+       <Stack.Screen
+        name="AddGroupMembers"
+        component={AddGroupMembers}
+        options={{
+          headerShown:false
+          // header: (props) => <GeneralAppbar title="Add group members" {...props} />,
         }}
       />
       <Stack.Screen

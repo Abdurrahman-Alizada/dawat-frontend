@@ -1,35 +1,22 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {DrawerItem, DrawerContentScrollView} from '@react-navigation/drawer';
-import {
-  Avatar,
-  Title,
-  Caption,
-  Paragraph,
-  Drawer,
-  Text,
-  TouchableRipple,
-  List,
-  Switch,
-} from 'react-native-paper';
+import {DrawerContentScrollView} from '@react-navigation/drawer';
+import {Avatar, Drawer, List, Switch, useTheme} from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import UserInDrawer from '../Screens/Skeletons/UserInDrawer';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const [active, setActive] = useState('');
   const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
-  const [name, setName] = useState('Abdur Rahman');
   const id = useRef(null);
-  const [email, setEmail] = useState('abdurrahman@gmail.com');
-  const [imageURL, setImageURL] = useState('');
   const getUserInfo = async () => {
     // const value = await AsyncStorage.getItem('name');
     // setName(await AsyncStorage.getItem('name'));
@@ -68,7 +55,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.elevation.level2}}>
       <View style={styles.drawerContent}>
         {isLoading ? (
           <List.Item
@@ -117,27 +104,22 @@ export default function DrawerContent(props) {
                 size={50}
               />
             )}
-            right={props => (
-              <List.Icon size={30} {...props} icon="chevron-right" />
-            )}
+            // right={props => (
+            //   <List.Icon size={30} {...props} icon="chevron-right" />
+            // )}
             description={user?.email}
           />
         )}
 
-        <Drawer.Section style={styles.drawerSection}>
-          <Drawer.Item
-            onPress={() => {
-              navigation.navigate('MakeFriends');
-            }}
-            icon="account-tie"
-            label="Friends"
-            right={props => (
-              <List.Icon size={30} {...props} icon="chevron-right" />
-            )}
-          />
-        </Drawer.Section>
+        <Drawer.Item
+          onPress={() => {
+            navigation.navigate('MakeFriends');
+          }}
+          icon="account-multiple"
+          label="Friends"
+        />
 
-        <Drawer.Section style={styles.drawerSection}>
+        <Drawer.Section title="Preferences" style={styles.drawerSection}>
           <Drawer.Item
             icon="weather-night"
             label="Dark Mode"

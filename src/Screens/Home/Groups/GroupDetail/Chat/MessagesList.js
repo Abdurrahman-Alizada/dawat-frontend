@@ -3,13 +3,13 @@ import React, {useRef, useEffect} from 'react';
 import {ScrollView, Text, View, Image} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {allMessages} from '../../../../../redux/reducers/groups/chat/chatThunk';
-
+import {useTheme} from 'react-native-paper';
 import Message from './Message';
 
 const MessagesList = ({onSwipeToReply, groupId}) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const messages = useSelector(state => state.chat.messages);
-  // console.log("messags are", messages[0].addedBy._id)
   const user = useRef(0);
   const scrollViewRef = useRef(null);
 
@@ -32,10 +32,10 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
   }, []);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.surface}}>
       {messages.length > 0 ? (
         <ScrollView
-          style={{backgroundColor: '#fff', flex: 1}}
+          style={{backgroundColor: theme.colors.surface, flex: 1}}
           ref={scrollViewRef}
           onContentSizeChange={() => {
             scrollViewRef.current?.scrollToEnd();
@@ -54,8 +54,8 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
         </ScrollView>
       ) : (
         <View style={{flex: 1, alignItems: 'center'}}>
-          <Image 
-          source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
+          <Image
+            source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
           />
           <Text>Send message to start conversation</Text>
         </View>

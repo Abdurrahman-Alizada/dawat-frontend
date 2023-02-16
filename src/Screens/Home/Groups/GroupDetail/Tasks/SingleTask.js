@@ -7,6 +7,7 @@ import {
   View,
   Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import moment from 'moment';
 import {
   Badge,
@@ -15,30 +16,28 @@ import {
   IconButton,
   List,
   Title,
+  Avatar,
 } from 'react-native-paper';
 
 const RenderGroupMembers = ({task}) => {
-  console.log('hello', task.responsibles);
   if (task.responsibles) {
-    // console.log('hhhh', task.responsibles);
     return (
       <View style={styles.groupMembersContent}>
         {task.responsibles.map((user, index) => (
           <View key={index}>
-            {index < 3 ? (
-              <View>
-                <Image
-                  style={styles.memberImage}
-                  source={require('../../../../../assets/drawer/userImage.png')}
-                  // source={require('../../../../../assets')}
-                />
-              </View>
+            {index < 5 ? (
+              <Avatar.Image
+                size={20}
+                source={{
+                  uri: 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329064/avatars-for-user-profile/Panda_qek53a.png',
+                }}
+              />
             ) : (
               <></>
             )}
           </View>
         ))}
-        {task.responsibles.length > 3 ? (
+        {task.responsibles.length > 5 ? (
           <View
             style={{
               justifyContent: 'center',
@@ -53,38 +52,68 @@ const RenderGroupMembers = ({task}) => {
                 paddingHorizontal: '1%',
                 fontWeight: 'bold',
               }}>
-              +{task.responsibles.length - 3}
+              +{task.responsibles.length - 5}
             </Text>
           </View>
         ) : (
-          <></>
+          <View>
+            {task.responsibles.length < 1 && <Text style={{}}>No participant</Text>}
+          </View>
         )}
       </View>
     );
   }
-  return (
-    <Image
-      style={styles.memberImage}
-      source={require('../../../../../assets/images/onboarding/1.png')}
-    />
-  );
 };
 
 const SingleTask = ({item, cardHandler}, navigation) => {
   return (
-    <List.Section title={moment(item.dueDate).format('lll')}>
-      <Card onPress={() => cardHandler(item)}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Card.Content>
-            <Title style={{fontFamily: 'Poppins-Regular'}}>
-              {item.taskName}
-            </Title>
-          </Card.Content>
+    <View>
+      <View
+        style={{
+          paddingHorizontal: '5%',
+          paddingVertical: '4%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}>
+        <View style={{width:"90%"}}>
+          <View
+            style={{
+              marginTop: '2%',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontWeight: '800', fontSize: 16}}>
+              {item.taskName} 
+            </Text>
+          </View>
+          <View
+            style={{
+              marginTop: '2%',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Icon size={13} name="clock" style={{marginRight: 15}} />
+            <Text style={{fontSize:13}}>{moment(item.dueDate).format('llll')}</Text>
+          </View>
+          <View
+            style={{
+              marginTop: '2%',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Icon size={13} name="users" style={{marginRight: 10}} />
+            <RenderGroupMembers task={item} />
+          </View>
+        </View>
+        <IconButton
+          icon="dots-vertical"
+          size={20}
+          onPress={() => cardHandler(item)}
+        />
+      </View>
+
+      {/* <Card onPress={() => cardHandler(item)}>
 
           {item.priority.priority === 'High' && (
             <Badge style={{marginHorizontal: 5}}></Badge>
@@ -98,16 +127,8 @@ const SingleTask = ({item, cardHandler}, navigation) => {
               style={{marginHorizontal: 5, backgroundColor: '#ed3'}}></Badge>
           )}
         </View>
-        <Card.Content>
-          <Paragraph>{item.taskDescription}</Paragraph>
-        </Card.Content>
-
-        <Card.Actions style={{justifyContent: 'space-between'}}>
-          <RenderGroupMembers task={item} />
-        </Card.Actions>
-        {/* </View> */}
-      </Card>
-    </List.Section>
+*/}
+    </View>
   );
 };
 

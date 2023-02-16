@@ -12,7 +12,8 @@ const SingleGroup = ({
   checkedItems,
   setCheckedItems,
   deleteLoading,
-  setIsSearch
+  setIsSearch,
+  theme
 }) => {
   const dispatch = useDispatch()
 
@@ -52,6 +53,8 @@ const SingleGroup = ({
       onLongPress={() => onLongPressHandler()}
       title={item.groupName}
       description={item.groupDescription}
+      titleStyle={{color:theme.colors.onBackground}}
+      descriptionStyle={{color:theme.colors.onSurface}}
       left={props => (
         <View>
           {item.imageURL ? (
@@ -75,6 +78,8 @@ const SingleGroup = ({
             <View>
               {!deleteLoading ? (
                 <Checkbox
+                color={theme.colors.onBackground}
+                uncheckedColor={theme.colors.onSurface}
                   status={checked && include ? 'checked' : 'unchecked'}
                   onPress={onLongPressHandler}
                 />
