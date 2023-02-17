@@ -779,14 +779,14 @@ const Index = ({route, navigation}) => {
 
       <Modal
         onBlur={() => setModalVisible(false)}
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        <TouchableOpacity
-          onPress={() => setModalVisible(false)}
+        <View
+          // onPress={() => setModalVisible(false)}
           style={{
             flex: 1,
             justifyContent: 'flex-end',
@@ -843,7 +843,7 @@ const Index = ({route, navigation}) => {
               <Text>Avatars</Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       {avatarModalVisible && (

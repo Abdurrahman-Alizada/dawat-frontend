@@ -6,6 +6,7 @@ import {
   FlatList,
   RefreshControl,
   Share,
+  ScrollView,
   Linking,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
@@ -31,6 +32,7 @@ import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
 import {handleCurrentInviti} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import moment from 'moment';
 
 export default function Example({route}) {
   const navigation = useNavigation();
@@ -55,6 +57,10 @@ export default function Example({route}) {
     groupId,
   });
 
+  const currentInvitiToDisplay = useSelector(
+    state => state.invitations?.currentInviti,
+  );
+
   // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
   const currentInviti = useRef({});
   const FABHandler = item => {
@@ -75,7 +81,7 @@ export default function Example({route}) {
     setSelectedChips([...selectedChips, id]);
   };
 
-  const BriefHandler = (item) => {
+  const BriefHandler = item => {
     dispatch(handleCurrentInviti(item));
     onBriefOpen();
   };
@@ -91,7 +97,7 @@ export default function Example({route}) {
   const theme = useTheme();
 
   return (
-    <View style={{flex: 1, backgroundColor:theme.colors.surface}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.surface}}>
       {/* <View
         style={{
           flexDirection: 'row',
@@ -142,7 +148,7 @@ export default function Example({route}) {
           )}
           renderItem={({item}) => (
             <List.Item
-              onPress={()=>BriefHandler(item)}
+              onPress={() => BriefHandler(item)}
               title={item.invitiName}
               description={item.invitiDescription}
               left={props => (
@@ -181,12 +187,98 @@ export default function Example({route}) {
         style={styles.fab}
         onPress={() => FABHandler()}
       />
-     
+
       <Modalize
-        modalStyle={{backgroundColor: theme.colors.surface}}
+        modalStyle={{backgroundColor: theme.colors.background}}
         ref={invitiBriefModalizeRef}
-        snapPoint={400}>
-        <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
+        // velocity={800}
+        threshold={200}
+        modalHeight={500}
+        HeaderComponent={() => (
+          <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
+        )}>
+        <List.Accordion style={{padding: '2%', }} title="More">
+          <View style={{marginHorizontal:"5%"}}>
+          <Text style={{ marginVertical:"2%", fontWeight:"bold"}}>Added by</Text>
+          <View
+            style={{
+              borderRadius: 10,
+              borderColor: '#C1C2B8',
+              borderWidth: 0.5,
+              padding: '2%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View>
+                <Avatar.Icon size={30} icon="account-circle-outline" />
+              </View>
+              <Text style={{marginHorizontal: '4%'}}>
+                {currentInvitiToDisplay?.addedBy?.name}
+              </Text>
+            </View>
+            <Text style={{}}>
+              {moment(currentInvitiToDisplay?.createdAt).fromNow()}
+            </Text>
+          </View>
+
+          <Text style={{ marginTop:"5%", fontWeight:"bold"}}>History</Text>
+          <ScrollView>
+            {currentInvitiToDisplay?.statuses?.map((Status, index) => (
+              <View
+                key={index}
+                style={{
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '2%',
+                  marginVertical: '2%',
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}>
+                  <View style={{}}>
+                    <Text style={{padding: '2%'}}>
+                      {Status.invitiStatus} by
+                    </Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Avatar.Icon size={30} icon="account-circle-outline" />
+                      <Text style={{marginHorizontal: '4%'}}>
+                        {Status.addedBy.name}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{alignItems: "flex-end"}}>
+                    {Status.invitiStatus === 'rejected' && (
+                      <List.Icon
+                        style={{margin: 0, padding: 0}}
+                        icon="cancel"
+                      />
+                    )}
+                    {Status.invitiStatus === 'pending' && (
+                      <List.Icon
+                        style={{margin: 0, padding: 0}}
+                        icon="clock-outline"
+                      />
+                    )}
+                    {Status.invitiStatus === 'invited' && (
+                      <List.Icon style={{margin: 0, padding: 0}} icon="check" />
+                    )}
+
+                    <Text style={{alignSelf: 'flex-end'}}>
+                      {moment(Status?.createdAt).fromNow()}{' '}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+</View>
+        </List.Accordion>
       </Modalize>
     </View>
   );

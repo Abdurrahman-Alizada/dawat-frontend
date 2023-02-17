@@ -66,6 +66,7 @@ const AvatarModal = props => {
               props.fileDataRef.current = null;
               setSelectedAvatar(avatarURL);
               props.setAvatarURL(avatarURL);
+              props?.setIsEditStart && props?.setIsEditStart(true) // function for inviti image update.. enable update button
             }}
             style={{margin: '1%'}}
             key={index}>
