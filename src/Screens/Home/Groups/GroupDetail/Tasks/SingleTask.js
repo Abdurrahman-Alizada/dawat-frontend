@@ -1,26 +1,24 @@
-import React, {useState} from 'react';
-import {
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-} from 'react-native';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import moment from 'moment';
+import {useNavigation} from '@react-navigation/native';
 import {
   Badge,
-  Card,
-  Paragraph,
   IconButton,
   Divider,
   List,
   useTheme,
-  Title,
   Avatar,
-  Chip,
+  Menu,
+  ActivityIndicator,
 } from 'react-native-paper';
+import {useDispatch, useSelector} from 'react-redux';
+import {handleCurrentViewingTask} from '../../../../../redux/reducers/groups/tasks/taskSlice';
+import {
+  useDeleteTaskMutation,
+  useMarkAsCompletedMutation,
+} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 const RenderGroupMembers = ({task}) => {
   const theme = useTheme();
@@ -73,30 +71,47 @@ const RenderGroupMembers = ({task}) => {
   }
 };
 
-const SingleTask = ({item, cardHandler}, navigation) => {
+const SingleTask = ({item, cardHandler}) => {
   const theme = useTheme();
-  const TitleForChip = () => {
-    if (item.priority.priority === 'Normal') {
-      return 'Normal Priority';
-    } else if (item.priority.priority === 'High') {
-      return 'High Priority';
-    } else if (item.priority.priority === 'Low') {
-      return 'Low Priority';
-    } else {
-      return 'No Priority';
-    }
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  
+  const currentLoginUser = useSelector(state=> state.user.currentLoginUser)
+
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
+  const [deleteTask, {isLoading: deleteLoading}] = useDeleteTaskMutation();
+  const [markAsCompleted, {isLoading: markAsCompletedLoading}] =
+    useMarkAsCompletedMutation();
+
+  const deleteHandler = async () => {
+    await deleteTask({groupId: item?.group?._id, taskId: item?._id})
+      .then(response => {
+        closeMenu();
+        console.log('deleted group is =>', response);
+      })
+      .catch(e => {
+        console.log('error in deleteHandler', e);
+      });
   };
-  const getIconForChip = () => {
-    if (item.priority.priority === 'Normal') {
-      return 'alpha-n-circle-outline';
-    } else if (item.priority.priority === 'High') {
-      return 'alpha-h-circle-outline';
-    } else if (item.priority.priority === 'Low') {
-      return 'alpha-l-circle-outline';
-    } else {
-      return 'alpha-n-circle-outline';
-    }
+
+  const markAsCompletedHandler = async () => {
+    await markAsCompleted({
+      condition: !item.isCompleted,
+      userId: currentLoginUser._id,
+      taskId: item._id,
+    })
+      .then(response => {
+        closeMenu();
+        console.log('updated task in markAsCompletedHandler is =>', response);
+      })
+      .catch(e => {
+        console.log(e);
+      });
   };
+
   return (
     <View>
       <View
@@ -119,6 +134,7 @@ const SingleTask = ({item, cardHandler}, navigation) => {
                 fontWeight: '800',
                 fontSize: 16,
                 color: theme.colors.onSurface,
+                textDecorationLine: item.isCompleted ? 'line-through' : 'none',
               }}>
               {item.taskName}
             </Text>
@@ -154,12 +170,73 @@ const SingleTask = ({item, cardHandler}, navigation) => {
             <RenderGroupMembers task={item} />
           </View>
         </View>
-          <IconButton
-            icon="dots-vertical"
-            size={20}
-            onPress={() => cardHandler(item)}
-          />
 
+        <View>
+          <Menu
+            visible={visible}
+            onDismiss={closeMenu}
+            // anchorPosition="bottom"
+            anchor={
+              <IconButton
+                icon="dots-vertical"
+                size={25}
+                onPress={() => openMenu()}
+              />
+            }>
+            <Menu.Item
+              leadingIcon={() => (
+                <View>
+                  {markAsCompletedLoading ? (
+                    <ActivityIndicator animating />
+                  ) : (
+                    <List.Icon
+                      icon={
+                        item?.isCompleted
+                          ? 'checkbox-blank-circle'
+                          : 'checkbox-blank-circle-outline'
+                      }
+                    />
+                  )}
+                </View>
+              )}
+              title={
+                item?.isCompleted ? 'Mark as incompleted' : 'Mark as complete'
+              }
+              onPress={() => {
+                markAsCompletedHandler()
+              }}
+            />
+
+            <Menu.Item
+              leadingIcon="comment-text-multiple"
+              title="Details"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                dispatch(handleCurrentViewingTask(item));
+                navigation.navigate('TaskDetail');
+              }}
+            />
+            <Divider />
+            <Menu.Item
+              leadingIcon={() => (
+                <View>
+                  {deleteLoading ? (
+                    <ActivityIndicator animating />
+                  ) : (
+                    <List.Icon color={theme.colors.error} icon="delete" />
+                  )}
+                </View>
+              )}
+              title="Delete"
+              titleStyle={{color: theme.colors.error}}
+              onPress={async () => {
+                deleteHandler();
+                // navigation.navigate('AppSettingsMain');
+              }}
+            />
+          </Menu>
+        </View>
       </View>
       <Divider />
       {/* 

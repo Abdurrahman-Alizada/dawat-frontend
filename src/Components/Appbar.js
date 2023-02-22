@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Menu, Divider, Appbar, Searchbar, useTheme} from 'react-native-paper';
+import {Menu, Appbar, Searchbar} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
-import AsyncStorage from '@react-native-community/async-storage';
 
 const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
   const navigation = useNavigation();
-  // const theme = useTheme();
   //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
@@ -65,22 +63,13 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
                 />
               }>
               <Menu.Item
-                leadingIcon="account-outline"
-                onPress={async () => {
-                  closeMenu();
-                  navigation.navigate('Profile', {
-                    id: await AsyncStorage.getItem('id'),
-                  });
-                }}
-                title="Profile"
-                titleStyle={{color: theme.colors.onBackground}}
-              />
-              <Divider />
-              <Menu.Item
                 leadingIcon="cog-outline"
-                onPress={() => {}}
                 title="Settings"
                 titleStyle={{color: theme.colors.onBackground}}
+                onPress={async () => {
+                  closeMenu();
+                  navigation.navigate('AppSettingsMain');
+                }}
               />
             </Menu>
           </Appbar.Header>

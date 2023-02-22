@@ -5,51 +5,25 @@ import {Card} from 'react-native-paper';
 
 export default function GroupsList() {
   return (
-    <View>
+    <View style={{marginVertical:"5%"}}>
       
       {
-        [1,2,3].map((item,index)=>(
-      <Card  
-    //   mode="outlined"
-      style={{
-        marginTop: '3%',
-        paddingVertical:"2%"
-      }} key={index} >
-      <Card.Content>
+        [1,2,3,4].map((item,index)=>(
           
-      <SkeletonPlaceholder height="100%" borderRadius={4}>
+      <SkeletonPlaceholder  key={index} height="100%" borderRadius={4}>
         <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
          
-          <SkeletonPlaceholder.Item width="100%" marginLeft={20}>
-            <SkeletonPlaceholder.Item width="40%" height={10} />
-            <SkeletonPlaceholder.Item marginTop={7} width="60%" height={10} />
-            <View style={{flexDirection:"row",width:"100%", marginTop:"5%", justifyContent:"space-between"}}>
-               <SkeletonPlaceholder.Item width="40%" height={10} />
-               <View style={{flexDirection:"row",}}>
-                <SkeletonPlaceholder.Item width={20} height={20} borderRadius={50} />
-                <SkeletonPlaceholder.Item width={20} height={20} borderRadius={50} />
-                <SkeletonPlaceholder.Item width={20} height={20} borderRadius={50} />
-               </View>    
-            </View>
-
+          <SkeletonPlaceholder.Item width="100%" marginLeft={10}>
+            <SkeletonPlaceholder.Item width="60%" height={10} />
+            <SkeletonPlaceholder.Item width="50%" marginTop={10}  height={10} />
+            <SkeletonPlaceholder.Item marginTop={10} width="80%" marginBottom={30} height={10} />
           </SkeletonPlaceholder.Item>
 
         
         </SkeletonPlaceholder.Item>
       </SkeletonPlaceholder>
-     </Card.Content>
-      </Card>
         ))
       }
-
-<View style={{marginTop:"7%"}} >
-      <SkeletonPlaceholder borderRadius={4} >
-        <SkeletonPlaceholder.Item alignItems="center" justifyContent="center" >
-            <SkeletonPlaceholder.Item width="30%" height={10} />
-            <SkeletonPlaceholder.Item marginTop={7} width="10%" height={10} />
-        </SkeletonPlaceholder.Item>
-      </SkeletonPlaceholder>
-      </View>
 
     </View>
   );

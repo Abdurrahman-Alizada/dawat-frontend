@@ -35,7 +35,7 @@ const Task = ({route}) => {
 
   const cardHandler = item => {
     setCurrentItem(item);
-    modalizeRef.current?.open();
+    // modalizeRef.current?.open();
   };
   const closeModalize = () => {
     modalizeRef.current?.close();
@@ -71,18 +71,6 @@ const Task = ({route}) => {
         onPress={() => FABHandler()}
       />
 
-      <Modalize ref={modalizeRef} 
-      // adjustToContentHeight={true}
-      snapPoint={300}
-      handlePosition="inside"
-      modalHeight={500}
-      >
-        <TaskBrief
-          item={currentItem}
-          closeModalize={closeModalize}
-          navigation={navigation}
-        />
-      </Modalize>
     </View>
   );
 };

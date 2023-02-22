@@ -10,6 +10,9 @@ import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSetting
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/InvitiDetails';
 import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
+import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/TaskDetails'
+import AddTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/AddTaskMembers'
+
 const Stack = createStackNavigator();
 
 const AppStack = () => {
@@ -62,6 +65,23 @@ const AppStack = () => {
         options={{
           title: 'Add task',
           headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="TaskDetail"
+        component={TaskDetail}
+        options={{
+          // headerShown:false
+          header: (props) => <GeneralAppbar title="Task detail" {...props} />,
+        }}
+      />
+
+      <Stack.Screen
+        name="AddTaskMembers"
+        component={AddTaskMembers}
+        options={{
+          headerShown:false
         }}
       />
 

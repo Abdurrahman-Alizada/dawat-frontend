@@ -92,18 +92,27 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
       <List.Item
         title={item.taskName}
         description={item.taskDescription}
-        left={props => (
-          <Avatar.Image
-            size={45}
-            {...props}
-            style={{alignSelf: 'center'}}
-            avatarStyle={{borderRadius: 20}}
-            source={
-              item.taskImageURL
-                ? {uri: item.taskImageURL}
-                : require('../../../../../assets/drawer/male-user.png')
-            }
-          />
+        // left={props => (
+        //   <Avatar.Image
+        //     size={45}
+        //     {...props}
+        //     style={{alignSelf: 'center'}}
+        //     avatarStyle={{borderRadius: 20}}
+        //     source={
+        //       item.taskImageURL
+        //         ? {uri: item.taskImageURL}
+        //         : require('../../../../../assets/drawer/male-user.png')
+        //     }
+        //   />
+        // )}
+        left={props =>(
+          <Checkbox
+          {...props}
+          status={item.completed ? 'checked' : 'unchecked'}
+          onPress={() => {
+            // setChecked(!checked);
+          }}
+        />
         )}
       />
 
