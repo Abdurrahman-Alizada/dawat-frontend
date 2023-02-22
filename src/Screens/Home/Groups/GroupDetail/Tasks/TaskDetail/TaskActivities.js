@@ -1,5 +1,5 @@
 import {View, FlatList, RefreshControl} from 'react-native';
-import React from 'react';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {Text, Button, Avatar, List, useTheme} from 'react-native-paper';
 
 import {useAllLogsForTaskQuery} from '../../../../../../redux/reducers/groups/tasks/taskThunk';
@@ -8,7 +8,8 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 const TaskActivities = ({navigation}) => {
   const theme = useTheme();
-
+  const flatlistRef = useRef();
+ 
   const currentViewingTask = useSelector(
     state => state?.tasks?.currentViewingTask,
   );
@@ -18,6 +19,10 @@ const TaskActivities = ({navigation}) => {
     useAllLogsForTaskQuery({
       taskId: currentViewingTask._id,
     });
+    const scrollToEndHandler = ()=>{
+      flatlistRef.current?.scrollToEnd();
+    }
+    scrollToEndHandler();
 
   return (
     <View style={{flexGrow: 1}}>
@@ -48,6 +53,10 @@ const TaskActivities = ({navigation}) => {
       ) : (
         <FlatList
           data={data}
+          ref={flatlistRef}
+          onContentSizeChange={() =>
+            flatlistRef.current?.scrollToEnd({animated: false})
+        }
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
               <Text>There isn't any activity</Text>

@@ -54,7 +54,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             <Menu
               visible={visible}
               onDismiss={closeMenu}
-              contentStyle={{backgroundColor: theme.colors.surface}}
+              contentStyle={{backgroundColor: theme.colors.background}}
               anchor={
                 <Appbar.Action
                   icon={MORE_ICON}

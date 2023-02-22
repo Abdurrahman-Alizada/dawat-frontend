@@ -267,7 +267,7 @@ const AddGroup = ({navigation, onClose}) => {
            backgroundColor:theme.colors.backdrop
         }}>
           <View
-            style={[styles.modalView, {position: 'absolute', width: '100%', backgroundColor:theme.colors.surface}]}>
+            style={[styles.modalView, {position: 'absolute', width: '100%', backgroundColor:theme.colors.background}]}>
             <IconButton
               style={{position: 'absolute', right: 5}}
               icon="close-circle-outline"

@@ -426,7 +426,7 @@ const Index = ({route, navigation}) => {
       <View style={{flex: 1}}>
         <ScrollView>
           <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+            style={{padding: '2%', backgroundColor: theme.colors.background}}>
             <TouchableOpacity
               onPress={() => {
                 seteditGroupName(false);
@@ -545,7 +545,7 @@ const Index = ({route, navigation}) => {
           </List.Section>
 
           <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+            style={{padding: '2%', backgroundColor: theme.colors.background}}>
             <List.Subheader>Group members</List.Subheader>
             <List.Item
               onPress={() => {
@@ -588,7 +588,7 @@ const Index = ({route, navigation}) => {
           </List.Section>
 
           <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.surface}}>
+            style={{padding: '2%', backgroundColor: theme.colors.background}}>
             <List.Item
               onPress={handleLeave}
               title="Leave group"
@@ -642,7 +642,6 @@ const Index = ({route, navigation}) => {
         <Modal
           visible={visible}
           animationType="slide"
-          // style={{backgroundColor:theme.colors.surface, maxHeight:"80%", justifyContent:"flex-end",bottom}}
           onDismiss={() => setVisible(false)}>
           <HeaderComponentFlatList />
           {/* <FlatList
@@ -665,7 +664,7 @@ const Index = ({route, navigation}) => {
 
           {/* scrollview */}
           <ScrollView
-            contentContainerStyle={{backgroundColor: theme.colors.surface}}>
+            contentContainerStyle={{backgroundColor: theme.colors.background}}>
             {allMembers.map((item, index) => (
               <RenderListItemForScrollView item={item} key={index} />
             ))}
@@ -709,8 +708,6 @@ const Index = ({route, navigation}) => {
             autoFocus={true}
             label="Group name"
             mode="outlined"
-            // activeOutlineColor={theme.colors.background}
-            // activeOutlineColor={theme.colors.onBackground}
             value={name}
             onChangeText={text => {
               setName(text);
@@ -799,7 +796,7 @@ const Index = ({route, navigation}) => {
               {
                 position: 'absolute',
                 width: '100%',
-                backgroundColor: theme.colors.surface,
+                backgroundColor: theme.colors.background,
               },
             ]}>
             <IconButton

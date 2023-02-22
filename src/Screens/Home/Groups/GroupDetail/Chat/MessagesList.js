@@ -32,10 +32,10 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
   }, []);
 
   return (
-    <View style={{flex: 1, backgroundColor: theme.colors.surface}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
       {messages.length > 0 ? (
         <ScrollView
-          style={{backgroundColor: theme.colors.surface, flex: 1}}
+          style={{backgroundColor: theme.colors.background, flex: 1}}
           ref={scrollViewRef}
           onContentSizeChange={() => {
             scrollViewRef.current?.scrollToEnd();
