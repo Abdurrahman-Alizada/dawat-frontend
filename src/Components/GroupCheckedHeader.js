@@ -10,7 +10,7 @@ import {
 } from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 
-const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack}) => {
+const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack, theme}) => {
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const [visible, setVisible] = React.useState(false);
 
@@ -21,15 +21,18 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack}) => {
   return (
     <>
       <View>
-        <Appbar.Header>
-          {/* <Appbar.BackAction onPress={() => {}} /> */}
-          <Appbar.BackAction onPress={() => checkedBack()} />
+        <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+          <Appbar.BackAction
+            color={theme.colors.onBackground}
+            onPress={() => checkedBack()}
+          />
           <Appbar.Content
             title={groupName}
             titleStyle={{alignSelf: 'center'}}
           />
 
           <Appbar.Action
+            color={theme.colors.onBackground}
             icon="delete-outline"
             onPress={() => {
               deleteF();
@@ -40,6 +43,5 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack}) => {
     </>
   );
 };
-
 
 export default Header;

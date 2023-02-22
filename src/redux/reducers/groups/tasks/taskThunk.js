@@ -12,7 +12,7 @@ export const TasksApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Tasks'],
+  tagTypes: ['Tasks','TaskLogs'],
   reducerPath: 'TasksApi',
   endpoints: build => ({
     getAllTasks: build.query({
@@ -59,6 +59,99 @@ export const TasksApi = createApi({
       }),
       invalidatesTags: ['Tasks'],
     }),
+    // update fields
+    updateTitle: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updateName`,
+        method: 'PATCH',
+        body: {
+          previousTaskName: task.previousTaskName,
+          newTaskName: task.newTaskName,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    updateDescription: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updateDescription`,
+        method: 'PATCH',
+        body: {
+          taskDescription: task.taskDescription,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    updateStartingDates: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updateStartingDates`,
+        method: 'PATCH',
+        body: {
+          previousStartingDate: task.previousStartingDate,
+          startingDate: task.startingDate,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    updateDueDates: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updateDueDates`,
+        method: 'PATCH',
+        body: {
+          previousDueDate: task.previousDueDate,
+          dueDate: task.dueDate,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    updatePriority: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updatePriority`,
+        method: 'PATCH',
+        body: {
+          previousPriority: task.previousPriority,
+          priority: task.priority,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    updateResponsibles: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/updateResponsibles`,
+        method: 'PATCH',
+        body: {
+          responsibles: task.responsibles,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+    
+    markAsCompleted: build.mutation({
+      query: task => ({
+        url: `/api/group/tasks/${task.taskId}/markAsCompleted`,
+        method: 'PATCH',
+        body: {
+          condition: task.condition,
+          userId:task.userId
+        },
+      }),
+      invalidatesTags: ['Tasks','TaskLogs'],
+    }),
+
+    allLogsForTask: build.query({
+      query: ({taskId}) => `/api/group/task/logs/${taskId}`,
+      providesTags: ['TaskLogs'],
+    }),
   }),
 });
 
@@ -66,5 +159,13 @@ export const {
   useGetAllTasksQuery,
   useAddTaskMutation,
   useUpdateTaskMutation,
-  useDeleteTaskMutation
+  useDeleteTaskMutation,
+  useUpdateTitleMutation,
+  useUpdateDescriptionMutation,
+  useUpdateStartingDatesMutation,
+  useUpdateDueDatesMutation,
+  useUpdatePriorityMutation,
+  useUpdateResponsiblesMutation,
+  useAllLogsForTaskQuery,
+  useMarkAsCompletedMutation
 } = TasksApi;

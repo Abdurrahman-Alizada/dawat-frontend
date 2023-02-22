@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Menu, Appbar, Searchbar} from 'react-native-paper';
+import {Menu, Divider, Appbar, Searchbar} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
+const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
     setSearch(search);
-    searchFilterFunction(search);
+    // searchFilterFunction(search)
   };
   const BlurHandler = () => {
     setIsSearch(!isSearch);
@@ -28,24 +29,19 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
     <>
       {!isSearch ? (
         <View>
-          <Appbar.Header
-            style={{backgroundColor: theme.colors.elevation.level2}}
-            elevated={true}>
-            <Appbar.Action
-              icon="menu"
-              color={theme.colors.onBackground}
-              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-            />
-            <Appbar.Content
-              title="App Name"
-              titleStyle={{
-                alignSelf: 'center',
-                color: theme.colors.onBackground,
+          <Appbar.Header elevated={true}>
+            <Appbar.BackAction
+              onPress={() => {
+                navigation.goBack();
               }}
+            />
+
+            <Appbar.Content
+              title="Friend requests"
+              titleStyle={{alignSelf: 'center'}}
             />
             <Appbar.Action
               icon="magnify"
-              color={theme.colors.onBackground}
               onPress={() => {
                 setIsSearch(!isSearch);
               }}
@@ -54,32 +50,30 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             <Menu
               visible={visible}
               onDismiss={closeMenu}
-              contentStyle={{backgroundColor: theme.colors.surface}}
               anchor={
-                <Appbar.Action
-                  icon={MORE_ICON}
-                  color={theme.colors.onBackground}
-                  onPress={() => openMenu()}
-                />
+                <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
               }>
               <Menu.Item
-                leadingIcon="cog-outline"
-                title="Settings"
-                titleStyle={{color: theme.colors.onBackground}}
+                leadingIcon="account-check"
                 onPress={async () => {
-                  closeMenu();
-                  navigation.navigate('AppSettingsMain');
+                    closeMenu()
+                  navigation.navigate('SeeAllFriends');
                 }}
+                title="Your friends"
+              />
+              <Menu.Item
+                leadingIcon="account-arrow-right"
+                onPress={async () => {
+                    closeMenu()
+                  navigation.navigate('FriendsSuggestions');
+                }}
+                title="Suggestions"
               />
             </Menu>
           </Appbar.Header>
         </View>
       ) : (
-          <Appbar.Header
-          style={{backgroundColor: theme.colors.elevation.level2}}
-            elevated={true}
-          >
-
+        <View>
           <Searchbar
             placeholder="Search..."
             onChangeText={updateSearch}
@@ -88,14 +82,11 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             onIconPress={BlurHandler}
             cancelButtonTitle="cancel"
             autoFocus
-            iconColor={theme.colors.onSurface}
-            inputStyle={{color:theme.colors.onSurface}}
-            placeholderTextColor={theme.colors.onSurface}
-            elevation={6}
+            elevation={2}
             // loading={true}
             // onBlur={BlurHandler}
           />
-          </Appbar.Header>
+        </View>
       )}
     </>
   );

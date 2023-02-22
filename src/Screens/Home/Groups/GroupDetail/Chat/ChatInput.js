@@ -46,7 +46,7 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
         email: await AsyncStorage.getItem('email'),
         name: await AsyncStorage.getItem("name")
       };
-      dispatch(addChat({addedBy:addedBy, content:e.data}))
+      dispatch(addChat({addedBy:addedBy , content:e.data}))
     };
   }, []);
 

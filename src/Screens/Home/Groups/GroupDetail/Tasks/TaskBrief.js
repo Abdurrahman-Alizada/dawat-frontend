@@ -1,62 +1,19 @@
 import React, {useState, useCallback} from 'react';
-import {ToastAndroid, TouchableOpacity, Image, StyleSheet, Text, View} from 'react-native';
-import moment from 'moment';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {IconButton, Avatar, List} from 'react-native-paper';
+import {
+  ToastAndroid,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {Checkbox} from 'react-native-paper'
+
+import {IconButton, Avatar, List, Chip} from 'react-native-paper';
 import {useDeleteTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-const RenderGroupMembers = ({groupMembers}) => {
-  if (groupMembers.responsibleAvatars) {
-    return (
-      <View style={styles.groupMembersContent}>
-        {groupMembers.responsibleAvatars.map((user, index) => (
-          <View key={index}>
-            {index < 3 ? (
-              <View>
-                <Image
-                  style={styles.memberImage}
-                  source={require('../../../../../assets/drawer/userImage.png')}
-                />
-              </View>
-            ) : (
-              <></>
-            )}
-          </View>
-        ))}
-        {groupMembers.responsibleAvatars.length > 3 ? (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderWidth: 1.5,
-              borderRadius: 50,
-              borderColor: '#20232a',
-            }}>
-            <Text
-              style={{
-                fontSize: 10,
-                paddingHorizontal: '1%',
-                fontWeight: 'bold',
-              }}>
-              +{groupMembers.responsibleAvatars.length - 3}
-            </Text>
-          </View>
-        ) : (
-          <></>
-        )}
-      </View>
-    );
-  }
-  return (
-    <Image
-      style={styles.memberImage}
-      source={require('../../../../../assets/drawer/userImage.png')}
-    />
-  );
-};
 
 const TaskBrief = ({item, closeModalize, navigation}) => {
- 
-  const showToast = (response) => {
+  const showToast = response => {
     ToastAndroid.show(`Task has been deleted`, ToastAndroid.SHORT);
   };
 
@@ -73,20 +30,44 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
       });
   };
 
-  const [textShown, setTextShown] = useState(false); //To show ur remaining Text
-  const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
-  const toggleNumberOfLines = () => {
-    setTextShown(!textShown);
+  const getIconForChip = () => {
+    if (item.priority.priority === 'Normal') {
+      return 'alpha-n-circle-outline';
+    } else if (item.priority.priority === 'High') {
+      return 'alpha-h-circle-outline';
+    } else if (item.priority.priority === 'Low') {
+      return 'alpha-l-circle-outline';
+    } else {
+      return 'alpha-n-circle-outline';
+    }
+  };
+  const TitleForChip = () => {
+    if (item.priority.priority === 'Normal') {
+      return 'Normal Priority';
+    } else if (item.priority.priority === 'High') {
+      return 'High Priority';
+    } else if (item.priority.priority === 'Low') {
+      return 'Low Priority';
+    } else {
+      return 'No Priority';
+    }
   };
 
-  const onTextLayout = useCallback(
-    e => {
-      setLengthMore(e.nativeEvent.lines.length >= 2); //to check the text is more than 4 lines or not
-    },
-    [textShown],
-  );
   return (
-      <View style={{padding: '2%'}}>
+    <View style={{padding: '4%'}}>
+      
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+        <View>
+          <Chip icon={getIconForChip()} onPress={() => console.log('Pressed')}>
+            {TitleForChip()}
+          </Chip>
+        </View>
+
         <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
           <IconButton
             icon="square-edit-outline"
@@ -105,21 +86,37 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
             onPress={deleteHandler}
           />
         </View>
-
-
-          <List.Item
-            title={item.taskName}
-            description={item.taskDescription}
-            left={props => (
-              <Avatar.Image 
-                size={45}
-                style={{alignSelf:"center"}}
-                avatarStyle={{borderRadius: 20}}
-                source={item.taskImageURL ? {uri:item.taskImageURL} : require('../../../../../assets/drawer/male-user.png')}
-              />
-            )}
-          />
       </View>
+
+
+      <List.Item
+        title={item.taskName}
+        description={item.taskDescription}
+        // left={props => (
+        //   <Avatar.Image
+        //     size={45}
+        //     {...props}
+        //     style={{alignSelf: 'center'}}
+        //     avatarStyle={{borderRadius: 20}}
+        //     source={
+        //       item.taskImageURL
+        //         ? {uri: item.taskImageURL}
+        //         : require('../../../../../assets/drawer/male-user.png')
+        //     }
+        //   />
+        // )}
+        left={props =>(
+          <Checkbox
+          {...props}
+          status={item.completed ? 'checked' : 'unchecked'}
+          onPress={() => {
+            // setChecked(!checked);
+          }}
+        />
+        )}
+      />
+
+    </View>
   );
 };
 

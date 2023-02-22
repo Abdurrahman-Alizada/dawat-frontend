@@ -23,9 +23,10 @@ import {
   FAB,
   Badge,
   useTheme,
+  Button,
 } from 'react-native-paper';
-
-import {useSelector, useDispatch} from 'react-redux';
+import AvatarModal from '../Menus/Profile/AvatarModal';
+import {useDispatch} from 'react-redux';
 import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
 const validationSchema = Yup.object().shape({
@@ -50,15 +51,12 @@ const AddGroup = ({navigation, onClose}) => {
     getUserInfo();
   }, []);
 
-  const dispatch = useDispatch();
-
-  const [addGroup, {isLoading}] = useAddGroupMutation();
-
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [dropdonwSearchLoading, setDropdownSearchLoading] = useState(false);
   const [isAddButtonDisable, setIsAddButtonDisable] = useState(false);
+  const [avatarURL, setAvatarURL] = useState("");
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   let openCamera = () => {
     setModalVisible(!modalVisible);
@@ -102,10 +100,11 @@ const AddGroup = ({navigation, onClose}) => {
     ImagePicker.clean()
       .then(() => {
         setfileData(null);
-        console.log('removed all tmp images from tmp directory');
+        fileDataRef.current = null;
+        setAvatarURL(false)
       })
       .catch(e => {
-        alert(e);
+        console.log(e);
       });
   };
 
@@ -121,117 +120,30 @@ const AddGroup = ({navigation, onClose}) => {
       data.append('file', photo);
       data.append('upload_preset', 'bzgif1or');
       data.append('cloud_name', 'dblhm3cbq');
-      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-        method: 'post',
-        body: data,
-      })
-        .then(res => res.json())
-        .then(async data => {
-          await addGroup({
-            groupName: values.groupName,
-            groupDescription: values.groupDescription,
-            imageURL: data.secure_url,
-            isChat: true,
-            isTasks: true,
-            isInvitations: true,
-            isMute: false,
-            members: users,
-          })
-            .then(response => {
-              console.log('new created group is =>', response);
-            })
-            .catch(e => {
-              console.log(e);
-            });
-          navigation.navigate('HomeIndex');
-        })
-        .catch(err => {
-          console.log('An Error Occured While Uploading group image', err);
-          fileDataRef.current = null;
-          setfileData(null);
-          return;
-        });
-    }
 
-    await addGroup({
-      groupName: values.groupName,
-      groupDescription: values.groupDescription,
-      imageURL: '',
-      isChat: true,
-      isTasks: true,
-      isInvitations: true,
-      isMute: false,
-      members: users,
-    })
-      .then(response => {
-        console.log('new created group is =>', response);
-      })
-      .catch(e => {
-        console.log(e);
+      navigation.navigate('AddGroupMembers', {
+        groupName: values.groupName,
+        groupDescription: values.groupDescription,
+        imageURL: '',
+        isChat: true,
+        isTasks: true,
+        isInvitations: true,
+        isMute: false,
+        members: users,
+        data: data,
       });
-    navigation.navigate('HomeIndex');
-  };
-
-  const removeItem = id => {
-    const index = users.indexOf(id);
-    if (index !== -1 && index !== 0) {
-      users.splice(index, 1);
-      usersList.splice(index, 1);
-    } else if (index == 0) {
-      users.shift();
-      usersList.shift();
+    } else {
+      navigation.navigate('AddGroupMembers', {
+        groupName: values.groupName,
+        groupDescription: values.groupDescription,
+        imageURL: avatarURL,
+        isChat: true,
+        isTasks: true,
+        isInvitations: true,
+        isMute: false,
+        members: users,
+      });
     }
-  };
-  const Item = itemProps => {
-    const [include, setInclude] = useState(users.includes(itemProps.item._id));
-    const index = users.indexOf(itemProps.item._id);
-    const add = () => {
-      if (include) {
-        if (index !== -1 && index !== 0) {
-          users.splice(include, 1);
-          usersList.splice(include, 1);
-          // console.log('if ',index, props.item._id);
-        } else if (index == 0) {
-          users.shift();
-          usersList.shift();
-        }
-      } else {
-        setUsers([...users, itemProps.item._id]);
-        setUsersList([...usersList, itemProps.item]);
-        // console.log('else', index, props.item._id);
-      }
-      setInclude(!include);
-    };
-    return (
-      <View>
-        <List.Item
-          onPress={add}
-          title={itemProps.item.name}
-          description={itemProps.item.email}
-          left={props => (
-            <View>
-              <Avatar.Image
-                {...props}
-                variant="image"
-                size={50}
-                source={
-                  itemProps.item?.imageURL
-                    ? {uri: itemProps.item?.imageURL}
-                    : require('../../../assets/drawer/userImage.png')
-                }
-              />
-            </View>
-          )}
-          right={props => (
-            <Checkbox
-              {...props}
-              status={include ? 'checked' : 'unchecked'}
-              onPress={add}
-            />
-          )}
-        />
-      </View>
-    );
   };
 
   const theme = useTheme();
@@ -255,162 +167,85 @@ const AddGroup = ({navigation, onClose}) => {
         }) => (
           <View
             style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
-            {!open && (
-              <View>
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
-                  {fileData ? (
+            <View>
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                {fileData ? (
+                  <Avatar.Image
+                    source={{uri: fileData.path}}
+                    style={{alignSelf: 'center'}}
+                    size={100}
+                  />
+                ) : (
+                  <View>
+                   {
+                    avatarURL ?
                     <Avatar.Image
-                      source={{uri: fileData.path}}
+                    source={{uri: avatarURL}}
+                    style={{alignSelf: 'center'}}
+                    size={100}
+                  />
+                    :
+                    <Avatar.Icon
+                      icon="account-circle-outline"
                       style={{alignSelf: 'center'}}
                       size={100}
                     />
-                  ) : (
-                    <View>
-                      <Avatar.Icon
-                        icon="account-circle-outline"
-                        style={{alignSelf: 'center'}}
-                        size={100}
-                      />
-                    </View>
-                  )}
-                </TouchableOpacity>
-
-                <TextInput
-                  style={{marginTop: '4%'}}
-                  error={errors.groupName && touched.groupName ? true : false}
-                  label="Group Name"
-                  mode="outlined"
-                  // style={{marginVertical: '2%', width: '85%'}}
-                  onChangeText={handleChange('groupName')}
-                  onBlur={handleBlur('groupName')}
-                  value={values.groupName}
-                />
-                {errors.groupName && touched.groupName ? (
-                  <Text style={styles.error}>{errors.groupName}</Text>
-                ) : null}
-
-                <TextInput
-                  style={{marginTop: '4%'}}
-                  error={
-                    errors.groupDescription && touched.groupDescription
-                      ? true
-                      : false
-                  }
-                  label="Group Description"
-                  mode="outlined"
-                  // style={{marginVertical: '2%', width: '85%'}}
-                  onChangeText={handleChange('groupDescription')}
-                  onBlur={handleBlur('groupDescription')}
-                  value={values.groupDescription}
-                />
-                {errors.groupDescription && touched.groupDescription ? (
-                  <Text style={styles.error}>{errors.groupDescription}</Text>
-                ) : null}
-              </View>
-            )}
-            <View style={{marginVertical: open ? '0%' : '5%'}}>
-              {users.length > 0 ? (
-                <Card style={{marginBottom: open ? '2%' : '5%'}}>
-                  {/* <Card.Title title="Card Title" /> */}
-                  <Card.Content>
-                    <ScrollView
-                      horizontal={true}
-                      contentContainerStyle={{}}
-                      showsHorizontalScrollIndicator={false}>
-                      {usersList.map(user => (
-                        <TouchableOpacity
-                          onPress={() => setOpen(true)}
-                          style={{marginRight: 5, alignItems: 'center'}}
-                          key={user._id}>
-                          {user?.imageURL ? (
-                            <Avatar.Image
-                              size={50}
-                              source={{uri: user?.imageURL}}
-                            />
-                          ) : (
-                            <Avatar.Icon size={50} icon="account-outline" />
-                          )}
-                          <Text style={{}} maxLength={10}>
-                            {user.name.length > 5
-                              ? user.name.substring(0, 6) + '..'
-                              : user.name}
-                          </Text>
-                          {/* <Badge onPress={()=>removeItem(user._id)} style={{position:"absolute", right:"-10%", backgroundColor:theme.colors.background}} >
-                          <Text style={{fontWeight:"bold"}}>X</Text>
-                          </Badge> */}
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </Card.Content>
-                </Card>
+                   }
+                  
+                  </View>
+                )}
+              </TouchableOpacity>
+              { (fileData || avatarURL) && (
+                <Button
+                  // style={{marginTop: '5%'}}
+                  icon="delete"
+                  mode="text"
+                  onPress={removePicture}>
+                  Remove image
+                </Button>
+              )}
+              <TextInput
+                style={{marginTop: '4%'}}
+                error={errors.groupName && touched.groupName ? true : false}
+                label="Group Name"
+                mode="outlined"
+                onChangeText={handleChange('groupName')}
+                onBlur={handleBlur('groupName')}
+                value={values.groupName}
+              />
+              {errors.groupName && touched.groupName ? (
+                <Text style={{color:theme.colors.error}}>{errors.groupName}</Text>
               ) : null}
 
-              <DropDownPicker
-                renderListItem={props => <Item {...props} />}
-                // multiple={true}
-                open={open}
-                value={users}
-                items={items}
-                placeholder={'Choose members'}
-                searchPlaceholder={'Search'}
-                setOpen={setOpen}
-                setItems={setItems}
-                listMode="MODAL"
-                searchable={true}
-                maxHeight="60%"
-                dropDownDirection="BOTTOM"
-                loading={dropdonwSearchLoading}
-                disableLocalSearch={true}
-                itemKey="_id"
-                onChangeSearchText={async () => {
-                  setDropdownSearchLoading(true);
-                  instance
-                    .get('/api/account/allusers', {
-                      headers: {
-                        Authorization: `Bearer ${await AsyncStorage.getItem(
-                          'token',
-                        )}`,
-                      },
-                    })
-                    .then(items => {
-                      setItems(items.data);
-                    })
-                    .catch(err => {
-                      console.log('error in dropdown', err);
-                      //
-                    })
-                    .finally(() => {
-                      // Hide the loading animation
-                      setDropdownSearchLoading(false);
-                    });
-                }}
-                // styles
-                style={{
-                  backgroundColor: theme.colors.background,
-                  borderColor: theme.colors.onSurface,
-                }}
-                searchTextInputStyle={{
-                  backgroundColor: theme.colors.background,
-                  borderColor: theme.colors.onSurface,
-                  color: theme.colors.onSurface,
-                }}
-                textStyle={{
-                  fontSize: 16,
-                  color: theme.colors.onSurface,
-                }}
-                dropDownContainerStyle={{
-                  backgroundColor: theme.colors.background,
-                  borderColor: theme.colors.onSurface,
-                }}
+              <TextInput
+                style={{marginTop: '4%'}}
+                error={
+                  errors.groupDescription && touched.groupDescription
+                    ? true
+                    : false
+                }
+                // placeholder="Group Description"
+                label={`Group Description (${ 99 - values.groupDescription.length})`}
+                mode="outlined"
+                multiline
+                maxLength={99}
+                numberOfLines={3}
+                // style={{marginVertical: '2%', width: '85%'}}
+                onChangeText={handleChange('groupDescription')}
+                onBlur={handleBlur('groupDescription')}
+                value={values.groupDescription}
               />
+              {errors.groupDescription && touched.groupDescription ? (
+                <Text style={styles.error}>{errors.groupDescription}</Text>
+              ) : null}
             </View>
 
             <FAB
-              icon="check"
-              label="Add"
+              icon="arrow-right"
+              label="Next"
               style={styles.fab}
-              disabled={isAddButtonDisable}
-              loading={isAddButtonDisable}
+              // disabled={isAddButtonDisable}
+              // loading={isAddButtonDisable}
               onPress={handleSubmit}
             />
           </View>
@@ -419,15 +254,20 @@ const AddGroup = ({navigation, onClose}) => {
 
       <Modal
         onBlur={() => setModalVisible(false)}
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        <View style={styles.centeredView}>
+        <View style={{
+           flex: 1,
+           justifyContent: 'flex-end',
+           alignItems: 'center',
+           backgroundColor:theme.colors.backdrop
+        }}>
           <View
-            style={[styles.modalView, {position: 'absolute', width: '100%'}]}>
+            style={[styles.modalView, {position: 'absolute', width: '100%', backgroundColor:theme.colors.surface}]}>
             <IconButton
               style={{position: 'absolute', right: 5}}
               icon="close-circle-outline"
@@ -455,9 +295,34 @@ const AddGroup = ({navigation, onClose}) => {
               />
               <Text>Gallery</Text>
             </View>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="account-circle-outline"
+                mode="outlined"
+                size={40}
+                onPress={() => {
+                  setModalVisible(false);
+                  setAvatarModalVisible(true);
+                }}
+              />
+              <Text>Avatars</Text>
+            </View>
           </View>
         </View>
       </Modal>
+
+      {avatarModalVisible && (
+        <AvatarModal
+          avatarModalVisible={avatarModalVisible}
+          setAvatarModalVisible={setAvatarModalVisible}
+          setAvatarURL={setAvatarURL}
+          setfileData={setfileData}
+          fileDataRef={fileDataRef}
+          // imageUploadHandler={imageUploadHandler}
+        />
+      )}
+
     </View>
   );
 };

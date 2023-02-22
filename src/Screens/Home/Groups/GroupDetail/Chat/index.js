@@ -22,8 +22,8 @@ const MessagesScreen = ({navigation, route}) => {
     <View style={{flexGrow: 1}}>
       <MessagesList onSwipeToReply={swipeToReply} groupId={groupId} />
       <ChatInput
-       groupId={groupId}  
-	   reply={reply}
+        groupId={groupId}
+        reply={reply}
         isLeft={isLeft}
         closeReply={closeReply}
         username={'user name'}

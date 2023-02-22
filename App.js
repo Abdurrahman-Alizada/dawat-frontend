@@ -51,6 +51,7 @@ export const App = () => {
       ...PaperDefaultTheme?.colors, 
       ...NavigationDefaultTheme.colors,  
     },
+
   };
 
   let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
