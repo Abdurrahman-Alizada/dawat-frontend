@@ -113,7 +113,7 @@ const SingleTask = ({item, cardHandler}) => {
   };
 
   return (
-    <View>
+      <View>
       <View
         style={{
           paddingHorizontal: '5%',
@@ -121,6 +121,7 @@ const SingleTask = ({item, cardHandler}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
+          backgroundColor : item.isCompleted ? theme.colors.surfaceVariant : theme.colors.background
         }}>
         <View style={{width: '90%'}}>
           <View
@@ -238,22 +239,8 @@ const SingleTask = ({item, cardHandler}) => {
           </Menu>
         </View>
       </View>
-      <Divider />
-      {/* 
-
-          {item.priority.priority === 'High' && (
-            <Badge style={{marginHorizontal: 5}}></Badge>
-          )}
-          {item.priority.priority === 'Normal' && (
-            <Badge
-              style={{marginHorizontal: 5, backgroundColor: '#34f'}}></Badge>
-          )}
-          {item.priority.priority === 'Low' && (
-            <Badge
-              style={{marginHorizontal: 5, backgroundColor: '#ed3'}}></Badge>
-          )}
-*/}
-    </View>
+        <Divider style={{backgroundColor:"#000"}} />
+        </View>
   );
 };
 

@@ -9,9 +9,7 @@ import React, {useState, useRef} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper'
-import {Modalize} from 'react-native-modalize';
 import {FAB, useTheme} from 'react-native-paper';
-import TaskBrief from './TaskBrief';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
@@ -35,13 +33,9 @@ const Task = ({route}) => {
 
   const cardHandler = item => {
     setCurrentItem(item);
-    // modalizeRef.current?.open();
-  };
-  const closeModalize = () => {
-    modalizeRef.current?.close();
   };
   return (
-    <View style={{flex:1, backgroundColor:theme.colors.surface}}>
+    <View style={{flex:1, backgroundColor:theme.colors.background}}>
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />

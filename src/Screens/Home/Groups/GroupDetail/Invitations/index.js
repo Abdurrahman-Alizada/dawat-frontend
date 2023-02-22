@@ -97,7 +97,7 @@ export default function Example({route}) {
   const theme = useTheme();
 
   return (
-    <View style={{flex: 1, backgroundColor: theme.colors.surface}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
       {/* <View
         style={{
           flexDirection: 'row',

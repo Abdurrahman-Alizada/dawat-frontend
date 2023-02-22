@@ -24,12 +24,12 @@ const AvatarModal = props => {
   const [selectedAvatar, setSelectedAvatar] = useState('');
   return (
     <Modal visible={props.avatarModalVisible}>
-     <View style={{flex:1, backgroundColor:theme.colors.surface}}>
+     <View style={{flex:1, backgroundColor:theme.colors.background}}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.background,
         }}>
         <IconButton
           style={{}}
@@ -53,7 +53,7 @@ const AvatarModal = props => {
 
       <ScrollView
         contentContainerStyle={{
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.background,
           padding: '1%',
           flexWrap: 'wrap',
           flexDirection: 'row',

@@ -110,7 +110,7 @@ const SeeAllFriends = ({navigation}) => {
       )}
 
       <Modalize
-        modalStyle={{backgroundColor: theme.colors.surface}}
+        modalStyle={{backgroundColor: theme.colors.background}}
         ref={modalizeRef}
         snapPoint={400}>
         <View style={{padding:"4%"}}>

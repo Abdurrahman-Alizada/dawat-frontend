@@ -122,7 +122,7 @@ const Groups = ({navigation}) => {
         )}
 
         {!isLoading ? (
-          <View style={{flex: 1, backgroundColor:theme.colors.surface}}>
+          <View style={{flex: 1, backgroundColor:theme.colors.background}}>
             <FlatList
               onScroll={onScroll}
               keyExtractor={item => item._id}

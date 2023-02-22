@@ -67,7 +67,7 @@ const Index = ({route}) => {
       <Tabs groupId={groupId} />
 
       <Modalize
-        modalStyle={{backgroundColor:theme.colors.surface}}
+        modalStyle={{backgroundColor:theme.colors.background}}
         ref={modalizeRef}
         snapPoint={400}>
         <GroupBrief group={route.params.group} onClose={onClose} />
