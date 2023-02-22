@@ -254,7 +254,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               <TouchableOpacity
                 style={{alignItems: 'center'}}
                 onPress={() => {
-                  navigation.navigate('AddTaskMembers');
+                  navigation.navigate('UpdateTaskMembers');
                 }}>
                 <Avatar.Icon icon="account-plus" mode="contained" size={40} />
                 <Text>Add</Text>

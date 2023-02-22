@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import React, { useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   Text,
   FAB,
@@ -19,32 +20,33 @@ import {
   Checkbox,
   useTheme,
 } from 'react-native-paper';
-import {useAddTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import {useUpdateResponsiblesMutation} from '../../../../../../redux/reducers/groups/tasks/taskThunk';
 
 import {useSelector} from 'react-redux';
 
-const AddGroup = ({navigation, route}) => {
-  const {values, startDate, dueDate, priority} = route.params;
+const AddGroup = ({navigation, onClose, route}) => {
   const theme = useTheme();
   const [isSearch, setIsSearch] = useState(false);
 
+  const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
+  const currentViewingTask = useSelector(
+    state => state.tasks?.currentViewingTask,
+  );
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
 
-  const [addTask, {isLoading}] = useAddTaskMutation();
-
-  const submitHandler = async () => {
-    await addTask({
-      taskName: values.taskTitle,
-      groupId: currentViewingGroup._id,
-      taskDescription: values.taskDescription,
-      responsibles: users,
-      startDate: startDate,
-      dueDate: dueDate,
-      prority: priority,
+  const [updateResponsibles, {isLoading: updateResponsiblesLoading}] =
+    useUpdateResponsiblesMutation();
+  
+    const submitHandler = async () => {
+      updateResponsibles({
+      responsibles: responsibleUsers,
+      userId: await AsyncStorage.getItem('userId'),
+      taskId: currentViewingTask._id,
     })
       .then(response => {
+        console.log('updated task is =>', response.data);
         navigation.pop(2);
       })
       .catch(e => {
@@ -54,6 +56,22 @@ const AddGroup = ({navigation, route}) => {
 
   const [users, setUsers] = useState([]);
   const [userIds, setUserIds] = useState([]);
+  const [responsibleUsers, setResponsibleUsers] = useState([]);
+
+  
+  useLayoutEffect(()=>{
+    const getResponsibles = () => {
+      for(let i=0; i<currentViewingTask.responsibles?.length; i++){
+       let user = currentViewingGroup?.users.find(e => e._id === currentViewingTask?.responsibles[i]?.responsible?._id)
+        if(user){
+          setUsers(prevState => ([...prevState, user]))
+          setUserIds(prevState => ([...prevState, user?._id]))
+          // setResponsibleUsers(prevState => ([...prevState, {id : user?._id, name: user?.name}]))
+        }
+      }
+    };
+    getResponsibles()
+  },[])
 
   const Item = ({itemProps}) => {
     const [include, setInclude] = useState(userIds.includes(itemProps?._id));
@@ -62,9 +80,16 @@ const AddGroup = ({navigation, route}) => {
         setUserIds(userIds.filter(userId => userId !== itemProps?._id));
         setUsers(users.filter(user => user._id !== itemProps?._id));
       } else {
-        setUsers(prevState => [...prevState, itemProps]);
-        setUserIds(prevState => [...prevState, itemProps?._id]);
-      }
+        setUsers(prevState => ([...prevState, itemProps]))
+        setUserIds(prevState => ([...prevState, itemProps?._id]))
+      }      
+      
+      let includeInResponsibleUsers = responsibleUsers.some(user => user.id == itemProps?._id);
+      if(includeInResponsibleUsers){
+        setResponsibleUsers(responsibleUsers.filter(user => user.id !== itemProps?._id));
+      }else{
+        setResponsibleUsers(prevState => ([...prevState, {id : itemProps._id, name: itemProps.name}]))
+      }      
       setInclude(!include);
     };
     return (
@@ -73,6 +98,7 @@ const AddGroup = ({navigation, route}) => {
           onPress={add}
           title={itemProps?.name}
           // description={itemProps?.responsible?.email}
+          style={{backgroundColor:include ? theme.colors.primaryContainer : theme.colors.background}}
           left={props => (
             <View>
               <Avatar.Image
@@ -82,7 +108,7 @@ const AddGroup = ({navigation, route}) => {
                 source={
                   itemProps?.imageURL
                     ? {uri: itemProps?.imageURL}
-                    : require('../../../../../assets/drawer/userImage.png')
+                    : require('../../../../../../assets/drawer/userImage.png')
                 }
               />
             </View>
@@ -123,7 +149,7 @@ const AddGroup = ({navigation, route}) => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Add participant members" />
+          <Appbar.Content title="Update task members" />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -171,7 +197,7 @@ const AddGroup = ({navigation, route}) => {
                 ))}
               </ScrollView>
             ) : null}
-            <Divider bold style={{marginBottom: '1%'}} />
+            <Divider bold style={{marginBottom:"1%"}} />
           </View>
         )}
         ListEmptyComponent={() => (
@@ -186,12 +212,10 @@ const AddGroup = ({navigation, route}) => {
         icon="check"
         label="Ok"
         style={styles.fab}
-        disabled={isLoading}
-        loading={isLoading}
+        disabled={updateResponsiblesLoading || currentViewingTask?.responsibles?.length == users.length}
+        loading={updateResponsiblesLoading}
         onPress={submitHandler}
       />
-
-
     </View>
   );
 };
