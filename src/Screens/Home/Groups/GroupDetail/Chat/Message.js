@@ -15,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const Message = ({time, message, onSwipe, addedBy, userId}) => {
+const Message = ({time, message, onSwipe, addedBy, userId, pic}) => {
   let uId = '';
   const [isLeft, setIsLeft] = useState(false);
   const getUser = async () => {
@@ -90,13 +90,14 @@ const Message = ({time, message, onSwipe, addedBy, userId}) => {
             flexDirection: isLeft ? 'row' : 'row-reverse',
             marginHorizontal: '2%',
           }}>
-
-          <Avatar.Image size={24} 
-          source={{
-            uri: 'https://media.istockphoto.com/photos/macaw-parrot-isolated-on-white-background-picture-id1328860045?b=1&k=20&m=1328860045&s=170667a&w=0&h=o24me3gyECkw5b_iKKrCiyowQYyAaW8q1cx8WUfwfoI=',
-          }}
-           />
-
+          <Avatar.Image
+            size={30}
+            source={
+              pic
+                ? {uri: pic}
+                : require('../../../../../assets/drawer/male-user.png')
+            }
+          />
           <View style={[styles.messageContainer, isOnLeft('messageContainer')]}>
             <View>
               <Text
