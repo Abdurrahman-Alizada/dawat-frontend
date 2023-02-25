@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
-import {Input, Button} from 'react-native-elements';
+import {TextInput, Button} from 'react-native-paper';
 
 const ForgotPassword = ({navigation}) => {
   return (
@@ -15,25 +15,20 @@ const ForgotPassword = ({navigation}) => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <View style={{justifyContent: 'center', flex: 1}}>
-        <Input
+        <TextInput
           placeholder="abc@domin.com"
           label="Enter your Email"
-          rightIcon={{type: 'font-awesome', name: 'envelope'}}
+          mode="outlined"
         />
 
         <Button
-          onPress={() => navigation.navigate('CheckEmail')}
-          title={'Sent Varification Cade'}
-          containerStyle={{
-            width: '95%',
-            alignSelf: 'center',
-          }}
-          buttonStyle={{
-            height: 50,
-            borderRadius: 5,
-            backgroundColor: '#334C8C',
-          }}
-        />
+          // icon="camera"
+          mode="contained"
+          theme={{roundness: 2}}
+          style={{marginVertical: '4%'}}
+          onPress={() => console.log('Pressed')}>
+          Sent Varification Code
+        </Button>
       </View>
     </View>
   );

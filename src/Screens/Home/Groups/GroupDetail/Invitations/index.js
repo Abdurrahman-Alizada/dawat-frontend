@@ -1,33 +1,16 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   StyleSheet,
   View,
-  Image,
   FlatList,
   RefreshControl,
-  Share,
   ScrollView,
-  Linking,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
-import AddInviti from './AddInviti';
 import {Modalize} from 'react-native-modalize';
-import {height} from '../../../../../GlobalStyles';
 import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
-import {
-  List,
-  Avatar,
-  FAB,
-  Text,
-  Modal,
-  Chip,
-  ActivityIndicator,
-  useTheme,
-  Banner,
-} from 'react-native-paper';
-import AddCategory from './AddCategory';
-import AsyncStorage from '@react-native-community/async-storage';
+import {List, Avatar, FAB, Text, useTheme, Banner} from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
@@ -197,87 +180,93 @@ export default function Example({route}) {
         HeaderComponent={() => (
           <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
         )}>
-        <List.Accordion style={{padding: '2%', }} title="More">
-          <View style={{marginHorizontal:"5%"}}>
-          <Text style={{ marginVertical:"2%", fontWeight:"bold"}}>Added by</Text>
-          <View
-            style={{
-              borderRadius: 10,
-              borderColor: '#C1C2B8',
-              borderWidth: 0.5,
-              padding: '2%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <View>
-                <Avatar.Icon size={30} icon="account-circle-outline" />
+        <List.Accordion style={{padding: '2%'}} title="More">
+          <View style={{marginHorizontal: '5%'}}>
+            <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
+              Added by
+            </Text>
+            <View
+              style={{
+                borderRadius: 10,
+                borderColor: '#C1C2B8',
+                borderWidth: 0.5,
+                padding: '2%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View>
+                  <Avatar.Icon size={30} icon="account-circle-outline" />
+                </View>
+                <Text style={{marginHorizontal: '4%'}}>
+                  {currentInvitiToDisplay?.addedBy?.name}
+                </Text>
               </View>
-              <Text style={{marginHorizontal: '4%'}}>
-                {currentInvitiToDisplay?.addedBy?.name}
+              <Text style={{}}>
+                {moment(currentInvitiToDisplay?.createdAt).fromNow()}
               </Text>
             </View>
-            <Text style={{}}>
-              {moment(currentInvitiToDisplay?.createdAt).fromNow()}
-            </Text>
-          </View>
 
-          <Text style={{ marginTop:"5%", fontWeight:"bold"}}>History</Text>
-          <ScrollView>
-            {currentInvitiToDisplay?.statuses?.map((Status, index) => (
-              <View
-                key={index}
-                style={{
-                  borderRadius: 10,
-                  borderColor: '#C1C2B8',
-                  borderWidth: 0.5,
-                  padding: '2%',
-                  marginVertical: '2%',
-                }}>
+            <Text style={{marginTop: '5%', fontWeight: 'bold'}}>History</Text>
+            <ScrollView>
+              {currentInvitiToDisplay?.statuses?.map((Status, index) => (
                 <View
+                  key={index}
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    borderRadius: 10,
+                    borderColor: '#C1C2B8',
+                    borderWidth: 0.5,
+                    padding: '2%',
+                    marginVertical: '2%',
                   }}>
-                  <View style={{}}>
-                    <Text style={{padding: '2%'}}>
-                      {Status.invitiStatus} by
-                    </Text>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      <Avatar.Icon size={30} icon="account-circle-outline" />
-                      <Text style={{marginHorizontal: '4%'}}>
-                        {Status.addedBy.name}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                    <View style={{}}>
+                      <Text style={{padding: '2%'}}>
+                        {Status.invitiStatus} by
+                      </Text>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Avatar.Icon size={30} icon="account-circle-outline" />
+                        <Text style={{marginHorizontal: '4%'}}>
+                          {Status.addedBy.name}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{alignItems: 'flex-end'}}>
+                      {Status.invitiStatus === 'rejected' && (
+                        <List.Icon
+                          style={{margin: 0, padding: 0}}
+                          icon="cancel"
+                        />
+                      )}
+                      {Status.invitiStatus === 'pending' && (
+                        <List.Icon
+                          style={{margin: 0, padding: 0}}
+                          icon="clock-outline"
+                        />
+                      )}
+                      {Status.invitiStatus === 'invited' && (
+                        <List.Icon
+                          style={{margin: 0, padding: 0}}
+                          icon="check"
+                        />
+                      )}
+
+                      <Text style={{alignSelf: 'flex-end'}}>
+                        {moment(Status?.createdAt).fromNow()}{' '}
                       </Text>
                     </View>
                   </View>
-                  <View style={{alignItems: "flex-end"}}>
-                    {Status.invitiStatus === 'rejected' && (
-                      <List.Icon
-                        style={{margin: 0, padding: 0}}
-                        icon="cancel"
-                      />
-                    )}
-                    {Status.invitiStatus === 'pending' && (
-                      <List.Icon
-                        style={{margin: 0, padding: 0}}
-                        icon="clock-outline"
-                      />
-                    )}
-                    {Status.invitiStatus === 'invited' && (
-                      <List.Icon style={{margin: 0, padding: 0}} icon="check" />
-                    )}
-
-                    <Text style={{alignSelf: 'flex-end'}}>
-                      {moment(Status?.createdAt).fromNow()}{' '}
-                    </Text>
-                  </View>
                 </View>
-              </View>
-            ))}
-          </ScrollView>
-</View>
+              ))}
+            </ScrollView>
+          </View>
         </List.Accordion>
       </Modalize>
     </View>

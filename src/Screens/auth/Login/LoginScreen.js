@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 
 import {
   ScrollView,
@@ -40,10 +40,11 @@ const LoginScreen = ({navigation, route}) => {
   const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
 
-  console.log('route params=> ', route?.params);
   const [verificationBannerVisible, setVerificationBannerVisible] = useState(
-    route?.params?.message ? true : false,
+    route.params ? true : false,
   );
+ 
+
   const [bannerMessage, setBannerMessage] = useState(
     route?.params?.message ? route?.params?.message : '',
   );
@@ -237,7 +238,8 @@ const LoginScreen = ({navigation, route}) => {
                   buttonColor={theme.colors.secondary}
                   theme={{roundness: 2}}
                   style={{marginTop: '2%', paddingHorizontal: '1%'}}
-                  onPress={() => navigation.navigate('SignUpwithEmail')}>
+                  // onPress={() => navigation.navigate('SignUpwithEmail')}>
+                  onPress={() => navigation.navigate('ForgotPassword')}>
                   Create account
                 </Button>
               </View>
@@ -246,27 +248,6 @@ const LoginScreen = ({navigation, route}) => {
         </Formik>
       </ScrollView>
 
-      <Banner
-        visible={verificationBannerVisible}
-        actions={[
-          {
-            label: 'OK',
-            onPress: () => setVerificationBannerVisible(false),
-          },
-        ]}
-        icon={({size}) => (
-          <Image
-            source={{
-              uri: 'https://avatars3.githubusercontent.com/u/17571969?s=400&v=4',
-            }}
-            style={{
-              width: size,
-              height: size,
-            }}
-          />
-        )}>
-        {bannerMessage}
-      </Banner>
     </View>
   );
 };
