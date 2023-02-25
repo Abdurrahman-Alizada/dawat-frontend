@@ -1,13 +1,29 @@
 import React, {useState} from 'react';
 
-import {ScrollView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  Image,
+  View,
+} from 'react-native';
 import {Formik} from 'formik';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon from 'react-native-vector-icons/AntDesign';
 import * as Yup from 'yup';
-import {TextInput, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
-import { useLoginUserMutation } from '../../../redux/reducers/user/userThunk';
+import {
+  TextInput,
+  Button,
+  Dialog,
+  Paragraph,
+  Banner,
+  Portal,
+  useTheme,
+} from 'react-native-paper';
+import {useLoginUserMutation} from '../../../redux/reducers/user/userThunk';
+import { handleCurrentLoaginUser } from '../../../redux/reducers/user/user';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import { useDispatch, useSelector } from 'react-redux';
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Please enter valid email')
@@ -19,65 +35,118 @@ const validationSchema = Yup.object().shape({
     .label('Password'),
 });
 
-const LoginScreen = ({navigation}) => {
-
+const LoginScreen = ({navigation, route}) => {
+  const theme = useTheme();
+  const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
 
+  console.log('route params=> ', route?.params);
+  const [verificationBannerVisible, setVerificationBannerVisible] = useState(
+    route?.params?.message ? true : false,
+  );
+  const [bannerMessage, setBannerMessage] = useState(
+    route?.params?.message ? route?.params?.message : '',
+  );
+  const [errorMessage, setErrorMessage] = useState('');
+
   const [loginUser, {isLoading, isError, error}] = useLoginUserMutation();
-
   const submitHandler = async values => {
-   
-    const { data } = await loginUser({ email: values.email, password: values.password})
+    const response = await loginUser({
+      email: values.email,
+      password: values.password,
+    });
 
-    if(data?._id){
+    if (response?.error) {
+      setVisible(true);
+    }
+    if (response?.data?.message) {
+      setErrorMessage(response?.data?.message);
+      setVisible(true);
+    }
+    if (!response?.data?.user?.verified) {
+      setBannerMessage('Please verify the provided email first');
+      setVerificationBannerVisible(true);
+    }
+    if (response?.data?.token) {
+      dispatch(handleCurrentLoaginUser(response?.data?.user))
       await AsyncStorage.setItem('isLoggedIn', 'login');
-      await AsyncStorage.setItem('id', data._id);
-      await AsyncStorage.setItem('token', data?.token);
-      await AsyncStorage.setItem('userId', data?._id);
-      await AsyncStorage.setItem('name', data?.name);
-      await AsyncStorage.setItem('email', data?.email);
-      await AsyncStorage.setItem('imageURL', data?.imageURL ? data?.imageURL : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png');
-      console.log('user has been logged in =>', data);
-      navigation.navigate("Drawer");
+      await AsyncStorage.setItem('id', response?.data?.user?._id);
+      await AsyncStorage.setItem('token', response?.data?.token);
+      await AsyncStorage.setItem('userId', response?.data?.user?._id);
+      await AsyncStorage.setItem('name', response.data.user.name);
+      await AsyncStorage.setItem('email', response?.data?.user?.email);
+      navigation.navigate('Drawer');
     }
-    if(!data?._id && isError){
-      console.log("error in login ", error)  
-      setVisible(true)
-    }
-
+    // if (!data?._id && isError) {
+    //   console.log('error in login ', error);
+    //   setVisible(true);
+    // }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
+
       <Portal>
-        <Dialog visible={visible} onDismiss={()=>setVisible(true)}>
-            <Dialog.Title>Login Error</Dialog.Title>
-            <Dialog.Content>
-              <Paragraph>Something went wrong {error?.data?.message}</Paragraph>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={()=>setVisible(false)}>Ok</Button>
-            </Dialog.Actions>
-          </Dialog>
+        <Dialog visible={visible} onDismiss={() => setVisible(true)}>
+          <Dialog.Title>Login Error</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph> {error?.data?.message} </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setVisible(false)}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{alignItems: 'flex-start', marginTop: 5}}>
-          <Icon size={28} name="times" />
-        </View>
+        <View style={{marginTop: '5%'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <View
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 100 / 2,
+                borderWidth: 10,
+                borderColor: '#097969',
+              }}
+            />
 
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                alignSelf: 'flex-end',
+                borderRadius: 100 / 2,
+                backgroundColor: '#F77A55',
+              }}
+            />
+          </View>
+          <Text
+            style={{
+              alignSelf: 'center',
+              fontSize: 18,
+              marginVertical: '2%',
+              fontWeight: '500',
+              textAlign: 'center',
+            }}>
+            Application name
+          </Text>
+        </View>
         <Text
           style={{
-            alignSelf: 'center',
-            fontSize: 18,
-            marginVertical: '2%',
-            fontWeight: '500',
-            width: '70%',
-            textAlign: 'center',
+            // alignSelf: 'center',
+            fontSize: 15,
+            marginTop: '2%',
+            fontWeight: '400',
+            // textAlign: 'center',
           }}>
-          Welcome back! Sign in to continue!{' '}
+          Enter your email and password to continue.
         </Text>
 
         <Formik
@@ -86,14 +155,13 @@ const LoginScreen = ({navigation}) => {
             password: '',
           }}
           validationSchema={validationSchema}
-          onSubmit={ (values, actions) => {
-            submitHandler(values)
-               actions.resetForm({
-                  email: '',
-                  password: '',
-               })
-            } 
-          }>
+          onSubmit={(values, actions) => {
+            submitHandler(values);
+            // actions.resetForm({
+            //   email: '',
+            //   password: '',
+            // });
+          }}>
           {({
             handleChange,
             handleBlur,
@@ -106,16 +174,19 @@ const LoginScreen = ({navigation}) => {
               <TextInput
                 error={errors.email && touched.email ? true : false}
                 label="Email"
+                placeholder="Enter your email"
                 mode="outlined"
                 style={{marginVertical: '2%'}}
                 value={values.email}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
+                activeOutlineColor={theme.colors.secondary}
               />
               {errors.email && touched.email ? (
-                <Text style={styles.error}>{errors.email}</Text>
+                <Text style={{color: theme.colors.error}}>{errors.email}</Text>
               ) : null}
               <TextInput
+                error={errors.password && touched.password ? true : false}
                 label="Password"
                 mode="outlined"
                 secureTextEntry={true}
@@ -123,46 +194,79 @@ const LoginScreen = ({navigation}) => {
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
+                activeOutlineColor={theme.colors.secondary}
               />
               {errors.password && touched.password ? (
-                <Text style={styles.error}>{errors.password}</Text>
-              ) : (
-                null
-              )}
+                <Text style={{color: theme.colors.error}}>
+                  {errors.password}
+                </Text>
+              ) : null}
               <Button
-              loading={isLoading}
-                mode="contained"
+                loading={isLoading}
                 style={{
-                  marginTop: '2%',
-                  borderRadius: 5,
-                  backgroundColor: '#334C8C',
+                  marginTop: '5%',
+                  padding: '1%',
                 }}
-                onPress={handleSubmit}>
+                contentStyle={{padding: '1%'}}
+                theme={{roundness: 1}}
+                mode="contained"
+                onPress={handleSubmit}
+                buttonColor={theme.colors.secondary}>
                 Sign in
               </Button>
 
-              <Text
+              <View
                 style={{
-                  fontSize: 14,
-                  fontWeight: 'bold',
-                  alignSelf: 'center',
-                  marginTop: '2%',
+                  marginTop: '10%',
+                  flexDirection: 'row',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-evenly',
                 }}>
-                Don't have an account?{' '}
-              </Text>
-
-              <Button
-                mode="outlined"
-                style={{marginTop: '2%', borderRadius: 5}}
-                onPress={() => navigation.navigate('SignUpwithEmail')}
-                // onPress={() => navigation.navigate('Register')}
-              >
-                Create account
-              </Button>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    alignSelf: 'center',
+                  }}>
+                  Don't have an account?
+                </Text>
+                <Button
+                  mode="contained-tonal"
+                  compact
+                  textColor={theme.colors.onSecondary}
+                  buttonColor={theme.colors.secondary}
+                  theme={{roundness: 2}}
+                  style={{marginTop: '2%', paddingHorizontal: '1%'}}
+                  onPress={() => navigation.navigate('SignUpwithEmail')}>
+                  Create account
+                </Button>
+              </View>
             </View>
           )}
         </Formik>
       </ScrollView>
+
+      <Banner
+        visible={verificationBannerVisible}
+        actions={[
+          {
+            label: 'OK',
+            onPress: () => setVerificationBannerVisible(false),
+          },
+        ]}
+        icon={({size}) => (
+          <Image
+            source={{
+              uri: 'https://avatars3.githubusercontent.com/u/17571969?s=400&v=4',
+            }}
+            style={{
+              width: size,
+              height: size,
+            }}
+          />
+        )}>
+        {bannerMessage}
+      </Banner>
     </View>
   );
 };
@@ -174,9 +278,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: '5%',
     paddingVertical: '2%',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    backgroundColor: '#fff',
   },
   img: {
     width: 100,

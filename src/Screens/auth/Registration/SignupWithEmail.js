@@ -1,12 +1,18 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
-import {Input, Button} from 'react-native-elements';
-import {TextInput, Dialog, Paragraph, Portal} from 'react-native-paper';
+import {
+  TextInput,
+  Dialog,
+  Paragraph,
+  Portal,
+  useTheme,
+  Button,
+} from 'react-native-paper';
 
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {useNavigation} from '@react-navigation/native';
-import { useRegisterUserMutation } from '../../../redux/reducers/user/userThunk';
+import {useRegisterUserMutation} from '../../../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const validationSchema = Yup.object().shape({
@@ -27,56 +33,49 @@ const validationSchema = Yup.object().shape({
 
 const SignupWithEmail = () => {
   const navigation = useNavigation();
-  
+  const theme = useTheme();
+
   const [visible, setVisible] = useState(false);
   const [registerUser, {isLoading, isError, error}] = useRegisterUserMutation();
 
-  const submitHandler =async values => {
-    console.log("hello value", values)
-    const { data } = await registerUser({ 
+  const submitHandler = async values => {
+    const response = await registerUser({
       name: values.name,
       email: values.email,
       password: values.password,
       passwordConfirmation: values.passwordConfirmation,
-    })
-
-      console.log("hello data", data)
-
-      if(data?._id){
-      await AsyncStorage.setItem('isLoggedIn', 'login');
-      await AsyncStorage.setItem('id', data._id);
-      await AsyncStorage.setItem('token', data?.token);
-      await AsyncStorage.setItem('userId', data?._id);
-      // await AsyncStorage.setItem('name', data?.name);
-      // await AsyncStorage.setItem('email', data?.email);
-      console.log('user has been register =>', data);
-      navigation.navigate("Drawer");
+    });
+    if(response?.error?.status === 409 ){
+      setVisible(true);
+      return;
     }
-    if(!data?._id && isError){
-      console.log("error in login ", error)  
-      setVisible(true)
+   
+    if(response.data.message === "An Email sent to your account please verify" ){
+      navigation.navigate("Login", {message : response.data.message})
     }
-
+    
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#fff', padding: '2%'}}>
-
-      <Text style={{fontSize: 18, margin: '2%', fontWeight: '500'}}>
-        Enter your detail
-      </Text>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors.background,
+        padding: '2%',
+      }}>
       <Portal>
-        <Dialog visible={visible} onDismiss={()=>setVisible(true)}>
-            <Dialog.Title>Login Error</Dialog.Title>
-            <Dialog.Content>
-              <Paragraph>Something went wrong {error?.data?.message}</Paragraph>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={()=>setVisible(false)}>Ok</Button>
-            </Dialog.Actions>
-          </Dialog>
+        <Dialog visible={visible} onDismiss={() => setVisible(true)}>
+          <Dialog.Title>Login Error</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph> {error?.data?.message}</Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setVisible(false)}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
-      <ScrollView>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Formik
           initialValues={{
             name: '',
@@ -94,99 +93,167 @@ const SignupWithEmail = () => {
             errors,
             touched,
           }) => (
-            <View style={{marginVertical: '2%'}}>
-              <View>
-                <Input
-                  rightIcon={{type: 'font-awesome', name: 'user'}}
-                  label="Enter Your user name"
-                  placeholder="gulab"
-                  onChangeText={handleChange('name')}
-                  onBlur={handleBlur('name')}
-                  value={values.name}
-                  renderErrorMessage={true}
-                  errorMessage={
-                    errors.name && touched.name ? (
-                      <Text style={styles.error}>{errors.name}</Text>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
-              </View>
+            <View style={{margin: '2%'}}>
+              <View style={{marginTop: '5%'}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <View
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 100 / 2,
+                      borderWidth: 10,
+                      borderColor: '#097969',
+                    }}
+                  />
 
-              <View>
-                <Input
-                  rightIcon={{type: 'font-awesome', name: 'envelope'}}
-                  label="Enter Your email"
-                  placeholder="Email"
-                  onChangeText={handleChange('email')}
-                  onBlur={handleBlur('email')}
-                  value={values.email}
-                  renderErrorMessage={true}
-                  errorMessage={
-                    errors.email && touched.email ? (
-                      <Text style={styles.error}>{errors.email}</Text>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
+                  <View
+                    style={{
+                      width: 20,
+                      height: 20,
+                      alignSelf: 'flex-end',
+                      borderRadius: 100 / 2,
+                      backgroundColor: '#F77A55',
+                    }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    alignSelf: 'center',
+                    fontSize: 18,
+                    marginVertical: '2%',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                  }}>
+                  Application name
+                </Text>
               </View>
+              <Text
+                style={{
+                  // alignSelf: 'center',
+                  fontSize: 15,
+                  marginTop: '2%',
+                  fontWeight: '400',
+                  // textAlign: 'center',
+                }}>
+                Enter the following details to continue.
+              </Text>
 
-              <View>
-                <Input
-                  rightIcon={{type: 'font-awesome', name: 'lock'}}
-                  label="Password"
-                  placeholder="*********"
-                  onChangeText={handleChange('password')}
-                  onBlur={handleBlur('password')}
-                  value={values.password}
-                  renderErrorMessage={true}
-                  errorMessage={
-                    errors.password && touched.password ? (
-                      <Text style={styles.error}>{errors.password}</Text>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
-              </View>
+              <TextInput
+                label="Name"
+                placeholder="Enter Your user name here"
+                onChangeText={handleChange('name')}
+                onBlur={handleBlur('name')}
+                mode="outlined"
+                value={values.name}
+                activeOutlineColor={theme.colors.secondary}
+                error={errors.name && touched.name ? true : false}
+                style={{marginTop: '2%'}}
+              />
+              {errors.name && touched.name ? (
+                <Text style={{color: theme.colors.error}}>{errors.name}</Text>
+              ) : null}
 
-              <View>
-                <Input
-                  rightIcon={{type: 'font-awesome', name: 'check'}}
-                  label="Confirm password"
-                  placeholder="*********"
-                  onChangeText={handleChange('passwordConfirmation')}
-                  onBlur={handleBlur('passwordConfirmation')}
-                  value={values.passwordConfirmation}
-                  renderErrorMessage={true}
-                  errorMessage={
-                    errors.passwordConfirmation &&
-                    touched.passwordConfirmation ? (
-                      <Text style={styles.error}>
-                        {errors.passwordConfirmation}
-                      </Text>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
-              </View>
+              <TextInput
+                label="Email"
+                placeholder="Enter Your email here"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                mode="outlined"
+                value={values.email}
+                activeOutlineColor={theme.colors.secondary}
+                error={errors.email && touched.email ? true : false}
+                style={{marginTop: '2%'}}
+              />
+              {errors.email && touched.email ? (
+                <Text style={{color: theme.colors.error}}>{errors.email}</Text>
+              ) : null}
+
+              <TextInput
+                error={errors.password && touched.password ? true : false}
+                label="Password"
+                placeholder="Enter your password here"
+                mode="outlined"
+                secureTextEntry={true}
+                style={{marginVertical: '2%'}}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                activeOutlineColor={theme.colors.secondary}
+              />
+              {errors.password && touched.password ? (
+                <Text style={{color: theme.colors.error}}>
+                  {errors.password}
+                </Text>
+              ) : null}
+
+              <TextInput
+                error={errors.password && touched.password ? true : false}
+                label="Confirm password"
+                placeholder="Confirm your password"
+                mode="outlined"
+                secureTextEntry={true}
+                style={{marginVertical: '2%'}}
+                onChangeText={handleChange('passwordConfirmation')}
+                onBlur={handleBlur('passwordConfirmation')}
+                value={values.passwordConfirmation}
+                activeOutlineColor={theme.colors.secondary}
+              />
+              {errors.passwordConfirmation && touched.passwordConfirmation ? (
+                <Text style={{color: theme.colors.error}}>
+                  {errors.passwordConfirmation}
+                </Text>
+              ) : null}
 
               <Button
-                title={'Sign up'}
+                loading={isLoading}
+                disabled={isLoading}
+                style={{
+                  marginTop: '5%',
+                  padding: '1%',
+                }}
+                theme={{roundness: 1}}
+                mode="contained"
                 onPress={handleSubmit}
-                containerStyle={{
-                  width: '95%',
-                  alignSelf: 'center',
-                }}
-                buttonStyle={{
-                  backgroundColor: '#334C8C',
-                  height: 50,
-                  borderRadius: 5,
-                }}
-              />
+                buttonColor={theme.colors.secondary}>
+                Sign up
+              </Button>
+
+              <View
+                style={{
+                  marginTop: '10%',
+                  flexDirection: 'row',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-evenly',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    alignSelf: 'center',
+                    width: '58%',
+                  }}>
+                  Already have an account?
+                </Text>
+                <Button
+                  mode="contained-tonal"
+                  compact
+                  textColor={theme.colors.onSecondary}
+                  buttonColor={theme.colors.secondary}
+                  theme={{roundness: 2}}
+                  style={{
+                    marginTop: '2%',
+                    paddingHorizontal: '1%',
+                    width: '40%',
+                  }}
+                  onPress={() => navigation.navigate('Login')}>
+                  Sign in
+                </Button>
+              </View>
             </View>
           )}
         </Formik>

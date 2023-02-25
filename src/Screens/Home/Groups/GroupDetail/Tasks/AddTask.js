@@ -173,7 +173,6 @@ const AddTask = ({route, navigation}) => {
               right: 0,
               margin: 16,
             }}
-            // theme={{roundness:1}}
             label="Next"
             icon="arrow-right"
           />

@@ -50,6 +50,7 @@ export const App = () => {
     colors: { 
       ...PaperDefaultTheme?.colors, 
       ...NavigationDefaultTheme.colors,  
+      ...lightPalette
     },
 
   };
