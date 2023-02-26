@@ -1,7 +1,3 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
-import {baseURL} from '../../axios';
-
-// query
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-community/async-storage';
 

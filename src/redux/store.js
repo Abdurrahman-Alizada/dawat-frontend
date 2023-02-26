@@ -8,9 +8,11 @@ import friendshipSlice from './reducers/Friendship/friendshipSlice';
 
 import {InvitaionsApi} from './reducers/groups/invitations/invitaionThunk';
 import {groupApi} from './reducers/groups/groupThunk';
-import { TasksApi } from './reducers/groups/tasks/taskThunk';
-import { userApi } from './reducers/user/userThunk';
-import { friendshipApi } from './reducers/Friendship/friendshipThunk';
+import {TasksApi} from './reducers/groups/tasks/taskThunk';
+import {userApi} from './reducers/user/userThunk';
+import {friendshipApi} from './reducers/Friendship/friendshipThunk';
+import {ChatApi} from './reducers/groups/chat/chatThunk';
+
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -18,16 +20,24 @@ export const store = configureStore({
     tasks: taskReducer,
     chat: chatReducer,
     invitations: invitationSlice,
-    friendship : friendshipSlice,
+    friendship: friendshipSlice,
     [InvitaionsApi.reducerPath]: InvitaionsApi.reducer,
     [groupApi.reducerPath]: groupApi.reducer,
     [TasksApi.reducerPath]: TasksApi.reducer,
-    [userApi.reducerPath] : userApi.reducer,
-    [friendshipApi.reducerPath] : friendshipApi.reducer
+    [ChatApi.reducerPath]: ChatApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
+    [friendshipApi.reducerPath]: friendshipApi.reducer,
   },
 
   middleware: getdefaultMiddleware =>
     getdefaultMiddleware({
       serializableCheck: false,
-    }).concat([InvitaionsApi.middleware, groupApi.middleware, TasksApi.middleware, userApi.middleware, friendshipApi.middleware]),
+    }).concat([
+      InvitaionsApi.middleware,
+      groupApi.middleware,
+      TasksApi.middleware,
+      userApi.middleware,
+      friendshipApi.middleware,
+      ChatApi.middleware
+    ]),
 });
