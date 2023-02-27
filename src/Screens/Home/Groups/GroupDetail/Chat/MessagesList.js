@@ -30,7 +30,6 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
     downButtonHandler();
     getAllMessages();
   }, []);
-
   return (
     <View style={{flex: 1, backgroundColor: theme.colors.background}}>
       {messages.length > 0 ? (
@@ -48,7 +47,7 @@ const MessagesList = ({onSwipeToReply, groupId}) => {
               userId={message.addedBy?._id}
               message={message.content}
               onSwipe={onSwipeToReply}
-              pic={message.pic}
+              pic={message.addedBy.imgURL}
             />
           ))}
         </ScrollView>

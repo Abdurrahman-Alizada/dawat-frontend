@@ -3,31 +3,23 @@ import {
   StyleSheet,
   Modal,
   View,
-  ScrollView,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
-import {instance} from '../../../redux/axios';
 import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import DropDownPicker from 'react-native-dropdown-picker';
 import {
   Text,
   List,
   Avatar,
   TextInput,
-  Checkbox,
   IconButton,
-  Card,
   FAB,
-  Badge,
   useTheme,
   Button,
 } from 'react-native-paper';
 import AvatarModal from '../Menus/Profile/AvatarModal';
-import {useDispatch} from 'react-redux';
-import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),
@@ -35,21 +27,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddGroup = ({navigation, onClose}) => {
-  const [userId, setuserId] = React.useState(null);
 
-  const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
-  const [usersList, setUsersList] = useState([]);
 
-  const [items, setItems] = useState([]);
-  const getUserInfo = async () => {
-    let userId = await AsyncStorage.getItem('userId');
-    setuserId(userId);
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
 
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);

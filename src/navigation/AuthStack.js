@@ -3,7 +3,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import { 
   LoginScreen, 
-  RegistrationScreen,
   ForgotPasswordScreen,
   OTPScreen,
   ResetPasswordScreen,
@@ -21,15 +20,10 @@ const AuthStack = () => {
         component={LoginScreen}
         options={{headerShown:false, presentation:"modal"}}
        />
-      <Stack.Screen
-        name="Register"
-        options={{headerShown:false, presentation:"modal"}}
-        component={RegistrationScreen}
-       
-      />
+      
        <Stack.Screen
         name="SignUpwithEmail"
-        options={{presentation:"modal", title: 'Sign Up with Email'}}
+        options={{presentation:"modal", headerShown:false, title: 'Sign Up with Email'}}
         component={SignupWithEmail}
        
       />

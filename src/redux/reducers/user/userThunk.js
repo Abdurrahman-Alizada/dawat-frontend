@@ -22,7 +22,7 @@ export const userApi = createApi({
     
     registerUser : build.mutation({
       query: user => ({
-        url: `/api/account/register`,
+        url: `/api/account/user/register`,
         method: 'POST',
         body: {
           name : user.name,
@@ -36,7 +36,7 @@ export const userApi = createApi({
 
     loginUser : build.mutation({
       query: user => ({
-        url: `/api/account/login`,
+        url: `/api/account/user/login`,
         method: 'POST',
         body: {
           email : user.email,

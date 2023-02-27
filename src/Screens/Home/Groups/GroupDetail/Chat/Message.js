@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, Text, StyleSheet, Alert} from 'react-native';
-import {Avatar} from 'react-native-elements';
+import {Avatar} from 'react-native-paper';
 import moment from 'moment/moment';
 import {
   FlingGestureHandler,
@@ -15,15 +15,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const Message = ({time, message, onSwipe, addedBy, userId}) => {
+const Message = ({time, message, onSwipe, addedBy, userId, pic}) => {
   let uId = '';
-  const [isLeft, setIsLeft] = useState(false)
+  const [isLeft, setIsLeft] = useState(false);
   const getUser = async () => {
     uId = await AsyncStorage.getItem('userId');
-    if(uId == userId){
-      setIsLeft(false)
-    }else{
-      setIsLeft(true)
+    if (uId == userId) {
+      setIsLeft(false);
+    } else {
+      setIsLeft(true);
     }
   };
   useEffect(() => {
@@ -47,13 +47,12 @@ const Message = ({time, message, onSwipe, addedBy, userId}) => {
       return {
         color: 'darkgray',
       };
-    }else if(isLeft && type === 'userName'){
+    } else if (isLeft && type === 'userName') {
       return {
-        color: "darkgray",
-        display:"flex"
-      }
-    }
-     else {
+        color: 'darkgray',
+        display: 'flex',
+      };
+    } else {
       return {
         borderTopRightRadius: 0,
       };
@@ -86,35 +85,25 @@ const Message = ({time, message, onSwipe, addedBy, userId}) => {
         }
       }}>
       <Animated.View style={[styles.container, uas]}>
-       
         <View
           style={{
             flexDirection: isLeft ? 'row' : 'row-reverse',
             marginHorizontal: '2%',
           }}>
-          <Avatar
-            activeOpacity={0.2}
-            avatarStyle={{}}
-            containerStyle={{backgroundColor: '#BDBDBD'}}
-            icon={{}}
-            iconStyle={{}}
-            imageProps={{}}
-            onLongPress={() => alert('onLongPress')}
-            onPress={() => alert('onPress')}
-            overlayContainerStyle={{}}
-            placeholderStyle={{}}
-            rounded
-            size="small"
-            source={{
-              uri: 'https://media.istockphoto.com/photos/macaw-parrot-isolated-on-white-background-picture-id1328860045?b=1&k=20&m=1328860045&s=170667a&w=0&h=o24me3gyECkw5b_iKKrCiyowQYyAaW8q1cx8WUfwfoI=',
-            }}
-            title="P"
-            titleStyle={{}}
+          <Avatar.Image
+            size={30}
+            source={
+              pic
+                ? {uri: pic}
+                : require('../../../../../assets/drawer/male-user.png')
+            }
           />
-
           <View style={[styles.messageContainer, isOnLeft('messageContainer')]}>
             <View>
-            <Text style={[{fontSize:12, display:"none"}, isOnLeft("userName")]}>{addedBy?.name}</Text>
+              <Text
+                style={[{fontSize: 12, display: 'none'}, isOnLeft('userName')]}>
+                {addedBy?.name}
+              </Text>
               <View style={styles.messageView}>
                 <Text style={[styles.message, isOnLeft('message')]}>
                   {message}
@@ -148,7 +137,7 @@ const styles = StyleSheet.create({
     marginHorizontal: '1%',
     paddingTop: 5,
     paddingBottom: 10,
-    maxWidth:"85%"
+    maxWidth: '85%',
   },
   messageView: {
     backgroundColor: 'transparent',

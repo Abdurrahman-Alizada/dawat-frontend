@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View, Image} from 'react-native';
 import React from 'react';
-import {Button} from 'react-native-elements';
+import {Button} from 'react-native-paper';
 const CheckEmail = () => {
   return (
     <View style={{backgroundColor: '#fff', flex: 1, padding: '5%'}}>
@@ -34,32 +34,20 @@ const CheckEmail = () => {
 
       <View>
         <Button
-          title={'Open Email App'}
-          containerStyle={{
-            width: '95%',
-            alignSelf: 'center',
-          }}
-          buttonStyle={{
-            height: 50,
-            borderRadius: 5,
-            backgroundColor: '#334C8C',
-          }}
-        />
-
+          theme={{roundness: 2}}
+          // icon="camera"
+          mode="contained"
+          style={{marginVertical:"2%"}}
+          onPress={() => console.log('Pressed')}>
+          Open Email App
+        </Button>
         <Button
-          title={'Will do it Later'}
-          type="outline"
-          containerStyle={{
-            width: '95%',
-            alignSelf: 'center',
-          }}
-          titleStyle={{color: '#334C8C'}}
-          buttonStyle={{
-            height: 50,
-            borderColor: '#334C8C',
-            borderRadius: 5,
-          }}
-        />
+          theme={{roundness: 2}}
+          // icon="camera"
+          mode="outlined"
+          onPress={() => console.log('Pressed')}>
+          Will do it later
+        </Button>
       </View>
     </View>
   );

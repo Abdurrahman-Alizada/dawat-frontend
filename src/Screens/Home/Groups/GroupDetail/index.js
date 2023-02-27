@@ -7,7 +7,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
 import {Modalize} from 'react-native-modalize';
-import { useTheme, Banner } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 
 const Tab = createMaterialTopTabNavigator();
 
