@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     paddingVertical: Platform.OS === 'ios' ? 10 : 0,
     borderRadius: 30,
-    alignItems: 'center',
     justifyContent: 'space-between',
   },
   input: {
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     height: '10%',
-    alignSelf: 'center',
+    maxHeight:150
   },
   rightIconButtonStyle: {
     justifyContent: 'center',

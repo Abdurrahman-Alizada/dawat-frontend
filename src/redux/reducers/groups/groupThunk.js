@@ -2,11 +2,12 @@
 // query
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-community/async-storage';
+import { baseURL } from '../../axios';
 
 export const groupApi = createApi({
 
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://dawat-backend.onrender.com',
+    baseUrl: baseURL,
     prepareHeaders: async (headers, {getState}) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -15,22 +15,26 @@ import {
 } from '../../../../../redux/reducers/groups/chat/chatThunk';
 import ChatInput from './ChatInput';
 import Message from './Message';
+import { baseURL } from '../../../../../redux/axios';
+// for socket.io
+import io from "socket.io-client";
 
 const MessagesScreen = ({navigation}) => {
+  
   const dispatch = useDispatch();
   const theme = useTheme();
   const listRef = useRef();
   const [newMessage, setNewMessage] = useState('');
-
+  const [messages, setMessages] = useState([]);
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
 
-  const {data: messages, isLoading, refetch, isFetching, isError, error} =
+  const {data, isLoading, refetch, isFetching, isError, error} =
     useGetAllMessagesQuery({groupId: currentViewingGroup?._id});
 
-  const [addNewMessage, {isLoading: addNewMessageLoading}] =
+    const [addNewMessage, {isLoading: addNewMessageLoading}] =
     useAddNewMessageMutation();
 
   const handleAddNewMessage = () => {
@@ -41,14 +45,40 @@ const MessagesScreen = ({navigation}) => {
       addedBy: currentLoginUser?._id,
     })
       .then(res => {
-        console.log(res.data);
+        socket.emit("new message", res.data);
       })
       .catch(err => {
         console.log(err.message);
       });
   };
+     
 
-  
+  // socket
+
+  const ENDPOINT = baseURL;
+  let socket, selectedChatCompare;
+
+   useLayoutEffect(() => {
+    socket = io(ENDPOINT)
+    socket.emit("setup", currentLoginUser);
+    socket.emit("join chat", currentViewingGroup._id);
+  },[])
+
+  useEffect(()=>{
+    if(data){
+      setMessages(data)
+    }
+  },[data])
+
+  useEffect(()=>{
+    socket?.on("message received", (newMessageReceived) => {
+      console.log("new message", newMessageReceived.content)
+     setMessages(prevState => [...prevState, newMessageReceived])
+    });
+  },[messages])
+
+  // end
+
   return (
     <View style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
@@ -81,6 +111,8 @@ const MessagesScreen = ({navigation}) => {
         ) : (
           <FlatList
             data={messages}
+            // keyExtractor={item => item._id}
+            // initialNumToRender={10} 
             ref={listRef}
             ListEmptyComponent={() => (
               <View style={{flex: 1, alignItems: 'center'}}>
@@ -109,7 +141,7 @@ const MessagesScreen = ({navigation}) => {
               />
             )}
             refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+              <RefreshControl refreshing={isLoading} onRefresh={refetch} />
             }
           />
         )}
