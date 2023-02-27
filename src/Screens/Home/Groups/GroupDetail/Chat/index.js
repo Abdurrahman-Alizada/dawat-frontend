@@ -39,13 +39,20 @@ const MessagesScreen = ({navigation}) => {
 
   const handleAddNewMessage = () => {
     setNewMessage('');
+    setMessages(prevState => [...prevState, {
+      _id : Math.floor(Math.random() * 100) + 1,
+      content : newMessage,
+      addedBy : currentLoginUser,
+      group : currentViewingGroup,
+      createdAd : new Date()
+    } ])
     addNewMessage({
       content: newMessage,
       groupId: currentViewingGroup?._id,
       addedBy: currentLoginUser?._id,
     })
       .then(res => {
-        socket.emit("new message", res.data);
+        socket?.emit("new message", res.data);
       })
       .catch(err => {
         console.log(err.message);
@@ -57,11 +64,11 @@ const MessagesScreen = ({navigation}) => {
 
   const ENDPOINT = baseURL;
   let socket, selectedChatCompare;
-
+   
    useLayoutEffect(() => {
     socket = io(ENDPOINT)
-    socket.emit("setup", currentLoginUser);
-    socket.emit("join chat", currentViewingGroup._id);
+    socket?.emit("setup", currentLoginUser);
+    socket?.emit("join chat", currentViewingGroup._id);
   },[])
 
   useEffect(()=>{
