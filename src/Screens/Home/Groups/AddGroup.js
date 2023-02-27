@@ -1,17 +1,11 @@
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  View,
-} from 'react-native';
-import React, {useState, useEffect, useRef} from 'react';
+import {TouchableOpacity, StyleSheet, View} from 'react-native';
+import React, {useState, useRef} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
-import AsyncStorage from '@react-native-community/async-storage';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import {Modalize} from 'react-native-modalize';
 import {
   Text,
-  List,
   Avatar,
   TextInput,
   IconButton,
@@ -27,19 +21,15 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddGroup = ({navigation, onClose}) => {
-
   const [users, setUsers] = useState([]);
-
 
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isAddButtonDisable, setIsAddButtonDisable] = useState(false);
-  const [avatarURL, setAvatarURL] = useState("");
+  const [avatarURL, setAvatarURL] = useState('');
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   let openCamera = () => {
-    setModalVisible(!modalVisible);
+    onCloseModalize();
 
     ImagePicker.openCamera({
       // cropperCircleOverlay: true,
@@ -58,7 +48,7 @@ const AddGroup = ({navigation, onClose}) => {
   };
 
   let openGallery = () => {
-    setModalVisible(!modalVisible);
+    onCloseModalize();
 
     ImagePicker.openPicker({
       // cropperCircleOverlay: true,
@@ -81,7 +71,7 @@ const AddGroup = ({navigation, onClose}) => {
       .then(() => {
         setfileData(null);
         fileDataRef.current = null;
-        setAvatarURL(false)
+        setAvatarURL(false);
       })
       .catch(e => {
         console.log(e);
@@ -89,8 +79,6 @@ const AddGroup = ({navigation, onClose}) => {
   };
 
   const submitHandler = async values => {
-    setIsAddButtonDisable(true);
-
     if (fileDataRef.current) {
       const uri = fileDataRef.current?.path;
       const type = fileDataRef.current?.mime;
@@ -128,6 +116,15 @@ const AddGroup = ({navigation, onClose}) => {
 
   const theme = useTheme();
 
+  const modalizeRef = useRef(null);
+  const onOpenModalize = () => {
+    modalizeRef.current?.open();
+  };
+
+  const onCloseModalize = () => {
+    modalizeRef.current?.close();
+  };
+
   return (
     <View style={{flex: 1}}>
       <Formik
@@ -148,7 +145,7 @@ const AddGroup = ({navigation, onClose}) => {
           <View
             style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
             <View>
-              <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <TouchableOpacity onPress={onOpenModalize}>
                 {fileData ? (
                   <Avatar.Image
                     source={{uri: fileData.path}}
@@ -157,25 +154,23 @@ const AddGroup = ({navigation, onClose}) => {
                   />
                 ) : (
                   <View>
-                   {
-                    avatarURL ?
-                    <Avatar.Image
-                    source={{uri: avatarURL}}
-                    style={{alignSelf: 'center'}}
-                    size={100}
-                  />
-                    :
-                    <Avatar.Icon
-                      icon="account-circle-outline"
-                      style={{alignSelf: 'center'}}
-                      size={100}
-                    />
-                   }
-                  
+                    {avatarURL ? (
+                      <Avatar.Image
+                        source={{uri: avatarURL}}
+                        style={{alignSelf: 'center'}}
+                        size={100}
+                      />
+                    ) : (
+                      <Avatar.Icon
+                        icon="account-circle-outline"
+                        style={{alignSelf: 'center'}}
+                        size={100}
+                      />
+                    )}
                   </View>
                 )}
               </TouchableOpacity>
-              { (fileData || avatarURL) && (
+              {(fileData || avatarURL) && (
                 <Button
                   // style={{marginTop: '5%'}}
                   icon="delete"
@@ -194,7 +189,9 @@ const AddGroup = ({navigation, onClose}) => {
                 value={values.groupName}
               />
               {errors.groupName && touched.groupName ? (
-                <Text style={{color:theme.colors.error}}>{errors.groupName}</Text>
+                <Text style={{color: theme.colors.error}}>
+                  {errors.groupName}
+                </Text>
               ) : null}
 
               <TextInput
@@ -205,7 +202,9 @@ const AddGroup = ({navigation, onClose}) => {
                     : false
                 }
                 // placeholder="Group Description"
-                label={`Group Description (${ 99 - values.groupDescription.length})`}
+                label={`Group Description (${
+                  99 - values.groupDescription.length
+                })`}
                 mode="outlined"
                 multiline
                 maxLength={99}
@@ -232,69 +231,58 @@ const AddGroup = ({navigation, onClose}) => {
         )}
       </Formik>
 
-      <Modal
-        onBlur={() => setModalVisible(false)}
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={{
-           flex: 1,
-           justifyContent: 'flex-end',
-           alignItems: 'center',
-           backgroundColor:theme.colors.backdrop
-        }}>
-          <View
-            style={[styles.modalView, {position: 'absolute', width: '100%', backgroundColor:theme.colors.background}]}>
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
+        <View
+          style={{
+            paddingVertical: '8%',
+            paddingHorizontal: '5%',
+            flexDirection: 'row',
+            backgroundColor: theme.colors.background,
+          }}>
+          <View style={{alignItems: 'center'}}>
             <IconButton
-              style={{position: 'absolute', right: 5}}
-              icon="close-circle-outline"
-              // mode="outlined"
-              size={30}
-              onPress={() => setModalVisible(false)}
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
             />
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="camera-image"
-                mode="outlined"
-                size={40}
-                onPress={openCamera}
-              />
-              <Text>Camera</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="image-outline"
-                mode="outlined"
-                size={40}
-                onPress={openGallery}
-              />
-              <Text>Gallery</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="account-circle-outline"
-                mode="outlined"
-                size={40}
-                onPress={() => {
-                  setModalVisible(false);
-                  setAvatarModalVisible(true);
-                }}
-              />
-              <Text>Avatars</Text>
-            </View>
+            <Text>Camera</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
+            <Text>Gallery</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="account-circle-outline"
+              mode="outlined"
+              size={40}
+              onPress={() => {
+                onCloseModalize();
+                setAvatarModalVisible(true);
+              }}
+            />
+            <Text>Avatars</Text>
           </View>
         </View>
-      </Modal>
+      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal
           avatarModalVisible={avatarModalVisible}
+          onCloseModalize={onCloseModalize}
           setAvatarModalVisible={setAvatarModalVisible}
           setAvatarURL={setAvatarURL}
           setfileData={setfileData}
@@ -302,7 +290,6 @@ const AddGroup = ({navigation, onClose}) => {
           // imageUploadHandler={imageUploadHandler}
         />
       )}
-
     </View>
   );
 };
@@ -310,12 +297,6 @@ const AddGroup = ({navigation, onClose}) => {
 export default AddGroup;
 
 const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
   fab: {
     position: 'absolute',
     margin: 16,
@@ -324,17 +305,5 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
   },
 });

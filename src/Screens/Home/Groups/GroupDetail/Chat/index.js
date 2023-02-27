@@ -37,6 +37,37 @@ const MessagesScreen = ({navigation}) => {
     const [addNewMessage, {isLoading: addNewMessageLoading}] =
     useAddNewMessageMutation();
 
+  // socket
+
+  const ENDPOINT = baseURL;
+  let socket;
+  const [socket1, setSocket1] = useState(null);
+
+   useLayoutEffect(() => {
+    socket = io(ENDPOINT)
+    socket?.emit("setup", currentLoginUser);
+    socket?.emit("join chat", currentViewingGroup._id);
+    
+    setSocket1(io(ENDPOINT))
+  },[])
+
+  useEffect(()=>{
+    if(data){
+      setMessages(data)
+    }
+  },[data])
+
+  useEffect(()=>{
+    socket?.on("message received", (newMessageReceived) => {
+      if ( currentViewingGroup?._id !== newMessageReceived?.group?._id) {
+        return;
+      }
+     setMessages(prevState => [...prevState, newMessageReceived])
+    });
+  },[messages])
+
+  // end
+
   const handleAddNewMessage = () => {
     setNewMessage('');
     setMessages(prevState => [...prevState, {
@@ -52,40 +83,13 @@ const MessagesScreen = ({navigation}) => {
       addedBy: currentLoginUser?._id,
     })
       .then(res => {
-        socket?.emit("new message", res.data);
+        socket1?.emit("new message", res.data);
       })
       .catch(err => {
         console.log(err.message);
       });
   };
      
-
-  // socket
-
-  const ENDPOINT = baseURL;
-  let socket, selectedChatCompare;
-   
-   useLayoutEffect(() => {
-    socket = io(ENDPOINT)
-    socket?.emit("setup", currentLoginUser);
-    socket?.emit("join chat", currentViewingGroup._id);
-  },[])
-
-  useEffect(()=>{
-    if(data){
-      setMessages(data)
-    }
-  },[data])
-
-  useEffect(()=>{
-    socket?.on("message received", (newMessageReceived) => {
-      console.log("new message", newMessageReceived.content)
-     setMessages(prevState => [...prevState, newMessageReceived])
-    });
-  },[messages])
-
-  // end
-
   return (
     <View style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
