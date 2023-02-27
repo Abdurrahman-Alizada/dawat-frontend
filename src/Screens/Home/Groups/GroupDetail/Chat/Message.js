@@ -1,163 +1,167 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import {Avatar} from 'react-native-paper';
-import moment from 'moment/moment';
-import {
-  FlingGestureHandler,
-  Directions,
-  State,
-} from 'react-native-gesture-handler';
-import Animated, {
-  withSpring,
-  useAnimatedStyle,
-  useAnimatedGestureHandler,
-  useSharedValue,
-} from 'react-native-reanimated';
-import AsyncStorage from '@react-native-community/async-storage';
+import { View, Text, StyleSheet } from 'react-native'
+import { Avatar } from 'react-native-paper'
+import React from 'react'
+import moment from 'moment'
 
-const Message = ({time, message, onSwipe, addedBy, userId, pic}) => {
-  let uId = '';
-  const [isLeft, setIsLeft] = useState(false);
-  const getUser = async () => {
-    uId = await AsyncStorage.getItem('userId');
-    if (uId == userId) {
-      setIsLeft(false);
-    } else {
-      setIsLeft(true);
-    }
-  };
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const startingPosition = 0;
-  const x = useSharedValue(startingPosition);
-  const isOnLeft = type => {
-    if (isLeft && type === 'messageContainer') {
-      return {
-        alignSelf: 'flex-start',
-        backgroundColor: '#f0f0f0',
-        borderTopLeftRadius: 0,
-      };
-    } else if (isLeft && type === 'message') {
-      return {
-        color: '#000',
-      };
-    } else if (isLeft && type === 'time') {
-      return {
-        color: 'darkgray',
-      };
-    } else if (isLeft && type === 'userName') {
-      return {
-        color: 'darkgray',
-        display: 'flex',
-      };
-    } else {
-      return {
-        borderTopRightRadius: 0,
-      };
-    }
-  };
-
-  const eventHandler = useAnimatedGestureHandler({
-    onStart: (event, ctx) => {},
-    onActive: (event, ctx) => {
-      x.value = isLeft ? 50 : -50;
-    },
-    onEnd: (event, ctx) => {
-      x.value = withSpring(startingPosition);
-    },
-  });
-
-  const uas = useAnimatedStyle(() => {
-    return {
-      transform: [{translateX: x.value}],
-    };
-  });
-
+const Message = ({item, currentLoginUser, theme}) => {
   return (
-    <FlingGestureHandler
-      direction={Directions.LEFT}
-      onGestureEvent={eventHandler}
-      onHandlerStateChange={({nativeEvent}) => {
-        if (nativeEvent.state === State.ACTIVE) {
-          onSwipe(message, isLeft);
-        }
-      }}>
-      <Animated.View style={[styles.container, uas]}>
+    <View>
+    {item?.addedBy?._id === currentLoginUser._id ? (
+      <View
+        style={{
+          padding: 5,
+          marginTop: 5,
+          alignSelf: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+        }}>
         <View
           style={{
-            flexDirection: isLeft ? 'row' : 'row-reverse',
-            marginHorizontal: '2%',
+            backgroundColor: theme.colors.primary,
+            padding: 10,
+            marginHorizontal: '1%',
+            maxWidth: '80%',
+            borderRadius: 15,
+            alignSelf: 'flex-end',
           }}>
-          <Avatar.Image
-            size={30}
-            source={
-              pic
-                ? {uri: pic}
-                : require('../../../../../assets/drawer/male-user.png')
-            }
-          />
-          <View style={[styles.messageContainer, isOnLeft('messageContainer')]}>
-            <View>
-              <Text
-                style={[{fontSize: 12, display: 'none'}, isOnLeft('userName')]}>
-                {addedBy?.name}
-              </Text>
-              <View style={styles.messageView}>
-                <Text style={[styles.message, isOnLeft('message')]}>
-                  {message}
-                </Text>
-              </View>
-
-              <View style={styles.timeView}>
-                <Text style={[styles.time, isOnLeft('time')]}>
-                  {moment(time).startOf('hour').fromNow()}
-                </Text>
-              </View>
-            </View>
-          </View>
+          <View>
+          <Text style={{fontSize: 16, color: '#fff'}}>
+            {item.content}
+          </Text>
+          <Text
+            style={{
+              fontSize: 11,
+              color: "#dedede",
+              textAlign:"left"
+            }}>
+            {moment(item.createdAt).fromNow(true)} 
+          </Text>
         </View>
-      </Animated.View>
-    </FlingGestureHandler>
-  );
-};
+          <View
+            style={{
+              position: 'absolute',
+              backgroundColor: theme.colors.primary,
+              width: 20,
+              height: 25,
+              bottom: 0,
+              borderBottomLeftRadius: 25,
+              right: -10,
+            }}></View>
+
+          <View
+            style={{
+              position: 'absolute',
+              backgroundColor: theme.colors.background,
+              width: 20,
+              height: 35,
+              bottom: -6,
+              borderBottomLeftRadius: 18,
+              right: -20,
+            }}></View>
+        </View>
+        <Avatar.Image
+          size={35}
+          source={
+            item.imageURL
+              ? {uri: item.imageURL}
+              : require('../../../../../assets/drawer/male-user.png')
+          }
+        />
+      </View>
+    ) : (
+      <View
+        style={{
+          padding: 5,
+           flexDirection: 'row-reverse',
+          alignSelf: 'flex-start',
+          alignItems: 'flex-end',
+        }}>
+        <View
+          style={{
+            backgroundColor: theme.colors.secondary,
+            padding: 10,
+            borderRadius: 5,
+            maxWidth: '80%',
+            marginLeft: '2%',
+            alignSelf: 'flex-start',
+            borderRadius: 15,
+          }}>
+          <View>
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colors.surface,
+              justifyContent: 'center',
+            }}>
+            {item.content} 
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 11,
+              color: theme.colors.surfaceVariant,
+              textAlign:"right"
+            }}>
+            {moment(item.createdAt).fromNow(true)} 
+          </Text>
+          
+          </View>
+          <View style={[styles.leftArrow, {backgroundColor:theme.colors.secondary}]}></View>
+          <View style={[styles.leftArrowOverlap, {backgroundColor:theme.colors.background}]}></View>
+        </View>
+        <Avatar.Image
+          size={35}
+          source={
+            item.imageURL
+              ? {uri: item.imageURL}
+              : require('../../../../../assets/drawer/male-user.png')
+          }
+        />
+      </View>
+    )}
+  </View>
+  )
+}
+
+export default Message
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 10,
-    marginVertical: 5,
+  rightArrow: {
+    position: 'absolute',
+    width: 20,
+    height: 25,
+    bottom: 0,
+    borderBottomLeftRadius: 25,
+    right: -10,
   },
-  messageContainer: {
-    backgroundColor: '#1B5583',
-    // alignSelf: 'flex-end',
-    // flexDirection: 'row',
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    marginHorizontal: '1%',
-    paddingTop: 5,
-    paddingBottom: 10,
-    maxWidth: '85%',
+
+  rightArrowOverlap: {
+    position: 'absolute',
+    width: 20,
+    height: 35,
+    bottom: -6,
+    borderBottomLeftRadius: 18,
+    right: -20,
   },
-  messageView: {
-    backgroundColor: 'transparent',
-    // maxWidth: "88%",
+
+  /*Arrow head for recevied messages*/
+  leftArrow: {
+    position: 'absolute',
+    width: 20,
+    height: 25,
+    bottom: 0,
+    borderBottomRightRadius: 25,
+    left: -10,
   },
-  timeView: {
-    backgroundColor: 'transparent',
-    justifyContent: 'flex-end',
-    paddingLeft: 10,
-  },
-  message: {
-    color: 'white',
-    alignSelf: 'flex-start',
-    fontSize: 15,
-  },
-  time: {
-    color: 'lightgray',
-    alignSelf: 'flex-end',
-    fontSize: 10,
+
+  leftArrowOverlap: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    //backgroundColor:"green",
+    width: 20,
+    height: 35,
+    bottom: -6,
+    borderBottomRightRadius: 18,
+    left: -20,
   },
 });
-
-export default Message;

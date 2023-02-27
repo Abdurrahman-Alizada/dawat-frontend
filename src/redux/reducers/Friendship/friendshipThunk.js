@@ -1,11 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-
+import { baseURL } from '../../axios';
 export const friendshipApi = createApi({
 
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://dawat-backend.onrender.com',
+    baseUrl: baseURL,
     prepareHeaders: async (headers, {getState}) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {

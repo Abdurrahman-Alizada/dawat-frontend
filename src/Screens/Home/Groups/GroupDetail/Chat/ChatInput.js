@@ -15,71 +15,11 @@ import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
 
 import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
-const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
-  const dispatch = useDispatch();
-  // chat
-  const [message, setMessage] = useState('');
-  const [localMessage, setLocalMessage] = useState('');
-  let ws = React.useRef(
-    new WebSocket('wss://dawat-backend.onrender.com/'),
-  ).current;
-  // https://dawat-backend.herokuapp.com/
-  // gjb7gt.sse.codesandbox.io/
-  React.useEffect(() => {
-    ws.onopen = () => {
-      console.log('connected to the server');
-    };
-
-    ws.onclose = e => {
-      console.log('not connected to the server');
-    };
-
-    ws.onerror = e => {
-      console.log('error in socket', e);
-    };
-
-    ws.onmessage = async e => {
-      // console.log(e.data);
-      let userId = await AsyncStorage.getItem('userId');
-      let addedBy = {
-        _id: await AsyncStorage.getItem('userId'),
-        email: await AsyncStorage.getItem('email'),
-        name: await AsyncStorage.getItem("name")
-      };
-      dispatch(addChat({addedBy:addedBy , content:e.data}))
-    };
-  }, []);
-
-  const submitMessage = async () => {
-    let token = await AsyncStorage.getItem('token');
-    let userId = await AsyncStorage.getItem('userId');
-    
-    ws.send(message);
-    dispatch(
-      addNewMessage({
-        content: message,
-        groupId: groupId,
-        addedBy: userId,
-        token: token,
-      }),
-    );
-    setMessage('');
-  };
-  // end chat
-
+const ChatInput = ({message, setMessage, handleAddNewMessage}) => {
+  
   return (
     <View style={[styles.container]}>
-      {reply ? (
-        <View style={styles.replyContainer}>
-          <TouchableOpacity onPress={closeReply} style={styles.closeReply}>
-            <Icon name="close" color="#000" size={20} />
-          </TouchableOpacity>
-          <Text style={styles.title}>
-            Response to {isLeft ? username : 'Me'}
-          </Text>
-          <Text style={styles.reply}>{reply}</Text>
-        </View>
-      ) : null}
+      
       <KeyboardAvoidingView style={styles.innerContainer}>
         <View style={styles.inputAndMicrophone}>
           <TextInput
@@ -92,7 +32,7 @@ const ChatInput = ({reply, closeReply, isLeft, username, groupId}) => {
         </View>
         <TouchableOpacity
           disabled={message ? false : true}
-          onPress={submitMessage}
+          onPress={handleAddNewMessage}
           style={{
             backgroundColor: message ? '#003153' : '#d4cfcf',
             borderRadius: 50,
@@ -146,7 +86,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     paddingVertical: Platform.OS === 'ios' ? 10 : 0,
     borderRadius: 30,
-    alignItems: 'center',
     justifyContent: 'space-between',
   },
   input: {
@@ -156,7 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     height: '10%',
-    alignSelf: 'center',
+    maxHeight:150
   },
   rightIconButtonStyle: {
     justifyContent: 'center',
