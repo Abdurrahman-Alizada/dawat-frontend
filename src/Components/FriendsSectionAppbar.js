@@ -26,70 +26,49 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
   const closeMenu = () => setVisible(false);
   // end more menu
   return (
-    <>
-      {!isSearch ? (
-        <View>
-          <Appbar.Header elevated={true}>
-            <Appbar.BackAction
-              onPress={() => {
-                navigation.goBack();
-              }}
-            />
+      <Appbar.Header elevated={true}>
+        <Appbar.BackAction
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
 
-            <Appbar.Content
-              title="Friend requests"
-              titleStyle={{alignSelf: 'center'}}
-            />
-            <Appbar.Action
-              icon="magnify"
-              onPress={() => {
-                setIsSearch(!isSearch);
-              }}
-            />
+        <Appbar.Content
+          title="Friends circle"
+        />
+        <Appbar.Action
+          icon="magnify"
+          onPress={() => {
+            // setIsSearch(!isSearch);
+            navigation.navigate("FriendsSearch")
+          }}
+        />
 
-            <Menu
-              visible={visible}
-              onDismiss={closeMenu}
-              anchor={
-                <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
-              }>
-              <Menu.Item
-                leadingIcon="account-check"
-                onPress={async () => {
-                    closeMenu()
-                  navigation.navigate('SeeAllFriends');
-                }}
-                title="Your friends"
-              />
-              <Menu.Item
-                leadingIcon="account-arrow-right"
-                onPress={async () => {
-                    closeMenu()
-                  navigation.navigate('FriendsSuggestions');
-                }}
-                title="Suggestions"
-              />
-            </Menu>
-          </Appbar.Header>
-        </View>
-      ) : (
-        <View>
-          <Searchbar
-            placeholder="Search..."
-            onChangeText={updateSearch}
-            value={search}
-            icon="arrow-left"
-            onIconPress={BlurHandler}
-            cancelButtonTitle="cancel"
-            autoFocus
-            elevation={2}
-            // loading={true}
-            // onBlur={BlurHandler}
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={
+            <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
+          }>
+          <Menu.Item
+            leadingIcon="account-check"
+            onPress={async () => {
+                closeMenu()
+              navigation.navigate('SeeAllFriends');
+            }}
+            title="Your friends"
           />
-        </View>
-      )}
-    </>
-  );
+          <Menu.Item
+            leadingIcon="account-arrow-right"
+            onPress={async () => {
+                closeMenu()
+              navigation.navigate('FriendsSuggestions');
+            }}
+            title="Suggestions"
+          />
+        </Menu>
+      </Appbar.Header>
+   );
 };
 
 export default Header;

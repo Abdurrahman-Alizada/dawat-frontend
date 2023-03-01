@@ -151,6 +151,7 @@ const Social = ({navigation}) => {
           ) : (
             // list of those users from which request has been received
             <FlatList
+              keyExtractor={item => item._id}
               data={data?.requested}
               ListEmptyComponent={() => (
                 <View style={{marginTop: '60%', alignItems: 'center'}}>

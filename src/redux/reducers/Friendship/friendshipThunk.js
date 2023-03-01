@@ -57,6 +57,16 @@ export const friendshipApi = createApi({
       query: (userId) => `/api/friendship/getFriends/${userId}`,
       providesTags: ['Friend'],
     }),
+    // searchForFriend: build.query({
+    //   query: (searchQuery) => `/api/friendship/search/hello`,
+    //   // providesTags: ['Friend'],
+    // }),
+    searchForFriend : build.mutation({
+      query: (searchQuery) => ({
+        url: `/api/friendship/search/${searchQuery}`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
@@ -64,6 +74,7 @@ export const {
  useAcceptFriendRequestMutation,
  useDeclineFriendRequestMutation,
  useGetAllFriendsQuery,
+ useSearchForFriendMutation,
  useGetFriendsSuggestionMutation,
  useGetRequestesOfFriendsMutation,
  useSendFriendRequestMutation
