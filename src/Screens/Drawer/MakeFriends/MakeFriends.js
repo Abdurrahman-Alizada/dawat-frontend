@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Text,
   SegmentedButtons,
+  useTheme,
 } from 'react-native-paper';
 import {
   useGetAllFriendsQuery,
@@ -16,8 +17,14 @@ import {
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
 import Skeleton from '../../Skeletons/InvitationsList';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import RequestSent from './RequestSent';
+import PendingRequest from './PendingRequest';
 
 const Social = ({navigation}) => {
+  const Tab = createMaterialTopTabNavigator();
+  const theme = useTheme();
+
   const [isSearch, setIsSearch] = useState(false);
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
@@ -52,14 +59,43 @@ const Social = ({navigation}) => {
   const [value, setValue] = useState('requested');
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <FriendScetionAppBar
         isSearch={isSearch}
         setIsSearch={setIsSearch}
         // searchFilterFunction={searchFilterFunction}
       />
 
-      <SegmentedButtons
+      <Tab.Navigator
+        initialRouteName="PendingRequest"
+        screenOptions={{
+          tabBarLabelStyle: {
+            fontSize: 15,
+            fontWeight: 'bold',
+            textTransform: 'none',
+          },
+          tabBarStyle: {backgroundColor: theme.colors.elevation.level2},
+        }}>
+        <Tab.Screen
+          name="PendingRequest"
+          initialParams={{
+            data: data,
+          }}
+          options={{tabBarLabel: 'Friend requests'}}
+          component={PendingRequest}
+        />
+
+        <Tab.Screen
+          name="RequestSent"
+          initialParams={{
+            data: data,
+          }}
+          options={{tabBarLabel: 'Request sent'}}
+          component={RequestSent}
+        />
+      </Tab.Navigator>
+
+      {/* <SegmentedButtons
         value={value}
         onValueChange={setValue}
         buttons={[
@@ -74,9 +110,9 @@ const Social = ({navigation}) => {
             label: 'Request sent',
           },
         ]}
-      />
+      /> */}
 
-      {isLoading ? (
+      {/* {isLoading ? (
         <Skeleton />
       ) : (
         <View>
@@ -218,7 +254,7 @@ const Social = ({navigation}) => {
             />
           )}
         </View>
-      )}
+      )} */}
     </View>
   );
 };

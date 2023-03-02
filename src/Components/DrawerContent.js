@@ -88,9 +88,12 @@ export default function DrawerContent(props) {
           <List.Item
             title={user?.name}
             onPress={async () => {
-              navigation.navigate('Profile', {
-                id: await AsyncStorage.getItem('id'),
-              });
+              navigation.navigate(
+                'AppSettingsMain', {
+                  screen: 'Profile',
+                  params: { id: await AsyncStorage.getItem('id') },
+                }
+              )
             }}
             left={props => (
               <Avatar.Image

@@ -23,7 +23,7 @@ import {
   Text,
   useTheme,
   Chip,
-  FAB
+  FAB,
 } from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
@@ -34,7 +34,7 @@ import {
   useDeleteInvitiMutation,
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import moment from 'moment';
-
+import {Modalize} from 'react-native-modalize';
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
     .required('Inviti name is required')
@@ -250,12 +250,17 @@ const AddInviti = ({route, navigation}) => {
       });
   };
 
+  const modalizeRef = useRef(null);
+  const onOpenModalize = () => {
+    modalizeRef.current?.open();
+  };
+
+  const onCloseModalize = () => {
+    modalizeRef.current?.close();
+  };
+
   return (
-    <ScrollView
-      nestedScrollEnabled={true}
-      style={{marginVertical: '1%', paddingHorizontal: '5%'}}
-      contentContainerStyle={{flex:1}}
-      >
+    <View style={{paddingHorizontal: '5%', flex: 1}}>
       <Formik
         initialValues={{
           invitiName: currentInviti?.invitiName,
@@ -271,10 +276,10 @@ const AddInviti = ({route, navigation}) => {
           errors,
           touched,
         }) => (
-          <View style={{marginVertical: '2%', flex:1}}>
+          <View style={{marginVertical: '2%', flex: 1}}>
             <TouchableOpacity
               style={{width: '50%', alignSelf: 'center'}}
-              onPress={() => setModalVisible(true)}>
+              onPress={onOpenModalize}>
               {fileData ? (
                 <Avatar.Image
                   source={{uri: fileData.path}}
@@ -313,7 +318,7 @@ const AddInviti = ({route, navigation}) => {
             <TextInput
               error={errors.invitiName && touched.invitiName ? true : false}
               label="Name"
-              placeholder='Name of Person who will be invited'
+              placeholder="Name of Person who will be invited"
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiName')}
@@ -334,7 +339,7 @@ const AddInviti = ({route, navigation}) => {
                   : false
               }
               label="Description"
-              placeholder='Description about the person'
+              placeholder="Description about the person"
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiDescription')}
@@ -354,15 +359,16 @@ const AddInviti = ({route, navigation}) => {
                 {statuses.map((statuse, index) => (
                   <Chip
                     key={index}
-                    selected={selectedStauts === statuse.value ?  true : false}
-                    mode={selectedStauts === statuse.value ? "flat":"outlined"}
+                    selected={selectedStauts === statuse.value ? true : false}
+                    mode={
+                      selectedStauts === statuse.value ? 'flat' : 'outlined'
+                    }
                     style={{marginRight: '2%', marginVertical: '2%'}}
-                    onPress={() =>{
-                      setSelectedStatus(statuse.value)
-                      setStatus(statuse.value)
-                      setIsEditStart(true)
-                    } 
-                    }>
+                    onPress={() => {
+                      setSelectedStatus(statuse.value);
+                      setStatus(statuse.value);
+                      setIsEditStart(true);
+                    }}>
                     {statuse.label}
                   </Chip>
                 ))}
@@ -385,36 +391,84 @@ const AddInviti = ({route, navigation}) => {
               //   Update
               // </Button>
               <FAB
-              icon="check"
-              loading={updateLoading}
-              disabled={!isEditStart || updateLoading}
-              label={"Update"}
-              style={{
-                position: 'absolute',
-                margin: 16,
-                right: 0,
-                bottom: 0,
-              }}
-              onPress={handleSubmit}
+                icon="check"
+                loading={updateLoading}
+                disabled={!isEditStart || updateLoading}
+                label={'Update'}
+                style={{
+                  position: 'absolute',
+                  margin: 16,
+                  right: 0,
+                  bottom: 0,
+                }}
+                onPress={handleSubmit}
               />
-              ) : (
+            ) : (
               <FAB
-              icon="plus"
-              loading={isLoading}
-              disabled={isLoading}
-              label={"Add"}
-              style={{
-                position: 'absolute',
-                margin: 16,
-                right: 0,
-                bottom: 0,
-              }}
-              onPress={handleSubmit}
+                icon="plus"
+                loading={isLoading}
+                disabled={isLoading}
+                label={'Add'}
+                style={{
+                  position: 'absolute',
+                  margin: 16,
+                  right: 0,
+                  bottom: 0,
+                }}
+                onPress={handleSubmit}
               />
             )}
           </View>
         )}
       </Formik>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
+        <View
+          style={{
+            paddingVertical: '8%',
+            paddingHorizontal: '5%',
+            flexDirection: 'row',
+            backgroundColor: theme.colors.background,
+          }}>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
+            />
+            <Text>Camera</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
+            <Text>Gallery</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="account-circle-outline"
+              mode="outlined"
+              size={40}
+              onPress={() => {
+                onCloseModalize();
+                setAvatarModalVisible(true);
+              }}
+            />
+            <Text>Avatars</Text>
+          </View>
+        </View>
+      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal
@@ -424,76 +478,9 @@ const AddInviti = ({route, navigation}) => {
           setfileData={setfileData}
           fileDataRef={fileDataRef}
           setIsEditStart={setIsEditStart}
-          />
+        />
       )}
-
-      <Modal
-        onBlur={() => setModalVisible(false)}
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            backgroundColor: theme.colors.backdrop,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: 'white',
-              padding: '5%',
-              width: '100%',
-              backgroundColor: theme.colors.background,
-            }}>
-            <IconButton
-              style={{position: 'absolute', right: 5}}
-              icon="close-circle-outline"
-              // mode="outlined"
-              size={30}
-              onPress={() => setModalVisible(false)}
-            />
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="camera-image"
-                mode="outlined"
-                size={40}
-                onPress={openCamera}
-              />
-              <Text>Camera</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="image-outline"
-                mode="outlined"
-                size={40}
-                onPress={openGallery}
-              />
-              <Text>Gallery</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="account-circle-outline"
-                mode="outlined"
-                size={40}
-                onPress={() => {
-                  setModalVisible(false);
-                  setAvatarModalVisible(true);
-                }}
-              />
-              <Text>Avatars</Text>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </ScrollView>
+    </View>
   );
 };
 

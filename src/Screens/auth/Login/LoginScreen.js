@@ -56,7 +56,8 @@ const LoginScreen = ({navigation, route}) => {
       email: values.email,
       password: values.password,
     });
-
+   
+    console.log(response)
     if (response?.error) {
       setVisible(true);
     }

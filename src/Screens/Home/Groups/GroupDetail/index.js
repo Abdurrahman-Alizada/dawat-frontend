@@ -17,7 +17,6 @@ const Tabs = ({groupId}) => {
   return (
     <Tab.Navigator
       initialRouteName="Invitations"
-      style={{}}
       screenOptions={{
         // tabBarActiveTintColor: '#ffffff',
         tabBarLabelStyle: {fontSize: 15, fontWeight: 'bold', textTransform:"none"},

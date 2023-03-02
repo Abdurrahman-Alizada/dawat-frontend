@@ -28,9 +28,19 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
+import {Modalize} from 'react-native-modalize';
 
 export default ProfileIndex = ({route}) => {
   const theme = useTheme();
+  const modalizeRef = useRef(null);
+  const onOpenModalize = () => {
+    modalizeRef.current?.open();
+  };
+
+  const onCloseModalize = () => {
+    modalizeRef.current?.close();
+  };
+
   const {
     data: user,
     isError,
@@ -99,7 +109,7 @@ export default ProfileIndex = ({route}) => {
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   let openGallery = () => {
-    setModalVisible(!modalVisible);
+    onCloseModalize()
     ImagePicker.openPicker({
       // cropperCircleOverlay: true,
       width: 300,
@@ -115,12 +125,11 @@ export default ProfileIndex = ({route}) => {
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
-  };
+    onCloseModalize();
+    };
 
   let openCamera = () => {
-    setModalVisible(!modalVisible);
-
+      onCloseModalize()
     ImagePicker.openCamera({
       // cropperCircleOverlay: true,
       width: 300,
@@ -137,8 +146,8 @@ export default ProfileIndex = ({route}) => {
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
-  };
+  onCloseModalize()
+    };
   const imageUploadHandler = async () => {
     const id = await AsyncStorage.getItem('id');
 
@@ -207,7 +216,7 @@ export default ProfileIndex = ({route}) => {
               paddingVertical: '2%',
             }}>
             <TouchableOpacity
-              onPress={() => setModalVisible(true)}
+              onPress={onOpenModalize}
               style={{width: 130, alignSelf: 'center'}}>
               {fileDataRef.current ? (
                 <Avatar.Image
@@ -428,72 +437,53 @@ export default ProfileIndex = ({route}) => {
         {snakeBarMessage}
       </Snackbar>
 
-      <Modal
-        onBlur={() => setModalVisible(false)}
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
         <View
           style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            backgroundColor: theme.colors.backdrop,
+            paddingVertical: '8%',
+            paddingHorizontal: '5%',
+            flexDirection: 'row',
+            backgroundColor: theme.colors.background,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              padding: '5%',
-              position: 'absolute',
-              width: '100%',
-              backgroundColor:theme.colors.background
-            }}>
+          <View style={{alignItems: 'center'}}>
             <IconButton
-              style={{position: 'absolute', right: 5}}
-              icon="close-circle-outline"
-              // mode="outlined"
-              size={30}
-              onPress={() => setModalVisible(false)}
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
             />
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="camera-image"
-                mode="outlined"
-                size={40}
-                onPress={openCamera}
-              />
-              <Text>Camera</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="image-outline"
-                mode="outlined"
-                size={40}
-                onPress={openGallery}
-              />
-              <Text>Gallery</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="account-circle-outline"
-                mode="outlined"
-                size={40}
-                onPress={() => {
-                  setModalVisible(false);
-                  setAvatarModalVisible(true);
-                }}
-              />
-              <Text>Avatars</Text>
-            </View>
+            <Text>Camera</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
+            <Text>Gallery</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="account-circle-outline"
+              mode="outlined"
+              size={40}
+              onPress={() => {
+                onCloseModalize();
+                setAvatarModalVisible(true);
+              }}
+            />
+            <Text>Avatars</Text>
           </View>
         </View>
-      </Modal>
+      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal
