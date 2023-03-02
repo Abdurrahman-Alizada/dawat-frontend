@@ -460,7 +460,7 @@ const Index = ({route, navigation}) => {
 
       {editGroupName && (
         <View
-          style={{padding: '2%', backgroundColor: theme.colors.surfaceVariant}}>
+          style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
             label="Group name"
@@ -469,33 +469,55 @@ const Index = ({route, navigation}) => {
             onChangeText={text => {
               setName(text);
             }}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+           
           />
-          <View
+           <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
+              justifyContent: 'space-between',
               alignSelf: 'flex-end',
             }}>
             <Button
-              style={{width: '50%'}}
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
-              mode="text"
-              onPress={() => seteditGroupName(false)}>
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setName(groupName)
+                seteditGroupName(false);
+              }}>
               cancel
             </Button>
             <Button
-              style={{width: '50%'}}
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
               icon="check"
-              mode="text"
+              mode="contained"
               loading={isLoading}
-              onPress={() => handleSubmit()}>
+              onPress={() => handleSubmit()}
+              theme={{roundness: 1}}
+              disabled={
+                isLoading || name.length < 1
+              }>
               Ok
             </Button>
           </View>
+
         </View>
       )}
       {editGroupDescription && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
             label="Group Description"
@@ -505,8 +527,16 @@ const Index = ({route, navigation}) => {
             onChangeText={text => {
               setDescription(text);
             }}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+           
           />
-          <View
+          {/* <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
@@ -527,7 +557,45 @@ const Index = ({route, navigation}) => {
               onPress={() => handleSubmit()}>
               Ok
             </Button>
+          </View> */}
+        
+        <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: '2%',
+              justifyContent: 'space-between',
+              alignSelf: 'flex-end',
+            }}>
+            <Button
+              style={{width: '49%', marginRight: '1%'}}
+              icon="close"
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setDescription(groupDescription)
+                setEditGroupDescription(false);
+              }}>
+              cancel
+            </Button>
+            <Button
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
+              icon="check"
+              mode="contained"
+              loading={isLoading}
+              onPress={() => handleSubmit()}
+              theme={{roundness: 1}}
+              disabled={
+                isLoading || description.length < 1
+              }>
+              Ok
+            </Button>
           </View>
+
+
         </View>
       )}
 

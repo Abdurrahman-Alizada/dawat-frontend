@@ -7,10 +7,6 @@ const Index = ({navigation}) => {
   
   return (
     <View style={{}}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={()=>navigation.goBack()} />
-        <Appbar.Content title="Settings" />
-      </Appbar.Header>
       <List.Item
         title="Profile"
         left={props => <List.Icon {...props} icon="account" />}

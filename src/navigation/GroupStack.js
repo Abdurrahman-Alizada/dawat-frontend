@@ -39,7 +39,6 @@ const AppStack = () => {
         component={AddGroupMembers}
         options={{
           headerShown:false
-          // header: (props) => <GeneralAppbar title="Add group members" {...props} />,
         }}
       />
       <Stack.Screen

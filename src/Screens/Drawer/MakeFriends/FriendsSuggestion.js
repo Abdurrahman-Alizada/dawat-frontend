@@ -86,7 +86,7 @@ const FriendsSuggestions = ({navigation}) => {
     <View>
       {!isSearch ? (
         <Appbar.Header
-          style={{backgroundColor: theme.colors.elevation.level2}}
+          style={{backgroundColor: theme.colors.background}}
           elevated={true}>
           <Appbar.BackAction
             onPress={() => {

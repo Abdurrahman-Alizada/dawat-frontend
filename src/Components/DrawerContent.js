@@ -55,7 +55,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   return (
-    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.elevation.level2}}>
+    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.background}}>
       <View style={styles.drawerContent}>
         {isLoading ? (
           <List.Item

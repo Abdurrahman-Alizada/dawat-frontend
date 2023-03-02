@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, useTheme} from 'react-native-paper';
+import {AnimatedFAB, Divider, useTheme} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
@@ -101,8 +101,8 @@ const Groups = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <StatusBar
-        backgroundColor={theme.colors.elevation.level2}
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.background}
       />
 
       <Provider>
@@ -120,9 +120,9 @@ const Groups = ({navigation}) => {
             theme={theme}
           />
         )}
-
+        
         {!isLoading ? (
-          <View style={{flex: 1, backgroundColor:theme.colors.background}}>
+          <View style={{flex: 1, backgroundColor: theme.colors.background}}>
             <FlatList
               onScroll={onScroll}
               keyExtractor={item => item._id}
@@ -167,11 +167,7 @@ const Groups = ({navigation}) => {
         visible={true}
         animateFrom={'right'}
         iconMode={'static'}
-        style={[
-          styles.fabStyle,
-          {justifyContent: 'flex-end', alignItems: 'flex-end'},
-          fabStyle,
-        ]}
+        style={styles.fabStyle}
       />
     </View>
   );

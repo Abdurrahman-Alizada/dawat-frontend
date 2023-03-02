@@ -28,7 +28,6 @@ const AppStack = () => {
         component={FriendsSuggestions}
         options={{
           headerShown:false
-          // header : (props)=><GeneralAppBar title={"Friends Suggestions"} {...props} />
         }}
       />
       <Stack.Screen

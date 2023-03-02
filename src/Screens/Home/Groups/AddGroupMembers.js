@@ -109,7 +109,6 @@ const AddGroup = ({navigation, onClose, route}) => {
       setInclude(!include);
     };
     return (
-      <View>
         <List.Item
           onPress={add}
           title={itemProps.name}
@@ -136,7 +135,6 @@ const AddGroup = ({navigation, onClose, route}) => {
             />
           )}
         />
-      </View>
     );
   };
 
@@ -158,7 +156,7 @@ const AddGroup = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated={true}>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
