@@ -1,5 +1,5 @@
-import React,{useCallback, useMemo, useEffect} from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useCallback, useMemo, useEffect, useState} from 'react';
+import {StyleSheet, Text} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import SplashScreen from './src/Screens/SplashScreen/SplashScreen';
@@ -12,8 +12,9 @@ import {Provider} from 'react-redux';
 
 const Stack = createStackNavigator();
 
-import {LogBox } from 'react-native';
-import SplashScreen123 from 'react-native-splash-screen'
+import {LogBox} from 'react-native';
+import SplashScreen123 from 'react-native-splash-screen';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
 LogBox.ignoreLogs(['Possible Unhandled']);
@@ -28,30 +29,29 @@ import {
   // DarkTheme as PaperDarkTheme,
   MD3DarkTheme as PaperDarkTheme,
   MD3LightTheme as PaperDefaultTheme,
-
   Provider as PaperProvider,
+  Snackbar,
+  Tooltip,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
-import { lightPalette } from './src/GlobalStyles';
+import {lightPalette} from './src/GlobalStyles';
 export const App = () => {
- 
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   const CombinedDarkTheme = {
     ...PaperDarkTheme,
     ...NavigationDarkTheme,
-    colors: { ...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors },
+    colors: {...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors},
   };
 
   const CombinedDefaultTheme = {
     ...PaperDefaultTheme,
     ...NavigationDefaultTheme,
-    colors: { 
-      ...PaperDefaultTheme?.colors, 
-      ...NavigationDefaultTheme.colors,  
-      ...lightPalette
+    colors: {
+      ...PaperDefaultTheme?.colors,
+      ...NavigationDefaultTheme.colors,
+      ...lightPalette,
     },
-
   };
 
   let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
@@ -68,9 +68,13 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
-  useEffect(()=>{
+  useEffect(() => {
     SplashScreen123.hide();
-  },[])
+  }, []);
+
+  // internet connection information
+  const netInfo = useNetInfo();
+
   return (
     <PreferencesContext.Provider value={preferences}>
       <Provider store={store}>
@@ -102,6 +106,15 @@ export const App = () => {
                 options={{headerShown: false}}
               />
             </Stack.Navigator>
+
+          {/* snackbar for checking internet connection */}
+            <Snackbar
+              visible={!netInfo.isConnected}
+              duration={1000}
+              onDismiss={() => console.log('snackbar dismissed')}>
+              You are currently offline.
+            </Snackbar>
+
           </NavigationContainer>
         </PaperProvider>
       </Provider>
