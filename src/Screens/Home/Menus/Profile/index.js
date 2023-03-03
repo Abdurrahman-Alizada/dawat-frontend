@@ -28,9 +28,19 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
+import {Modalize} from 'react-native-modalize';
 
 export default ProfileIndex = ({route}) => {
   const theme = useTheme();
+  const modalizeRef = useRef(null);
+  const onOpenModalize = () => {
+    modalizeRef.current?.open();
+  };
+
+  const onCloseModalize = () => {
+    modalizeRef.current?.close();
+  };
+
   const {
     data: user,
     isError,
@@ -39,10 +49,10 @@ export default ProfileIndex = ({route}) => {
   } = useGetCurrentLoginUserQuery(route.params?.id);
 
   const [editNam, setEditName] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(user?.name);
 
   const [editEmail, setEditEmail] = useState(false);
-  const [email, setEmail] = useState(false);
+  const [email, setEmail] = useState(user?.email);
 
   const [editPassword, setEditPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
@@ -99,7 +109,7 @@ export default ProfileIndex = ({route}) => {
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   let openGallery = () => {
-    setModalVisible(!modalVisible);
+    onCloseModalize();
     ImagePicker.openPicker({
       // cropperCircleOverlay: true,
       width: 300,
@@ -115,12 +125,11 @@ export default ProfileIndex = ({route}) => {
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
+    onCloseModalize();
   };
 
   let openCamera = () => {
-    setModalVisible(!modalVisible);
-
+    onCloseModalize();
     ImagePicker.openCamera({
       // cropperCircleOverlay: true,
       width: 300,
@@ -137,7 +146,7 @@ export default ProfileIndex = ({route}) => {
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
+    onCloseModalize();
   };
   const imageUploadHandler = async () => {
     const id = await AsyncStorage.getItem('id');
@@ -199,7 +208,6 @@ export default ProfileIndex = ({route}) => {
   return (
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
-        <Header />
         {user ? (
           <List.Section
             style={{
@@ -207,7 +215,7 @@ export default ProfileIndex = ({route}) => {
               paddingVertical: '2%',
             }}>
             <TouchableOpacity
-              onPress={() => setModalVisible(true)}
+              onPress={onOpenModalize}
               style={{width: 130, alignSelf: 'center'}}>
               {fileDataRef.current ? (
                 <Avatar.Image
@@ -322,28 +330,52 @@ export default ProfileIndex = ({route}) => {
       </View>
 
       {editNam && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             label="Enter name"
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
             autoFocus={true}
             mode="outlined"
             value={name}
             onChangeText={text => setName(text)}
           />
+
           <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
+              justifyContent: 'space-between',
               alignSelf: 'flex-end',
             }}>
-            <Button icon="close" mode="text" onPress={() => setEditName(false)}>
+            <Button
+              style={{width: '49%', marginRight: '1%'}}
+              icon="close"
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setName(user?.name);
+                setEditName(false);
+              }}>
               cancel
             </Button>
             <Button
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
               icon="check"
-              mode="text"
+              mode="contained"
               loading={updateNameLoading}
-              onPress={() => editNameHandler()}>
+              onPress={() => editNameHandler()}
+              theme={{roundness: 1}}
+              disabled={updateNameLoading || name.length < 1}>
               Ok
             </Button>
           </View>
@@ -351,31 +383,52 @@ export default ProfileIndex = ({route}) => {
       )}
 
       {editEmail && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             label="Enter email"
             autoFocus={true}
             mode="outlined"
             value={email}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
             onChangeText={text => setEmail(text)}
           />
+
           <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
+              justifyContent: 'space-between',
               alignSelf: 'flex-end',
             }}>
             <Button
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
-              mode="text"
-              onPress={() => setEditEmail(false)}>
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setEmail(user?.email);
+                setEditEmail(false);
+              }}>
               cancel
             </Button>
             <Button
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
               icon="check"
-              mode="text"
+              mode="contained"
               loading={updateEmailLoading}
-              onPress={() => editEmailHandler()}>
+              onPress={() => editEmailHandler()}
+              theme={{roundness: 1}}
+              disabled={updateEmailLoading || email.length < 1}>
               Ok
             </Button>
           </View>
@@ -383,38 +436,69 @@ export default ProfileIndex = ({route}) => {
       )}
 
       {editPassword && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             label="Enter old password"
             autoFocus={true}
             mode="outlined"
             value={oldPassword}
             onChangeText={text => setOldPassword(text)}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+            
           />
           <TextInput
             label="Enter new password"
-            style={{marginTop: '2%'}}
             mode="outlined"
             value={newPassword}
             onChangeText={text => setNewPassword(text)}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+            
           />
           <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
+              justifyContent: 'space-between',
               alignSelf: 'flex-end',
             }}>
             <Button
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
-              mode="text"
-              onPress={() => setEditPassword(false)}>
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setEditPassword(false);
+              }}>
               cancel
             </Button>
             <Button
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
               icon="check"
-              mode="text"
+              mode="contained"
               loading={updatePasswordLoading}
-              onPress={() => editPasswordHandler()}>
+              onPress={() => editPasswordHandler()}
+              theme={{roundness: 1}}
+              disabled={
+                updatePasswordLoading ||
+                newPassword.length < 1 ||
+                newPassword === oldPassword
+              }>
               Ok
             </Button>
           </View>
@@ -428,72 +512,53 @@ export default ProfileIndex = ({route}) => {
         {snakeBarMessage}
       </Snackbar>
 
-      <Modal
-        onBlur={() => setModalVisible(false)}
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
         <View
           style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            backgroundColor: theme.colors.backdrop,
+            paddingVertical: '8%',
+            paddingHorizontal: '5%',
+            flexDirection: 'row',
+            backgroundColor: theme.colors.background,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              padding: '5%',
-              position: 'absolute',
-              width: '100%',
-              backgroundColor:theme.colors.background
-            }}>
+          <View style={{alignItems: 'center'}}>
             <IconButton
-              style={{position: 'absolute', right: 5}}
-              icon="close-circle-outline"
-              // mode="outlined"
-              size={30}
-              onPress={() => setModalVisible(false)}
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
             />
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="camera-image"
-                mode="outlined"
-                size={40}
-                onPress={openCamera}
-              />
-              <Text>Camera</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="image-outline"
-                mode="outlined"
-                size={40}
-                onPress={openGallery}
-              />
-              <Text>Gallery</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="account-circle-outline"
-                mode="outlined"
-                size={40}
-                onPress={() => {
-                  setModalVisible(false);
-                  setAvatarModalVisible(true);
-                }}
-              />
-              <Text>Avatars</Text>
-            </View>
+            <Text>Camera</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
+            <Text>Gallery</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="account-circle-outline"
+              mode="outlined"
+              size={40}
+              onPress={() => {
+                onCloseModalize();
+                setAvatarModalVisible(true);
+              }}
+            />
+            <Text>Avatars</Text>
           </View>
         </View>
-      </Modal>
+      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal

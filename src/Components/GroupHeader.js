@@ -6,6 +6,7 @@ import {
   Appbar,
   Searchbar,
   Avatar,
+  useTheme,
   Text,
 } from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -15,7 +16,8 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
-
+  const theme = useTheme();
+  
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
       return user.name;
@@ -49,7 +51,9 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
       {!isSearch ? (
         <Appbar
           elevated={true}
-          style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+          style={{flexDirection: 'row', justifyContent: 'flex-start', backgroundColor: theme.colors.background}}
+          
+          >
           <View>
             <Appbar.BackAction onPress={() => navigation.goBack()} />
           </View>

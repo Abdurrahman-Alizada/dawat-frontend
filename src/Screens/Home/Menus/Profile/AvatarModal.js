@@ -62,7 +62,6 @@ const AvatarModal = props => {
         {avatarsURL.map((avatarURL, index) => (
           <TouchableOpacity
             onPress={() => {
-              props?.setfileData(null);
               props.fileDataRef.current = null;
               setSelectedAvatar(avatarURL);
               props.setAvatarURL(avatarURL);

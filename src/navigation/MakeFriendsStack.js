@@ -5,7 +5,7 @@ import GeneralAppBar from '../Components/GeneralAppbar'
 import MakeFriends from '../Screens/Drawer/MakeFriends/MakeFriends';
 import AllFriends from '../Screens/Drawer/MakeFriends/SeeAllFriends';
 import FriendsSuggestions from '../Screens/Drawer/MakeFriends/FriendsSuggestion';
-
+import FriendsSearch from '../Screens/Drawer/MakeFriends/FriendsSearch';
 const Stack = createStackNavigator();
 
 const AppStack = () => {
@@ -27,7 +27,15 @@ const AppStack = () => {
         name="FriendsSuggestions"
         component={FriendsSuggestions}
         options={{
-          header : (props)=><GeneralAppBar title={"Friends Suggestions"} {...props} />
+          headerShown:false
+        }}
+      />
+      <Stack.Screen
+        name="FriendsSearch"
+        component={FriendsSearch}
+        options={{
+          headerShown:false,
+          presentation:"modal"
         }}
       />
     </Stack.Navigator>

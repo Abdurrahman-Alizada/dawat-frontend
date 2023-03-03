@@ -55,7 +55,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   return (
-    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.elevation.level2}}>
+    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.background}}>
       <View style={styles.drawerContent}>
         {isLoading ? (
           <List.Item
@@ -88,9 +88,12 @@ export default function DrawerContent(props) {
           <List.Item
             title={user?.name}
             onPress={async () => {
-              navigation.navigate('Profile', {
-                id: await AsyncStorage.getItem('id'),
-              });
+              navigation.navigate(
+                'AppSettingsMain', {
+                  screen: 'Profile',
+                  params: { id: await AsyncStorage.getItem('id') },
+                }
+              )
             }}
             left={props => (
               <Avatar.Image

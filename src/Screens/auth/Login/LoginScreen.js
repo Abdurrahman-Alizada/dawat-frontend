@@ -56,7 +56,8 @@ const LoginScreen = ({navigation, route}) => {
       email: values.email,
       password: values.password,
     });
-
+   
+    console.log(response)
     if (response?.error) {
       setVisible(true);
     }
@@ -238,8 +239,7 @@ const LoginScreen = ({navigation, route}) => {
                   buttonColor={theme.colors.secondary}
                   theme={{roundness: 2}}
                   style={{marginTop: '2%', paddingHorizontal: '1%'}}
-                  // onPress={() => navigation.navigate('SignUpwithEmail')}>
-                  onPress={() => navigation.navigate('ForgotPassword')}>
+                  onPress={() => navigation.navigate('SignUpwithEmail')}>
                   Create account
                 </Button>
               </View>

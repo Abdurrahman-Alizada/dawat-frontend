@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import React, {useState} from 'react';
-import Skeleton from '../../Skeletons/InvitationsList';
+import React, {useState, useEffect} from 'react';
+//   import Skeleton from '../../Skeletons/InvitationsList';
+import Skeleton from '../../../../Skeletons/InvitationsList';
 import {
   Text,
   FAB,
@@ -19,83 +20,110 @@ import {
   Divider,
   Checkbox,
   useTheme,
+  ActivityIndicator,
 } from 'react-native-paper';
-import {useGetAllFriendsQuery} from '../../../redux/reducers/Friendship/friendshipThunk';
-import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
-
-import {useSelector} from 'react-redux';
+import {useGetAllFriendsQuery} from '../../../../../redux/reducers/Friendship/friendshipThunk';
+import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
+import {useAddUserToGroupMutation} from '../../../../../redux/reducers/groups/groupThunk';
+import {useSelector, useDispatch} from 'react-redux';
+import {useRef} from 'react';
+import {useLayoutEffect} from 'react';
 
 const AddGroup = ({navigation, onClose, route}) => {
-  const {
-    groupName,
-    groupDescription,
-    imageURL,
-    isChat,
-    isInvitations,
-    isMute,
-    isTasks,
-  } = route.params;
   const theme = useTheme();
-  const [isSearch, setIsSearch] = useState(false);
+  const dispatch = useDispatch();
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
+  const currentViewingGroup = useSelector(
+    state => state.groups?.currentViewingGroup,
+  );
   const {data, isLoading, refetch, isFetching, isError, error} =
     useGetAllFriendsQuery(currentLoginUser?._id);
 
-  const [addGroup, {isLoading: addGroupLoading}] = useAddGroupMutation();
+  const [friends, setFriends] = useState(data?.accepted);
+
+  const [addUserToGroup, {isLoading: addUserLoading}] =
+    useAddUserToGroupMutation();
 
   const [users, setUsers] = useState([]);
   const [userIds, setUserIds] = useState([]);
 
-  const submitHandler = async () => {
-    if (route.params.data) {
-      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-        method: 'post',
-        body: route.params.data,
-      })
-        .then(res => res.json())
-        .then(async data => {
-          await addGroup({
-            groupName: groupName,
-            groupDescription: groupDescription,
-            imageURL: data.secure_url,
-            isChat: isChat,
-            isTasks: isTasks,
-            isInvitations: isInvitations,
-            isMute: isMute,
-            members: userIds,
-          })
-            .then(res => {
-              navigation.navigate('HomeIndex');
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        })
-        .catch(err => {
-          console.log('An Error Occured While Uploading group image', err);
-          return;
-        });
-    } else {
-      await addGroup({
-        groupName: groupName,
-        groupDescription: groupDescription,
-        imageURL: imageURL,
-        isChat: isChat,
-        isTasks: isTasks,
-        isInvitations: isInvitations,
-        isMute: isMute,
-        members: userIds,
+  const handleAddMember = async () => {
+    for (let i = 0; i < users.length; i++) {
+      addUserToGroup({
+        chatId: currentViewingGroup._id,
+        userId: users,
       })
         .then(res => {
-          navigation.navigate('HomeIndex');
+          console.log(res);
+          dispatch(handleCurrentViewingGroup(res.data));
+          navigation.navigate('SingleGroupSettings');
         })
-        .catch(err => {
-          console.log(err);
+        .catch(e => {
+          console.log('error in handleAddMember', e);
         });
     }
   };
 
+  const getResponsibles = () => {
+    if (friends) {
+      for (let i = 0; i < currentViewingGroup.users?.length; i++) {
+        let foundUser = friends.find(
+          e => e._id === currentViewingGroup?.users[i]?._id,
+        );
+        if (foundUser) {
+          setFriends(friends.filter(friend => friend._id !== foundUser._id));
+        }
+      }
+    }
+  };
+
+    // search
+    const [search, setSearch] = useState('');
+    const [isSearch, setIsSearch] = useState(false);
+    const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to group");
+    const [filteredDataSource, setFilteredDataSource] = useState([]);
+    const [masterDataSource, setMasterDataSource] = useState([]);
+  
+    const updateSearch = search => {
+      setSearch(search);
+      searchFilterFunction(search);
+    };
+  
+    const searchFilterFunction = text => {
+      setMasterDataSource(friends);
+      setFilteredDataSource(friends);
+      if (text) {
+        const newData = masterDataSource?.filter(item => {
+          const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+          const textData = text.toUpperCase();
+          return itemData.indexOf(textData) > -1;
+        });
+        if (!newData?.length) {
+          setListEmptyText('Nothing found.');
+        }
+        setFilteredDataSource(newData);
+      } 
+      else {
+        setFilteredDataSource(masterDataSource);
+      }
+    };
+  
+    const getHighlightedText = result =>
+    result.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
+      return (
+        <Text
+          key={index}
+          style={
+            piece.toLocaleLowerCase() == search.toLocaleLowerCase()
+              ? {backgroundColor: 'yellow', color: '#000'}
+              : {}
+          }>
+          {piece}
+        </Text>
+      );
+    });
+  
   const Item = ({itemProps}) => {
     const [include, setInclude] = useState(userIds.includes(itemProps._id));
     const add = () => {
@@ -106,12 +134,15 @@ const AddGroup = ({navigation, onClose, route}) => {
         setUserIds([...userIds, itemProps._id]);
         setUsers([...users, itemProps]);
       }
+
       setInclude(!include);
     };
     return (
+      <View>
         <List.Item
           onPress={add}
-          title={itemProps.name}
+          // title={itemProps.name}
+          title={getHighlightedText(itemProps.name)}
           // description={itemProps.email}
           left={props => (
             <View>
@@ -122,7 +153,7 @@ const AddGroup = ({navigation, onClose, route}) => {
                 source={
                   itemProps?.imageURL
                     ? {uri: itemProps?.imageURL}
-                    : require('../../../assets/drawer/userImage.png')
+                    : require('../../../../../assets/drawer/userImage.png')
                 }
               />
             </View>
@@ -135,9 +166,9 @@ const AddGroup = ({navigation, onClose, route}) => {
             />
           )}
         />
+      </View>
     );
   };
-
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
@@ -145,18 +176,17 @@ const AddGroup = ({navigation, onClose, route}) => {
           <Searchbar
             elevation={6}
             placeholder="Search"
-            icon={'arrow-left'}
+            icon={'close'}
             autoFocus
-            // loading={true}
             onIconPress={() => {
               setIsSearch(false);
             }}
-            // onChangeText={onChangeSearch}
-            // value={searchQuery}
+            onChangeText={updateSearch}
+            value={search}
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated={true}>
+        <Appbar.Header elevated={true}>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
@@ -166,6 +196,7 @@ const AddGroup = ({navigation, onClose, route}) => {
           <Appbar.Action
             icon="magnify"
             onPress={() => {
+              setFilteredDataSource(friends)
               setIsSearch(true);
             }}
           />
@@ -176,8 +207,10 @@ const AddGroup = ({navigation, onClose, route}) => {
         <Skeleton />
       ) : (
         <FlatList
-          data={data?.accepted}
+          // data={friends}
+          data={isSearch ? filteredDataSource : friends}
           // stickyHeaderHiddenOnScroll
+          onContentSizeChange={getResponsibles}
           stickyHeaderIndices={[0]}
           ListHeaderComponent={() => (
             <View style={{backgroundColor: theme.colors.background}}>
@@ -216,8 +249,8 @@ const AddGroup = ({navigation, onClose, route}) => {
           )}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>You don't have any friend yet</Text>
-              <Text>Please refresh or search for new friends</Text>
+              <Text>{listEmptyText}</Text>
+              <Text>Refresh or search for new friends</Text>
               <Button
                 icon="refresh"
                 mode="contained"
@@ -225,14 +258,13 @@ const AddGroup = ({navigation, onClose, route}) => {
                 onPress={refetch}>
                 Refresh
               </Button>
-              {/* <Button
-              icon="account-search"
-              mode="text"
-              style={{marginTop: '5%',marginHorizontal:"2%"}}
-              onPress={()=>navigation.navigate('FriendsSuggestions')}
-              >
-              Search for friends
-            </Button> */}
+              <Button
+                icon="account-search"
+                mode="text"
+                style={{marginTop: '5%', marginHorizontal: '2%'}}
+                onPress={() => navigation.navigate("MakeFriends", {screen : 'FriendsSuggestions'})}>
+                Search for friends
+              </Button>
             </View>
           )}
           renderItem={({item}) => <Item itemProps={item} />}
@@ -246,9 +278,9 @@ const AddGroup = ({navigation, onClose, route}) => {
         icon="check"
         label="Add"
         style={styles.fab}
-        disabled={addGroupLoading}
-        loading={addGroupLoading}
-        onPress={submitHandler}
+        disabled={addUserLoading || users.length < 1}
+        loading={addUserLoading}
+        onPress={handleAddMember}
       />
     </View>
   );

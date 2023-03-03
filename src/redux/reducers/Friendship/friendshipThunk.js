@@ -1,11 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-
+import { baseURL } from '../../axios';
 export const friendshipApi = createApi({
 
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://dawat-backend.onrender.com',
+    baseUrl: baseURL,
     prepareHeaders: async (headers, {getState}) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
@@ -57,6 +57,16 @@ export const friendshipApi = createApi({
       query: (userId) => `/api/friendship/getFriends/${userId}`,
       providesTags: ['Friend'],
     }),
+    // searchForFriend: build.query({
+    //   query: (searchQuery) => `/api/friendship/search/hello`,
+    //   // providesTags: ['Friend'],
+    // }),
+    searchForFriend : build.mutation({
+      query: (searchQuery) => ({
+        url: `/api/friendship/search/${searchQuery}`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
@@ -64,6 +74,7 @@ export const {
  useAcceptFriendRequestMutation,
  useDeclineFriendRequestMutation,
  useGetAllFriendsQuery,
+ useSearchForFriendMutation,
  useGetFriendsSuggestionMutation,
  useGetRequestesOfFriendsMutation,
  useSendFriendRequestMutation

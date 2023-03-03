@@ -3,22 +3,14 @@ import {StyleSheet, View} from 'react-native';
 import {Menu, Divider, Appbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 
-const Header = ({ onOpen, group}) => {
+const Header = ({onOpen, group}) => {
   const navigation = useNavigation();
-  
-  return (
-    <>
-        <View>
-          <Appbar.Header>
-            <Appbar.BackAction onPress={() => navigation.goBack()} />
-            <Appbar.Content
-              title="Profile"
-              titleStyle={{alignSelf: 'center'}}
-            />
 
-          </Appbar.Header>
-        </View>
-    </>
+  return (
+    <Appbar.Header>
+      <Appbar.BackAction onPress={() => navigation.goBack()} />
+      <Appbar.Content title="Profile" titleStyle={{alignSelf: 'center'}} />
+    </Appbar.Header>
   );
 };
 

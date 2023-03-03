@@ -4,12 +4,10 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  Modal,
 } from 'react-native';
 import React, {useState, useCallback, useRef, useEffect} from 'react';
 import {
   Avatar,
-  Modal as PaperModal,
   TextInput,
   Button,
   List,
@@ -20,21 +18,18 @@ import {
   Snackbar,
   Checkbox,
   Searchbar,
-  FAB,
-  Portal,
   useTheme,
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
   useDeleteGroupForUserMutation,
-  useAddUserToGroupMutation,
 } from '../../../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from '../../../Menus/Profile/AvatarModal';
-import {instance} from '../../../../../redux/axios';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
+import {Modalize} from 'react-native-modalize';
 // imports end
 
 const Index = ({route, navigation}) => {
@@ -45,16 +40,13 @@ const Index = ({route, navigation}) => {
     state => state.groups?.currentViewingGroup,
   );
   // component state - start
-  // const {users, groupName, _id, groupDescription} = route?.params?.group?.group;
   const {users, groupName, _id, groupDescription} = currentViewingGroup;
-  const [memberUsers, setMemberUsers] = useState(users);
   const [name, setName] = useState(groupName);
   const [description, setDescription] = useState(groupDescription);
   const [userId, setUserId] = useState('');
 
   // image uploading state
   const [modalVisible, setModalVisible] = useState(false);
-  const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
   // const [avatarURL, setAvatarURL] = useState( route?.params?.group?.group.imageURL,);
   const [avatarURL, setAvatarURL] = useState(currentViewingGroup.imageURL);
@@ -69,11 +61,6 @@ const Index = ({route, navigation}) => {
   const [editGroupDescription, setEditGroupDescription] = useState(false);
 
   // add member to group
-  const [visible, setVisible] = useState(false);
-  const [allMembers, setAllMembers] = useState([]);
-  const [filteredAllMembers, setfilteredAllMembers] = useState([]);
-
-  const [selectedMembers, setSelectedMembers] = useState([]);
   const modalizeRef = useRef(null);
 
   // show more for description
@@ -83,14 +70,10 @@ const Index = ({route, navigation}) => {
     setTextShown(!textShown);
   };
 
-  // component state - end
-
   // redux toolkit - start
   const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
     useDeleteGroupForUserMutation();
-  const [addUserToGroup, {isLoading: addUserLoading}] =
-    useAddUserToGroupMutation();
   // redux toolkit - end
 
   // functions - start
@@ -139,7 +122,6 @@ const Index = ({route, navigation}) => {
     })
       .then(res => {
         dispatch(handleCurrentViewingGroup(res.data));
-        setMemberUsers(res.data.users);
         setShowSnakeBar(false);
       })
       .catch(e => {
@@ -171,7 +153,7 @@ const Index = ({route, navigation}) => {
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
+    onCloseModalize();
   };
 
   let openCamera = () => {
@@ -186,18 +168,15 @@ const Index = ({route, navigation}) => {
       .then(image => {
         setAvatarURL('');
         fileDataRef.current = image;
-        setfileData(image);
         imageUploadHandler();
       })
       .catch(e => {
         console.log('Error in image selection', e);
       });
-    setModalVisible(false);
+    onCloseModalize();
   };
 
   const imageUploadHandler = async () => {
-    const id = await AsyncStorage.getItem('id');
-
     if (fileDataRef.current) {
       const uri = fileDataRef.current?.path;
       const type = fileDataRef.current?.mime;
@@ -234,7 +213,6 @@ const Index = ({route, navigation}) => {
         .catch(err => {
           console.log('An Error Occured While Uploading profile image', err);
           fileDataRef.current = null;
-          setfileData(null);
           return;
         });
     }
@@ -260,38 +238,6 @@ const Index = ({route, navigation}) => {
     }
   };
 
-  const handleAddMember = async () => {
-    for (let i = 0; i < selectedMembers.length; i++) {
-      addUserToGroup({
-        chatId: _id,
-        userId: selectedMembers[i],
-      })
-        .then(res => {
-          dispatch(handleCurrentViewingGroup(res.data));
-          setMemberUsers(res.data?.users);
-          setVisible(false);
-        })
-        .catch(e => {
-          console.log('error in handleAddMember', e);
-        });
-    }
-  };
-
-  const getAllUsers = async () => {
-    instance
-      .get('/api/account/allusers', {
-        headers: {
-          Authorization: `Bearer ${await AsyncStorage.getItem('token')}`,
-        },
-      })
-      .then(response => {
-        setAllMembers(response.data);
-      })
-      .catch(err => {
-        console.log('error in dropdown', err);
-      });
-  };
-
   const getCurrentUserId = async () => {
     const id = await AsyncStorage.getItem('userId');
     setUserId(id);
@@ -299,127 +245,17 @@ const Index = ({route, navigation}) => {
 
   useEffect(() => {
     getCurrentUserId();
-    getAllUsers();
   }, []);
 
   // functions - end
 
-  // components - start
-  const HeaderComponentFlatList = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const searchMemberForGroup = queryText => {
-      setSearchQuery(queryText);
-      let remainingItems = allMembers.filter(item => {
-        return item.name !== queryText;
-      });
-    };
-
-    return (
-      <View style={{}}>
-        <Searchbar
-          placeholder="Search"
-          elevation={2}
-          icon="close"
-          onIconPress={() => {
-            setVisible(false);
-            modalizeRef.current?.close();
-          }}
-          onChangeText={query => searchMemberForGroup(query)}
-          value={searchQuery}
-        />
-      </View>
-    );
+  const onOpenModalize = () => {
+    modalizeRef.current?.open();
   };
 
-  const RenderListItem = member => {
-    const item = member?.member?.item;
-    const [include, setInclude] = useState(selectedMembers.includes(item._id));
-    const index = selectedMembers.indexOf(item._id);
-    const add = () => {
-      if (include) {
-        if (index !== -1 && index !== 0) {
-          selectedMembers.splice(include, 1);
-        } else if (index == 0) {
-          selectedMembers.shift();
-        }
-      } else {
-        setSelectedMembers([...selectedMembers, item._id]);
-      }
-      setInclude(!include);
-    };
-    return (
-      <List.Item
-        style={{backgroundColor: include ? '#fdd' : '#fff'}}
-        title={item.name}
-        description={item.email}
-        onPress={add}
-        left={props => (
-          <Avatar.Image
-            source={{
-              uri: item?.imageURL
-                ? item?.imageURL
-                : 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-            }}
-            size={50}
-            {...props}
-          />
-        )}
-        right={props => (
-          <Checkbox
-            {...props}
-            // status="checked"
-            status={include ? 'checked' : 'unchecked'}
-            onPress={add}
-          />
-        )}
-      />
-    );
+  const onCloseModalize = () => {
+    modalizeRef.current?.close();
   };
-
-  const RenderListItemForScrollView = ({item}) => {
-    const [include, setInclude] = useState(selectedMembers.includes(item._id));
-    const index = selectedMembers.indexOf(item._id);
-    const add = () => {
-      if (include) {
-        if (index !== -1 && index !== 0) {
-          selectedMembers.splice(include, 1);
-        } else if (index == 0) {
-          selectedMembers.shift();
-        }
-      } else {
-        setSelectedMembers([...selectedMembers, item._id]);
-      }
-      setInclude(!include);
-    };
-    return (
-      <List.Item
-        // style={{backgroundColor: include ? '#fdd' : '#fff'}}
-        title={item.name}
-        description={item.email}
-        onPress={add}
-        left={props => (
-          <Avatar.Image
-            source={{
-              uri: item?.imageURL
-                ? item?.imageURL
-                : 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-            }}
-            size={50}
-            {...props}
-          />
-        )}
-        right={props => (
-          <Checkbox
-            {...props}
-            // status="checked"
-            status={include ? 'checked' : 'unchecked'}
-            onPress={add}
-          />
-        )}
-      />
-    );
-  };
-  // components - end
 
   return (
     <SafeAreaView style={{flexGrow: 1}}>
@@ -431,7 +267,7 @@ const Index = ({route, navigation}) => {
               onPress={() => {
                 seteditGroupName(false);
                 setEditGroupDescription(false);
-                setModalVisible(true);
+                onOpenModalize();
               }}
               style={{marginVertical: '4%'}}>
               {fileDataRef.current ? (
@@ -549,14 +385,13 @@ const Index = ({route, navigation}) => {
             <List.Subheader>Group members</List.Subheader>
             <List.Item
               onPress={() => {
-                setVisible(true);
-                modalizeRef.current?.open();
+                navigation.navigate('updateGroupMembers');
               }}
               title="Add Member"
               left={() => <Avatar.Icon size={50} icon="account-plus-outline" />}
             />
             <Divider />
-            {memberUsers.map((member, index) => (
+            {users.map((member, index) => (
               <List.Item
                 key={index}
                 title={member.name}
@@ -588,7 +423,10 @@ const Index = ({route, navigation}) => {
           </List.Section>
 
           <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.background}}>
+            style={{
+              padding: '2%',
+              backgroundColor: theme.colors.secondaryContainer,
+            }}>
             <List.Item
               onPress={handleLeave}
               title="Leave group"
@@ -596,15 +434,9 @@ const Index = ({route, navigation}) => {
                 <List.Icon color={theme.colors.error} icon="logout" />
               )}
               titleStyle={{color: theme.colors.error}}
-              // right={() =>
-              //   deleteLoading ? (
-              //     <ActivityIndicator animating={true} size="small" />
-              //   ) : (
-              //     <></>
-              //   )
-              // }
             />
-            {/* <List.Item
+            {/* <Divider />
+            <List.Item
               title="Report"
               onPress={() => console.log('report pressed')}
               left={() => <List.Icon icon="thumb-down-outline" />}
@@ -612,81 +444,6 @@ const Index = ({route, navigation}) => {
           </List.Section>
         </ScrollView>
       </View>
-
-      {/* add member portal - start*/}
-      <Portal>
-        {/* <View style={{position:"absolute"}}> */}
-        {/* <Modalize
-        ref={modalizeRef}
-        HeaderComponent={<HeaderComponentFlatList />}
-        withHandle={false}
-        snapPoint={300}
-        onClose={() => setVisible(false)}
-        // keyboardAvoidingBehavior="padding"
-        // avoidKeyboardLikeIOS
-        // modalHeight={600}
-        // alwaysOpen={1}
-        disableScrollIfPossible
-        adjustToContentHeight
-        keyboardAvoidingOffset={200}
-        threshold={300}
-        flatListProps={{
-          data: allMembers,
-          renderItem: item => <RenderListItem member={item} />,
-          keyExtractor: item => item.email,
-          // ListHeaderComponent : HeaderComponentFlatList
-        }}
-      /> */}
-        {/* </View> */}
-
-        <Modal
-          visible={visible}
-          animationType="slide"
-          onDismiss={() => setVisible(false)}>
-          <HeaderComponentFlatList />
-          {/* <FlatList
-              keyExtractor={item => item._id}
-              data={allMembers}
-              // ListHeaderComponent={HeaderComponentFlatList}
-              ListEmptyComponent={() => (
-                <View style={{alignItems: 'center', padding: '5%'}}>
-                  <Text>Loading...</Text>
-                </View>
-              )}
-              renderItem={item => <RenderListItem member={item} />}
-              refreshControl={
-                <RefreshControl
-                // refreshing={true}
-                // onRefresh={refetch}
-                />
-              }
-            /> */}
-
-          {/* scrollview */}
-          <ScrollView
-            contentContainerStyle={{backgroundColor: theme.colors.background}}>
-            {allMembers.map((item, index) => (
-              <RenderListItemForScrollView item={item} key={index} />
-            ))}
-          </ScrollView>
-          <FAB
-            icon={
-              addUserLoading
-                ? () => <ActivityIndicator animating size={'small'} />
-                : 'check'
-            }
-            disabled={addUserLoading}
-            style={{
-              position: 'absolute',
-              margin: 16,
-              right: 0,
-              bottom: 0,
-            }}
-            onPress={() => handleAddMember()}
-          />
-        </Modal>
-      </Portal>
-      {/* add member portal - end*/}
 
       <Snackbar
         visible={showSnakeBar}
@@ -699,11 +456,11 @@ const Index = ({route, navigation}) => {
         onDismiss={() => setShowSnakeBar(false)}
         duration={4000}>
         {snakeBarMessage}
-        {/* <ActivityIndicator animating={true} size="small" /> */}
       </Snackbar>
 
       {editGroupName && (
-        <View style={{padding: '2%', backgroundColor: theme.colors.surfaceVariant}}>
+        <View
+          style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
             label="Group name"
@@ -712,33 +469,55 @@ const Index = ({route, navigation}) => {
             onChangeText={text => {
               setName(text);
             }}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+           
           />
-          <View
+           <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
+              justifyContent: 'space-between',
               alignSelf: 'flex-end',
             }}>
             <Button
-              style={{width: '50%'}}
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
-              mode="text"
-              onPress={() => seteditGroupName(false)}>
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setName(groupName)
+                seteditGroupName(false);
+              }}>
               cancel
             </Button>
             <Button
-              style={{width: '50%'}}
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
               icon="check"
-              mode="text"
+              mode="contained"
               loading={isLoading}
-              onPress={() => handleSubmit()}>
+              onPress={() => handleSubmit()}
+              theme={{roundness: 1}}
+              disabled={
+                isLoading || name.length < 1
+              }>
               Ok
             </Button>
           </View>
+
         </View>
       )}
       {editGroupDescription && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
             label="Group Description"
@@ -748,8 +527,16 @@ const Index = ({route, navigation}) => {
             onChangeText={text => {
               setDescription(text);
             }}
+            style={{
+              textAlignVertical: 'top',
+              marginTop: '2%',
+              backgroundColor: theme.colors.background,
+            }}
+            underlineColor={theme.colors.background}
+            activeOutlineColor={theme.colors.onBackground}
+           
           />
-          <View
+          {/* <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
@@ -770,85 +557,101 @@ const Index = ({route, navigation}) => {
               onPress={() => handleSubmit()}>
               Ok
             </Button>
+          </View> */}
+        
+        <View
+            style={{
+              flexDirection: 'row',
+              marginVertical: '2%',
+              justifyContent: 'space-between',
+              alignSelf: 'flex-end',
+            }}>
+            <Button
+              style={{width: '49%', marginRight: '1%'}}
+              icon="close"
+              mode="outlined"
+              theme={{roundness: 1}}
+              onPress={() => {
+                setDescription(groupDescription)
+                setEditGroupDescription(false);
+              }}>
+              cancel
+            </Button>
+            <Button
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                color: theme.colors.onBackground,
+              }}
+              icon="check"
+              mode="contained"
+              loading={isLoading}
+              onPress={() => handleSubmit()}
+              theme={{roundness: 1}}
+              disabled={
+                isLoading || description.length < 1
+              }>
+              Ok
+            </Button>
           </View>
+
+
         </View>
       )}
 
-      <Modal
-        onBlur={() => setModalVisible(false)}
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
         <View
-          // onPress={() => setModalVisible(false)}
           style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            backgroundColor: theme.colors.backdrop,
+            paddingVertical: '8%',
+            paddingHorizontal: '5%',
+            flexDirection: 'row',
+            backgroundColor: theme.colors.background,
           }}>
-          <View
-            style={[
-              styles.modalView,
-              {
-                position: 'absolute',
-                width: '100%',
-                backgroundColor: theme.colors.background,
-              },
-            ]}>
+          <View style={{alignItems: 'center'}}>
             <IconButton
-              style={{position: 'absolute', right: 5}}
-              icon="close-circle-outline"
-              // mode="outlined"
-              size={30}
-              onPress={() => setModalVisible(false)}
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
             />
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="camera-image"
-                mode="outlined"
-                size={40}
-                onPress={openCamera}
-              />
-              <Text>Camera</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="image-outline"
-                mode="outlined"
-                size={40}
-                onPress={openGallery}
-              />
-              <Text>Gallery</Text>
-            </View>
-            <View style={{alignItems: 'center'}}>
-              <IconButton
-                style={{marginHorizontal: '2%'}}
-                icon="account-circle-outline"
-                mode="outlined"
-                size={40}
-                onPress={() => {
-                  setModalVisible(false);
-                  setAvatarModalVisible(true);
-                }}
-              />
-              <Text>Avatars</Text>
-            </View>
+            <Text>Camera</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
+            <Text>Gallery</Text>
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="account-circle-outline"
+              mode="outlined"
+              size={40}
+              onPress={() => {
+                onCloseModalize();
+                setAvatarModalVisible(true);
+              }}
+            />
+            <Text>Avatars</Text>
           </View>
         </View>
-      </Modal>
+      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal
           avatarModalVisible={avatarModalVisible}
           setAvatarModalVisible={setAvatarModalVisible}
           setAvatarURL={setAvatarURL}
-          setfileData={setfileData}
           fileDataRef={fileDataRef}
           imageUploadHandler={imageUploadHandler}
         />

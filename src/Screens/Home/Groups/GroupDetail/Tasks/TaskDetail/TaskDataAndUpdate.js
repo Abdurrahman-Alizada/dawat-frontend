@@ -329,13 +329,13 @@ const TaskDataAndUpdate = ({navigation}) => {
       </View>
 
       {editTitle && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
-            outlineColor={theme.colors.background}
+            outlineColor={theme.colors.backdrop}
             style={{
               textAlignVertical: 'top',
               marginTop: '2%',
-              backgroundColor: theme.colors.background,
+              backgroundColor: theme.colors.surface,
             }}
             underlineColor={theme.colors.background}
             activeOutlineColor={theme.colors.onBackground}
@@ -355,7 +355,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               alignSelf: 'flex-end',
             }}>
             <Button
-              style={{width: '48%', marginRight: '1%'}}
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
               mode="outlined"
               theme={{roundness: 1}}
@@ -366,7 +366,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               cancel
             </Button>
             <Button
-              style={{width: '48%', marginLeft: '1%'}}
+              style={{width: '49%', marginLeft: '1%', color:theme.colors.onBackground}}
               icon="check"
               mode="contained"
               loading={updateTitleLoading}
@@ -379,7 +379,7 @@ const TaskDataAndUpdate = ({navigation}) => {
         </View>
       )}
       {editDescription && (
-        <View style={{padding: '2%', backgroundColor: '#fff'}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             outlineColor={theme.colors.background}
             style={{
@@ -405,7 +405,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               alignSelf: 'flex-end',
             }}>
             <Button
-              style={{width: '48%', marginRight: '1%'}}
+              style={{width: '49%', marginRight: '1%'}}
               icon="close"
               mode="outlined"
               theme={{roundness: 1}}
@@ -416,7 +416,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               cancel
             </Button>
             <Button
-              style={{width: '48%', marginLeft: '1%'}}
+              style={{width: '49%', marginLeft: '1%'}}
               icon="check"
               mode="contained"
               loading={updateDescriptionLoading}
