@@ -113,12 +113,12 @@ const AddInviti = ({route, navigation}) => {
       });
   };
 
-  const [stauts, setStatus] = useState(
+  const [status, setStatus] = useState(
     currentInviti?.lastStatus?.invitiStatus
       ? currentInviti?.lastStatus?.invitiStatus
       : 'pending',
   );
-  const [selectedStauts, setSelectedStatus] = useState(
+  const [selectedstatus, setSelectedStatus] = useState(
     currentInviti?.lastStatus?.invitiStatus
       ? currentInviti?.lastStatus?.invitiStatus
       : 'pending',
@@ -154,7 +154,7 @@ const AddInviti = ({route, navigation}) => {
             invitiName: values.invitiName,
             invitiDescription: values.invitiDescription,
             invitiImageURL: data.secure_url,
-            lastStatus: stauts,
+            lastStatus: status,
           })
             .then(response => {
               navigation.goBack();
@@ -172,7 +172,7 @@ const AddInviti = ({route, navigation}) => {
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
         invitiImageURL: avatarURL,
-        lastStatus: stauts,
+        lastStatus: status,
       })
         .then(response => {
           navigation.goBack();
@@ -207,7 +207,7 @@ const AddInviti = ({route, navigation}) => {
             invitiName: values.invitiName,
             invitiDescription: values.invitiDescription,
             invitiImageURL: data.secure_url,
-            lastStatus: stauts,
+            lastStatus: status,
           })
             .then(response => {
               console.log('group has been updated  with image=>', response);
@@ -229,7 +229,7 @@ const AddInviti = ({route, navigation}) => {
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
         invitiImageURL: avatarURL,
-        lastStatus: stauts,
+        lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
       })
         .then(response => {
           console.log('group has been updated without image=>', response);
@@ -359,9 +359,9 @@ const AddInviti = ({route, navigation}) => {
                 {statuses.map((statuse, index) => (
                   <Chip
                     key={index}
-                    selected={selectedStauts === statuse.value ? true : false}
+                    selected={selectedstatus === statuse.value ? true : false}
                     mode={
-                      selectedStauts === statuse.value ? 'flat' : 'outlined'
+                      selectedstatus === statuse.value ? 'flat' : 'outlined'
                     }
                     style={{marginRight: '2%', marginVertical: '2%'}}
                     onPress={() => {
