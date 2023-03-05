@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useEffect, useState} from 'react';
+import React, {useCallback, useMemo, useLayoutEffect, useState} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -31,7 +31,6 @@ import {
   MD3LightTheme as PaperDefaultTheme,
   Provider as PaperProvider,
   Snackbar,
-  Tooltip,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
 import {lightPalette} from './src/GlobalStyles';
@@ -68,8 +67,13 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
-  useEffect(() => {
+  const [isNetSnackBarVisible, setIsNetSnackBarVisible ] = useState(false);
+
+  useLayoutEffect(() => {
     SplashScreen123.hide();
+    setTimeout(() => {
+      setIsNetSnackBarVisible(true);
+    }, 3000);
   }, []);
 
   // internet connection information
@@ -109,7 +113,7 @@ export const App = () => {
 
           {/* snackbar for checking internet connection */}
             <Snackbar
-              visible={!netInfo.isConnected}
+              visible={!netInfo.isConnected && isNetSnackBarVisible}
               duration={1000}
               onDismiss={() => console.log('snackbar dismissed')}>
               You are currently offline.
