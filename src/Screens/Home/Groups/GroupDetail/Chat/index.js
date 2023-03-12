@@ -16,6 +16,8 @@ import {
 import ChatInput from './ChatInput';
 import Message from './Message';
 import { baseURL } from '../../../../../redux/axios';
+import { FlashList } from "@shopify/flash-list";
+
 // for socket.io
 import io from "socket.io-client";
 
@@ -70,13 +72,13 @@ const MessagesScreen = ({navigation}) => {
 
   const handleAddNewMessage = () => {
     setNewMessage('');
-    setMessages(prevState => [...prevState, {
+    setMessages(prevState => [{
       _id : Math.floor(Math.random() * 100) + 1,
       content : newMessage,
       addedBy : currentLoginUser,
       group : currentViewingGroup,
       createdAd : new Date()
-    } ])
+    }, ...prevState ])
     addNewMessage({
       content: newMessage,
       groupId: currentViewingGroup?._id,
@@ -120,10 +122,11 @@ const MessagesScreen = ({navigation}) => {
             ))}
           </View>
         ) : (
-          <FlatList
+          <FlashList
             data={messages}
-            // keyExtractor={item => item._id}
-            // initialNumToRender={10} 
+            keyExtractor={item => item._id}
+            estimatedItemSize={150}
+            initialNumToRender={10} 
             ref={listRef}
             ListEmptyComponent={() => (
               <View style={{flex: 1, alignItems: 'center'}}>
@@ -141,9 +144,19 @@ const MessagesScreen = ({navigation}) => {
                 </Button>
               </View>
             )}
-            onContentSizeChange={() => {
-              listRef.current?.scrollToEnd();
-            }}
+            disableAutoLayout={true}
+            inverted
+            // onContentSizeChange={() => {
+            //   listRef.current?.scrollToEnd();
+            // }}
+            // initialScrollIndex={messages.length - 2}
+          //  onLoad={() => {
+          //     listRef.current?.scrollToEnd();
+          //   }}
+          //  onLoad={() => {
+          //     listRef.current?.scrollToEnd();
+          //   }}
+          // scrollToIndex={1}
             renderItem={({item}) => (
               <Message
                 item={item}
@@ -155,6 +168,42 @@ const MessagesScreen = ({navigation}) => {
               <RefreshControl refreshing={isLoading} onRefresh={refetch} />
             }
           />
+          // <FlatList
+          //   data={messages}
+          //   keyExtractor={item => item._id}
+          //   // initialNumToRender={10} 
+          //   ref={listRef}
+          //   inverted
+          //   ListEmptyComponent={() => (
+          //     <View style={{flex: 1, alignItems: 'center'}}>
+          //       <Image
+          //         source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
+          //       />
+          //       <Text>Send message to start conversation</Text>
+          //       <Text>or</Text>
+          //       <Button
+          //         icon="refresh"
+          //         mode="contained"
+          //         style={{marginTop: '5%'}}
+          //         onPress={refetch}>
+          //         Refresh
+          //       </Button>
+          //     </View>
+          //   )}
+          //   // onContentSizeChange={() => {
+          //   //   listRef.current?.scrollToEnd();
+          //   // }}
+          //   renderItem={({item}) => (
+          //     <Message
+          //       item={item}
+          //       currentLoginUser={currentLoginUser}
+          //       theme={theme}
+          //     />
+          //   )}
+          //   refreshControl={
+          //     <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          //   }
+          // />
         )}
       </View>
 

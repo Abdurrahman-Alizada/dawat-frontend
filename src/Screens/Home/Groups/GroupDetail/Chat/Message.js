@@ -62,8 +62,8 @@ const Message = ({item, currentLoginUser, theme}) => {
         <Avatar.Image
           size={35}
           source={
-            item.imageURL
-              ? {uri: item.imageURL}
+            item?.addedBy?.imageURL
+              ? {uri: item?.addedBy?.imageURL}
               : require('../../../../../assets/drawer/male-user.png')
           }
         />
@@ -111,8 +111,8 @@ const Message = ({item, currentLoginUser, theme}) => {
         <Avatar.Image
           size={35}
           source={
-            item.imageURL
-              ? {uri: item.imageURL}
+            item?.addedBy
+              ? {uri: item?.addedBy?.imageURL}
               : require('../../../../../assets/drawer/male-user.png')
           }
         />
