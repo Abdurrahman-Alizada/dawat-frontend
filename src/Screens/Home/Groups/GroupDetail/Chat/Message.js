@@ -80,9 +80,8 @@ const Message = ({item, currentLoginUser, theme}) => {
           style={{
             backgroundColor: theme.colors.secondary,
             padding: 10,
-            borderRadius: 5,
             maxWidth: '80%',
-            marginLeft: '2%',
+            marginLeft: '1%',
             alignSelf: 'flex-start',
             borderRadius: 15,
           }}>
@@ -157,7 +156,6 @@ const styles = StyleSheet.create({
   leftArrowOverlap: {
     position: 'absolute',
     backgroundColor: '#fff',
-    //backgroundColor:"green",
     width: 20,
     height: 35,
     bottom: -6,

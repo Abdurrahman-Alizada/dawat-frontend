@@ -1,22 +1,17 @@
-import {
-  View,
-  SafeAreaView,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-} from 'react-native';
+import {View, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState, useRef} from 'react';
-import Header from '../../../../Components/ProfileScreenHeader';
 import {
-  Text,
-  Avatar,
-  List,
-  IconButton,
-  TextInput,
   ActivityIndicator,
+  Avatar,
   Button,
-  useTheme,
+  Dialog,
+  Text,
+  IconButton,
+  List,
   Snackbar,
+  Portal,
+  TextInput,
+  useTheme,
 } from 'react-native-paper';
 import {
   useGetCurrentLoginUserQuery,
@@ -24,14 +19,19 @@ import {
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
   useUpdateImageURLMutation,
+  useDeleteUserByItselfMutation,
 } from '../../../../redux/reducers/user/userThunk';
+import {handleCurrentLoaginUser} from '../../../../redux/reducers/user/user'
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
 import {Modalize} from 'react-native-modalize';
+import { useSelector,useDispatch } from 'react-redux';
 
-export default ProfileIndex = ({route}) => {
+export default ProfileIndex = ({navigation, route}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+
   const modalizeRef = useRef(null);
   const onOpenModalize = () => {
     modalizeRef.current?.open();
@@ -102,7 +102,6 @@ export default ProfileIndex = ({route}) => {
   };
 
   // image uploading - start
-  const [modalVisible, setModalVisible] = useState(false);
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
   const [avatarURL, setAvatarURL] = useState('');
@@ -205,9 +204,55 @@ export default ProfileIndex = ({route}) => {
   };
   // image uploading - end
 
+  // delete dialog for deleting user by itself
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+
+  const [
+    deleleUserByItSelf,
+    {isLoading: deleteLoading, isSuccess: isDeleteUserSuccess},
+  ] = useDeleteUserByItselfMutation();
+  const deleteUserAccountHandler = async () => {
+    deleleUserByItSelf(user._id)
+      .then(res => {
+          AsyncStorage.clear();
+          dispatch(handleCurrentLoaginUser({}))
+          setDeleteDialogVisible(false);
+          navigation.navigate('Auth', {screen:"Login"});
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  };
+
   return (
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
+        <Portal>
+          <Dialog
+            visible={deleteDialogVisible}
+            onDismiss={() => setDeleteDialogVisible(false)}>
+            <Dialog.Icon icon="alert" />
+            <Dialog.Title>Are you sure?</Dialog.Title>
+            <Dialog.Content>
+              <Text variant="bodyMedium">
+                If you delete your account, your account with all asssociated
+                data will be delete.
+              </Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setDeleteDialogVisible(false)}>
+                Cancel
+              </Button>
+              <Button
+                loading={deleteLoading}
+                textColor={theme.colors.error}
+                onPress={deleteUserAccountHandler}>
+                Ok, I understand
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
         {user ? (
           <List.Section
             style={{
@@ -295,6 +340,7 @@ export default ProfileIndex = ({route}) => {
                   />
                 )}
               />
+
               <List.Subheader>Password</List.Subheader>
 
               <List.Item
@@ -316,6 +362,22 @@ export default ProfileIndex = ({route}) => {
                 )}
               />
             </View>
+            <List.Item
+              onPress={() => setDeleteDialogVisible(true)}
+              title="Delete my account"
+              style={{
+                backgroundColor: theme.colors.errorContainer,
+                marginVertical: '1%',
+              }}
+              left={props => (
+                <List.Icon
+                  {...props}
+                  color={theme.colors.error}
+                  icon="delete"
+                />
+              )}
+              titleStyle={{color: theme.colors.error}}
+            />
           </List.Section>
         ) : (
           <View
@@ -450,7 +512,6 @@ export default ProfileIndex = ({route}) => {
             }}
             underlineColor={theme.colors.background}
             activeOutlineColor={theme.colors.onBackground}
-            
           />
           <TextInput
             label="Enter new password"
@@ -464,7 +525,6 @@ export default ProfileIndex = ({route}) => {
             }}
             underlineColor={theme.colors.background}
             activeOutlineColor={theme.colors.onBackground}
-            
           />
           <View
             style={{
