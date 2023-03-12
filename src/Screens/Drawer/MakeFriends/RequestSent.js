@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import {
   useGetAllFriendsQuery,
   useAcceptFriendRequestMutation,
@@ -21,25 +21,77 @@ const PendingRequest = ({route}) => {
 const [declineFriendRequest, {isLoading: declineRequestLoading}] =
   useDeclineFriendRequestMutation();
 
-const handleAcceptFriendRequest = userB => {
-  acceptFriendRequest({userA: currentLoginUser._id, userB: userB})
-    .then(res => {
-      console.log(res.data);
-    })
-    .catch(err => {
-      console.log(err.message);
-    });
-};
+  // single item to render
+  const RenderItem = ({item}) => {
+    const [clicked, setClicked] = useState(false);
+    const [textAfterAction, setTextAfterAction] = useState('');
 
-const handleDeclineFriendRequest = userB => {
-  declineFriendRequest({userA: currentLoginUser._id, userB: userB})
-    .then(res => {
-      console.log(res.data);
-    })
-    .catch(err => {
-      console.log(err.message);
-    });
-};
+    const [declineFriendRequest, {isLoading: declineRequestLoading}] =
+    useDeclineFriendRequestMutation();
+
+
+    const handleDeclineFriendRequest = userB => {
+      setTextAfterAction(`Request sent to ${item.name} has been deleted.`)
+      setClicked(true)
+      
+      declineFriendRequest({userA: currentLoginUser._id, userB: userB})
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.message);
+        });
+    };
+
+    return (
+      <List.Item
+        titleStyle={{fontWeight: '800'}}
+        title={item.name}
+        description={() => (
+          <View>
+            {clicked ? (
+              <Text>{textAfterAction}</Text>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginTop: '5%',
+                }}>
+                <Button
+                  style={{width: '48%'}}
+                  mode="contained"
+                  disabled
+                  // onPress={() => handleAcceptFriendRequest(item._id)}
+                  >
+                  Add
+                </Button>
+                <Button
+                  style={{width: '48%'}}
+                  mode="outlined"
+                  onPress={() => handleDeclineFriendRequest(item._id)}>
+                  Delete
+                </Button>
+              </View>
+            )}
+          </View>
+        )}
+        left={props => (
+          <Avatar.Image
+            size={70}
+            {...props}
+            source={
+              item.imageURL
+                ? {uri: item.imageURL}
+                : require('../../../assets/drawer/male-user.png')
+            }
+          />
+        )}
+      />
+    );
+  };
+
+
 
   return (
     <View>
@@ -50,7 +102,6 @@ const handleDeclineFriendRequest = userB => {
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
             <Text>You didn't sent request to anyone yet</Text>
-            <Text>Please refresh or search for new friends</Text>
             <Button
               icon="refresh"
               mode="contained"
@@ -68,45 +119,7 @@ const handleDeclineFriendRequest = userB => {
             </Button>
             </View>
         )}
-        renderItem={({item}) => (
-          <List.Item
-            titleStyle={{fontWeight: '800'}}
-            title={item.name}
-            description={() => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: '5%',
-                }}>
-                <Button
-                  style={{width: '48%'}}
-                  mode="contained"
-                  disabled
-                  onPress={() => handleAcceptFriendRequest(item._id)}>
-                  Add
-                </Button>
-                <Button
-                  style={{width: '48%'}}
-                  mode="outlined"
-                  onPress={() => handleDeclineFriendRequest(item._id)}>
-                  Delete
-                </Button>
-              </View>
-            )}
-            left={props => (
-              <Avatar.Image
-                size={80}
-                {...props}
-                source={
-                  item.imageURL
-                    ? {uri: item.imageURL}
-                    : require('../../../assets/drawer/male-user.png')
-                }
-              />
-            )}
-          />
-        )}
+        renderItem={({item}) => <RenderItem item={item} />}
         refreshControl={
           <RefreshControl refreshing={isFetching} onRefresh={refetch} />
         }
@@ -116,5 +129,3 @@ const handleDeclineFriendRequest = userB => {
 }
 
 export default PendingRequest
-
-const styles = StyleSheet.create({})
