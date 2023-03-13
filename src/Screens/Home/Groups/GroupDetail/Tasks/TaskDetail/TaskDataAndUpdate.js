@@ -239,8 +239,8 @@ const TaskDataAndUpdate = ({navigation}) => {
                     size={40}
                     style={{marginVertical: '2%'}}
                     source={{
-                      uri: responsible.imgURL
-                        ? responsible.imgURL
+                      uri: responsible?.responsible?.imageURL
+                        ? responsible?.responsible?.imageURL
                         : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329064/avatars-for-user-profile/Panda_qek53a.png',
                     }}
                   />

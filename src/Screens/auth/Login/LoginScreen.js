@@ -21,9 +21,13 @@ import {
   useTheme,
 } from 'react-native-paper';
 import {useLoginUserMutation} from '../../../redux/reducers/user/userThunk';
-import { handleCurrentLoaginUser } from '../../../redux/reducers/user/user';
+import {handleCurrentLoaginUser} from '../../../redux/reducers/user/user';
 import AsyncStorage from '@react-native-community/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {userApi} from '../../../redux/reducers/user/userThunk';
+import {groupApi} from '../../../redux/reducers/groups/groupThunk';
+import {friendshipApi} from '../../../redux/reducers/Friendship/friendshipThunk';
+
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Please enter valid email')
@@ -43,11 +47,11 @@ const LoginScreen = ({navigation, route}) => {
   const [verificationBannerVisible, setVerificationBannerVisible] = useState(
     route.params ? true : false,
   );
- 
 
   const [bannerMessage, setBannerMessage] = useState(
     route?.params?.message ? route?.params?.message : '',
   );
+
   const [errorMessage, setErrorMessage] = useState('');
 
   const [loginUser, {isLoading, isError, error}] = useLoginUserMutation();
@@ -56,8 +60,7 @@ const LoginScreen = ({navigation, route}) => {
       email: values.email,
       password: values.password,
     });
-   
-    console.log(response)
+
     if (response?.error) {
       setVisible(true);
     }
@@ -70,19 +73,18 @@ const LoginScreen = ({navigation, route}) => {
       setVerificationBannerVisible(true);
     }
     if (response?.data?.token) {
-      dispatch(handleCurrentLoaginUser(response?.data?.user))
+      dispatch(handleCurrentLoaginUser(response?.data?.user));
       await AsyncStorage.setItem('isLoggedIn', 'login');
       await AsyncStorage.setItem('id', response?.data?.user?._id);
       await AsyncStorage.setItem('token', response?.data?.token);
       await AsyncStorage.setItem('userId', response?.data?.user?._id);
       await AsyncStorage.setItem('name', response.data.user.name);
       await AsyncStorage.setItem('email', response?.data?.user?.email);
-      navigation.navigate('Drawer');
+      navigation.navigate('Drawer', {
+        sreen : "Home",
+        refreshTimeStamp: new Date().toISOString(),
+      });
     }
-    // if (!data?._id && isError) {
-    //   console.log('error in login ', error);
-    //   setVisible(true);
-    // }
   };
 
   return (
@@ -247,7 +249,6 @@ const LoginScreen = ({navigation, route}) => {
           )}
         </Formik>
       </ScrollView>
-
     </View>
   );
 };

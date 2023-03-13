@@ -21,17 +21,70 @@ const FriendsSuggestions = ({navigation}) => {
   const {data, isLoading, refetch, isFetching, isError, error} =
     useGetAllFriendsQuery(currentLoginUser?._id);
 
-  const [sendFriendRequest, {isLoading: sendRequestLoading}] =
+
+  // single item to render
+  const RenderItem = ({item}) => {
+    const [sendFriendRequest, {isLoading: sendRequestLoading}] =
     useSendFriendRequestMutation();
 
-  const handleSendFriendRequest = userB => {
-    sendFriendRequest({userA: currentLoginUser?._id, userB: userB})
-      .then(res => {
-        console.log(res.data);
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
+    const [clicked, setClicked] = useState(false);
+    const [textAfterAction, setTextAfterAction] = useState('');
+    const handleSendFriendRequest = userB => {
+      setTextAfterAction(`Your request has been sent to ${item.name}`)
+      setClicked(true);
+      sendFriendRequest({userA: currentLoginUser?._id, userB: userB})
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.message);
+        });
+    };
+    return (
+      <List.Item
+        titleStyle={{fontWeight: '800'}}
+        title={getHighlightedText(item.name)}
+        description={() => (
+          <View>
+           {
+            clicked ?
+            <Text>{textAfterAction}</Text>
+            :<View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: '5%',
+              }}>
+              <Button
+                style={{}}
+                mode="contained"
+                onPress={() => handleSendFriendRequest(item._id)}>
+                Add
+              </Button>
+              <Button
+                style={{}}
+                mode="outlined"
+                onPress={() => console.log('Pressed')}>
+                View profile
+              </Button>
+            </View>
+           }
+         
+          </View>
+        )}
+        left={props => (
+          <Avatar.Image
+            size={80}
+            {...props}
+            source={
+              item.imageURL
+                ? {uri: item.imageURL}
+                : require('../../../assets/drawer/male-user.png')
+            }
+          />
+        )}
+      />
+    );
   };
 
   // search
@@ -68,22 +121,22 @@ const FriendsSuggestions = ({navigation}) => {
   };
 
   const getHighlightedText = result =>
-  result.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
-    return (
-      <Text
-        key={index}
-        style={
-          piece.toLocaleLowerCase() == search.toLocaleLowerCase()
-            ? {backgroundColor: 'yellow', color: '#000'}
-            : {}
-        }>
-        {piece}
-      </Text>
-    );
-  });
+    result.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
+      return (
+        <Text
+          key={index}
+          style={
+            piece.toLocaleLowerCase() == search.toLocaleLowerCase()
+              ? {backgroundColor: 'yellow', color: '#000'}
+              : {}
+          }>
+          {piece}
+        </Text>
+      );
+    });
 
   return (
-    <View>
+    <View style={{flex:1}}>
       {!isSearch ? (
         <Appbar.Header
           style={{backgroundColor: theme.colors.background}}
@@ -141,55 +194,10 @@ const FriendsSuggestions = ({navigation}) => {
                 onPress={refetch}>
                 Refresh
               </Button>
-              <Button
-                icon="home"
-                mode="contained-tonal"
-                style={{marginTop: '5%'}}
-                onPress={() => {
-                  navigation.navigate('HomeIndex');
-                }}>
-                Go to home
-              </Button>
+
             </View>
           )}
-          renderItem={({item}) => (
-            <List.Item
-              titleStyle={{fontWeight: '800'}}
-              title={getHighlightedText(item.name)}
-              description={() => (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginTop: '5%',
-                  }}>
-                  <Button
-                    style={{width: '48%'}}
-                    mode="contained"
-                    onPress={() => handleSendFriendRequest(item._id)}>
-                    Add
-                  </Button>
-                  <Button
-                    style={{width: '48%'}}
-                    mode="outlined"
-                    onPress={() => console.log('Pressed')}>
-                    Delete
-                  </Button>
-                </View>
-              )}
-              left={props => (
-                <Avatar.Image
-                  size={80}
-                  {...props}
-                  source={
-                    item.imageURL
-                      ? {uri: item.imageURL}
-                      : require('../../../assets/drawer/male-user.png')
-                  }
-                />
-              )}
-            />
-          )}
+          renderItem={({item}) => <RenderItem item={item} />}
           refreshControl={
             <RefreshControl refreshing={isFetching} onRefresh={refetch} />
           }

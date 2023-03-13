@@ -16,12 +16,12 @@ export const groupApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Groups', 'User'],
+  tagTypes: ['Groups'],
   reducerPath: 'groupApi',
   endpoints: build => ({
     getAllGroups: build.query({
       query: () => `/api/group`,
-      providesTags: ['Groups', 'User'],
+      providesTags: ['Groups'],
     }),
     addGroup: build.mutation({
       query: group => ({

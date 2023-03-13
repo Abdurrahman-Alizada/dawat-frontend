@@ -91,6 +91,17 @@ export const userApi = createApi({
       }),
       invalidatesTags: ['User'],
     }),
+    // delete user by itself
+    deleteUserByItself : build.mutation({
+      query: id => ({
+        url: `/api/account/users/${id}/deleleUserByItSelf`,
+        method: 'DELETE',
+        body: {
+          reson: "Reason will be here"
+        },
+      }),
+      invalidatesTags: ['User'],
+    })
   }),
 });
 
@@ -101,6 +112,7 @@ export const {
  useGetCurrentLoginUserQuery,
  useUpdateEmailMutation,
  useUpdatePasswordMutation,
- useUpdateImageURLMutation
+ useUpdateImageURLMutation,
+ useDeleteUserByItselfMutation
 } = userApi;
 

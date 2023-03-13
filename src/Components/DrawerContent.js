@@ -9,6 +9,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useDispatch} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
+import { userApi } from '../redux/reducers/user/userThunk';
+import { groupApi } from '../redux/reducers/groups/groupThunk';
+import { friendshipApi } from '../redux/reducers/Friendship/friendshipThunk';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -18,10 +21,6 @@ export default function DrawerContent(props) {
   const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const id = useRef(null);
   const getUserInfo = async () => {
-    // const value = await AsyncStorage.getItem('name');
-    // setName(await AsyncStorage.getItem('name'));
-    // setEmail(await AsyncStorage.getItem('email'));
-    // setImageURL(await AsyncStorage.getItem('imageURL'));
     id.current = await AsyncStorage.getItem('userId');
     // console.log('User name', value);
   };
@@ -34,6 +33,7 @@ export default function DrawerContent(props) {
     isError,
     error,
     isLoading,
+    refetch
   } = useGetCurrentLoginUserQuery(id.current);
 
   const logout = async () => {
@@ -44,6 +44,10 @@ export default function DrawerContent(props) {
     await AsyncStorage.setItem('userId', '');
     await AsyncStorage.setItem('name', '');
     await AsyncStorage.setItem('ImageURL', '');
+    dispatch(handleCurrentLoaginUser({}));
+    // dispatch(userApi.util.resetApiState())
+    dispatch(groupApi.util.resetApiState())
+    // dispatch(friendshipApi.util.resetApiState())
     navigation.dispatch(DrawerActions.closeDrawer());
     navigation.navigate('Auth');
   };

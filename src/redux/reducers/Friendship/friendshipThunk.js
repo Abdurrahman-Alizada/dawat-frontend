@@ -1,9 +1,8 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import { baseURL } from '../../axios';
+import {baseURL} from '../../axios';
 export const friendshipApi = createApi({
-
   baseQuery: fetchBaseQuery({
     baseUrl: baseURL,
     prepareHeaders: async (headers, {getState}) => {
@@ -17,52 +16,48 @@ export const friendshipApi = createApi({
   tagTypes: ['Friend'],
   reducerPath: 'friendshipApi',
   endpoints: build => ({
-    
-    sendFriendRequest : build.mutation({
+    sendFriendRequest: build.mutation({
       query: ({userA, userB}) => ({
         url: `/api/friendship/sendRequest`,
         method: 'POST',
         body: {
-          userA : userA,
-          userB : userB
+          userA: userA,
+          userB: userB,
         },
       }),
       invalidatesTags: ['Friend'],
     }),
 
-    acceptFriendRequest : build.mutation({
+    acceptFriendRequest: build.mutation({
       query: ({userA, userB}) => ({
         url: `/api/friendship/acceptRequest`,
         method: 'POST',
         body: {
-          userA : userA,
-          userB : userB,
+          userA: userA,
+          userB: userB,
         },
       }),
       invalidatesTags: ['Friend'],
     }),
 
-    declineFriendRequest : build.mutation({
+    declineFriendRequest: build.mutation({
       query: ({userA, userB}) => ({
         url: `/api/friendship/declineRequest`,
         method: 'POST',
         body: {
-          userA : userA,
-          userB : userB,
+          userA: userA,
+          userB: userB,
         },
       }),
       invalidatesTags: ['Friend'],
     }),
     getAllFriends: build.query({
-      query: (userId) => `/api/friendship/getFriends/${userId}`,
+      query: userId => `/api/friendship/getFriends/${userId}`,
       providesTags: ['Friend'],
     }),
-    // searchForFriend: build.query({
-    //   query: (searchQuery) => `/api/friendship/search/hello`,
-    //   // providesTags: ['Friend'],
-    // }),
-    searchForFriend : build.mutation({
-      query: (searchQuery) => ({
+
+    searchForFriend: build.mutation({
+      query: searchQuery => ({
         url: `/api/friendship/search/${searchQuery}`,
         method: 'GET',
       }),
@@ -71,12 +66,11 @@ export const friendshipApi = createApi({
 });
 
 export const {
- useAcceptFriendRequestMutation,
- useDeclineFriendRequestMutation,
- useGetAllFriendsQuery,
- useSearchForFriendMutation,
- useGetFriendsSuggestionMutation,
- useGetRequestesOfFriendsMutation,
- useSendFriendRequestMutation
+  useAcceptFriendRequestMutation,
+  useDeclineFriendRequestMutation,
+  useGetAllFriendsQuery,
+  useSearchForFriendMutation,
+  useGetFriendsSuggestionMutation,
+  useGetRequestesOfFriendsMutation,
+  useSendFriendRequestMutation,
 } = friendshipApi;
-

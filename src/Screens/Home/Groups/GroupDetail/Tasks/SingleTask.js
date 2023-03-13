@@ -21,8 +21,9 @@ import {
 } from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 const RenderGroupMembers = ({task}) => {
+  
   const theme = useTheme();
-  if (task.responsibles) {
+  if (task?.responsibles) {
     return (
       <View style={styles.groupMembersContent}>
         {task.responsibles.map((user, index) => (
@@ -30,9 +31,11 @@ const RenderGroupMembers = ({task}) => {
             {index < 5 ? (
               <Avatar.Image
                 size={20}
-                source={{
-                  uri: 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329064/avatars-for-user-profile/Panda_qek53a.png',
-                }}
+                source={
+                  user?.responsible?.imageURL
+                    ? {uri: user?.responsible?.imageURL}
+                    : require('../../../../../assets/drawer/male-user.png')
+                }
               />
             ) : (
               <></>

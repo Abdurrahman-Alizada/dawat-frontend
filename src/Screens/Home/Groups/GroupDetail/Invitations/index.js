@@ -234,7 +234,7 @@ export default function Example({route}) {
                         style={{flexDirection: 'row', alignItems: 'center'}}>
                         <Avatar.Icon size={30} icon="account-circle-outline" />
                         <Text style={{marginHorizontal: '4%'}}>
-                          {Status.addedBy.name}
+                          {Status?.addedBy?.name}
                         </Text>
                       </View>
                     </View>
