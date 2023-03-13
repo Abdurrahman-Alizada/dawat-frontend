@@ -244,22 +244,14 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
             </View>
           )}
           ListEmptyComponent={() => (
-            <View style={{marginTop: '60%', alignItems: 'center'}}>
+            <View style={{marginTop: '40%', alignItems: 'center'}}>
               <Text>{listEmptyText}</Text>
-              <Text>Refresh or search for new friends</Text>
               <Button
                 icon="refresh"
-                mode="contained"
-                style={{marginTop: '5%', marginHorizontal: '2%'}}
+                mode="outlined"
+                style={{marginTop: '5%', }}
                 onPress={refetch}>
                 Refresh
-              </Button>
-              <Button
-                icon="account-search"
-                mode="text"
-                style={{marginTop: '5%', marginHorizontal: '2%'}}
-                onPress={() => navigation.navigate("MakeFriends", {screen : 'FriendsSuggestions'})}>
-                Search for friends
               </Button>
             </View>
           )}
