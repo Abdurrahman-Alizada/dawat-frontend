@@ -22,7 +22,7 @@ import {
   useDeleteUserByItselfMutation,
 } from '../../../../redux/reducers/user/userThunk';
 import {handleCurrentLoaginUser} from '../../../../redux/reducers/user/user'
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
 import {Modalize} from 'react-native-modalize';

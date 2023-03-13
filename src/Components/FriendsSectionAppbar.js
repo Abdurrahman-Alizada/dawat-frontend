@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import {Menu, Divider, Appbar, useTheme} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
   const navigation = useNavigation();

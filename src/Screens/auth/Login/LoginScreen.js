@@ -22,7 +22,7 @@ import {
 } from 'react-native-paper';
 import {useLoginUserMutation} from '../../../redux/reducers/user/userThunk';
 import {handleCurrentLoaginUser} from '../../../redux/reducers/user/user';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {userApi} from '../../../redux/reducers/user/userThunk';
 import {groupApi} from '../../../redux/reducers/groups/groupThunk';
