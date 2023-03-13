@@ -58,6 +58,16 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    updateInvitiStatus: build.mutation({
+      query: inviti => ({
+        url: `/api/group/invitations/${inviti.id}/updateInviteStatus`,
+        method: 'PATCH',
+        body: {
+          lastStatus: inviti.lastStatus
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
   }),
 });
 
@@ -65,7 +75,8 @@ export const {
   useGetAllInvitationsQuery,
   useAddInvitiMutation,
   useUpdateInvitiMutation,
-  useDeleteInvitiMutation
+  useDeleteInvitiMutation,
+  useUpdateInvitiStatusMutation
 } = InvitaionsApi;
 
 
