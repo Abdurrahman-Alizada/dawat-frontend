@@ -5,7 +5,7 @@ import {Avatar, Drawer, List, Switch, useTheme} from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useDispatch} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
