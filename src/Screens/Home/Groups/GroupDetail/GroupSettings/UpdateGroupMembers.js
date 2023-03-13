@@ -48,7 +48,6 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
 
   const handleAddMember = async () => {
-    for (let i = 0; i < users.length; i++) {
       addUserToGroup({
         chatId: currentViewingGroup._id,
         userId: users,
@@ -61,7 +60,6 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
         .catch(e => {
           console.log('error in handleAddMember', e);
         });
-    }
   };
 
   const getResponsibles = () => {
@@ -112,7 +110,6 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
         <Text
           key={index}
           style={
-            
             piece.toLocaleLowerCase() == search.toLocaleLowerCase()
               ? {fontWeight:"bold", color: theme.colors.primary}
               : {fontWeight:"bold",}
@@ -139,7 +136,6 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
       <View>
         <List.Item
           onPress={add}
-          // title={itemProps.name}
           title={getHighlightedText(itemProps.name)}
           // description={itemProps.email}
           left={props => (
@@ -170,13 +166,15 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header elevated style={{backgroundColor:theme.colors.elevation.level3}}>
           <Searchbar
-            elevation={6}
+            elevation={7}
+            theme={{roundness:0}}
             placeholder="Search"
             icon={'close'}
             autoFocus
             onIconPress={() => {
+              setSearch('')
               setIsSearch(false);
             }}
             onChangeText={updateSearch}
@@ -184,7 +182,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
