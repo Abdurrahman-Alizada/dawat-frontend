@@ -1,4 +1,3 @@
 <resources>
-    <string name="app_name">AwesomeProject</string>
-    <color name="primary_dark">#000000</color>
+    <string name="app_name">simple</string>
 </resources>

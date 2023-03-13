@@ -11,7 +11,7 @@ import {
 
 import GlobalStyles from '../../GlobalStyles';
 
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({navigation}) => {
   const isAppFirstLaunched = useRef(true); //onboarding screen decision

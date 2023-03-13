@@ -1,7 +1,7 @@
 import {View} from 'react-native';
 import React from 'react';
 import {List, Divider, Appbar} from 'react-native-paper';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Index = ({navigation}) => {
 
   

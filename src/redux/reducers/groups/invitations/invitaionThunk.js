@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { baseURL } from '../../../axios';
 export const InvitaionsApi = createApi({
   baseQuery: fetchBaseQuery({

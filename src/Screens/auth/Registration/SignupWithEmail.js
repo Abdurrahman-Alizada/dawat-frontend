@@ -13,7 +13,7 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {useNavigation} from '@react-navigation/native';
 import {useRegisterUserMutation} from '../../../redux/reducers/user/userThunk';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').label('Name'),
