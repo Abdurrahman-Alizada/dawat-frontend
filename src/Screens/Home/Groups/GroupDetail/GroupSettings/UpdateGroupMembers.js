@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-//   import Skeleton from '../../Skeletons/InvitationsList';
 import Skeleton from '../../../../Skeletons/InvitationsList';
 import {
   Text,
@@ -20,16 +19,13 @@ import {
   Divider,
   Checkbox,
   useTheme,
-  ActivityIndicator,
 } from 'react-native-paper';
 import {useGetAllFriendsQuery} from '../../../../../redux/reducers/Friendship/friendshipThunk';
 import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
 import {useAddUserToGroupMutation} from '../../../../../redux/reducers/groups/groupThunk';
 import {useSelector, useDispatch} from 'react-redux';
-import {useRef} from 'react';
-import {useLayoutEffect} from 'react';
 
-const AddGroup = ({navigation, onClose, route}) => {
+const UpdateGroupMembers = ({navigation, onClose, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -41,6 +37,9 @@ const AddGroup = ({navigation, onClose, route}) => {
     useGetAllFriendsQuery(currentLoginUser?._id);
 
   const [friends, setFriends] = useState(data?.accepted);
+  useEffect(()=>{
+   setFriends(data?.accepted)
+  },[data])
 
   const [addUserToGroup, {isLoading: addUserLoading}] =
     useAddUserToGroupMutation();
@@ -83,7 +82,6 @@ const AddGroup = ({navigation, onClose, route}) => {
     const [isSearch, setIsSearch] = useState(false);
     const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to group");
     const [filteredDataSource, setFilteredDataSource] = useState([]);
-    const [masterDataSource, setMasterDataSource] = useState([]);
   
     const updateSearch = search => {
       setSearch(search);
@@ -91,10 +89,9 @@ const AddGroup = ({navigation, onClose, route}) => {
     };
   
     const searchFilterFunction = text => {
-      setMasterDataSource(friends);
       setFilteredDataSource(friends);
       if (text) {
-        const newData = masterDataSource?.filter(item => {
+        const newData = friends?.filter(item => {
           const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
           const textData = text.toUpperCase();
           return itemData.indexOf(textData) > -1;
@@ -105,7 +102,7 @@ const AddGroup = ({navigation, onClose, route}) => {
         setFilteredDataSource(newData);
       } 
       else {
-        setFilteredDataSource(masterDataSource);
+        setFilteredDataSource(friends);
       }
     };
   
@@ -115,9 +112,10 @@ const AddGroup = ({navigation, onClose, route}) => {
         <Text
           key={index}
           style={
+            
             piece.toLocaleLowerCase() == search.toLocaleLowerCase()
-              ? {backgroundColor: 'yellow', color: '#000'}
-              : {}
+              ? {fontWeight:"bold", color: theme.colors.primary}
+              : {fontWeight:"bold",}
           }>
           {piece}
         </Text>
@@ -286,7 +284,7 @@ const AddGroup = ({navigation, onClose, route}) => {
   );
 };
 
-export default AddGroup;
+export default UpdateGroupMembers;
 
 const styles = StyleSheet.create({
   images: {

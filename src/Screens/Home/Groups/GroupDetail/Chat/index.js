@@ -1,11 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  Image,
-} from 'react-native';
+import {View, Text, FlatList, RefreshControl, Image} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {Button, useTheme} from 'react-native-paper';
@@ -15,14 +9,13 @@ import {
 } from '../../../../../redux/reducers/groups/chat/chatThunk';
 import ChatInput from './ChatInput';
 import Message from './Message';
-import { baseURL } from '../../../../../redux/axios';
-import { FlashList } from "@shopify/flash-list";
+import {baseURL} from '../../../../../redux/axios';
+import {FlashList} from '@shopify/flash-list';
 
 // for socket.io
-import io from "socket.io-client";
+import io from 'socket.io-client';
 
 const MessagesScreen = ({navigation}) => {
-  
   const dispatch = useDispatch();
   const theme = useTheme();
   const listRef = useRef();
@@ -36,7 +29,7 @@ const MessagesScreen = ({navigation}) => {
   const {data, isLoading, refetch, isFetching, isError, error} =
     useGetAllMessagesQuery({groupId: currentViewingGroup?._id});
 
-    const [addNewMessage, {isLoading: addNewMessageLoading}] =
+  const [addNewMessage, {isLoading: addNewMessageLoading}] =
     useAddNewMessageMutation();
 
   // socket
@@ -45,53 +38,56 @@ const MessagesScreen = ({navigation}) => {
   let socket;
   const [socket1, setSocket1] = useState(null);
 
-   useLayoutEffect(() => {
-    socket = io(ENDPOINT)
-    socket?.emit("setup", currentLoginUser);
-    socket?.emit("join chat", currentViewingGroup._id);
-    
-    setSocket1(io(ENDPOINT))
-  },[])
+  useLayoutEffect(() => {
+    socket = io(ENDPOINT);
+    socket?.emit('setup', currentLoginUser);
+    socket?.emit('join chat', currentViewingGroup._id);
 
-  useEffect(()=>{
-    if(data){
-      setMessages(data)
+    setSocket1(io(ENDPOINT));
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      setMessages(data);
     }
-  },[data])
+  }, [data]);
 
-  useEffect(()=>{
-    socket?.on("message received", (newMessageReceived) => {
-      if ( currentViewingGroup?._id !== newMessageReceived?.group?._id) {
+  useEffect(() => {
+    socket?.on('message received', newMessageReceived => {
+      if (currentViewingGroup?._id !== newMessageReceived?.group?._id) {
         return;
       }
-     setMessages(prevState => [...prevState, newMessageReceived])
+      setMessages(prevState => [newMessageReceived, ...prevState]);
     });
-  },[messages])
+  }, [messages]);
 
   // end
 
   const handleAddNewMessage = () => {
     setNewMessage('');
-    setMessages(prevState => [{
-      _id : Math.floor(Math.random() * 100) + 1,
-      content : newMessage,
-      addedBy : currentLoginUser,
-      group : currentViewingGroup,
-      createdAd : new Date()
-    }, ...prevState ])
+    setMessages(prevState => [
+      {
+        _id: Math.floor(Math.random() * 100) + 1,
+        content: newMessage,
+        addedBy: currentLoginUser,
+        group: currentViewingGroup,
+        createdAd: new Date(),
+      },
+      ...prevState,
+    ]);
     addNewMessage({
       content: newMessage,
       groupId: currentViewingGroup?._id,
       addedBy: currentLoginUser?._id,
     })
       .then(res => {
-        socket1?.emit("new message", res.data);
+        socket1?.emit('new message', res.data);
       })
       .catch(err => {
         console.log(err.message);
       });
   };
-     
+
   return (
     <View style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
@@ -126,7 +122,7 @@ const MessagesScreen = ({navigation}) => {
             data={messages}
             keyExtractor={item => item._id}
             estimatedItemSize={150}
-            initialNumToRender={10} 
+            initialNumToRender={10}
             ref={listRef}
             ListEmptyComponent={() => (
               <View style={{flex: 1, alignItems: 'center'}}>
@@ -145,18 +141,7 @@ const MessagesScreen = ({navigation}) => {
               </View>
             )}
             disableAutoLayout={true}
-            inverted
-            // onContentSizeChange={() => {
-            //   listRef.current?.scrollToEnd();
-            // }}
-            // initialScrollIndex={messages.length - 2}
-          //  onLoad={() => {
-          //     listRef.current?.scrollToEnd();
-          //   }}
-          //  onLoad={() => {
-          //     listRef.current?.scrollToEnd();
-          //   }}
-          // scrollToIndex={1}
+            inverted={messages.length !== 0 ? true : false}
             renderItem={({item}) => (
               <Message
                 item={item}
@@ -168,42 +153,6 @@ const MessagesScreen = ({navigation}) => {
               <RefreshControl refreshing={isLoading} onRefresh={refetch} />
             }
           />
-          // <FlatList
-          //   data={messages}
-          //   keyExtractor={item => item._id}
-          //   // initialNumToRender={10} 
-          //   ref={listRef}
-          //   inverted
-          //   ListEmptyComponent={() => (
-          //     <View style={{flex: 1, alignItems: 'center'}}>
-          //       <Image
-          //         source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
-          //       />
-          //       <Text>Send message to start conversation</Text>
-          //       <Text>or</Text>
-          //       <Button
-          //         icon="refresh"
-          //         mode="contained"
-          //         style={{marginTop: '5%'}}
-          //         onPress={refetch}>
-          //         Refresh
-          //       </Button>
-          //     </View>
-          //   )}
-          //   // onContentSizeChange={() => {
-          //   //   listRef.current?.scrollToEnd();
-          //   // }}
-          //   renderItem={({item}) => (
-          //     <Message
-          //       item={item}
-          //       currentLoginUser={currentLoginUser}
-          //       theme={theme}
-          //     />
-          //   )}
-          //   refreshControl={
-          //     <RefreshControl refreshing={isLoading} onRefresh={refetch} />
-          //   }
-          // />
         )}
       </View>
 
