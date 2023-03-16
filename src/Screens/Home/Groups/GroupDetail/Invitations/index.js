@@ -57,10 +57,12 @@ export default function Example({route}) {
   const currentInvitiToDisplay = useSelector(
     state => state.invitations?.currentInviti,
   );
-  const invitationSearchQuery = useSelector(state=> state.invitations.invitationSearchQuery)
+  const invitationSearchQuery = useSelector(
+    state => state.invitations.invitationSearchQuery,
+  );
 
   useEffect(() => {
-    dispatch(handleInvitions(data))
+    dispatch(handleInvitions(data));
   }, [data]);
 
   const isInvitaionSearch = useSelector(
@@ -72,7 +74,6 @@ export default function Example({route}) {
   // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
   const currentInviti = useRef({});
   const FABHandler = item => {
-
     currentInviti.current = item ? item : {};
     navigation.navigate('AddInviti', {
       groupId: groupId,
@@ -84,6 +85,8 @@ export default function Example({route}) {
     {id: 0, name: 'Invited', selected: true},
     {id: 1, name: 'Rejected', selected: false},
     {id: 2, name: 'Pending', selected: true},
+    {id: 3, name: 'Pending', selected: false},
+    {id: 4, name: 'Pending', selected: true},
   ]);
   const [selectedChips, setSelectedChips] = useState([]);
   const selectedChipsHandler = id => {
@@ -106,20 +109,24 @@ export default function Example({route}) {
   const theme = useTheme();
 
   const getHighlightedText = result =>
-  result.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
-    return (
-      <Text
-        key={index}
-        style={
-          piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase()
-            ? {fontWeight:"bold", color: theme.colors.primary}
-            : {}
-        }>
-        {piece}
-      </Text>
-    );
-  });
+    result
+      .split(new RegExp(`(${invitationSearchQuery})`, `gi`))
+      .map((piece, index) => {
+        return (
+          <Text
+            key={index}
+            style={
+              piece.toLocaleLowerCase() ==
+              invitationSearchQuery.toLocaleLowerCase()
+                ? {fontWeight: 'bold', color: theme.colors.primary}
+                : {}
+            }>
+            {piece}
+          </Text>
+        );
+      });
 
+  // item to render in flatlist
   const AccordionItem = ({item}) => {
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
@@ -223,26 +230,7 @@ export default function Example({route}) {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          padding: '2%',
-          width: '100%',
-          justifyContent: 'space-between',
-        }}>
-        {chips.map(chip => (
-          <View key={chip.id} style={{marginHorizontal: '2%'}}>
-            <Chip
-              selected={chip.selected}
-              mode="flat"
-              onPress={() => console.log('Pressed')}>
-              {chip.name}
-            </Chip>
-          </View>
-        ))}
-      </View> */}
-
+    <View style={{flexGrow:1, backgroundColor: theme.colors.background}}>
       <Banner
         visible={isExportBanner}
         actions={[
@@ -255,7 +243,22 @@ export default function Example({route}) {
         Invitaions List of this group has been exported in Downlaod folder
         successfully
       </Banner>
-
+        
+        {/* <View>
+            <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >
+              {chips.map((chip, index) => (
+                <View key={index} style={{marginHorizontal: '2%'}}>
+                  <Chip
+                    selected={chip.selected}
+                    mode={chip.selected ? 'flat' : 'outlined'}
+                    onPress={() => console.log('Pressed')}>
+                    {chip.name}
+                  </Chip>
+                </View>
+              ))}
+            </ScrollView>
+        </View> */}
+ 
       {isLoading ? (
         <View
           style={{
