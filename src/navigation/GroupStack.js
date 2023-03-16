@@ -10,10 +10,12 @@ import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSetting
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/InvitiDetails';
 import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
+import AddMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddMultipleInviti';
 import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/TaskDetails'
 import UpdateTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/UndateTaskMembers'
 import AddTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/AddTaskMembers'
 import UpdateGroupMembers from '../Screens/Home/Groups/GroupDetail/GroupSettings/UpdateGroupMembers'
+
 const Stack = createStackNavigator();
 
 const AppStack = () => {
@@ -107,6 +109,14 @@ const AppStack = () => {
         options={{
           // headerShown:false
           header: (props) => <GeneralAppbar title="Add inviti" {...props} />,
+        }}
+      />
+      <Stack.Screen
+        name="AddMultipleInviti"
+        component={AddMultipleInviti}
+        options={{
+          // headerShown:false,
+          header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
         }}
       />
     </Stack.Navigator>

@@ -1,33 +1,22 @@
-import React, {useCallback, useState} from 'react';
-import {TouchableOpacity, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import {Button, Avatar, List, Snackbar} from 'react-native-paper';
 import RNFS from 'react-native-fs';
-import {jsonToCSV} from 'react-native-csv';
+import {jsonToCSV, readString} from 'react-native-csv';
 import {useSelector, useDispatch} from 'react-redux';
-import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {
+  useGetAllInvitationsQuery,
+  useAddMultipleInvitiMutation,
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import moment from 'moment';
 import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+import DocumentPicker, {types} from 'react-native-document-picker';
+import { useNavigation } from '@react-navigation/native';
 
 const Index = ({group, onClose}) => {
   const dispatch = useDispatch();
-
-  const [textShown, setTextShown] = useState(false); //To show ur remaining Text
-  const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
-  const toggleNumberOfLines = () => {
-    //To toggle the show text or hide it
-    setTextShown(!textShown);
-    console.log('clicked');
-  };
-
-  const onTextLayout = useCallback(
-    e => {
-      setLengthMore(e.nativeEvent.lines.length >= 2); //to check the text is more than 4 lines or not
-      // console.log(e.nativeEvent);
-    },
-    [textShown],
-  );
-
+  const navigation = useNavigation();
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
@@ -44,66 +33,138 @@ const Index = ({group, onClose}) => {
     groupId: currentViewingGroup._id,
   });
 
+  const [addMultipleInviti, {isLoading: addMultipleInvitiLoading}] =
+    useAddMultipleInvitiMutation();
+
+  const importCSV = () => {
+    check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+      .then(result => {
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+            console.log(
+              'This feature is not available (on this device / in this context)',
+            );
+            break;
+          case RESULTS.DENIED:
+            console.log(
+              'The permission has not been requested / is denied but requestable',
+            );
+            request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+              .then(result => {
+                console.log(result);
+                if (result.data) uploadCSV();
+              })
+              .catch(error => {
+                console.log(error.message);
+              });
+            break;
+          case RESULTS.LIMITED:
+            console.log('The permission is limited: some actions are possible');
+            break;
+          case RESULTS.GRANTED:
+            uploadCSV();
+            break;
+          case RESULTS.BLOCKED:
+            console.log('The permission is denied and not requestable anymore');
+            break;
+        }
+      })
+      .catch(error => {
+        console.log('error is=>', error.message);
+      });
+  };
+
+  const uploadCSV = async () => {
+    try {
+      const res = await DocumentPicker.pickSingle({
+        type: types.csv
+      });
+      if (res.type === 'text/comma-separated-values') {
+        RNFS.readFile(res.uri, 'ascii')
+          .then(response => {
+            const results = readString(response);
+            onClose();
+            navigation.navigate("AddMultipleInviti", {data:results.data})
+           })
+          .catch(e => {
+            console.log(e);
+          });
+      } else {
+        alert('Please select .csv file');
+      }
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        onClose();
+        alert('You did not pick any file');
+      } else {
+        alert('Unknown Error: ' + JSON.stringify(err));
+        throw err;
+      }
+    }
+  };
+
   const [exportLoading, setExportLoading] = useState(false);
   const exportCSV = () => {
-     saveCSV();
-    // check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
-    //   .then(result => {
-    //     switch (result) {
-    //       case RESULTS.UNAVAILABLE:
-    //         console.log(
-    //           'This feature is not available (on this device / in this context)',
-    //         );
-    //         break;
-    //       case RESULTS.DENIED:
-    //         console.log(
-    //           'The permission has not been requested / is denied but requestable',
-    //         );
-    //         request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
-    //           .then(result => {
-    //             console.log(result)
-    //             if(result.data)
-    //             saveCSV()
-    //           })
-    //           .catch(error => {
-    //             console.log(error.message);
-    //           });
-    //         break;
-    //       case RESULTS.LIMITED:
-    //         console.log('The permission is limited: some actions are possible');
-    //         break;
-    //       case RESULTS.GRANTED:
-    //         saveCSV();
-    //         break;
-    //       case RESULTS.BLOCKED:
-    //         console.log('The permission is denied and not requestable anymore');
-    //         break;
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.log(error.message);
-    //   });
+    //  saveCSV();
+    check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+      .then(result => {
+        console.log(result);
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+            console.log(
+              'This feature is not available (on this device / in this context)',
+            );
+            break;
+          case RESULTS.DENIED:
+            console.log(
+              'The permission has not been requested / is denied but requestable',
+            );
+            request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
+              .then(result => {
+                console.log(result);
+                if (result.data) saveCSV();
+              })
+              .catch(error => {
+                console.log(error.message);
+              });
+            break;
+          case RESULTS.LIMITED:
+            console.log('The permission is limited: some actions are possible');
+            break;
+          case RESULTS.GRANTED:
+            saveCSV();
+            break;
+          case RESULTS.BLOCKED:
+            console.log('The permission is denied and not requestable anymore');
+            break;
+        }
+      })
+      .catch(error => {
+        console.log('error is=>', error.message);
+      });
   };
 
   const saveCSV = async () => {
     const jsonData = data.map(user => {
       return {
         'Inviti name': user.invitiName,
-        'Inviti contact': user.email,
-        'Added by': user.addedBy.name,
-        'Last status': user.lastStatus.invitiStatus,
-        'Last status updated by': user.lastStatus.addedBy.name,
+        'Inviti Description': user.invitiDescription,
+        'Inviti contact': user.contact,
+        'Added by': user?.addedBy?.name,
+        'Last status': user?.lastStatus?.invitiStatus,
+        'Last status updated by': user?.lastStatus?.addedBy?.name,
+        'Image URL of inviti': user.invitiImageURL,
       };
     });
     const results = jsonToCSV(jsonData);
-    const date = moment(new Date()).format(' d_MMM_YYYY_hh_mm_ss_A')
-    const path = RNFS.DownloadDirectoryPath + `/${currentViewingGroup.groupName}${date}.csv`;
-
-   console.log(await RNFS.exists(path))
+    const date = moment(new Date()).format(' d_MMM_YYYY_hh_mm_ss_A');
+    const path =
+      RNFS.DownloadDirectoryPath +
+      `/${currentViewingGroup.groupName}${date}.csv`;
 
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
-        console.log('FILE WRITTEN!');
+        console.log('FILE WRITTEN!',success);
         setExportLoading(false);
         onClose();
         dispatch(handleIsExportBanner(true));
@@ -143,6 +204,14 @@ const Index = ({group, onClose}) => {
         icon={'download'}
         style={{marginTop: '5%'}}>
         Downlaod Invitations list
+      </Button>
+      <Button
+        loading={addMultipleInvitiLoading}
+        onPress={importCSV}
+        mode="contained-tonal"
+        icon={'upload'}
+        style={{marginTop: '5%'}}>
+        Upload Invitations list to add in this group
       </Button>
 
       <Snackbar

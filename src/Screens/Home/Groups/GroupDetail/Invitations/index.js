@@ -11,7 +11,11 @@ import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {
+  handleInvitions,
+  handleCurrentInviti,
+  handleIsExportBanner,
+} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import {
   List,
   Avatar,
@@ -20,14 +24,11 @@ import {
   Chip,
   useTheme,
   Banner,
-  Portal,
-  Provider,
   Divider,
 } from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
-import {handleCurrentInviti} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import moment from 'moment';
 import {FlashList} from '@shopify/flash-list';
 import Animated, {
@@ -42,36 +43,36 @@ export default function Example({route}) {
   const navigation = useNavigation();
 
   const {groupId} = route.params;
-  const modalizeRef = useRef(null);
   const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
   const isExportBanner = useSelector(
     state => state.invitations?.isExportBanner,
   );
 
-  const {
-    data,
-    isError,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-    getAllInvitations,
-  } = useGetAllInvitationsQuery({
-    groupId,
-  });
-
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const {data, isError, isLoading, error, isFetching, refetch} =
+    useGetAllInvitationsQuery({
+      groupId,
+    });
 
   const currentInvitiToDisplay = useSelector(
     state => state.invitations?.currentInviti,
   );
+  const invitationSearchQuery = useSelector(state=> state.invitations.invitationSearchQuery)
 
+  useEffect(() => {
+    dispatch(handleInvitions(data))
+  }, [data]);
+
+  const isInvitaionSearch = useSelector(
+    state => state.invitations.isInvitaionSearch,
+  );
+  const invitaionsForSearch = useSelector(
+    state => state.invitations.invitations,
+  );
   // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
   const currentInviti = useRef({});
   const FABHandler = item => {
+
     currentInviti.current = item ? item : {};
     navigation.navigate('AddInviti', {
       groupId: groupId,
@@ -104,6 +105,21 @@ export default function Example({route}) {
 
   const theme = useTheme();
 
+  const getHighlightedText = result =>
+  result.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
+    return (
+      <Text
+        key={index}
+        style={
+          piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase()
+            ? {fontWeight:"bold", color: theme.colors.primary}
+            : {}
+        }>
+        {piece}
+      </Text>
+    );
+  });
+
   const AccordionItem = ({item}) => {
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
@@ -130,7 +146,8 @@ export default function Example({route}) {
       <TouchableWithoutFeedback onPress={toggleButton}>
         <View>
           <List.Item
-            title={item.invitiName}
+            // title={item.invitiName}
+            title={getHighlightedText(item.invitiName)}
             description={item.invitiDescription}
             left={props => (
               <Avatar.Image
@@ -206,7 +223,6 @@ export default function Example({route}) {
   };
 
   return (
-
     <View style={{flex: 1, backgroundColor: theme.colors.background}}>
       {/* <View
         style={{
@@ -249,7 +265,7 @@ export default function Example({route}) {
         </View>
       ) : (
         <FlashList
-          data={data}
+          data={isInvitaionSearch ? invitaionsForSearch : data}
           estimatedItemSize={100}
           // keyExtractor={item => item._id}
           ListEmptyComponent={() => (
@@ -267,7 +283,6 @@ export default function Example({route}) {
       <FAB
         icon="plus"
         size="medium"
-        // variant="primary"
         style={styles.fab}
         onPress={() => FABHandler()}
       />
@@ -282,7 +297,6 @@ export default function Example({route}) {
         HeaderComponent={() => (
           <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
         )}>
-        
         <List.Accordion style={{padding: '4%'}} title="Statuses">
           <View style={{marginHorizontal: '5%'}}>
             <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
@@ -371,7 +385,6 @@ export default function Example({route}) {
             </ScrollView>
           </View>
         </List.Accordion>
-     
       </Modalize>
     </View>
   );

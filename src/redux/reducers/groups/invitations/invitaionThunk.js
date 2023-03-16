@@ -33,6 +33,17 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    addMultipleInviti: build.mutation({
+      query: data => ({
+        url: `/api/group/invitations/addMultiple`,
+        method: 'POST',
+        body: {
+          invities : data.invities,
+          groupId: data.groupId,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
     updateInviti: build.mutation({
       query: inviti => ({
         url: `/api/group/invitations/update`,
@@ -76,7 +87,8 @@ export const {
   useAddInvitiMutation,
   useUpdateInvitiMutation,
   useDeleteInvitiMutation,
-  useUpdateInvitiStatusMutation
+  useUpdateInvitiStatusMutation,
+  useAddMultipleInvitiMutation
 } = InvitaionsApi;
 
 
