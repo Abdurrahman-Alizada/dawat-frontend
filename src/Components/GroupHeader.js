@@ -1,23 +1,33 @@
 import React, {useState} from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {
+  List,
   Menu,
   Divider,
   Appbar,
   Searchbar,
   Avatar,
   useTheme,
+  IconButton,
   Text,
 } from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  handleIsInvitationSearch,
+  handleInvitationSearch,
+} from '../redux/reducers/groups/invitations/invitationSlice';
 
-const Header = ({isSearch, setIsSearch, onOpen, group}) => {
+const Header = ({onOpen, group}) => {
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const navigation = useNavigation();
+
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
-  const theme = useTheme();
-  
+  const currentTab = useSelector(state => state.groups.currentTab);
+
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
       return user.name;
@@ -27,14 +37,19 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
       : `${membersText.toString().substring(0, 25)}...`;
   };
 
-  const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
+  const isInvitaionSearch = useSelector(
+    state => state.invitations.isInvitaionSearch,
+  );
+
   const updateSearch = search => {
     setSearch(search);
+    dispatch(handleInvitationSearch(search));
   };
   const BlurHandler = () => {
-    setIsSearch(!isSearch);
+    setSearch('');
+    dispatch(handleIsInvitationSearch(false));
   };
   // end search
 
@@ -48,53 +63,58 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
   // end more menu
   return (
     <>
-      {!isSearch ? (
+      {!isInvitaionSearch ? (
         <Appbar
           elevated={true}
-          style={{flexDirection: 'row', justifyContent: 'flex-start', backgroundColor: theme.colors.background}}
-          
-          >
-          <View>
-            <Appbar.BackAction onPress={() => navigation.goBack()} />
-          </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('SingleGroupSettings', {group: group});
-            }}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            backgroundColor: theme.colors.background,
+          }}>
+          <View
             style={{
               flexDirection: 'row',
-              width: '70%',
-              alignItems: 'flex-end',
+              alignItems: 'center',
               justifyContent: 'flex-start',
+              maxWidth: '70%',
             }}>
-            <Avatar.Image
-              size={40}
-              source={
-                currentViewingGroup.imageURL
-                  ? {uri: currentViewingGroup.imageURL}
-                  : require('../assets/drawer/male-user.png')
-              }
-              // source={require('../assets/drawer/male-user.png')}
-            />
-            <View style={{marginLeft: 5}}>
-              <Text style={{fontSize: 18, fontWeight: '700'}}>
-                {currentViewingGroup.groupName?.length > 18
-                  ? `${currentViewingGroup.groupName.substring(0, 18)}...`
-                  : currentViewingGroup.groupName}
-              </Text>
-              <Text
-                style={{
-                  width: '100%',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                  flexDirection: 'row',
-                  // marginLeft: 5,
-                }}>
-                {getMembersOfGroup()}
-              </Text>
-            </View>
-          </TouchableOpacity>
+            <Appbar.BackAction onPress={() => navigation.goBack()} />
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('SingleGroupSettings', {group: group});
+              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-start',
+              }}>
+              <Avatar.Image
+                size={40}
+                source={
+                  currentViewingGroup.imageURL
+                    ? {uri: currentViewingGroup.imageURL}
+                    : require('../assets/drawer/male-user.png')
+                }
+              />
+              <View style={{marginLeft: 5}}>
+                <Text style={{fontSize: 18, fontWeight: '700'}}>
+                  {currentViewingGroup.groupName?.length > 18
+                    ? `${currentViewingGroup.groupName.substring(0, 18)}...`
+                    : currentViewingGroup.groupName}
+                </Text>
+                <Text
+                  style={{
+                    width: '100%',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    flexDirection: 'row',
+                    // marginLeft: 5,
+                  }}>
+                  {getMembersOfGroup()}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
           <View
             style={{
@@ -102,23 +122,102 @@ const Header = ({isSearch, setIsSearch, onOpen, group}) => {
               alignSelf: 'flex-end',
               justifyContent: 'flex-end',
             }}>
-            <Appbar.Action
-              icon="briefcase-outline"
-              onPress={() => {
-                onOpen();
-              }}
-            />
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <IconButton
+                  icon="dots-vertical"
+                  size={25}
+                  onPress={() => openMenu()}
+                />
+              }>
+              {currentTab === 'Invitations' && (
+                <View>
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      dispatch(handleIsInvitationSearch(true));
+                    }}
+                    title="Search for inviti"
+                    leadingIcon={'account-search'}
+                  />
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      onOpen();
+                    }}
+                    title="Import/Export"
+                    leadingIcon={'microsoft-excel'}
+                  />
+                  <Divider />
+
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('AddMultipleInviti');
+                    }}
+                    title="Add multiple inviti"
+                    leadingIcon={'account-multiple-plus'}
+                  />
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('MarkMultipleInviti');
+                    }}
+                    title="Mark multiple"
+                    leadingIcon={'checkbox-multiple-blank-circle-outline'}
+                  />
+                  <Divider />
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('DeleteMultipleInviti');
+                    }}
+                    title="Delete multiple inviti"
+                    leadingIcon={() => (
+                      <List.Icon color={theme.colors.tertiary} icon="delete" />
+                    )}
+                    titleStyle={{color: theme.colors.tertiary}}
+                  />
+                </View>
+              )}
+              {currentTab === 'Tasks' && (
+                <View>
+                  <Menu.Item
+                    onPress={() => {
+                      console.log('Search for task');
+                    }}
+                    title="Search for task"
+                    leadingIcon={'calendar-search'}
+                  />
+                </View>
+              )}
+              {currentTab === 'Chat' && (
+                <View>
+                  <Menu.Item
+                    onPress={() => {
+                      console.log('Task menu 1');
+                    }}
+                    title="Search for chat"
+                    leadingIcon={'comment-search-outline'}
+                  />
+                </View>
+              )}
+            </Menu>
           </View>
         </Appbar>
       ) : (
         <View>
           <Searchbar
-            placeholder="Search anything"
+            placeholder="Search..."
             onChangeText={updateSearch}
             value={search}
             cancelButtonTitle="cancel"
             autoFocus
-            onBlur={BlurHandler}
+            icon="arrow-left"
+            onIconPress={BlurHandler}
+            theme={{roundness: 0}}
             cancel={() => {
               console.log('hello');
             }}

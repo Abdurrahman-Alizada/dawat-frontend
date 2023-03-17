@@ -2,7 +2,8 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
   totalgroups: [],
-  currentViewingGroup : {} 
+  currentViewingGroup : {},
+  currentTab : "Invitations"
 };
 
 export const groupSlice = createSlice({
@@ -12,10 +13,13 @@ export const groupSlice = createSlice({
     handleCurrentViewingGroup: (state, action) => {
       state.currentViewingGroup = action.payload;
     },
+    handleCurrentTab: (state, action) => {
+      state.currentTab = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {handleCurrentViewingGroup} = groupSlice.actions;
+export const {handleCurrentViewingGroup, handleCurrentTab} = groupSlice.actions;
 
 export default groupSlice.reducer;

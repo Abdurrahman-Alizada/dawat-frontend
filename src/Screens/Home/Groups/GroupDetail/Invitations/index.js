@@ -1,49 +1,76 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   StyleSheet,
   View,
   FlatList,
   RefreshControl,
   ScrollView,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
 import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
-import {List, Avatar, FAB, Text, useTheme, Banner} from 'react-native-paper';
+import {
+  handleInvitions,
+  handleCurrentInviti,
+  handleIsExportBanner,
+} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {
+  List,
+  Avatar,
+  FAB,
+  Text,
+  Chip,
+  useTheme,
+  Banner,
+  Divider,
+} from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
-import {handleCurrentInviti} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import moment from 'moment';
+import {FlashList} from '@shopify/flash-list';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
 export default function Example({route}) {
   const navigation = useNavigation();
 
   const {groupId} = route.params;
-  const modalizeRef = useRef(null);
   const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
   const isExportBanner = useSelector(
     state => state.invitations?.isExportBanner,
   );
 
-  const {
-    data,
-    isError,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-    getAllInvitations,
-  } = useGetAllInvitationsQuery({
-    groupId,
-  });
+  const {data, isError, isLoading, error, isFetching, refetch} =
+    useGetAllInvitationsQuery({
+      groupId,
+    });
 
   const currentInvitiToDisplay = useSelector(
     state => state.invitations?.currentInviti,
   );
+  const invitationSearchQuery = useSelector(
+    state => state.invitations.invitationSearchQuery,
+  );
 
+  useEffect(() => {
+    dispatch(handleInvitions(data));
+  }, [data]);
+
+  const isInvitaionSearch = useSelector(
+    state => state.invitations.isInvitaionSearch,
+  );
+  const invitaionsForSearch = useSelector(
+    state => state.invitations.invitations,
+  );
   // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
   const currentInviti = useRef({});
   const FABHandler = item => {
@@ -58,6 +85,8 @@ export default function Example({route}) {
     {id: 0, name: 'Invited', selected: true},
     {id: 1, name: 'Rejected', selected: false},
     {id: 2, name: 'Pending', selected: true},
+    {id: 3, name: 'Pending', selected: false},
+    {id: 4, name: 'Pending', selected: true},
   ]);
   const [selectedChips, setSelectedChips] = useState([]);
   const selectedChipsHandler = id => {
@@ -69,7 +98,7 @@ export default function Example({route}) {
     onBriefOpen();
   };
 
-  const onBriefOpen = item => {
+  const onBriefOpen = () => {
     invitiBriefModalizeRef.current?.open();
   };
 
@@ -79,27 +108,129 @@ export default function Example({route}) {
 
   const theme = useTheme();
 
-  return (
-    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          padding: '2%',
-          width: '100%',
-          justifyContent: 'space-between',
-        }}>
-        {chips.map(chip => (
-          <View key={chip.id} style={{marginHorizontal: '2%'}}>
-            <Chip
-              selected={chip.selected}
-              mode="flat"
-              onPress={() => console.log('Pressed')}>
-              {chip.name}
-            </Chip>
-          </View>
-        ))}
-      </View> */}
+  const getHighlightedText = result =>
+    result
+      .split(new RegExp(`(${invitationSearchQuery})`, `gi`))
+      .map((piece, index) => {
+        return (
+          <Text
+            key={index}
+            style={
+              piece.toLocaleLowerCase() ==
+              invitationSearchQuery.toLocaleLowerCase()
+                ? {fontWeight: 'bold', color: theme.colors.primary}
+                : {}
+            }>
+            {piece}
+          </Text>
+        );
+      });
 
+  // item to render in flatlist
+  const AccordionItem = ({item}) => {
+    const shareValue = useSharedValue(0);
+    const [bodySectionHeight, setBodySectionHeight] = useState(0);
+
+    const bodyHeight = useAnimatedStyle(() => ({
+      height: interpolate(shareValue.value, [0, 1], [0, bodySectionHeight]),
+    }));
+
+    const toggleButton = () => {
+      if (shareValue.value === 0) {
+        shareValue.value = withTiming(1, {
+          duration: 500,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+      } else {
+        shareValue.value = withTiming(0, {
+          duration: 200,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+      }
+    };
+
+    return (
+      <TouchableWithoutFeedback onPress={toggleButton}>
+        <View>
+          <List.Item
+            // title={item.invitiName}
+            title={getHighlightedText(item.invitiName)}
+            description={item.invitiDescription}
+            left={props => (
+              <Avatar.Image
+                style={props.style}
+                size={45}
+                avatarStyle={{borderRadius: 20}}
+                source={
+                  item.invitiImageURL
+                    ? {uri: item.invitiImageURL}
+                    : require('../../../../../assets/drawer/male-user.png')
+                }
+              />
+            )}
+            style={{paddingVertical: '1%'}}
+            right={props => {
+              if (item.lastStatus.invitiStatus === 'invited')
+                return <List.Icon {...props} icon="check" />;
+              if (item.lastStatus.invitiStatus === 'pending')
+                return <List.Icon {...props} icon="clock-outline" />;
+              else if (item.lastStatus.invitiStatus === 'rejected')
+                return <List.Icon {...props} icon="cancel" />;
+            }}
+          />
+          <Animated.View style={[{overflow: 'hidden'}, bodyHeight]}>
+            <View
+              style={{position: 'absolute', padding: '3%', width: '100%'}}
+              onLayout={event => {
+                setBodySectionHeight(event.nativeEvent.layout.height);
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginLeft: '2%',
+                }}>
+                <View style={{flexDirection: 'row'}}>
+                  <Chip
+                    icon={() => (
+                      <Icon
+                        name="edit"
+                        size={16}
+                        color={theme.colors.onBackground}
+                      />
+                    )}
+                    style={{marginLeft: '4%'}}
+                    textStyle={{color: theme.colors.onBackground}}
+                    mode="flat"
+                    onPress={() => FABHandler(item)}>
+                    Edit
+                  </Chip>
+                  <Chip
+                    icon={() => (
+                      <Icon
+                        name="eye"
+                        size={16}
+                        color={theme.colors.onBackground}
+                      />
+                    )}
+                    style={{marginLeft: '4%'}}
+                    textStyle={{color: theme.colors.onBackground}}
+                    mode="flat"
+                    onPress={() => BriefHandler(item)}>
+                    Detail
+                  </Chip>
+                </View>
+              </View>
+            </View>
+          </Animated.View>
+          <Divider />
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  return (
+    <View style={{flexGrow:1, backgroundColor: theme.colors.background}}>
       <Banner
         visible={isExportBanner}
         actions={[
@@ -112,7 +243,22 @@ export default function Example({route}) {
         Invitaions List of this group has been exported in Downlaod folder
         successfully
       </Banner>
-
+        
+        {/* <View>
+            <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >
+              {chips.map((chip, index) => (
+                <View key={index} style={{marginHorizontal: '2%'}}>
+                  <Chip
+                    selected={chip.selected}
+                    mode={chip.selected ? 'flat' : 'outlined'}
+                    onPress={() => console.log('Pressed')}>
+                    {chip.name}
+                  </Chip>
+                </View>
+              ))}
+            </ScrollView>
+        </View> */}
+ 
       {isLoading ? (
         <View
           style={{
@@ -121,42 +267,16 @@ export default function Example({route}) {
           <InvitaionsList />
         </View>
       ) : (
-        <FlatList
-          data={data}
-          keyExtractor={item => item._id}
+        <FlashList
+          data={isInvitaionSearch ? invitaionsForSearch : data}
+          estimatedItemSize={100}
+          // keyExtractor={item => item._id}
           ListEmptyComponent={() => (
             <View style={{marginTop: '50%', alignItems: 'center'}}>
               <Text>No invitation</Text>
             </View>
           )}
-          renderItem={({item}) => (
-            <List.Item
-              onPress={() => BriefHandler(item)}
-              title={item.invitiName}
-              description={item.invitiDescription}
-              left={props => (
-                <Avatar.Image
-                  style={props.style}
-                  size={45}
-                  avatarStyle={{borderRadius: 20}}
-                  source={
-                    item.invitiImageURL
-                      ? {uri: item.invitiImageURL}
-                      : require('../../../../../assets/drawer/male-user.png')
-                  }
-                />
-              )}
-              style={{paddingVertical: '1%'}}
-              right={props => {
-                if (item.lastStatus.invitiStatus === 'invited')
-                  return <List.Icon {...props} icon="check" />;
-                if (item.lastStatus.invitiStatus === 'pending')
-                  return <List.Icon {...props} icon="clock-outline" />;
-                else if (item.lastStatus.invitiStatus === 'rejected')
-                  return <List.Icon {...props} icon="cancel" />;
-              }}
-            />
-          )}
+          renderItem={({item}) => <AccordionItem item={item} />}
           refreshControl={
             <RefreshControl refreshing={isFetching} onRefresh={refetch} />
           }
@@ -166,21 +286,21 @@ export default function Example({route}) {
       <FAB
         icon="plus"
         size="medium"
-        // variant='tertiary'
         style={styles.fab}
         onPress={() => FABHandler()}
       />
-
       <Modalize
         modalStyle={{backgroundColor: theme.colors.background}}
         ref={invitiBriefModalizeRef}
         // velocity={800}
         threshold={200}
+        snapPoint={200}
+        handlePosition="inside"
         modalHeight={500}
         HeaderComponent={() => (
           <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
         )}>
-        <List.Accordion style={{padding: '2%'}} title="More">
+        <List.Accordion style={{padding: '4%'}} title="Statuses">
           <View style={{marginHorizontal: '5%'}}>
             <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
               Added by
@@ -274,13 +394,6 @@ export default function Example({route}) {
 }
 
 const styles = StyleSheet.create({
-  containerStyle: {
-    backgroundColor: 'white',
-    padding: 20,
-    margin: '5%',
-    // flex:1,
-    // justifyContent: 'flex-start',
-  },
   fab: {
     position: 'absolute',
     margin: 16,
@@ -292,5 +405,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
     alignSelf: 'center',
+  },
+  containerStyle: {
+    flex: 1,
+    // paddingTop: 20,
+    // paddingHorizontal: 24,
+  },
+  btnStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  subContainer: {
+    backgroundColor: 'white',
+    paddingHorizontal: 8,
+    marginBottom: 6,
+    flex: 1,
+    borderRadius: 10,
+  },
+  svgStyle: {
+    width: 20,
+    height: 20,
+  },
+
+  title: {
+    fontWeight: '600',
   },
 });

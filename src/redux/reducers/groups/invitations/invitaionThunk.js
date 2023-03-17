@@ -33,6 +33,17 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    addMultipleInviti: build.mutation({
+      query: data => ({
+        url: `/api/group/invitations/addMultiple`,
+        method: 'POST',
+        body: {
+          invities : data.invities,
+          groupId: data.groupId,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
     updateInviti: build.mutation({
       query: inviti => ({
         url: `/api/group/invitations/update`,
@@ -58,6 +69,27 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    deleteMultipleInviti: build.mutation({
+      query: inviti => ({
+        url: `/api/group/invitations/deleteMultiple`,
+        method: 'DELETE',
+        body: {
+          invities: inviti.invities,
+          groupId: inviti.groupId,
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
+    updateInvitiStatus: build.mutation({
+      query: inviti => ({
+        url: `/api/group/invitations/${inviti.id}/updateInviteStatus`,
+        method: 'PATCH',
+        body: {
+          lastStatus: inviti.lastStatus
+        },
+      }),
+      invalidatesTags: ['Invitations'],
+    }),
   }),
 });
 
@@ -65,7 +97,10 @@ export const {
   useGetAllInvitationsQuery,
   useAddInvitiMutation,
   useUpdateInvitiMutation,
-  useDeleteInvitiMutation
+  useDeleteInvitiMutation,
+  useUpdateInvitiStatusMutation,
+  useAddMultipleInvitiMutation,
+  useDeleteMultipleInvitiMutation
 } = InvitaionsApi;
 
 

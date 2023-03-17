@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-//   import Skeleton from '../../Skeletons/InvitationsList';
 import Skeleton from '../../../../Skeletons/InvitationsList';
 import {
   Text,
@@ -20,16 +19,13 @@ import {
   Divider,
   Checkbox,
   useTheme,
-  ActivityIndicator,
 } from 'react-native-paper';
 import {useGetAllFriendsQuery} from '../../../../../redux/reducers/Friendship/friendshipThunk';
 import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
 import {useAddUserToGroupMutation} from '../../../../../redux/reducers/groups/groupThunk';
 import {useSelector, useDispatch} from 'react-redux';
-import {useRef} from 'react';
-import {useLayoutEffect} from 'react';
 
-const AddGroup = ({navigation, onClose, route}) => {
+const UpdateGroupMembers = ({navigation, onClose, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -41,6 +37,9 @@ const AddGroup = ({navigation, onClose, route}) => {
     useGetAllFriendsQuery(currentLoginUser?._id);
 
   const [friends, setFriends] = useState(data?.accepted);
+  useEffect(()=>{
+   setFriends(data?.accepted)
+  },[data])
 
   const [addUserToGroup, {isLoading: addUserLoading}] =
     useAddUserToGroupMutation();
@@ -49,7 +48,6 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
 
   const handleAddMember = async () => {
-    for (let i = 0; i < users.length; i++) {
       addUserToGroup({
         chatId: currentViewingGroup._id,
         userId: users,
@@ -62,7 +60,6 @@ const AddGroup = ({navigation, onClose, route}) => {
         .catch(e => {
           console.log('error in handleAddMember', e);
         });
-    }
   };
 
   const getResponsibles = () => {
@@ -83,7 +80,6 @@ const AddGroup = ({navigation, onClose, route}) => {
     const [isSearch, setIsSearch] = useState(false);
     const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to group");
     const [filteredDataSource, setFilteredDataSource] = useState([]);
-    const [masterDataSource, setMasterDataSource] = useState([]);
   
     const updateSearch = search => {
       setSearch(search);
@@ -91,10 +87,9 @@ const AddGroup = ({navigation, onClose, route}) => {
     };
   
     const searchFilterFunction = text => {
-      setMasterDataSource(friends);
       setFilteredDataSource(friends);
       if (text) {
-        const newData = masterDataSource?.filter(item => {
+        const newData = friends?.filter(item => {
           const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
           const textData = text.toUpperCase();
           return itemData.indexOf(textData) > -1;
@@ -105,7 +100,7 @@ const AddGroup = ({navigation, onClose, route}) => {
         setFilteredDataSource(newData);
       } 
       else {
-        setFilteredDataSource(masterDataSource);
+        setFilteredDataSource(friends);
       }
     };
   
@@ -116,8 +111,8 @@ const AddGroup = ({navigation, onClose, route}) => {
           key={index}
           style={
             piece.toLocaleLowerCase() == search.toLocaleLowerCase()
-              ? {backgroundColor: 'yellow', color: '#000'}
-              : {}
+              ? {fontWeight:"bold", color: theme.colors.primary}
+              : {fontWeight:"bold",}
           }>
           {piece}
         </Text>
@@ -141,7 +136,6 @@ const AddGroup = ({navigation, onClose, route}) => {
       <View>
         <List.Item
           onPress={add}
-          // title={itemProps.name}
           title={getHighlightedText(itemProps.name)}
           // description={itemProps.email}
           left={props => (
@@ -172,13 +166,15 @@ const AddGroup = ({navigation, onClose, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header elevated style={{backgroundColor:theme.colors.elevation.level3}}>
           <Searchbar
-            elevation={6}
+            elevation={7}
+            theme={{roundness:0}}
             placeholder="Search"
             icon={'close'}
             autoFocus
             onIconPress={() => {
+              setSearch('')
               setIsSearch(false);
             }}
             onChangeText={updateSearch}
@@ -186,7 +182,7 @@ const AddGroup = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
@@ -248,22 +244,14 @@ const AddGroup = ({navigation, onClose, route}) => {
             </View>
           )}
           ListEmptyComponent={() => (
-            <View style={{marginTop: '60%', alignItems: 'center'}}>
+            <View style={{marginTop: '40%', alignItems: 'center'}}>
               <Text>{listEmptyText}</Text>
-              <Text>Refresh or search for new friends</Text>
               <Button
                 icon="refresh"
-                mode="contained"
-                style={{marginTop: '5%', marginHorizontal: '2%'}}
+                mode="outlined"
+                style={{marginTop: '5%', }}
                 onPress={refetch}>
                 Refresh
-              </Button>
-              <Button
-                icon="account-search"
-                mode="text"
-                style={{marginTop: '5%', marginHorizontal: '2%'}}
-                onPress={() => navigation.navigate("MakeFriends", {screen : 'FriendsSuggestions'})}>
-                Search for friends
               </Button>
             </View>
           )}
@@ -286,7 +274,7 @@ const AddGroup = ({navigation, onClose, route}) => {
   );
 };
 
-export default AddGroup;
+export default UpdateGroupMembers;
 
 const styles = StyleSheet.create({
   images: {

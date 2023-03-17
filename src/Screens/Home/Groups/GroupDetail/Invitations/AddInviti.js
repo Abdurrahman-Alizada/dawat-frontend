@@ -376,20 +376,6 @@ const AddInviti = ({route, navigation}) => {
             </View>
 
             {currentInviti?.invitiName ? (
-              // <Button
-              //   loading={updateLoading}
-              //   disabled={!isEditStart}
-              //   mode="contained"
-              //   onPress={handleSubmit}
-              //   style={{
-              //     borderRadius: 10,
-              //     borderColor: '#C1C2B8',
-              //     borderWidth: 0.5,
-              //     padding: '1%',
-              //     marginVertical: '2%',
-              //   }}>
-              //   Update
-              // </Button>
               <FAB
                 icon="check"
                 loading={updateLoading}
@@ -397,7 +383,7 @@ const AddInviti = ({route, navigation}) => {
                 label={'Update'}
                 style={{
                   position: 'absolute',
-                  margin: 16,
+                  marginVertical: 16,
                   right: 0,
                   bottom: 0,
                 }}
@@ -411,7 +397,7 @@ const AddInviti = ({route, navigation}) => {
                 label={'Add'}
                 style={{
                   position: 'absolute',
-                  margin: 16,
+                  marginVertical: 16,
                   right: 0,
                   bottom: 0,
                 }}
