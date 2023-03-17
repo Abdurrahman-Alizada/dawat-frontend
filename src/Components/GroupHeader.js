@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {
+  List,
   Menu,
   Divider,
   Appbar,
@@ -12,7 +13,10 @@ import {
 } from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
-import { handleIsInvitationSearch, handleInvitationSearch } from '../redux/reducers/groups/invitations/invitationSlice';
+import {
+  handleIsInvitationSearch,
+  handleInvitationSearch,
+} from '../redux/reducers/groups/invitations/invitationSlice';
 
 const Header = ({onOpen, group}) => {
   const dispatch = useDispatch();
@@ -35,7 +39,9 @@ const Header = ({onOpen, group}) => {
 
   //search
   const [search, setSearch] = useState('');
-  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
+  const isInvitaionSearch = useSelector(
+    state => state.invitations.isInvitaionSearch,
+  );
 
   const updateSearch = search => {
     setSearch(search);
@@ -131,7 +137,7 @@ const Header = ({onOpen, group}) => {
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
-                      dispatch(handleIsInvitationSearch(true))
+                      dispatch(handleIsInvitationSearch(true));
                     }}
                     title="Search for inviti"
                     leadingIcon={'account-search'}
@@ -154,6 +160,26 @@ const Header = ({onOpen, group}) => {
                     title="Add multiple inviti"
                     leadingIcon={'account-multiple-plus'}
                   />
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('MarkMultipleInviti');
+                    }}
+                    title="Mark multiple"
+                    leadingIcon={'checkbox-multiple-blank-circle-outline'}
+                  />
+                  <Divider />
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('DeleteMultipleInviti');
+                    }}
+                    title="Delete multiple inviti"
+                    leadingIcon={() => (
+                      <List.Icon color={theme.colors.tertiary} icon="delete" />
+                    )}
+                    titleStyle={{color: theme.colors.tertiary}}
+                  />
                 </View>
               )}
               {currentTab === 'Tasks' && (
@@ -163,7 +189,7 @@ const Header = ({onOpen, group}) => {
                       console.log('Search for task');
                     }}
                     title="Search for task"
-                    leadingIcon={"calendar-search"}
+                    leadingIcon={'calendar-search'}
                   />
                 </View>
               )}
@@ -174,7 +200,7 @@ const Header = ({onOpen, group}) => {
                       console.log('Task menu 1');
                     }}
                     title="Search for chat"
-                    leadingIcon={"comment-search-outline"}
+                    leadingIcon={'comment-search-outline'}
                   />
                 </View>
               )}
@@ -191,7 +217,7 @@ const Header = ({onOpen, group}) => {
             autoFocus
             icon="arrow-left"
             onIconPress={BlurHandler}
-            theme={{roundness:0}}
+            theme={{roundness: 0}}
             cancel={() => {
               console.log('hello');
             }}

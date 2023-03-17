@@ -1,5 +1,5 @@
 import React from 'react';
-import GeneralAppbar from '../Components/GeneralAppbar'
+import GeneralAppbar from '../Components/GeneralAppbar';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeIndex from '../Screens/Home/Groups/Index';
@@ -10,18 +10,21 @@ import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSetting
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/InvitiDetails';
 import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
+
 import AddMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddMultipleInviti';
-import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/TaskDetails'
-import UpdateTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/UndateTaskMembers'
-import AddTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/AddTaskMembers'
-import UpdateGroupMembers from '../Screens/Home/Groups/GroupDetail/GroupSettings/UpdateGroupMembers'
+import DeleteMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/deleteMultipleInviti';
+import MarkMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/markMultipleInviti';
+
+import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/TaskDetails';
+import UpdateTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/UndateTaskMembers';
+import AddTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/AddTaskMembers';
+import UpdateGroupMembers from '../Screens/Home/Groups/GroupDetail/GroupSettings/UpdateGroupMembers';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
-
   return (
-    <Stack.Navigator initialRouteName="HomeIndex" >
+    <Stack.Navigator initialRouteName="HomeIndex">
       <Stack.Screen
         name="HomeIndex"
         component={HomeIndex}
@@ -33,14 +36,14 @@ const AppStack = () => {
         options={{
           title: 'Add Your Group',
           // headerShown:false
-          header: (props) => <GeneralAppbar title="Add group" {...props} />,
+          header: props => <GeneralAppbar title="Add group" {...props} />,
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="AddGroupMembers"
         component={AddGroupMembers}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -57,7 +60,9 @@ const AppStack = () => {
         component={SingleGroupSettings}
         options={{
           title: 'Single group settings',
-          header: (props) => <GeneralAppbar title="Single group settings" {...props} />,
+          header: props => (
+            <GeneralAppbar title="Single group settings" {...props} />
+          ),
         }}
       />
 
@@ -66,8 +71,8 @@ const AppStack = () => {
         component={UpdateGroupMembers}
         options={{
           title: 'Add group members',
-          headerShown:false,
-          presentation:"modal"
+          headerShown: false,
+          presentation: 'modal',
         }}
       />
 
@@ -75,7 +80,7 @@ const AppStack = () => {
         name="AddTask"
         component={AddTask}
         options={{
-          header: (props) => <GeneralAppbar title="Add Task" {...props} />,
+          header: props => <GeneralAppbar title="Add Task" {...props} />,
         }}
       />
 
@@ -84,7 +89,7 @@ const AppStack = () => {
         component={TaskDetail}
         options={{
           // headerShown:false
-          header: (props) => <GeneralAppbar title="Task detail" {...props} />,
+          header: props => <GeneralAppbar title="Task detail" {...props} />,
         }}
       />
 
@@ -92,15 +97,15 @@ const AppStack = () => {
         name="UpdateTaskMembers"
         component={UpdateTaskMembers}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
 
-    <Stack.Screen
+      <Stack.Screen
         name="AddTaskMembers"
         component={AddTaskMembers}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -108,7 +113,7 @@ const AppStack = () => {
         component={AddInviti}
         options={{
           // headerShown:false
-          header: (props) => <GeneralAppbar title="Add inviti" {...props} />,
+          header: props => <GeneralAppbar title="Add inviti" {...props} />,
         }}
       />
       <Stack.Screen
@@ -116,7 +121,28 @@ const AppStack = () => {
         component={AddMultipleInviti}
         options={{
           // headerShown:false,
-          header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
+          header: props => (
+            <GeneralAppbar title="Add multiple inviti" {...props} />
+          ),
+        }}
+      />
+
+      <Stack.Screen
+        name="DeleteMultipleInviti"
+        component={DeleteMultipleInviti}
+        options={{
+          headerShown: false,
+          presentation:"modal"
+          // header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
+        }}
+      />
+      <Stack.Screen
+        name="MarkMultipleInviti"
+        component={MarkMultipleInviti}
+        options={{
+          headerShown: false,
+          presentation:"modal",
+          // header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
         }}
       />
     </Stack.Navigator>
