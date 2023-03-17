@@ -14,6 +14,7 @@ import {
   Snackbar,
   useTheme,
   Provider,
+  ActivityIndicator,
   Banner,
 } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
@@ -319,7 +320,7 @@ export default function DisplayCsvDataTable({props, route}) {
                 </View>
               </View>
             </Dialog.ScrollArea>
-            <Dialog.Actions >
+            <Dialog.Actions>
               <Button
                 onPress={() => {
                   setVisibleSingle(false);
@@ -415,7 +416,7 @@ export default function DisplayCsvDataTable({props, route}) {
               </View>
             </View>
           </Dialog.ScrollArea>
-          <Dialog.Actions >
+          <Dialog.Actions>
             <Button
               onPress={() => {
                 setVisible(false);
@@ -485,24 +486,44 @@ export default function DisplayCsvDataTable({props, route}) {
       </DataTable>
 
       <Portal>
-        <FAB.Group
-          open={open}
-          visible
-          icon={open ? 'close' : 'plus'}
-          actions={[
-            {
-              icon: 'account-plus',
-              label: 'New Inviti',
-              onPress: () => setVisible(true),
-            },
-            {
-              icon: 'account-multiple-check',
-              label: 'Add listed inviti',
-              onPress: () => AddMultipleHandler(),
-            },
-          ]}
-          onStateChange={onStateChange}
+        {
+          !addMultipleInvitiLoading ? 
+
+          <FAB.Group
+            open={open}
+            visible
+            disabled
+            icon={open ? 'close' : 'plus'}
+            actions={[
+              {
+                icon: 'account-plus',
+                label: 'New Inviti',
+                onPress: () => setVisible(true),
+              },
+              {
+                icon: 'account-multiple-check',
+                label: 'Add listed inviti',
+                onPress: () => AddMultipleHandler(),
+              },
+            ]}
+            onStateChange={onStateChange}
+          />
+          :
+
+        <FAB
+          label='Loading'
+          disabled
+          icon={()=><ActivityIndicator animating />}
+          style={{
+            position: 'absolute',
+            margin: 16,
+            right: 0,
+            bottom: 0,
+          }}
+          onPress={() => console.log('Pressed')}
         />
+        }
+
       </Portal>
 
       <Snackbar
