@@ -163,22 +163,10 @@ const Header = ({onOpen, group}) => {
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
-                      navigation.navigate('MarkMultipleInviti');
+                      navigation.navigate('MultipleInvitiActions');
                     }}
-                    title="Mark multiple"
+                    title="Edit multiple inviti"
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
-                  />
-                  <Divider />
-                  <Menu.Item
-                    onPress={() => {
-                      closeMenu();
-                      navigation.navigate('DeleteMultipleInviti');
-                    }}
-                    title="Delete multiple inviti"
-                    leadingIcon={() => (
-                      <List.Icon color={theme.colors.tertiary} icon="delete" />
-                    )}
-                    titleStyle={{color: theme.colors.tertiary}}
                   />
                 </View>
               )}
