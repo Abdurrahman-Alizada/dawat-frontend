@@ -33,10 +33,10 @@ const Index = ({group, onClose}) => {
     groupId: currentViewingGroup._id,
   });
 
-  const [addMultipleInviti, {isLoading: addMultipleInvitiLoading}] =
-    useAddMultipleInvitiMutation();
 
+  const [importLoading, setImportLoading] = useState(false);
   const importCSV = () => {
+    setImportLoading(true);
     check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
       .then(result => {
         switch (result) {
@@ -84,9 +84,11 @@ const Index = ({group, onClose}) => {
           .then(response => {
             const results = readString(response);
             onClose();
+            setImportLoading(false) 
             navigation.navigate("AddMultipleInviti", {data:results.data})
            })
           .catch(e => {
+            setImportLoading(false)
             console.log(e);
           });
       } else {
@@ -104,8 +106,10 @@ const Index = ({group, onClose}) => {
   };
 
   const [exportLoading, setExportLoading] = useState(false);
+ 
   const exportCSV = () => {
     //  saveCSV();
+    setExportLoading(true)
     check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
       .then(result => {
         console.log(result);
@@ -166,15 +170,21 @@ const Index = ({group, onClose}) => {
       .then(success => {
         console.log('FILE WRITTEN!',success);
         setExportLoading(false);
+        setExportLoading(false)
         onClose();
         dispatch(handleIsExportBanner(true));
       })
       .catch(err => {
         setSnackbarMessage('something went wrong');
         setShowSnackbar(true);
+        setExportLoading(false)
         console.log(err.message);
       });
   };
+
+
+  const [uploadToGoogleDriveLoading, setUploadToGoogleDriveLoading] = useState(false);
+  
 
   const [SnackbarMessage, setSnackbarMessage] = useState('');
   const [showSnackBar, setShowSnackbar] = useState(false);
@@ -199,20 +209,35 @@ const Index = ({group, onClose}) => {
 
       <Button
         loading={exportLoading}
+        disabled={exportLoading}
         onPress={exportCSV}
         mode="contained"
         icon={'download'}
         style={{marginTop: '5%'}}>
-        Downlaod Invitations list
+        Export Invitations list
       </Button>
+      
       <Button
-        loading={addMultipleInvitiLoading}
         onPress={importCSV}
+        loading={importLoading}
+        disabled={importLoading}
         mode="contained-tonal"
         icon={'upload'}
         style={{marginTop: '5%'}}>
-        Upload Invitations list to add in this group
+        Import Invitations list
       </Button>
+
+
+      <Button
+        onPress={importCSV}
+        loading={importLoading}
+        disabled={importLoading}
+        mode="outlined"
+        icon={'google-drive'}
+        style={{marginTop: '5%'}}>
+        Upload to Google Drive
+      </Button>
+
 
       <Snackbar
         visible={showSnackBar}
