@@ -12,8 +12,7 @@ import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/Inviti
 import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
 
 import AddMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddMultipleInviti';
-import DeleteMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/deleteMultipleInviti';
-import MarkMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/markMultipleInviti';
+import MultipleInvitiActions from '../Screens/Home/Groups/GroupDetail/Invitations/multipleInvitiesActions';
 
 import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/TaskDetails';
 import UpdateTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/UndateTaskMembers';
@@ -120,31 +119,20 @@ const AppStack = () => {
         name="AddMultipleInviti"
         component={AddMultipleInviti}
         options={{
-          // headerShown:false,
-          header: props => (
-            <GeneralAppbar title="Add multiple inviti" {...props} />
-          ),
+          headerShown:false,
         }}
       />
 
       <Stack.Screen
-        name="DeleteMultipleInviti"
-        component={DeleteMultipleInviti}
+        name="MultipleInvitiActions"
+        component={MultipleInvitiActions}
         options={{
           headerShown: false,
           presentation:"modal"
           // header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
         }}
       />
-      <Stack.Screen
-        name="MarkMultipleInviti"
-        component={MarkMultipleInviti}
-        options={{
-          headerShown: false,
-          presentation:"modal",
-          // header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
-        }}
-      />
+
     </Stack.Navigator>
   );
 };

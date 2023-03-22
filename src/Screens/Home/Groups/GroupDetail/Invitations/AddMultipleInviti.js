@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import {TouchableWithoutFeedback, View, Image} from 'react-native';
 import {
   Avatar,
+  Appbar,
   DataTable,
   Divider,
   Button,
@@ -355,6 +356,9 @@ export default function DisplayCsvDataTable({props, route}) {
 
   return (
     <Provider>
+    
+
+
       <Banner
         visible={bannerVisible}
         actions={[
@@ -447,6 +451,27 @@ export default function DisplayCsvDataTable({props, route}) {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      <Appbar
+        style={{
+          backgroundColor: theme.colors.background,
+          marginBottom: 2,
+        }}
+        elevated
+        // mode="medium"
+        >
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title={`Add multiple invities`} />
+
+
+        <Appbar.Action
+          icon="account-plus"
+          iconColor={theme.colors.error}
+          style={{marginHorizontal: '3%'}}
+          onPress={() => setVisible(true)}
+        />
+      </Appbar>
+    
+
       <DataTable style={{flex: 1}}>
         <FlashList
           data={invitiToDisplay}
@@ -485,46 +510,18 @@ export default function DisplayCsvDataTable({props, route}) {
         />
       </DataTable>
 
-      <Portal>
-        {
-          !addMultipleInvitiLoading ? 
-
-          <FAB.Group
-            open={open}
-            visible
-            disabled
-            icon={open ? 'close' : 'plus'}
-            actions={[
-              {
-                icon: 'account-plus',
-                label: 'New Inviti',
-                onPress: () => setVisible(true),
-              },
-              {
-                icon: 'account-multiple-check',
-                label: 'Add listed inviti',
-                onPress: () => AddMultipleHandler(),
-              },
-            ]}
-            onStateChange={onStateChange}
-          />
-          :
-
         <FAB
-          label='Loading'
-          disabled
-          icon={()=><ActivityIndicator animating />}
+          label='Add listed invitie(s)'
+          disabled={addMultipleInvitiLoading}
+          icon={addMultipleInvitiLoading ? ()=><ActivityIndicator animating /> : "account-multiple-check"}
           style={{
             position: 'absolute',
             margin: 16,
             right: 0,
             bottom: 0,
           }}
-          onPress={() => console.log('Pressed')}
+          onPress={() => AddMultipleHandler()}
         />
-        }
-
-      </Portal>
 
       <Snackbar
         visible={SnackbarVisible}
