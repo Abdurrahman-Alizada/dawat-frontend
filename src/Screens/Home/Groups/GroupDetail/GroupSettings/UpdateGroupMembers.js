@@ -24,6 +24,7 @@ import {useGetAllFriendsQuery} from '../../../../../redux/reducers/Friendship/fr
 import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
 import {useAddUserToGroupMutation} from '../../../../../redux/reducers/groups/groupThunk';
 import {useSelector, useDispatch} from 'react-redux';
+import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 
 const UpdateGroupMembers = ({navigation, onClose, route}) => {
   const theme = useTheme();
@@ -53,9 +54,8 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
         userId: users,
       })
         .then(res => {
-          console.log(res);
-          dispatch(handleCurrentViewingGroup(res.data));
-          navigation.navigate('SingleGroupSettings');
+            dispatch(handleCurrentViewingGroup(res.data));
+            navigation.navigate('SingleGroupSettings');
         })
         .catch(e => {
           console.log('error in handleAddMember', e);
@@ -163,6 +163,10 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
       </View>
     );
   };
+
+  // error snackbar
+  const [snackbarVisible, setSnackBarVisible] = useState(false);
+
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
@@ -188,7 +192,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Add group members" />
+          <Appbar.Content title="Update group members" />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -265,10 +269,16 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
       <FAB
         icon="check"
         label="Add"
-        style={styles.fab}
-        disabled={addUserLoading || users.length < 1}
+        style={{bottom: snackbarVisible ? 70 : 16, right:16, position:"absolute"}}
+        disabled={addUserLoading}
         loading={addUserLoading}
         onPress={handleAddMember}
+      />
+
+    <ErrorSnackBar
+        isVisible={snackbarVisible}
+        text={'Something went wrong'}
+        onDismissHandler={setSnackBarVisible}
       />
     </View>
   );

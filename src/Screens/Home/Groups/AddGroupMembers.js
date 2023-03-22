@@ -23,9 +23,11 @@ import {
 import {useGetAllFriendsQuery} from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
-import {useSelector} from 'react-redux';
-
+import {useSelector, useDispatch} from 'react-redux';
+import { groupApi } from '../../../redux/reducers/groups/groupThunk';
 const AddGroup = ({navigation, onClose, route}) => {
+  const dispatch = useDispatch();
+
   const {
     groupName,
     groupDescription,
@@ -55,7 +57,7 @@ const AddGroup = ({navigation, onClose, route}) => {
       })
         .then(res => res.json())
         .then(async data => {
-          await addGroup({
+           addGroup({
             groupName: groupName,
             groupDescription: groupDescription,
             imageURL: data.secure_url,
@@ -88,7 +90,9 @@ const AddGroup = ({navigation, onClose, route}) => {
         members: userIds,
       })
         .then(res => {
-          navigation.navigate('HomeIndex');
+          if(res.data?._id){
+            navigation.navigate('HomeIndex');
+          }
         })
         .catch(err => {
           console.log(err);
@@ -97,6 +101,7 @@ const AddGroup = ({navigation, onClose, route}) => {
   };
 
   const Item = ({itemProps}) => {
+  
     const [include, setInclude] = useState(userIds.includes(itemProps._id));
     const add = () => {
       if (include) {

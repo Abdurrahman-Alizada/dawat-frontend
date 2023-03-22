@@ -1,10 +1,7 @@
 import React, {useState, useCallback} from 'react';
 import {
   ToastAndroid,
-  TouchableOpacity,
-  Image,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import {Checkbox} from 'react-native-paper'
@@ -23,7 +20,7 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
       .then(response => {
         closeModalize();
         showToast();
-        console.log('deleted group is =>', response);
+        console.log('deleted task is =>', response);
       })
       .catch(e => {
         console.log('error in deleteHandler', e);

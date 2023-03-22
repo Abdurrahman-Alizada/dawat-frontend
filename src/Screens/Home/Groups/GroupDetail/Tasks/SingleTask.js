@@ -19,9 +19,9 @@ import {
   useDeleteTaskMutation,
   useMarkAsCompletedMutation,
 } from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import {groupApi} from '../../../../../redux/reducers/groups/groupThunk';
 
 const RenderGroupMembers = ({task}) => {
-  
   const theme = useTheme();
   if (task?.responsibles) {
     return (
@@ -74,12 +74,15 @@ const RenderGroupMembers = ({task}) => {
   }
 };
 
-const SingleTask = ({item, cardHandler}) => {
+const SingleTask = ({item, cardHandler, setSnackBarVisible}) => {
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  
-  const currentLoginUser = useSelector(state=> state.user.currentLoginUser)
+
+  const currentLoginUser = useSelector(state => state.user.currentLoginUser);
+  const currentViewingGroup = useSelector(
+    state => state.groups.currentViewingGroup,
+  );
 
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
@@ -90,10 +93,15 @@ const SingleTask = ({item, cardHandler}) => {
     useMarkAsCompletedMutation();
 
   const deleteHandler = async () => {
-    await deleteTask({groupId: item?.group?._id, taskId: item?._id})
+    deleteTask({groupId: currentViewingGroup._id, taskId: item?._id})
       .then(response => {
-        closeMenu();
-        console.log('deleted group is =>', response);
+        if (response.data?._id) {
+          closeMenu();
+          dispatch(groupApi.util.invalidateTags(['GroupLogs']));
+        }else{
+          setSnackBarVisible(true)
+        }
+        console.log('deleted task is =>', response);
       })
       .catch(e => {
         console.log('error in deleteHandler', e);
@@ -115,8 +123,10 @@ const SingleTask = ({item, cardHandler}) => {
       });
   };
 
+  // error snackbar
+
   return (
-      <View>
+    <View>
       <View
         style={{
           paddingHorizontal: '5%',
@@ -124,7 +134,9 @@ const SingleTask = ({item, cardHandler}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          backgroundColor : item.isCompleted ? theme.colors.surfaceVariant : theme.colors.background
+          backgroundColor: item.isCompleted
+            ? theme.colors.surfaceVariant
+            : theme.colors.background,
         }}>
         <View style={{width: '90%'}}>
           <View
@@ -207,7 +219,7 @@ const SingleTask = ({item, cardHandler}) => {
                 item?.isCompleted ? 'Mark as incompleted' : 'Mark as complete'
               }
               onPress={() => {
-                markAsCompletedHandler()
+                markAsCompletedHandler();
               }}
             />
 
@@ -242,8 +254,9 @@ const SingleTask = ({item, cardHandler}) => {
           </Menu>
         </View>
       </View>
-        <Divider style={{backgroundColor:"#000"}} />
-        </View>
+      <Divider style={{backgroundColor: '#000'}} />
+  
+    </View>
   );
 };
 

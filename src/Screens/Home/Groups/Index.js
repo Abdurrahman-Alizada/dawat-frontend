@@ -7,6 +7,7 @@ import {
   FlatList,
   StatusBar,
 } from 'react-native';
+import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
 import {AnimatedFAB, Divider, useTheme} from 'react-native-paper';
@@ -98,6 +99,13 @@ const Groups = ({navigation}) => {
   const theme = useTheme();
   const {isThemeDark} = useContext(PreferencesContext);
 
+  // snackebar
+  const [snackbarVisible, setSnackBarVisible] = useState(false);
+  const [snackebarText, setSnackBarText] = useState('');
+  useEffect(() => {
+    setSnackBarVisible(isError);
+  }, [isError]);
+
   return (
     <View style={{flex: 1}}>
       <StatusBar
@@ -120,7 +128,7 @@ const Groups = ({navigation}) => {
             theme={theme}
           />
         )}
-        
+
         {!isLoading ? (
           <View style={{flex: 1, backgroundColor: theme.colors.background}}>
             <FlatList
@@ -167,21 +175,16 @@ const Groups = ({navigation}) => {
         visible={true}
         animateFrom={'right'}
         iconMode={'static'}
-        style={styles.fabStyle}
+        style={{bottom: snackbarVisible ? 70 : 16, right: 16}}
+      />
+
+      <ErrorSnackBar
+        isVisible={snackbarVisible}
+        text={'Something went wrong'}
+        onDismissHandler={setSnackBarVisible}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-  },
-  fabStyle: {
-    bottom: 16,
-    right: 16,
-    position: 'absolute',
-  },
-});
 
 export default Groups;

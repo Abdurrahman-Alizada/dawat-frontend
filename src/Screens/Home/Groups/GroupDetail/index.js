@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import Chat from './Chat';
 import Tasks from './Tasks';
 import Invitations from './Invitations';
+import GroupLogs from './GroupLogs/Index';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
@@ -12,6 +13,7 @@ import {handleCurrentTab} from '../../../../redux/reducers/groups/groups';
 import {handleIsInvitationSearch} from '../../../../redux/reducers/groups/invitations/invitationSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch} from 'react-redux';
+
 const Tab = createMaterialTopTabNavigator();
 
 const Tabs = ({groupId, navigation}) => {
@@ -23,21 +25,22 @@ const Tabs = ({groupId, navigation}) => {
       initialRouteName="Invitations"
       screenOptions={{
         tabBarLabelStyle: {
-          fontSize: 15,
+          fontSize: 17,
           fontWeight: 'bold',
-          textTransform: 'none',
+          textTransform: "none",
+          justifyContent:"space-evenly",
         },
         tabBarScrollEnabled: true,
         tabBarStyle: {
           backgroundColor: theme.colors.elevation.level2,
         },
-        tabBarItemStyle: {width: 'auto', minWidth: '20%', marginLeft: 10},
-        tabBarIndicatorStyle: {maxWidth: '0%'},
+        tabBarItemStyle: {width: 'auto',marginLeft:10},
+        tabBarIndicatorStyle: {marginLeft:10},
       }}>
       <Tab.Screen
         name="Logs"
         initialParams={{groupId: groupId}}
-        component={Invitations}
+        component={GroupLogs}
         listeners={({route}) => ({
           focus: e => {
             dispatch(handleCurrentTab(route.name));
@@ -95,6 +98,7 @@ const Tabs = ({groupId, navigation}) => {
           },
         })}
       />
+      
     </Tab.Navigator>
   );
 };
