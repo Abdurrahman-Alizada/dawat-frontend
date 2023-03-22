@@ -4,6 +4,7 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import React, {useState, useCallback, useRef, useEffect} from 'react';
 import {
@@ -22,6 +23,9 @@ import {
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
+  useUpdateGroupNameMutation,
+  useUpdateGroupDescriptionMutation,
+  useUpdateImageURLMutation,
   useDeleteGroupForUserMutation,
 } from '../../../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,6 +76,14 @@ const Index = ({route, navigation}) => {
 
   // redux toolkit - start
   const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
+
+  const [updateGroupName, {isLoading: updateGroupNameLoading}] =
+    useUpdateGroupNameMutation();
+  const [updateGroupDescription, {isLoading:updateGroupDescriptionLoading}] =
+    useUpdateGroupDescriptionMutation();
+  const [updateImageURL, {isLoading :updateImageURLLoging}] = useUpdateImageURLMutation();
+  const [imageUploading, setimageUploading] = useState(false);
+
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
     useDeleteGroupForUserMutation();
   // redux toolkit - end
@@ -97,6 +109,62 @@ const Index = ({route, navigation}) => {
       });
   };
 
+  const handleUpdateGroupName = () => {
+    updateGroupName({
+      groupId: _id,
+      previousGroupName: currentViewingGroup.groupName,
+      newGroupName: name,
+    })
+      .then(res => {
+        if (res.data._id) {
+          dispatch(handleCurrentViewingGroup(res.data));
+          setSnakeBarMessage('Group name has been updated');
+          setShowSnakeBar(true);
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        } else {
+          setSnakeBarMessage('Something went wrong. Please try again');
+          setShowSnakeBar(true);
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        }
+      })
+      .catch(e => {
+        setSnakeBarMessage('Something went wrong. Please try again');
+        setShowSnakeBar(true);
+        seteditGroupName(false);
+        setEditGroupDescription(false);
+      });
+  };
+
+  const handleUpdateGroupDescription = () => {
+    updateGroupDescription({
+      groupId: _id,
+      groupDescription: description,
+      newGroupName: name,
+    })
+      .then(res => {
+        if (res.data?._id) {
+          dispatch(handleCurrentViewingGroup(res.data));
+          setSnakeBarMessage('Group description has been updated');
+          setShowSnakeBar(true);
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        } else {
+          setSnakeBarMessage('Something went wrong. Please try again');
+          setShowSnakeBar(true);
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        }
+      })
+      .catch(e => {
+        setSnakeBarMessage('Something went wrong. Please try again');
+        setShowSnakeBar(true);
+        seteditGroupName(false);
+        setEditGroupDescription(false);
+      });
+  };
+
   const handleLeave = async () => {
     setSnakeBarMessage('Leaving group');
     setShowSnakeBar(true);
@@ -105,6 +173,7 @@ const Index = ({route, navigation}) => {
       userId: await AsyncStorage.getItem('userId'),
     })
       .then(res => {
+        console.log(res)
         setShowSnakeBar(false);
         navigation.replace('Drawer');
       })
@@ -178,32 +247,33 @@ const Index = ({route, navigation}) => {
 
   const imageUploadHandler = async () => {
     if (fileDataRef.current) {
-      const uri = fileDataRef.current?.path;
-      const type = fileDataRef.current?.mime;
-      const name = 'user-profile';
+      setimageUploading(true)
+      const uri = fileDataRef.current.path;
+      const type = fileDataRef.current.mime;
+      const name = currentViewingGroup.groupName;
       const photo = {uri, type, name};
       const data = new FormData();
       data.append('file', photo);
       data.append('upload_preset', 'bzgif1or');
       data.append('cloud_name', 'dblhm3cbq');
+      
       fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
         method: 'post',
         body: data,
       })
         .then(res => res.json())
         .then(async data => {
-          updateGroupInfo({
+          updateImageURL({
             groupId: _id,
-            groupName: name,
-            groupDescription: groupDescription,
-            imageURL: avatarURL,
+            imageURL: data.url,
           })
             .then(res => {
               dispatch(handleCurrentViewingGroup(res.data));
-              setSnakeBarMessage('Group information has been updated');
+              setSnakeBarMessage('Group profile image has been updated');
               setShowSnakeBar(true);
               seteditGroupName(false);
               setEditGroupDescription(false);
+              setimageUploading(false)
             })
             .catch(e => {
               setSnakeBarMessage('Something went wrong. Please try again');
@@ -213,15 +283,15 @@ const Index = ({route, navigation}) => {
         .catch(err => {
           console.log('An Error Occured While Uploading profile image', err);
           fileDataRef.current = null;
+          setimageUploading(false)
           return;
         });
     }
 
-    if (avatarURL) {
-      updateGroupInfo({
+    else if (avatarURL) {
+      setimageUploading(true)
+      updateImageURL({
         groupId: _id,
-        groupName: name,
-        groupDescription: groupDescription,
         imageURL: avatarURL,
       })
         .then(res => {
@@ -230,11 +300,16 @@ const Index = ({route, navigation}) => {
           setShowSnakeBar(true);
           seteditGroupName(false);
           setEditGroupDescription(false);
+          setimageUploading(false)
         })
         .catch(e => {
           setSnakeBarMessage('Something went wrong. Please try again');
           setShowSnakeBar(true);
+          setimageUploading(false)
         });
+    }
+    else {
+      Alert.alert("Image not selected", "Please select an image")
     }
   };
 
@@ -307,7 +382,7 @@ const Index = ({route, navigation}) => {
               <ActivityIndicator
                 style={{position: 'absolute', left: '55%', top: 75}}
                 size="large"
-                animating={isLoading}
+                animating={updateImageURLLoging || imageUploading}
               />
             </TouchableOpacity>
 
@@ -450,7 +525,7 @@ const Index = ({route, navigation}) => {
         icon={
           deleteLoading
             ? () => <ActivityIndicator animating={true} size="small" />
-            : 'check'
+            :  'check'
         }
         onIconPress={() => console.log('hello')}
         onDismiss={() => setShowSnakeBar(false)}
@@ -458,9 +533,17 @@ const Index = ({route, navigation}) => {
         {snakeBarMessage}
       </Snackbar>
 
+      <Snackbar
+        visible={deleteLoading}
+        icon={ () => <ActivityIndicator animating={true} size="small" />}
+        onIconPress={() => console.log('hello')}
+        onDismiss={() => setShowSnakeBar(false)}
+        >
+        {snakeBarMessage}
+      </Snackbar>
+
       {editGroupName && (
-        <View
-          style={{padding: '2%', backgroundColor: theme.colors.background}}>
+        <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
             label="Group name"
@@ -476,9 +559,8 @@ const Index = ({route, navigation}) => {
             }}
             underlineColor={theme.colors.background}
             activeOutlineColor={theme.colors.onBackground}
-           
           />
-           <View
+          <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
@@ -491,7 +573,7 @@ const Index = ({route, navigation}) => {
               mode="outlined"
               theme={{roundness: 1}}
               onPress={() => {
-                setName(groupName)
+                setName(groupName);
                 seteditGroupName(false);
               }}>
               cancel
@@ -504,16 +586,13 @@ const Index = ({route, navigation}) => {
               }}
               icon="check"
               mode="contained"
-              loading={isLoading}
-              onPress={() => handleSubmit()}
+              loading={updateGroupNameLoading}
+              onPress={() => handleUpdateGroupName()}
               theme={{roundness: 1}}
-              disabled={
-                isLoading || name.length < 1
-              }>
+              disabled={updateGroupNameLoading || name.length < 1}>
               Ok
             </Button>
           </View>
-
         </View>
       )}
       {editGroupDescription && (
@@ -534,32 +613,9 @@ const Index = ({route, navigation}) => {
             }}
             underlineColor={theme.colors.background}
             activeOutlineColor={theme.colors.onBackground}
-           
           />
-          {/* <View
-            style={{
-              flexDirection: 'row',
-              marginVertical: '2%',
-              alignSelf: 'flex-end',
-            }}>
-            <Button
-              style={{width: '50%'}}
-              icon="close"
-              mode="text"
-              onPress={() => setEditGroupDescription(false)}>
-              cancel
-            </Button>
-            <Button
-              style={{width: '50%'}}
-              icon="check"
-              mode="text"
-              loading={isLoading}
-              onPress={() => handleSubmit()}>
-              Ok
-            </Button>
-          </View> */}
-        
-        <View
+
+          <View
             style={{
               flexDirection: 'row',
               marginVertical: '2%',
@@ -572,7 +628,7 @@ const Index = ({route, navigation}) => {
               mode="outlined"
               theme={{roundness: 1}}
               onPress={() => {
-                setDescription(groupDescription)
+                setDescription(groupDescription);
                 setEditGroupDescription(false);
               }}>
               cancel
@@ -585,17 +641,13 @@ const Index = ({route, navigation}) => {
               }}
               icon="check"
               mode="contained"
-              loading={isLoading}
-              onPress={() => handleSubmit()}
+              loading={updateGroupDescriptionLoading}
+              onPress={() => handleUpdateGroupDescription()}
               theme={{roundness: 1}}
-              disabled={
-                isLoading || description.length < 1
-              }>
+              disabled={updateGroupDescriptionLoading || description.length < 1}>
               Ok
             </Button>
           </View>
-
-
         </View>
       )}
 

@@ -13,7 +13,7 @@ import {FAB, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-
+import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 const Task = ({route}) => {
   const {groupId} = route.params;
 
@@ -34,6 +34,9 @@ const Task = ({route}) => {
   const cardHandler = item => {
     setCurrentItem(item);
   };
+
+  const [snackbarVisible, setSnackBarVisible] = useState(false)
+
   return (
     <View style={{flex:1, backgroundColor:theme.colors.background}}>
       {isLoading ? (
@@ -49,7 +52,7 @@ const Task = ({route}) => {
             </View>
           )}
           renderItem={({item}) => (
-            <RenderItem item={item} cardHandler={cardHandler} />
+            <RenderItem item={item} cardHandler={cardHandler} setSnackBarVisible={setSnackBarVisible} />
           )}
           refreshControl={
             <RefreshControl refreshing={isFetching} onRefresh={refetch} />
@@ -61,10 +64,15 @@ const Task = ({route}) => {
         icon="plus"
         size="medium"
         // variant='tertiary'
-        style={styles.fab}
+        style={{bottom: snackbarVisible ? 70 : 16, right: 16, position:"absolute"}}
         onPress={() => FABHandler()}
       />
 
+      <ErrorSnackBar
+        isVisible={snackbarVisible}
+        text={'Something went wrong'}
+        onDismissHandler={setSnackBarVisible}
+      />
     </View>
   );
 };
