@@ -207,11 +207,13 @@ const LoginScreen = ({navigation, route}) => {
               ) : null}
               <Button
                 loading={isLoading}
+                disabled={isLoading}
                 style={{
                   marginTop: '5%',
                   padding: '1%',
                 }}
                 contentStyle={{padding: '1%'}}
+                buttonStyle={{padding:"1%"}}
                 theme={{roundness: 1}}
                 mode="contained"
                 onPress={handleSubmit}

@@ -122,6 +122,13 @@ const AppStack = () => {
           headerShown:false,
         }}
       />
+      <Stack.Screen
+        name="MultipleInvitiActions"
+        component={MultipleInvitiActions}
+        options={{
+          headerShown:false,
+        }}
+      />
 
     </Stack.Navigator>
   );
