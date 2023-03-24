@@ -5,7 +5,7 @@
 //  Modified by : -------
 // ==========================================
 
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper'
@@ -13,29 +13,32 @@ import {FAB, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import { handleTasks } from '../../../../../redux/reducers/groups/tasks/taskSlice';
+import { useSelector, useDispatch } from 'react-redux';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 const Task = ({route}) => {
   const {groupId} = route.params;
 
   const navigation = useNavigation();
   const theme = useTheme();
-  const [currentItem, setCurrentItem] = useState({});
+  const dispatch = useDispatch();
+  const [snackbarVisible, setSnackBarVisible] = useState(false)
 
   const {data, isError, isLoading, error, isFetching, refetch} =
     useGetAllTasksQuery({
       groupId,
     });
+  
+  const tasksFromRedux = useSelector(state => state.tasks.tasks);
+  const isTaskSearch = useSelector(state => state.tasks.isTasksSearch);
 
-  const modalizeRef = useRef(null);
   const FABHandler = () => {
     navigation.navigate('AddTask', {groupId: groupId});
   };
 
-  const cardHandler = item => {
-    setCurrentItem(item);
-  };
-
-  const [snackbarVisible, setSnackBarVisible] = useState(false)
+  useEffect(()=>{
+      dispatch(handleTasks(data))
+  },[data])
 
   return (
     <View style={{flex:1, backgroundColor:theme.colors.background}}>
@@ -45,14 +48,14 @@ const Task = ({route}) => {
         </View>
       ) : (
         <FlatList
-          data={data}
+          data={isTaskSearch ? tasksFromRedux : data}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
               <Text>No task yet</Text>
             </View>
           )}
           renderItem={({item}) => (
-            <RenderItem item={item} cardHandler={cardHandler} setSnackBarVisible={setSnackBarVisible} />
+            <RenderItem item={item} setSnackBarVisible={setSnackBarVisible} />
           )}
           refreshControl={
             <RefreshControl refreshing={isFetching} onRefresh={refetch} />
