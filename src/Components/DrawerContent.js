@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {DrawerContentScrollView} from '@react-navigation/drawer';
-import {Avatar, Drawer, List, Switch, useTheme} from 'react-native-paper';
+import {View} from 'react-native';
+import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
+import {Avatar, Drawer, List, useTheme, Text} from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
@@ -9,9 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useDispatch} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
-import { userApi } from '../redux/reducers/user/userThunk';
-import { groupApi } from '../redux/reducers/groups/groupThunk';
-import { friendshipApi } from '../redux/reducers/Friendship/friendshipThunk';
+import {userApi} from '../redux/reducers/user/userThunk';
+import {groupApi} from '../redux/reducers/groups/groupThunk';
+import {friendshipApi} from '../redux/reducers/Friendship/friendshipThunk';
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ export default function DrawerContent(props) {
     isError,
     error,
     isLoading,
-    refetch
+    refetch,
   } = useGetCurrentLoginUserQuery(id.current);
 
   const logout = async () => {
@@ -46,7 +46,7 @@ export default function DrawerContent(props) {
     await AsyncStorage.setItem('ImageURL', '');
     dispatch(handleCurrentLoaginUser({}));
     // dispatch(userApi.util.resetApiState())
-    dispatch(groupApi.util.resetApiState())
+    dispatch(groupApi.util.resetApiState());
     // dispatch(friendshipApi.util.resetApiState())
     navigation.dispatch(DrawerActions.closeDrawer());
     navigation.navigate('Auth');
@@ -58,9 +58,17 @@ export default function DrawerContent(props) {
     }
   }, [user]);
 
+  const obscureEmail = (email) => {
+    const [name, domain] = email.split('@');
+    return `${name[0]}${name[1]}${new Array(name.length - 3 ).join('*')}@${domain}`;
+  };
+  
   return (
-    <DrawerContentScrollView {...props} style={{backgroundColor:theme.colors.background}}>
-      <View style={styles.drawerContent}>
+    <DrawerContentScrollView
+      {...props}
+      style={{backgroundColor: theme.colors.background}}
+      contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}>
+      <View>
         {isLoading ? (
           <List.Item
             title={props => (
@@ -92,17 +100,14 @@ export default function DrawerContent(props) {
           <List.Item
             title={user?.name}
             onPress={async () => {
-              navigation.navigate(
-                'AppSettingsMain', {
-                  screen: 'Profile',
-                  params: { id: await AsyncStorage.getItem('id') },
-                }
-              )
+              navigation.navigate('AppSettingsMain', {
+                screen: 'Profile',
+                params: {id: await AsyncStorage.getItem('id')},
+              });
             }}
             left={props => (
               <Avatar.Image
                 {...props}
-                // size={30}
                 source={{
                   uri: user?.imageURL
                     ? user?.imageURL
@@ -114,19 +119,19 @@ export default function DrawerContent(props) {
             // right={props => (
             //   <List.Icon size={30} {...props} icon="chevron-right" />
             // )}
-            description={user?.email}
+            description={obscureEmail(user?.email)}
           />
         )}
 
         <Drawer.Item
           onPress={() => {
-            navigation.navigate('MakeFriends');
+            navigation.navigate('MakeFriends', {screen: 'MakeFriendsMain'});
           }}
           icon="account-multiple"
           label="Friends"
         />
 
-        <Drawer.Section title="Preferences" style={styles.drawerSection}>
+        {/* <Drawer.Section title="Preferences" >
           <Drawer.Item
             icon="weather-night"
             label="Dark Mode"
@@ -134,56 +139,28 @@ export default function DrawerContent(props) {
               <Switch value={isThemeDark} onValueChange={() => toggleTheme()} />
             )}
           />
-        </Drawer.Section>
+        </Drawer.Section> */}
 
         <Drawer.Item
-          icon="logout"
-          label="Logout"
-          active={active === 'logout'}
+          icon="seed"
+          label="Watch an ad"
+          onPress={() => navigation.navigate('SupportUs')}
+        />
+
+        <List.Item
+          title="Logout"
           onPress={() => logout()}
-          style={{}}
+          left={() => <List.Icon icon="logout" color={theme.colors.error} />}
+          style={{
+            backgroundColor: theme.colors.errorContainer,
+            paddingHorizontal: '11%',
+            marginVertical:"3%"
+          }}
+          titleStyle={{color: theme.colors.error}}
         />
       </View>
+      <Text style={{alignSelf:"center", margin:"5%"}} >V 0.0.1</Text>
+
     </DrawerContentScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  drawerContent: {
-    flex: 1,
-  },
-  userInfoSection: {
-    paddingLeft: 20,
-  },
-  title: {
-    marginTop: '2%',
-    fontWeight: 'bold',
-  },
-  caption: {
-    fontSize: 14,
-    lineHeight: 14,
-  },
-  row: {
-    marginTop: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  section: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  paragraph: {
-    fontWeight: 'bold',
-    marginRight: 3,
-  },
-  drawerSection: {
-    marginTop: 15,
-  },
-  preference: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-});

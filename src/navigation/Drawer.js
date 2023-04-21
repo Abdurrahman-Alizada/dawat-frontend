@@ -5,6 +5,8 @@ import HomeScreen from './AppStack';
 import DrawerContent from '../Components/DrawerContent';
 const Drawer1 = createDrawerNavigator();
 import MakeFriends from './MakeFriendsStack';
+// import SupportUs from '../Screens/Drawer/Supportus/Index';
+import SupportUs from './SupportUsStatck';
 
 const DrawerStack = props => {
   return (
@@ -18,6 +20,11 @@ const DrawerStack = props => {
         name="MakeFriends"
         options={{headerShown: false}}
         component={MakeFriends}
+      />
+      <Drawer1.Screen
+        name="SupportUs"
+        options={{headerShown: false}}
+        component={SupportUs}
       />
     </Drawer1.Navigator>
   );
