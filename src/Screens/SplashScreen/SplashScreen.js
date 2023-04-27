@@ -39,7 +39,7 @@ const SplashScreen = ({navigation}) => {
         .then(value => {
           isAppFirstLaunched.current
             ? navigation.replace('Onboarding')
-            : navigation.navigate(value == "0" ? 'Auth' : 'Drawer');
+            : navigation.replace(value == "0" ? 'Auth' : 'Drawer');
         })
         .catch(err => {
           console.log(err);

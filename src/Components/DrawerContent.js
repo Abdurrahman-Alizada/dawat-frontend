@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {View} from 'react-native';
+import {View, Linking, Alert} from 'react-native';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import {Avatar, Drawer, List, useTheme, Text} from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
@@ -62,6 +62,23 @@ export default function DrawerContent(props) {
     const [name, domain] = email.split('@');
     return `${name[0]}${name[1]}${new Array(name.length - 3 ).join('*')}@${domain}`;
   };
+
+
+  // privacy policy 
+  const handlePrivacyPolicyPress = async () => {
+    // Checking if the link is supported for links with custom URL scheme.
+    const supported = await Linking.canOpenURL("https://fantastic-maamoul-0a74ba.netlify.app/privacy-policy");
+
+    if (supported) {
+      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+      // by some browser in the mobile
+      await Linking.openURL("https://fantastic-maamoul-0a74ba.netlify.app/privacy-policy");
+    } else {
+      Alert.alert(`Something went wrong`);
+    }
+  };
+
+
   
   return (
     <DrawerContentScrollView
@@ -147,7 +164,16 @@ export default function DrawerContent(props) {
           onPress={() => navigation.navigate('SupportUs')}
         />
 
-        <List.Item
+      </View>
+      <View>
+
+      <Drawer.Item
+          icon="seed"
+          label="Privacy policy"
+          onPress={() => handlePrivacyPolicyPress()}
+        />
+
+      <List.Item
           title="Logout"
           onPress={() => logout()}
           left={() => <List.Icon icon="logout" color={theme.colors.error} />}
@@ -158,8 +184,8 @@ export default function DrawerContent(props) {
           }}
           titleStyle={{color: theme.colors.error}}
         />
-      </View>
       <Text style={{alignSelf:"center", margin:"5%"}} >V 0.0.1</Text>
+      </View>
 
     </DrawerContentScrollView>
   );
