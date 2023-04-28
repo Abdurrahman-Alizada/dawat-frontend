@@ -128,9 +128,8 @@ const AddGroup = ({navigation, onClose, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header>
           <Searchbar
-            elevation={6}
             placeholder="Search"
             icon={'arrow-left'}
             autoFocus
@@ -138,12 +137,13 @@ const AddGroup = ({navigation, onClose, route}) => {
             onIconPress={() => {
               setIsSearch(false);
             }}
+             theme={{roundness:0}}
             // onChangeText={onChangeSearch}
             // value={searchQuery}
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header >
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();

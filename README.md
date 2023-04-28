@@ -1,1 +1,1 @@
-# dawat-frontend
+# Event Planner

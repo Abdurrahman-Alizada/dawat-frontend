@@ -5,7 +5,6 @@ import {useNavigation, DrawerActions} from '@react-navigation/native';
 
 const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
   const navigation = useNavigation();
-  const theme1 = useTheme()
   //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
@@ -26,60 +25,55 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
   const closeMenu = () => setVisible(false);
   // end more menu
   return (
-        <View>
+    <View>
       {!isSearch ? (
-          <Appbar.Header
+        <Appbar.Header
           style={{backgroundColor: theme.colors.background}}
-            elevated={true}
-            >
-            <Appbar.Action
-              icon="menu"
-              color={theme.colors.onBackground}
-              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-            />
-            <Appbar.Content
-              title="App Name"
-              titleStyle={{
-                alignSelf: 'center',
-                color: theme.colors.onBackground,
-              }}
-            />
-            <Appbar.Action
-              icon="magnify"
-              color={theme.colors.onBackground}
-              onPress={() => {
-                setIsSearch(!isSearch);
-              }}
-            />
+          elevated={true}>
+          <Appbar.Action
+            icon="menu"
+            color={theme.colors.onBackground}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+          />
+          <Appbar.Content
+            title="Event Planner"
+            titleStyle={{
+              color: theme.colors.onBackground,
+            }}
+          />
+          <Appbar.Action
+            icon="magnify"
+            color={theme.colors.onBackground}
+            onPress={() => {
+              setIsSearch(!isSearch);
+              searchFilterFunction("");
+            }}
+          />
 
-            <Menu
-              visible={visible}
-              onDismiss={closeMenu}
-              contentStyle={{backgroundColor: theme.colors.background}}
-              anchor={
-                <Appbar.Action
-                  icon={MORE_ICON}
-                  color={theme.colors.onBackground}
-                  onPress={() => openMenu()}
-                />
-              }>
-              <Menu.Item
-                leadingIcon="cog-outline"
-                title="Settings"
-                titleStyle={{color: theme.colors.onBackground}}
-                onPress={async () => {
-                  closeMenu();
-                  navigation.navigate('AppSettingsMain');
-                }}
+          <Menu
+            visible={visible}
+            onDismiss={closeMenu}
+            contentStyle={{backgroundColor: theme.colors.background}}
+            anchor={
+              <Appbar.Action
+                icon={MORE_ICON}
+                color={theme.colors.onBackground}
+                onPress={() => openMenu()}
               />
-            </Menu>
-          </Appbar.Header>
+            }>
+            <Menu.Item
+              leadingIcon="cog-outline"
+              title="Settings"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                navigation.navigate('AppSettingsMain');
+              }}
+            />
+          </Menu>
+        </Appbar.Header>
       ) : (
-          <Appbar.Header
-          style={{backgroundColor: theme.colors.elevation.level2}}
-            elevated={true}
-          >
-
+        <Appbar.Header style={{backgroundColor: theme.colors.background}}>
           <Searchbar
             placeholder="Search..."
             onChangeText={updateSearch}
@@ -89,15 +83,16 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             cancelButtonTitle="cancel"
             autoFocus
             iconColor={theme.colors.onSurface}
-            inputStyle={{color:theme.colors.onSurface}}
+            inputStyle={{color: theme.colors.onSurface}}
             placeholderTextColor={theme.colors.onSurface}
-            elevation={6}
+            // elevation={6}
+            theme={{roundness: 0}}
             // loading={true}
             // onBlur={BlurHandler}
           />
-          </Appbar.Header>
+        </Appbar.Header>
       )}
-      </View>
+    </View>
   );
 };
 

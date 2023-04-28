@@ -93,9 +93,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.simple"
+    namespace "com.eventplanner"
     defaultConfig {
-        applicationId "com.simple"
+        applicationId "com.eventplanner"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
