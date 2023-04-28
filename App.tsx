@@ -13,7 +13,6 @@ import {Provider} from 'react-redux';
 const Stack = createStackNavigator();
 
 import {LogBox} from 'react-native';
-// import SplashScreen123 from 'react-native-splash-screen';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
@@ -69,12 +68,12 @@ export const App = () => {
 
   const [isNetSnackBarVisible, setIsNetSnackBarVisible ] = useState(false);
 
-  // useLayoutEffect(() => {
-  //   SplashScreen123.hide();
-  //   setTimeout(() => {
-  //     setIsNetSnackBarVisible(true);
-  //   }, 3000);
-  // }, []);
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      setIsNetSnackBarVisible(true);
+    }, 3000);
+  }, []);
+
 
   // internet connection information
   const netInfo = useNetInfo();
