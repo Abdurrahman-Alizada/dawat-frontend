@@ -117,7 +117,8 @@ const LoginScreen = ({navigation, route}) => {
                 height: 60,
                 borderRadius: 100 / 2,
                 borderWidth: 10,
-                borderColor: '#097969',
+                // borderColor: '#097969',
+                borderColor :"#4838D1"
               }}
             />
 
@@ -207,11 +208,13 @@ const LoginScreen = ({navigation, route}) => {
               ) : null}
               <Button
                 loading={isLoading}
+                disabled={isLoading}
                 style={{
                   marginTop: '5%',
                   padding: '1%',
                 }}
                 contentStyle={{padding: '1%'}}
+                buttonStyle={{padding:"1%"}}
                 theme={{roundness: 1}}
                 mode="contained"
                 onPress={handleSubmit}

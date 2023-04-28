@@ -122,14 +122,11 @@ const AppStack = () => {
           headerShown:false,
         }}
       />
-
       <Stack.Screen
         name="MultipleInvitiActions"
         component={MultipleInvitiActions}
         options={{
-          headerShown: false,
-          presentation:"modal"
-          // header: (props) => <GeneralAppbar title="Add multiple inviti" {...props} />,
+          headerShown:false,
         }}
       />
 

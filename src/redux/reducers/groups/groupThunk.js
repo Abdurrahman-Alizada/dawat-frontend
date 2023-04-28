@@ -16,7 +16,7 @@ export const groupApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Groups'],
+  tagTypes: ['Groups','GroupLogs'],
   reducerPath: 'groupApi',
   endpoints: build => ({
     getAllGroups: build.query({
@@ -38,7 +38,7 @@ export const groupApi = createApi({
           users: group.members,
         },
       }),
-      invalidatesTags: ['Groups'],
+      invalidatesTags: ['Groups','GroupLogs'],
     }),
 
     updateGroupInfo: build.mutation({
@@ -52,7 +52,41 @@ export const groupApi = createApi({
           imageURL:group.imageURL
         },
       }),
-      invalidatesTags: ['Groups'],
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
+    updateGroupName: build.mutation({
+      query: group => ({
+        url: `/api/group/${group.groupId}/updateName`,
+        method: 'PUT',
+        body: {
+          newGroupName: group.newGroupName,
+          previousGroupName : group.previousGroupName,
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
+    updateGroupDescription: build.mutation({
+      query: group => ({
+        url: `/api/group/${group.groupId}/updateDescription`,
+        method: 'PUT',
+        body: {
+          groupDescription: group.groupDescription,
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
+    updateImageURL: build.mutation({
+      query: group => ({
+        url: `/api/group/${group.groupId}/updateImageURL`,
+        method: 'PUT',
+        body: {
+          imageURL: group.imageURL,
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
     }),
 
     deleteGroupForUser: build.mutation({
@@ -64,7 +98,7 @@ export const groupApi = createApi({
           userId: group.userId,
         },
       }),
-      invalidatesTags: ['Groups'],
+      invalidatesTags: ['Groups','GroupLogs'],
     }),
     addUserToGroup: build.mutation({
       query: group => ({
@@ -76,7 +110,12 @@ export const groupApi = createApi({
         },
       }),
       invalidatesTags: ['Groups'],
-      providesTags:['Groups']
+      providesTags:['Groups','GroupLogs']
+    }),
+
+    allLogsForGroup: build.query({
+      query: ({groupId}) => `/api/group/logs/${groupId}`,
+      providesTags: ['GroupLogs'],
     }),
   }),
 });
@@ -86,7 +125,11 @@ export const {
   useAddGroupMutation,
   useDeleteGroupForUserMutation,
   useAddUserToGroupMutation,
-  useUpdateGroupInfoMutation
+  useUpdateGroupInfoMutation,
+  useAllLogsForGroupQuery,
+  useUpdateGroupNameMutation,
+  useUpdateGroupDescriptionMutation,
+  useUpdateImageURLMutation
 } = groupApi;
 
 // end query

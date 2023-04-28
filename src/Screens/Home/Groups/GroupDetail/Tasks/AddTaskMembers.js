@@ -21,11 +21,15 @@ import {
 } from 'react-native-paper';
 import {useAddTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import { groupApi } from '../../../../../redux/reducers/groups/groupThunk';
+import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 
 const AddGroup = ({navigation, route}) => {
   const {values, startDate, dueDate, priority} = route.params;
   const theme = useTheme();
+  const dispatch = useDispatch();
+
   const [isSearch, setIsSearch] = useState(false);
 
   const currentViewingGroup = useSelector(
@@ -45,7 +49,12 @@ const AddGroup = ({navigation, route}) => {
       prority: priority,
     })
       .then(response => {
-        navigation.pop(2);
+        if(response.data?._id){
+          dispatch(groupApi.util.invalidateTags(['GroupLogs']))
+          navigation.pop(2);
+        }else{
+          setSnackBarVisible(true)
+        }
       })
       .catch(e => {
         console.log(e);
@@ -98,6 +107,9 @@ const AddGroup = ({navigation, route}) => {
       </View>
     );
   };
+
+  // snackbar
+  const [snackbarVisible, setSnackBarVisible] = useState(false);
 
   return (
     <View style={{flex: 1}}>
@@ -185,13 +197,17 @@ const AddGroup = ({navigation, route}) => {
       <FAB
         icon="check"
         label="Ok"
-        style={styles.fab}
+        style={{bottom:snackbarVisible ? 70 : 16, right:16, position:'absolute'}}
         disabled={isLoading}
         loading={isLoading}
         onPress={submitHandler}
       />
 
-
+      <ErrorSnackBar
+        isVisible={snackbarVisible}
+        text={'Something went wrong'}
+        onDismissHandler={setSnackBarVisible}
+      />
     </View>
   );
 };
