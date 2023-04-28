@@ -74,7 +74,7 @@ const RenderGroupMembers = ({task}) => {
   }
 };
 
-const SingleTask = ({item, cardHandler, setSnackBarVisible}) => {
+const SingleTask = ({item, setSnackBarVisible}) => {
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -125,6 +125,25 @@ const SingleTask = ({item, cardHandler, setSnackBarVisible}) => {
 
   // error snackbar
 
+  const tasksSearchQuery = useSelector(state => state.tasks.tasksSearchQuery);
+  const getHighlightedText = result =>
+  result
+    .split(new RegExp(`(${tasksSearchQuery})`, `gi`))
+    .map((piece, index) => {
+      return (
+        <Text
+          key={index}
+          style={
+            piece.toLocaleLowerCase() ==
+            tasksSearchQuery.toLocaleLowerCase()
+              ? {fontWeight: 'bold', color: theme.colors.primary}
+              : {}
+          }>
+          {piece}
+        </Text>
+      );
+    });
+
   return (
     <View>
       <View
@@ -152,7 +171,7 @@ const SingleTask = ({item, cardHandler, setSnackBarVisible}) => {
                 color: theme.colors.onSurface,
                 textDecorationLine: item.isCompleted ? 'line-through' : 'none',
               }}>
-              {item.taskName}
+              {getHighlightedText(item.taskName)}
             </Text>
           </View>
           <View

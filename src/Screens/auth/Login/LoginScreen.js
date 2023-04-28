@@ -117,7 +117,8 @@ const LoginScreen = ({navigation, route}) => {
                 height: 60,
                 borderRadius: 100 / 2,
                 borderWidth: 10,
-                borderColor: '#097969',
+                // borderColor: '#097969',
+                borderColor :"#4838D1"
               }}
             />
 

@@ -25,17 +25,17 @@ const Tabs = ({groupId, navigation}) => {
       initialRouteName="Invitations"
       screenOptions={{
         tabBarLabelStyle: {
-          fontSize: 17,
+          // fontSize: 17,
           fontWeight: 'bold',
           textTransform: "none",
           justifyContent:"space-evenly",
         },
-        tabBarScrollEnabled: true,
+        // tabBarScrollEnabled: true,
         tabBarStyle: {
           backgroundColor: theme.colors.elevation.level2,
         },
-        tabBarItemStyle: {width: 'auto',marginLeft:10},
-        tabBarIndicatorStyle: {marginLeft:10},
+        // tabBarItemStyle: {width: 'auto',marginLeft:10},
+        // tabBarIndicatorStyle: {marginLeft:10},
       }}>
       <Tab.Screen
         name="Logs"

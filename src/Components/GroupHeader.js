@@ -17,6 +17,8 @@ import {
   handleIsInvitationSearch,
   handleInvitationSearch,
 } from '../redux/reducers/groups/invitations/invitationSlice';
+import {handleIsSearch} from '../redux/reducers/groups/groups';
+import { handleIsTaskSearch, handleTasksSearch } from '../redux/reducers/groups/tasks/taskSlice';
 
 const Header = ({onOpen, group}) => {
   const dispatch = useDispatch();
@@ -38,19 +40,36 @@ const Header = ({onOpen, group}) => {
   };
 
   //search
+  const isSearch = useSelector(state => state.groups.isSearch);
+  
+  // invitations
   const [search, setSearch] = useState('');
   const isInvitaionSearch = useSelector(
     state => state.invitations.isInvitaionSearch,
   );
-
   const updateSearch = search => {
     setSearch(search);
     dispatch(handleInvitationSearch(search));
   };
   const BlurHandler = () => {
     setSearch('');
+    dispatch(handleIsSearch(false));
     dispatch(handleIsInvitationSearch(false));
   };
+
+  // tasks
+  const isTasksSearch = useSelector(state => state.tasks.isTasksSearch);
+  const updateSearchForTasks = search => {
+    setSearch(search);
+    dispatch(handleTasksSearch(search));
+  };
+  const BlurHandlerForTasks = () => {
+    setSearch('');
+    dispatch(handleIsSearch(false));
+    dispatch(handleIsTaskSearch(false));
+  };
+
+
   // end search
 
   // "more menu"
@@ -63,7 +82,7 @@ const Header = ({onOpen, group}) => {
   // end more menu
   return (
     <>
-      {!isInvitaionSearch ? (
+      {!isSearch ? (
         <Appbar
           elevated={true}
           style={{
@@ -137,6 +156,7 @@ const Header = ({onOpen, group}) => {
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
+                      dispatch(handleIsSearch(true));
                       dispatch(handleIsInvitationSearch(true));
                     }}
                     title="Search for inviti"
@@ -174,7 +194,8 @@ const Header = ({onOpen, group}) => {
                 <View>
                   <Menu.Item
                     onPress={() => {
-                      console.log('Search for task');
+                      dispatch(handleIsSearch(true));
+                      dispatch(handleIsTaskSearch(true));
                     }}
                     title="Search for task"
                     leadingIcon={'calendar-search'}
@@ -197,19 +218,37 @@ const Header = ({onOpen, group}) => {
         </Appbar>
       ) : (
         <View>
-          <Searchbar
-            placeholder="Search..."
-            onChangeText={updateSearch}
-            value={search}
-            cancelButtonTitle="cancel"
-            autoFocus
-            icon="arrow-left"
-            onIconPress={BlurHandler}
-            theme={{roundness: 0}}
-            cancel={() => {
-              console.log('hello');
-            }}
-          />
+          {isInvitaionSearch && (
+            <Searchbar
+              placeholder="Search..."
+              onChangeText={updateSearch}
+              value={search}
+              cancelButtonTitle="cancel"
+              autoFocus
+              icon="arrow-left"
+              onIconPress={BlurHandler}
+              theme={{roundness: 0}}
+              cancel={() => {
+                console.log('hello');
+              }}
+            />
+          )}
+
+          {isTasksSearch && (
+            <Searchbar
+              placeholder="Search for task..."
+              onChangeText={updateSearchForTasks}
+              value={search}
+              cancelButtonTitle="cancel"
+              autoFocus
+              icon="arrow-left"
+              onIconPress={BlurHandlerForTasks}
+              theme={{roundness: 0}}
+              cancel={() => {
+                console.log('hello');
+              }}
+            />
+          )}
         </View>
       )}
     </>

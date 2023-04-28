@@ -130,7 +130,7 @@ const Groups = ({navigation}) => {
         )}
 
         {!isLoading ? (
-          <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+          <View style={{flex: 1,marginTop:2, backgroundColor: theme.colors.background}}>
             <FlatList
               onScroll={onScroll}
               keyExtractor={item => item._id}
@@ -163,7 +163,7 @@ const Groups = ({navigation}) => {
               margin: '3%',
             }}>
             <GroupsList />
-          </View>
+           </View>
         )}
       </Provider>
 
