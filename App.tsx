@@ -74,6 +74,7 @@ export const App = () => {
     }, 3000);
   }, []);
 
+
   // internet connection information
   const netInfo = useNetInfo();
 
@@ -87,10 +88,9 @@ export const App = () => {
               <Stack.Screen
                 name="SplashScreen"
                 component={SplashScreen}
-                // Hiding header for Splash Screen
                 options={{headerShown: false}}
               />
-              {/* Auth Navigator which includer Login Signup will come once */}
+              {/* Auth Navigator which includes Login Signup, will come once */}
               <Stack.Screen
                 name="Auth"
                 component={Auth}

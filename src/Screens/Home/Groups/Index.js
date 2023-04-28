@@ -174,7 +174,7 @@ const Groups = ({navigation}) => {
         onPress={() => onOpen()}
         visible={true}
         animateFrom={'right'}
-        iconMode={'static'}
+        iconMode="static"
         style={{bottom: snackbarVisible ? 70 : 16, right: 16}}
       />
 

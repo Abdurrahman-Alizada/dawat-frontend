@@ -160,7 +160,6 @@ const SingleTask = ({item, setSnackBarVisible}) => {
         <View style={{width: '90%'}}>
           <View
             style={{
-              marginTop: '2%',
               flexDirection: 'row',
               alignItems: 'center',
             }}>

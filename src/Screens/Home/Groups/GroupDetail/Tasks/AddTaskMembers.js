@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   FAB,
@@ -22,7 +22,7 @@ import {
 import {useAddTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 import {useSelector, useDispatch} from 'react-redux';
-import { groupApi } from '../../../../../redux/reducers/groups/groupThunk';
+import {groupApi} from '../../../../../redux/reducers/groups/groupThunk';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 
 const AddGroup = ({navigation, route}) => {
@@ -49,11 +49,11 @@ const AddGroup = ({navigation, route}) => {
       prority: priority,
     })
       .then(response => {
-        if(response.data?._id){
-          dispatch(groupApi.util.invalidateTags(['GroupLogs']))
+        if (response.data?._id) {
+          dispatch(groupApi.util.invalidateTags(['GroupLogs']));
           navigation.pop(2);
-        }else{
-          setSnackBarVisible(true)
+        } else {
+          setSnackBarVisible(true);
         }
       })
       .catch(e => {
@@ -114,22 +114,21 @@ const AddGroup = ({navigation, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header>
           <Searchbar
-            elevation={6}
             placeholder="Search"
             icon={'arrow-left'}
             autoFocus
-            // loading={true}
             onIconPress={() => {
               setIsSearch(false);
             }}
+            theme={{roundness: 0}}
             // onChangeText={onChangeSearch}
             // value={searchQuery}
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header elevated={true}>
+        <Appbar.Header>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
@@ -183,7 +182,9 @@ const AddGroup = ({navigation, route}) => {
                 ))}
               </ScrollView>
             ) : null}
-            <Divider bold style={{marginBottom: '1%'}} />
+            {users.length > 0 ? (
+              <Divider bold style={{marginBottom: '1%'}} />
+            ) : null}
           </View>
         )}
         ListEmptyComponent={() => (
@@ -197,7 +198,11 @@ const AddGroup = ({navigation, route}) => {
       <FAB
         icon="check"
         label="Ok"
-        style={{bottom:snackbarVisible ? 70 : 16, right:16, position:'absolute'}}
+        style={{
+          bottom: snackbarVisible ? 70 : 16,
+          right: 16,
+          position: 'absolute',
+        }}
         disabled={isLoading}
         loading={isLoading}
         onPress={submitHandler}
