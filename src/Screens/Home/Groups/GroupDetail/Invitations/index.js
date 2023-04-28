@@ -229,6 +229,10 @@ export default function Example({route}) {
     );
   };
 
+  const [expanded, setExpanded] = useState(true);
+
+  const handlePress = () => setExpanded(!expanded);
+
   return (
     <View style={{flexGrow:1, backgroundColor: theme.colors.background}}>
       <Banner
@@ -294,13 +298,16 @@ export default function Example({route}) {
         ref={invitiBriefModalizeRef}
         // velocity={800}
         threshold={200}
-        snapPoint={200}
+        snapPoint={400}
         handlePosition="inside"
-        modalHeight={500}
+        modalHeight={600}
         HeaderComponent={() => (
           <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
         )}>
-        <List.Accordion style={{padding: '4%'}} title="Statuses">
+        <List.Accordion style={{padding: '4%'}} title="Statuses" 
+         expanded={expanded}
+         onPress={handlePress}
+        >
           <View style={{marginHorizontal: '5%'}}>
             <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
               Added by
@@ -348,11 +355,19 @@ export default function Example({route}) {
                     }}>
                     <View style={{}}>
                       <Text style={{padding: '2%'}}>
-                        {Status.invitiStatus} by
+                        marked as <Text style={{fontWeight:"bold"}}>{Status.invitiStatus}</Text> by
                       </Text>
                       <View
                         style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Avatar.Icon size={30} icon="account-circle-outline" />
+                        <Avatar.Image
+                          size={30}
+                          source={
+                            Status?.addedBy?.imageURL
+                              ? {uri: Status?.addedBy?.imageURL}
+                              : require('../../../../../assets/drawer/male-user.png')
+                          }
+                          />
+                        {/* <Avatar.Icon size={30} icon="account-circle-outline" /> */}
                         <Text style={{marginHorizontal: '4%'}}>
                           {Status?.addedBy?.name}
                         </Text>

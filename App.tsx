@@ -13,7 +13,7 @@ import {Provider} from 'react-redux';
 const Stack = createStackNavigator();
 
 import {LogBox} from 'react-native';
-import SplashScreen123 from 'react-native-splash-screen';
+// import SplashScreen123 from 'react-native-splash-screen';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 LogBox.ignoreLogs(['EventEmitter.removeListener']);
@@ -69,12 +69,12 @@ export const App = () => {
 
   const [isNetSnackBarVisible, setIsNetSnackBarVisible ] = useState(false);
 
-  useLayoutEffect(() => {
-    SplashScreen123.hide();
-    setTimeout(() => {
-      setIsNetSnackBarVisible(true);
-    }, 3000);
-  }, []);
+  // useLayoutEffect(() => {
+  //   SplashScreen123.hide();
+  //   setTimeout(() => {
+  //     setIsNetSnackBarVisible(true);
+  //   }, 3000);
+  // }, []);
 
   // internet connection information
   const netInfo = useNetInfo();
@@ -89,10 +89,9 @@ export const App = () => {
               <Stack.Screen
                 name="SplashScreen"
                 component={SplashScreen}
-                // Hiding header for Splash Screen
                 options={{headerShown: false}}
               />
-              {/* Auth Navigator which includer Login Signup will come once */}
+              {/* Auth Navigator which includes Login Signup, will come once */}
               <Stack.Screen
                 name="Auth"
                 component={Auth}

@@ -1,4 +1,4 @@
-package com.simple;
+package com.eventplanner;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

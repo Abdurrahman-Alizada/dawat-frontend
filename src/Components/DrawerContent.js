@@ -59,7 +59,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   const obscureEmail = (email) => {
-    const [name, domain] = email.split('@');
+    const [name, domain] = email?.split('@');
     return `${name[0]}${name[1]}${new Array(name.length - 3 ).join('*')}@${domain}`;
   };
 
@@ -159,7 +159,7 @@ export default function DrawerContent(props) {
         </Drawer.Section> */}
 
         <Drawer.Item
-          icon="seed"
+          icon="motion-play"
           label="Watch an ad"
           onPress={() => navigation.navigate('SupportUs')}
         />
@@ -168,7 +168,7 @@ export default function DrawerContent(props) {
       <View>
 
       <Drawer.Item
-          icon="seed"
+          icon="text-box"
           label="Privacy policy"
           onPress={() => handlePrivacyPolicyPress()}
         />
