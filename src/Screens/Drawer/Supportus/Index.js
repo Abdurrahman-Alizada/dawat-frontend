@@ -82,10 +82,10 @@ export default function App() {
       <Card style={{marginVertical: '0%'}}>
         <Card.Content>
           <Text variant="headlineMedium">Thank you for coming here.</Text>
-          <Text style={{marginVertical:"5%"}} variant="bodyLarge">
-            We greatly appreciate your support by watching an Ad. Your
-            support helps us continue to maintain, improve and enhance our app for you and
-            all of our users.
+          <Text style={{marginVertical: '5%'}} variant="bodyLarge">
+            We greatly appreciate your patience and willingness to watch an Ad.
+            Your support through watching this Ad helps us continue to provide
+            our app for free.
           </Text>
         </Card.Content>
       </Card>
@@ -110,9 +110,7 @@ export default function App() {
             )}
           </View>
         ) : (
-          <Text style={{marginVertical: '5%'}}>
-            You have watched the ad
-          </Text>
+          <Text style={{marginVertical: '5%'}}>You have watched the ad</Text>
         )}
 
         {!isrewardedWatched ? (
@@ -136,13 +134,11 @@ export default function App() {
           <Text>You have watched the ad</Text>
         )}
 
-       
-       {
-         isInterstitialWatched && isrewardedWatched &&
-        <Text style={{marginVertical: '10%'}}>
-          You can watch ad again when you re-open the app.
-        </Text>
-       }
+        {isInterstitialWatched && isrewardedWatched && (
+          <Text style={{marginVertical: '10%'}}>
+            You can watch ad again when you re-open the app.
+          </Text>
+        )}
       </View>
     </View>
   );
