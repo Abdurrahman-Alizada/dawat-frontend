@@ -140,7 +140,7 @@ const LoginScreen = ({navigation, route}) => {
               fontWeight: '500',
               textAlign: 'center',
             }}>
-            Application name
+            Event Planner
           </Text>
         </View>
         <Text

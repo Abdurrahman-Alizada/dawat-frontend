@@ -67,12 +67,12 @@ export default function DrawerContent(props) {
   // privacy policy 
   const handlePrivacyPolicyPress = async () => {
     // Checking if the link is supported for links with custom URL scheme.
-    const supported = await Linking.canOpenURL("https://fantastic-maamoul-0a74ba.netlify.app/privacy-policy");
+    const supported = await Linking.canOpenURL("https://eventplannerapp.netlify.app/privacy-policy");
 
     if (supported) {
       // Opening the link with some app, if the URL scheme is "http" the web link should be opened
       // by some browser in the mobile
-      await Linking.openURL("https://fantastic-maamoul-0a74ba.netlify.app/privacy-policy");
+      await Linking.openURL("https://eventplannerapp.netlify.app/privacy-policy");
     } else {
       Alert.alert(`Something went wrong`);
     }
@@ -145,7 +145,7 @@ export default function DrawerContent(props) {
             navigation.navigate('MakeFriends', {screen: 'MakeFriendsMain'});
           }}
           icon="account-multiple"
-          label="Friends"
+          label="Friends circle"
         />
 
         {/* <Drawer.Section title="Preferences" >

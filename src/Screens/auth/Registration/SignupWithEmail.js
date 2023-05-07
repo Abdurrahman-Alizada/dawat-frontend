@@ -107,7 +107,8 @@ const SignupWithEmail = () => {
                       height: 60,
                       borderRadius: 100 / 2,
                       borderWidth: 10,
-                      borderColor: '#097969',
+                      // borderColor: '#097969',
+                      borderColor :"#4838D1"
                     }}
                   />
 
@@ -129,7 +130,7 @@ const SignupWithEmail = () => {
                     fontWeight: '500',
                     textAlign: 'center',
                   }}>
-                  Application name
+                  Event Planner
                 </Text>
               </View>
               <Text
