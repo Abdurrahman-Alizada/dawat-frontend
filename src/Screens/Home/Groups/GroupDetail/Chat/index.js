@@ -2,7 +2,7 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {View, Text, FlatList, RefreshControl, Image} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {Button, useTheme} from 'react-native-paper';
+import {Button, useTheme, Card} from 'react-native-paper';
 import {
   useGetAllMessagesQuery,
   useAddNewMessageMutation,
@@ -91,7 +91,7 @@ const MessagesScreen = ({navigation}) => {
   return (
     <View style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
-        {isLoading ? (
+        {/* {isLoading ? (
           <View style={{margin: '5%'}}>
             {[1, 2, 3, 4].map((item, index) => (
               <View key={index} style={{marginTop: '3%'}}>
@@ -153,14 +153,30 @@ const MessagesScreen = ({navigation}) => {
               <RefreshControl refreshing={isLoading} onRefresh={refetch} />
             }
           />
-        )}
+        )} */}
+
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Image
+            source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
+          />
+          <Text style={{fontWeight:"bold", fontSize:25}}>Chat option iscoming soon</Text>
+          <Text style={{textAlign:"center", padding:"5%"}}>You will be able to chat about task, guests or other things related to event.</Text>
+          {/* <Text>or</Text> */}
+          {/* <Button
+            icon="refresh"
+            mode="contained"
+            style={{marginTop: '5%'}}
+            onPress={refetch}>
+            Refresh
+          </Button> */}
+        </View>
       </View>
 
-      <ChatInput
+      {/* <ChatInput
         message={newMessage}
         setMessage={setNewMessage}
         handleAddNewMessage={handleAddNewMessage}
-      />
+      /> */}
     </View>
   );
 };
