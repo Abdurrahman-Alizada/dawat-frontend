@@ -1,4 +1,4 @@
-package com.eventplanner;
+package com.softcodes.eventplanner;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
