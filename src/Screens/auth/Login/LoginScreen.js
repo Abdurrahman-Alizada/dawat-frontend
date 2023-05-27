@@ -226,24 +226,18 @@ const LoginScreen = ({navigation, route}) => {
                 style={{
                   marginTop: '10%',
                   flexDirection: 'row',
-                  alignItems: 'baseline',
-                  justifyContent: 'space-evenly',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}>
                 <Text
                   style={{
                     fontSize: 15,
                     fontWeight: 'bold',
-                    alignSelf: 'center',
                   }}>
                   Don't have an account?
                 </Text>
                 <Button
-                  mode="contained-tonal"
-                  compact
-                  textColor={theme.colors.onSecondary}
-                  buttonColor={theme.colors.secondary}
-                  theme={{roundness: 2}}
-                  style={{marginTop: '2%', paddingHorizontal: '1%'}}
+                  mode="text"
                   onPress={() => navigation.navigate('SignUpwithEmail')}>
                   Create account
                 </Button>

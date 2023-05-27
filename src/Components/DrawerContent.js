@@ -1,7 +1,14 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {View, Linking, Alert} from 'react-native';
+import {View, Linking, Alert, TouchableOpacity} from 'react-native';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
-import {Avatar, Drawer, List, useTheme, Text} from 'react-native-paper';
+import {
+  Avatar,
+  Drawer,
+  List,
+  useTheme,
+  Text,
+  Divider,
+} from 'react-native-paper';
 import {PreferencesContext} from '../themeContext';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
@@ -58,28 +65,31 @@ export default function DrawerContent(props) {
     }
   }, [user]);
 
-  const obscureEmail = (email) => {
+  const obscureEmail = email => {
     const [name, domain] = email?.split('@');
-    return `${name[0]}${name[1]}${new Array(name.length - 3 ).join('*')}@${domain}`;
+    return `${name[0]}${name[1]}${new Array(name.length - 3).join(
+      '*',
+    )}@${domain}`;
   };
 
-
-  // privacy policy 
+  // privacy policy
   const handlePrivacyPolicyPress = async () => {
     // Checking if the link is supported for links with custom URL scheme.
-    const supported = await Linking.canOpenURL("https://eventplannerapp.netlify.app/privacy-policy");
+    const supported = await Linking.canOpenURL(
+      'https://eventplannerapp.netlify.app/privacy-policy',
+    );
 
     if (supported) {
       // Opening the link with some app, if the URL scheme is "http" the web link should be opened
       // by some browser in the mobile
-      await Linking.openURL("https://eventplannerapp.netlify.app/privacy-policy");
+      await Linking.openURL(
+        'https://eventplannerapp.netlify.app/privacy-policy',
+      );
     } else {
       Alert.alert(`Something went wrong`);
     }
   };
 
-
-  
   return (
     <DrawerContentScrollView
       {...props}
@@ -164,29 +174,38 @@ export default function DrawerContent(props) {
           onPress={() => navigation.navigate('SupportUs')}
         />
 
-      </View>
-      <View>
-
-      <Drawer.Item
-          icon="text-box"
-          label="Privacy policy"
-          onPress={() => handlePrivacyPolicyPress()}
-        />
-
-      <List.Item
+        <List.Item
           title="Logout"
           onPress={() => logout()}
           left={() => <List.Icon icon="logout" color={theme.colors.error} />}
           style={{
-            backgroundColor: theme.colors.errorContainer,
             paddingHorizontal: '11%',
-            marginVertical:"3%"
+            marginVertical: '3%',
           }}
           titleStyle={{color: theme.colors.error}}
         />
-      <Text style={{alignSelf:"center", margin:"5%"}} >V 0.0.1</Text>
       </View>
 
+      <View style={{marginVertical:"5%"}}>
+        <Divider />
+        <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+          <TouchableOpacity
+            onPress={() => handlePrivacyPolicyPress()}
+            style={{alignSelf: 'center', margin: '5%'}}>
+            <Text>Privacy policy</Text>
+          </TouchableOpacity>
+          <Text
+            style={{
+              alignSelf: 'center',
+              fontWeight: 'bold',
+              marginBottom: 6,
+              fontSize: 20,
+            }}>
+            .
+          </Text>
+          <Text style={{alignSelf: 'center', margin: '5%'}}>V 0.0.1</Text>
+        </View>
+      </View>
     </DrawerContentScrollView>
   );
 }
