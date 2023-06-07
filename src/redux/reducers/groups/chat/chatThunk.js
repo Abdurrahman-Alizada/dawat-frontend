@@ -34,11 +34,24 @@ export const ChatApi = createApi({
       invalidatesTags: ['Messages'],
     }),
 
+    deleteMessages: build.mutation({
+      query: data => ({
+        url: `/api/group/message/delete`,
+        method: 'DELETE',
+        body: {
+          groupId: data.groupId,
+          userId : data.userId, 
+          messages : data.messages
+        },
+      }),
+      invalidatesTags: ['Messages'],
+    }),
   }),
 });
 
 export const {
   useGetAllMessagesQuery,
   useAddNewMessageMutation,
+  useDeleteMessagesMutation
 } = ChatApi;
 

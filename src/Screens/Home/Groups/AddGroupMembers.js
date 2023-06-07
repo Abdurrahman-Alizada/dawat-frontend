@@ -221,8 +221,8 @@ const AddGroup = ({navigation, onClose, route}) => {
           )}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>You don't have any friend yet</Text>
-              <Text>Please refresh or search for new friends</Text>
+              <Text>You don't have any friend to add in this group</Text>
+              <Text>But still you can create group by clicking on Add button</Text>
               <Button
                 icon="refresh"
                 mode="contained"

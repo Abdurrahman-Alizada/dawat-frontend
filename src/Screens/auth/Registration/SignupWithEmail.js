@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {
   TextInput,
   Dialog,
+  Text,
   Paragraph,
   Portal,
   useTheme,
@@ -16,17 +17,17 @@ import {useRegisterUserMutation} from '../../../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required').label('Name'),
+  name: Yup.string().required('*required').label('Name'),
   email: Yup.string()
     .email('Please enter valid email')
-    .required('Email is required')
+    .required('*required')
     .label('Email'),
   password: Yup.string()
     .min(2, ({min}) => `Password must be at least ${min} characters`)
-    .required('Password is required')
+    .required('*required')
     .label('Password'),
   passwordConfirmation: Yup.string()
-    .required('Confirm your password')
+    .required('*required')
     .oneOf([Yup.ref('password'), null], 'Passwords must match')
     .label('passwordConfirmation'),
 });
@@ -36,6 +37,8 @@ const SignupWithEmail = () => {
   const theme = useTheme();
 
   const [visible, setVisible] = useState(false);
+  const [message, setMessage] = useState("");
+  
   const [registerUser, {isLoading, isError, error}] = useRegisterUserMutation();
 
   const submitHandler = async values => {
@@ -46,12 +49,14 @@ const SignupWithEmail = () => {
       passwordConfirmation: values.passwordConfirmation,
     });
     if(response?.error?.status === 409 ){
+      setMessage(response?.error?.status)
       setVisible(true);
       return;
     }
    
     if(response.data.message === "An Email sent to your account please verify" ){
-      navigation.navigate("Login", {message : response.data.message})
+     setMessage("An Email sent to your account. Please verify and then login")
+      setVisible(true)
     }
     
   };
@@ -65,12 +70,13 @@ const SignupWithEmail = () => {
       }}>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
-          <Dialog.Title>Login Error</Dialog.Title>
+          <Dialog.Title>Sign up</Dialog.Title>
           <Dialog.Content>
-            <Paragraph> {error?.data?.message}</Paragraph>
+            <Paragraph> {message}</Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setVisible(false)}>Ok</Button>
+            <Button onPress={() => navigation.navigate("Login", {message : message})}>Go to login</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -146,14 +152,13 @@ const SignupWithEmail = () => {
 
               <TextInput
                 label="Name"
-                placeholder="Enter Your user name here"
                 onChangeText={handleChange('name')}
                 onBlur={handleBlur('name')}
                 mode="outlined"
                 value={values.name}
                 activeOutlineColor={theme.colors.secondary}
                 error={errors.name && touched.name ? true : false}
-                style={{marginTop: '2%'}}
+                style={{marginTop: '3%'}}
               />
               {errors.name && touched.name ? (
                 <Text style={{color: theme.colors.error}}>{errors.name}</Text>
@@ -161,14 +166,13 @@ const SignupWithEmail = () => {
 
               <TextInput
                 label="Email"
-                placeholder="Enter Your email here"
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 mode="outlined"
                 value={values.email}
                 activeOutlineColor={theme.colors.secondary}
                 error={errors.email && touched.email ? true : false}
-                style={{marginTop: '2%'}}
+                style={{marginTop: '3%'}}
               />
               {errors.email && touched.email ? (
                 <Text style={{color: theme.colors.error}}>{errors.email}</Text>
@@ -177,10 +181,9 @@ const SignupWithEmail = () => {
               <TextInput
                 error={errors.password && touched.password ? true : false}
                 label="Password"
-                placeholder="Enter your password here"
                 mode="outlined"
                 secureTextEntry={true}
-                style={{marginVertical: '2%'}}
+                style={{marginVertical: '3%'}}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
@@ -195,10 +198,9 @@ const SignupWithEmail = () => {
               <TextInput
                 error={errors.password && touched.password ? true : false}
                 label="Confirm password"
-                placeholder="Confirm your password"
                 mode="outlined"
                 secureTextEntry={true}
-                style={{marginVertical: '2%'}}
+                style={{marginVertical: '3%'}}
                 onChangeText={handleChange('passwordConfirmation')}
                 onBlur={handleBlur('passwordConfirmation')}
                 value={values.passwordConfirmation}
@@ -214,8 +216,10 @@ const SignupWithEmail = () => {
                 loading={isLoading}
                 disabled={isLoading}
                 style={{
-                  marginTop: '5%',
-                  padding: '1%',
+                  marginTop: '3%',
+                }}
+                contentStyle={{
+                  padding: '3%',
                 }}
                 theme={{roundness: 1}}
                 mode="contained"

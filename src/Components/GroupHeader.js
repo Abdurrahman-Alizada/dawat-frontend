@@ -18,7 +18,11 @@ import {
   handleInvitationSearch,
 } from '../redux/reducers/groups/invitations/invitationSlice';
 import {handleIsSearch} from '../redux/reducers/groups/groups';
-import { handleIsTaskSearch, handleTasksSearch } from '../redux/reducers/groups/tasks/taskSlice';
+import {
+  handleIsTaskSearch,
+  handleTasksSearch,
+} from '../redux/reducers/groups/tasks/taskSlice';
+import {isConfirmDialogVisibleHandler} from '../redux/reducers/groups/chat/chatSlice';
 
 const Header = ({onOpen, group}) => {
   const dispatch = useDispatch();
@@ -28,6 +32,11 @@ const Header = ({onOpen, group}) => {
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
+
+  const isMessagesSelected = useSelector(
+    state => state.chat.isMessagesSelected,
+  );
+
   const currentTab = useSelector(state => state.groups.currentTab);
 
   const getMembersOfGroup = () => {
@@ -41,7 +50,7 @@ const Header = ({onOpen, group}) => {
 
   //search
   const isSearch = useSelector(state => state.groups.isSearch);
-  
+
   // invitations
   const [search, setSearch] = useState('');
   const isInvitaionSearch = useSelector(
@@ -69,11 +78,9 @@ const Header = ({onOpen, group}) => {
     dispatch(handleIsTaskSearch(false));
   };
 
-
   // end search
 
   // "more menu"
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const [visible, setVisible] = React.useState(false);
 
   const openMenu = () => setVisible(true);
@@ -137,10 +144,22 @@ const Header = ({onOpen, group}) => {
 
           <View
             style={{
-              maxWidth: '20%',
+              flexDirection: 'row',
+              maxWidth: '25%',
               alignSelf: 'flex-end',
               justifyContent: 'flex-end',
             }}>
+            {currentTab === 'Chat' &&
+              isMessagesSelected &&
+               (
+                <Appbar.Action
+                  icon="delete-outline"
+                  color={theme.colors.onBackground}
+                  onPress={() => {
+                    dispatch(isConfirmDialogVisibleHandler(true));
+                  }}
+                />
+              )}
             <Menu
               visible={visible}
               onDismiss={closeMenu}

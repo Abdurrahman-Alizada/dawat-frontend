@@ -4,13 +4,14 @@ import {
   StyleSheet,
   RefreshControl,
   View,
+  Image,
   FlatList,
   StatusBar,
 } from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, Divider, useTheme} from 'react-native-paper';
+import {AnimatedFAB, Divider, useTheme, Button} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
@@ -130,32 +131,55 @@ const Groups = ({navigation}) => {
         )}
 
         {!isLoading ? (
-          <View style={{flex: 1,marginTop:2, backgroundColor: theme.colors.background}}>
-            <FlatList
-              onScroll={onScroll}
-              keyExtractor={item => item._id}
-              data={isSearch ? filteredDataSource : allGroups}
-              ListEmptyComponent={() => (
-                <View style={{marginTop: '60%', alignItems: 'center'}}>
-                  <Text>{listEmptyText}</Text>
-                </View>
-              )}
-              renderItem={item => (
-                <RenderItem
-                  item={item.item}
-                  navigation={navigation}
-                  checked={checked}
-                  setChecked={setChecked}
-                  checkedItems={checkedItems}
-                  setCheckedItems={setCheckedItems}
-                  setIsSearch={setIsSearch}
-                  theme={theme}
+          <View
+            style={{
+              flex: 1,
+              marginTop: 2,
+              backgroundColor: theme.colors.background,
+            }}>
+            {isError ? (
+              <View style={{flex: 1, alignItems: 'center',marginTop:100}}>
+                <Image
+                  source={require('../../../assets/images/cancel.png')}
+                  style={{width:100, height:100}}
                 />
-              )}
-              refreshControl={
-                <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-              }
-            />
+                <Text style={{fontSize:20}}>Something went wrong</Text>
+                <Button
+                  icon="refresh"
+                  mode="contained"
+                  style={{marginTop: '5%'}}
+                  onPress={refetch}
+                  >
+                  Refresh
+                </Button>
+              </View>
+            ) : (
+              <FlatList
+                onScroll={onScroll}
+                keyExtractor={item => item._id}
+                data={isSearch ? filteredDataSource : allGroups}
+                ListEmptyComponent={() => (
+                  <View style={{marginTop: '60%', alignItems: 'center'}}>
+                    <Text>{listEmptyText}</Text>
+                  </View>
+                )}
+                renderItem={item => (
+                  <RenderItem
+                    item={item.item}
+                    navigation={navigation}
+                    checked={checked}
+                    setChecked={setChecked}
+                    checkedItems={checkedItems}
+                    setCheckedItems={setCheckedItems}
+                    setIsSearch={setIsSearch}
+                    theme={theme}
+                  />
+                )}
+                refreshControl={
+                  <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+                }
+              />
+            )}
           </View>
         ) : (
           <View
@@ -163,7 +187,7 @@ const Groups = ({navigation}) => {
               margin: '3%',
             }}>
             <GroupsList />
-           </View>
+          </View>
         )}
       </Provider>
 
@@ -181,7 +205,7 @@ const Groups = ({navigation}) => {
       <ErrorSnackBar
         isVisible={snackbarVisible}
         text={'Something went wrong'}
-        onDismissHandler={setSnackBarVisible}
+        onDismissHandler={()=>setSnackBarVisible(false)}
       />
     </View>
   );

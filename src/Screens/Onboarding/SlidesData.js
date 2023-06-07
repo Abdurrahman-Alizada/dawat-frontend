@@ -2,7 +2,7 @@ const slides = [
     {
       id: '1',
       image: require('../../assets/images/onboarding/1.png'),
-      title: 'Create a  group where you and your co-host can manage your invity for your next function',
+      title: 'Create a  group where you and other group member can manage guests list for the next function',
     },
     {
       id: '2',
@@ -12,7 +12,7 @@ const slides = [
     {
       id: '3',
       image: require('../../assets/images/onboarding/3.png'),
-      title: 'Schedule your next meeting or function ',
+      title: 'Add and manage to-do list for the next event.',
     },
   ];
 

@@ -4,15 +4,13 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  Image,
   View,
 } from 'react-native';
 import {Formik} from 'formik';
-import Icon from 'react-native-vector-icons/AntDesign';
 import * as Yup from 'yup';
 import {
   TextInput,
+  Text,
   Button,
   Dialog,
   Paragraph,
@@ -31,11 +29,11 @@ import {friendshipApi} from '../../../redux/reducers/Friendship/friendshipThunk'
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email('Please enter valid email')
-    .required('Email is required')
+    .required('*required')
     .label('Email'),
   password: Yup.string()
     .min(2, ({min}) => `Password must be at least ${min} characters`)
-    .required('Password is required')
+    .required('*required')
     .label('Password'),
 });
 
@@ -187,7 +185,7 @@ const LoginScreen = ({navigation, route}) => {
                 onBlur={handleBlur('email')}
                 activeOutlineColor={theme.colors.secondary}
               />
-              {errors.email && touched.email ? (
+              {errors.email  ? (
                 <Text style={{color: theme.colors.error}}>{errors.email}</Text>
               ) : null}
               <TextInput
@@ -211,9 +209,8 @@ const LoginScreen = ({navigation, route}) => {
                 disabled={isLoading}
                 style={{
                   marginTop: '5%',
-                  padding: '1%',
                 }}
-                contentStyle={{padding: '1%'}}
+                contentStyle={{padding: '3%'}}
                 buttonStyle={{padding:"1%"}}
                 theme={{roundness: 1}}
                 mode="contained"

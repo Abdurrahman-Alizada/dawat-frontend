@@ -13,6 +13,7 @@ import {handleCurrentTab} from '../../../../redux/reducers/groups/groups';
 import {handleIsInvitationSearch} from '../../../../redux/reducers/groups/invitations/invitationSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch} from 'react-redux';
+import { selectedMessageIdsClearHandler } from '../../../../redux/reducers/groups/chat/chatSlice';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -44,6 +45,7 @@ const Tabs = ({groupId, navigation}) => {
         listeners={({route}) => ({
           focus: e => {
             dispatch(handleCurrentTab(route.name));
+            dispatch(selectedMessageIdsClearHandler());
           },
         })}
         options={{
@@ -71,6 +73,7 @@ const Tabs = ({groupId, navigation}) => {
         listeners={({route}) => ({
           focus: e => {
             dispatch(handleCurrentTab(route.name));
+            dispatch(selectedMessageIdsClearHandler());
           },
         })}
       />
@@ -81,8 +84,9 @@ const Tabs = ({groupId, navigation}) => {
         component={Tasks}
         listeners={({route}) => ({
           focus: e => {
-            dispatch(handleIsInvitationSearch(false));
+            // dispatch(handleIsInvitationSearch(false));
             dispatch(handleCurrentTab(route.name));
+            dispatch(selectedMessageIdsClearHandler());
           },
         })}
       />

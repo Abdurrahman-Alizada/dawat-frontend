@@ -19,11 +19,13 @@ import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
 import {userApi} from '../redux/reducers/user/userThunk';
 import {groupApi} from '../redux/reducers/groups/groupThunk';
 import {friendshipApi} from '../redux/reducers/Friendship/friendshipThunk';
+
+import { version } from "../../package.json"
+
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const theme = useTheme();
-
   const [active, setActive] = useState('');
   const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const id = useRef(null);
@@ -66,6 +68,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   const obscureEmail = email => {
+    if(!email) return "*******"
     const [name, domain] = email?.split('@');
     return `${name[0]}${name[1]}${new Array(name.length - 3).join(
       '*',
@@ -125,7 +128,7 @@ export default function DrawerContent(props) {
           />
         ) : (
           <List.Item
-            title={user?.name}
+            title={user?.name ? user?.name : "*****"}
             onPress={async () => {
               navigation.navigate('AppSettingsMain', {
                 screen: 'Profile',
@@ -203,7 +206,7 @@ export default function DrawerContent(props) {
             }}>
             .
           </Text>
-          <Text style={{alignSelf: 'center', margin: '5%'}}>V 0.0.1</Text>
+          <Text style={{alignSelf: 'center', margin: '5%'}}>V {version}</Text>
         </View>
       </View>
     </DrawerContentScrollView>

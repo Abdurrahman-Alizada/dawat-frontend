@@ -12,11 +12,11 @@ import {Appbar, Button, Text, Card} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 const adUnitIdINTERSTITIAL = __DEV__
   ? TestIds.INTERSTITIAL
-  : 'ca-app-pub-9526618780177325/2035594601';
+  : 'ca-app-pub-9526618780177325~5729262145';
 
 const adUnitIdREWARDED = __DEV__
   ? TestIds.REWARDED
-  : 'ca-app-pub-9526618780177325/7227206913';
+  : 'ca-app-pub-9526618780177325/1213040869';
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitIdINTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
