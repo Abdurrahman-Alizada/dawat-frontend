@@ -169,7 +169,7 @@ const Groups = ({navigation}) => {
 
       <AnimatedFAB
         icon={'plus'}
-        label={'New Program'}
+        label={'Add New Event'}
         extended={isExtended}
         onPress={() => onOpen()}
         visible={true}
