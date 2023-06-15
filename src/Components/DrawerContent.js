@@ -47,7 +47,7 @@ export default function DrawerContent(props) {
 
   const logout = async () => {
     setActive('logout');
-    await AsyncStorage.setItem('isLoggedIn', '0');
+    await AsyncStorage.setItem('isLoggedIn', '');
     await AsyncStorage.setItem('id', '');
     await AsyncStorage.setItem('token', '');
     await AsyncStorage.setItem('userId', '');
@@ -138,11 +138,11 @@ export default function DrawerContent(props) {
             left={props => (
               <Avatar.Image
                 {...props}
-                source={{
-                  uri: user?.imageURL
-                    ? user?.imageURL
-                    : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
-                }}
+                source={
+                  user?.imageURL
+                    ? {uri: user?.imageURL}
+                    : require('../assets/drawer/male-user.png')
+                }
                 size={50}
               />
             )}

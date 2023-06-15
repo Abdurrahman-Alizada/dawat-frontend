@@ -3,10 +3,8 @@ import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
-  Image,
   Text,
   StatusBar,
-  Dimensions,
 } from 'react-native';
 
 import GlobalStyles from '../../GlobalStyles';
@@ -39,7 +37,7 @@ const SplashScreen = ({navigation}) => {
         .then(value => {
           isAppFirstLaunched.current
             ? navigation.replace('Onboarding')
-            : navigation.replace(value == "0" ? 'Auth' : 'Drawer');
+            : navigation.replace(!value ? 'Auth' : 'Drawer');
         })
         .catch(err => {
           console.log(err);
@@ -50,37 +48,49 @@ const SplashScreen = ({navigation}) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <View style={{}}>
-        <View
-          style={{
-            width: 100,
-            height: 100,
-            borderRadius: 100 / 2,
-            borderWidth: 10,
-            borderColor: '#4838D1',
-          }}
-        />
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{alignItems: 'center'}}>
+          <View
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 100 / 2,
+              borderWidth: 10,
+              borderColor: '#4838D1',
+            }}
+          />
 
-        <View
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              alignSelf: 'flex-end',
+              borderRadius: 100 / 2,
+              backgroundColor: '#F77A55',
+            }}
+          />
+        </View>
+        <View style={{marginHorizontal:"5%",}}>
+
+        <Text
           style={{
-            width: 30,
-            height: 30,
-            alignSelf: 'flex-end',
-            borderRadius: 100 / 2,
-            backgroundColor: '#F77A55',
-          }}
-        />
+            color: '#3E3F41',
+            fontSize: 35,
+            fontWeight: 'bold',
+            letterSpacing: 5,
+          }}>
+          Event 
+        </Text>
+        <Text
+          style={{
+            color: '#3E3F41',
+            fontSize: 30,
+            letterSpacing: 1,
+          }}>
+          Planner 
+        </Text>
+        </View>
       </View>
-
-      {/* <Text
-        style={{
-          color: '#3E3F41',
-          fontSize: 38,
-          fontWeight: 'bold',
-          letterSpacing: 1,
-        }}>
-        Dawat
-      </Text> */}
     </View>
   );
 };

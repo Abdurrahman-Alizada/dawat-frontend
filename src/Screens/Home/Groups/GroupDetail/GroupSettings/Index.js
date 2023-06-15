@@ -17,9 +17,8 @@ import {
   Text,
   IconButton,
   Snackbar,
-  Checkbox,
-  Searchbar,
   useTheme,
+  Chip,
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
@@ -53,7 +52,7 @@ const Index = ({route, navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const fileDataRef = useRef(null);
   // const [avatarURL, setAvatarURL] = useState( route?.params?.group?.group.imageURL,);
-  const [avatarURL, setAvatarURL] = useState(currentViewingGroup.imageURL);
+  const [avatarURL, setAvatarURL] = useState(currentViewingGroup?.imageURL);
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   // snakebar
@@ -79,9 +78,10 @@ const Index = ({route, navigation}) => {
 
   const [updateGroupName, {isLoading: updateGroupNameLoading}] =
     useUpdateGroupNameMutation();
-  const [updateGroupDescription, {isLoading:updateGroupDescriptionLoading}] =
+  const [updateGroupDescription, {isLoading: updateGroupDescriptionLoading}] =
     useUpdateGroupDescriptionMutation();
-  const [updateImageURL, {isLoading :updateImageURLLoging}] = useUpdateImageURLMutation();
+  const [updateImageURL, {isLoading: updateImageURLLoging}] =
+    useUpdateImageURLMutation();
   const [imageUploading, setimageUploading] = useState(false);
 
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
@@ -112,7 +112,7 @@ const Index = ({route, navigation}) => {
   const handleUpdateGroupName = () => {
     updateGroupName({
       groupId: _id,
-      previousGroupName: currentViewingGroup.groupName,
+      previousGroupName: currentViewingGroup?.groupName,
       newGroupName: name,
     })
       .then(res => {
@@ -173,7 +173,7 @@ const Index = ({route, navigation}) => {
       userId: await AsyncStorage.getItem('userId'),
     })
       .then(res => {
-        console.log(res)
+        console.log(res);
         setShowSnakeBar(false);
         navigation.replace('Drawer');
       })
@@ -247,16 +247,16 @@ const Index = ({route, navigation}) => {
 
   const imageUploadHandler = async () => {
     if (fileDataRef.current) {
-      setimageUploading(true)
+      setimageUploading(true);
       const uri = fileDataRef.current.path;
       const type = fileDataRef.current.mime;
-      const name = currentViewingGroup.groupName;
+      const name = currentViewingGroup?.groupName;
       const photo = {uri, type, name};
       const data = new FormData();
       data.append('file', photo);
       data.append('upload_preset', 'bzgif1or');
       data.append('cloud_name', 'dblhm3cbq');
-      
+
       fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
         method: 'post',
         body: data,
@@ -273,7 +273,7 @@ const Index = ({route, navigation}) => {
               setShowSnakeBar(true);
               seteditGroupName(false);
               setEditGroupDescription(false);
-              setimageUploading(false)
+              setimageUploading(false);
             })
             .catch(e => {
               setSnakeBarMessage('Something went wrong. Please try again');
@@ -283,13 +283,11 @@ const Index = ({route, navigation}) => {
         .catch(err => {
           console.log('An Error Occured While Uploading profile image', err);
           fileDataRef.current = null;
-          setimageUploading(false)
+          setimageUploading(false);
           return;
         });
-    }
-
-    else if (avatarURL) {
-      setimageUploading(true)
+    } else if (avatarURL) {
+      setimageUploading(true);
       updateImageURL({
         groupId: _id,
         imageURL: avatarURL,
@@ -300,16 +298,15 @@ const Index = ({route, navigation}) => {
           setShowSnakeBar(true);
           seteditGroupName(false);
           setEditGroupDescription(false);
-          setimageUploading(false)
+          setimageUploading(false);
         })
         .catch(e => {
           setSnakeBarMessage('Something went wrong. Please try again');
           setShowSnakeBar(true);
-          setimageUploading(false)
+          setimageUploading(false);
         });
-    }
-    else {
-      Alert.alert("Image not selected", "Please select an image")
+    } else {
+      Alert.alert('Image not selected', 'Please select an image');
     }
   };
 
@@ -348,6 +345,7 @@ const Index = ({route, navigation}) => {
               {fileDataRef.current ? (
                 <Avatar.Image
                   source={{uri: fileDataRef.current?.path}}
+                  {...props}
                   style={{alignSelf: 'center'}}
                   size={130}
                 />
@@ -470,26 +468,45 @@ const Index = ({route, navigation}) => {
               <List.Item
                 key={index}
                 title={member.name}
-                description={member.email}
+                description={() => (
+                  <View style={{width: '40%'}}>
+                    {currentViewingGroup?.groupAdmin?._id === member?._id ? (
+                      <View
+                        style={{
+                          backgroundColor: theme.colors.surfaceVariant,
+                          padding: '2%',
+                          borderRadius: 5,
+                        }}>
+                        <Text style={{textAlign: 'center'}}>Group admin</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                )}
+                // description={member.email}
+                titleStyle={{fontWeight: 'bold'}}
                 right={props => (
-                  <IconButton
-                    {...props}
-                    disabled={
-                      member._id === userId || deleteLoading ? true : false
-                    }
-                    icon="delete"
-                    size={20}
-                    onPress={() => handleRemoveUserFromGroup(member._id)}
-                    mode="contained-tonal"
-                  />
+                  <View>
+                    {currentViewingGroup?.groupAdmin?._id === userId ? (
+                      <IconButton
+                        {...props}
+                        disabled={
+                          member._id === userId || deleteLoading ? true : false
+                        }
+                        icon="delete"
+                        size={20}
+                        onPress={() => handleRemoveUserFromGroup(member._id)}
+                        mode="contained-tonal"
+                      />
+                    ) : null}
+                  </View>
                 )}
                 left={() => (
                   <Avatar.Image
-                    source={{
-                      uri: member.imageURL
-                        ? member.imageURL
-                        : 'https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg',
-                    }}
+                    source={
+                      member.imageURL
+                        ? {uri: member.imageURL}
+                        : require('../../../../../assets/drawer/male-user.png')
+                    }
                     size={50}
                   />
                 )}
@@ -525,7 +542,7 @@ const Index = ({route, navigation}) => {
         icon={
           deleteLoading
             ? () => <ActivityIndicator animating={true} size="small" />
-            :  'check'
+            : 'check'
         }
         onIconPress={() => console.log('hello')}
         onDismiss={() => setShowSnakeBar(false)}
@@ -535,10 +552,9 @@ const Index = ({route, navigation}) => {
 
       <Snackbar
         visible={deleteLoading}
-        icon={ () => <ActivityIndicator animating={true} size="small" />}
+        icon={() => <ActivityIndicator animating={true} size="small" />}
         onIconPress={() => console.log('hello')}
-        onDismiss={() => setShowSnakeBar(false)}
-        >
+        onDismiss={() => setShowSnakeBar(false)}>
         {snakeBarMessage}
       </Snackbar>
 
@@ -644,7 +660,9 @@ const Index = ({route, navigation}) => {
               loading={updateGroupDescriptionLoading}
               onPress={() => handleUpdateGroupDescription()}
               theme={{roundness: 1}}
-              disabled={updateGroupDescriptionLoading || description.length < 1}>
+              disabled={
+                updateGroupDescriptionLoading || description.length < 1
+              }>
               Ok
             </Button>
           </View>

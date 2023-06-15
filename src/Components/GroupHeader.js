@@ -114,14 +114,19 @@ const Header = ({onOpen, group}) => {
                 alignItems: 'flex-end',
                 justifyContent: 'flex-start',
               }}>
-              <Avatar.Image
-                size={40}
-                source={
-                  currentViewingGroup.imageURL
-                    ? {uri: currentViewingGroup.imageURL}
-                    : require('../assets/drawer/male-user.png')
-                }
-              />
+              {currentViewingGroup.imageURL ? (
+                <Avatar.Image
+                  size={40}
+                  source={{
+                    uri: currentViewingGroup.imageURL,
+                  }}
+                />
+              ) : (
+                <Avatar.Text
+                  label={currentViewingGroup?.groupName?.charAt(0)}
+                  size={40}
+                />
+              )}
               <View style={{marginLeft: 5}}>
                 <Text style={{fontSize: 18, fontWeight: '700'}}>
                   {currentViewingGroup.groupName?.length > 18
@@ -149,17 +154,15 @@ const Header = ({onOpen, group}) => {
               alignSelf: 'flex-end',
               justifyContent: 'flex-end',
             }}>
-            {currentTab === 'Chat' &&
-              isMessagesSelected &&
-               (
-                <Appbar.Action
-                  icon="delete-outline"
-                  color={theme.colors.onBackground}
-                  onPress={() => {
-                    dispatch(isConfirmDialogVisibleHandler(true));
-                  }}
-                />
-              )}
+            {currentTab === 'Chat' && isMessagesSelected && (
+              <Appbar.Action
+                icon="delete-outline"
+                color={theme.colors.onBackground}
+                onPress={() => {
+                  dispatch(isConfirmDialogVisibleHandler(true));
+                }}
+              />
+            )}
             <Menu
               visible={visible}
               onDismiss={closeMenu}

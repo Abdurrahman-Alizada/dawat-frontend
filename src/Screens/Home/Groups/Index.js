@@ -1,7 +1,5 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {
-  Text,
-  StyleSheet,
   RefreshControl,
   View,
   Image,
@@ -11,7 +9,7 @@ import {
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, Divider, useTheme, Button} from 'react-native-paper';
+import {AnimatedFAB, Text, useTheme, Button} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
