@@ -100,7 +100,7 @@ const ForgotPassword = ({navigation}) => {
             marginVertical: '2%',
           }}
           loading={isLoading}
-          contentStyle={{padding: '2%'}}
+          contentStyle={{padding: '3%'}}
           buttonStyle={{padding: '1%'}}
           theme={{roundness: 1}}
           buttonColor={theme.colors.secondary}

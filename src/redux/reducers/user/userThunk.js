@@ -124,12 +124,23 @@ export const userApi = createApi({
     }),
     // Verification of OTP For Password Recovery
     VerifyOTPForPasswordRecovery: build.mutation({
-      query: ({email,OTP}) => ({
+      query: ({email, OTP}) => ({
         url: `/api/account/user/VerifyOTPForPasswordRecovery`,
         method: 'POST',
         body: {
-          email:email,
-          OTP: OTP
+          email: email,
+          OTP: OTP,
+        },
+      }),
+      invalidatesTags: ['User'],
+    }),
+    // Resend email for registering new user
+    resendEmailForUserRegistration: build.mutation({
+      query: ({email}) => ({
+        url: `/api/account/user/register/resendEmailForUserRegistration`,
+        method: 'POST',
+        body: {
+          email: email,
         },
       }),
       invalidatesTags: ['User'],
@@ -148,5 +159,6 @@ export const {
   useDeleteUserByItselfMutation,
   useForgotPasswordMutation,
   useVerifyOTPForPasswordRecoveryMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useResendEmailForUserRegistrationMutation
 } = userApi;

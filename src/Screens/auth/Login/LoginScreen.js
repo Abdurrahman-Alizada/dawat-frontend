@@ -34,7 +34,7 @@ const validationSchema = Yup.object().shape({
     .required('*required')
     .label('Email'),
   password: Yup.string()
-    .min(2, ({min}) => `Password must be at least ${min} characters`)
+    .min(6, ({min}) => `Password must be at least ${min} characters`)
     .required('*required')
     .label('Password'),
 });
@@ -94,7 +94,7 @@ const LoginScreen = ({navigation, route}) => {
     }
   };
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}
@@ -104,6 +104,52 @@ const LoginScreen = ({navigation, route}) => {
       }}
       >
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      <View style={{alignSelf:"center", flexDirection: 'row', marginTop:"5%" }}>
+        <View style={{alignItems: 'center'}}>
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 100 / 2,
+              borderWidth: 8,
+              borderColor: '#3557b7',
+            }}
+          />
+
+          <View
+            style={{
+              width: 16,
+              height: 16,
+              alignSelf: 'flex-end',
+              marginTop:-3,
+              borderRadius: 100 / 2,
+              backgroundColor: '#F77A55',
+            }}
+          />
+        </View>
+        <View style={{marginHorizontal:15,}}>
+
+        <Text
+          style={{
+            color: '#3E3F41',
+            fontSize: 20,
+            fontWeight: 'bold',
+            letterSpacing: 5,
+          }}>
+          Event 
+        </Text>
+        <Text
+          style={{
+            color: '#3E3F41',
+            fontSize: 20,
+            letterSpacing: 1,
+          }}>
+          Planner 
+        </Text>
+        </View>
+      </View>
+
 
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
@@ -156,8 +202,8 @@ const LoginScreen = ({navigation, route}) => {
           values,
           errors,
           touched,
-          dirty,
-          isValid,
+          // dirty,
+          // isValid,
         }) => (
           <View
             style={{
@@ -206,7 +252,8 @@ const LoginScreen = ({navigation, route}) => {
 
               <Button
                 loading={isLoading}
-                disabled={!(dirty && isValid) || isLoading}
+                // disabled={!(dirty && isValid) || isLoading}
+                disabled={isLoading}
                 style={{
                   marginVertical: '3%',
                 }}
@@ -230,7 +277,7 @@ const LoginScreen = ({navigation, route}) => {
             </View>
             <View
               style={{
-                marginVertical: '7%',
+                marginVertical: '5%',
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',

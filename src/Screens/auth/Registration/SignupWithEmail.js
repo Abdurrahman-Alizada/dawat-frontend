@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import {
   TextInput,
@@ -13,13 +13,15 @@ import {
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {useNavigation} from '@react-navigation/native';
-import {useRegisterUserMutation} from '../../../redux/reducers/user/userThunk';
+import {
+  useRegisterUserMutation,
+  useResendEmailForUserRegistrationMutation,
+} from '../../../redux/reducers/user/userThunk';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .required('*required')
     .trim('Full name can not include leading and trailing spaces')
-    .strict(true)
     .label('Name')
     .min(2, ({min}) => `Name must be at least ${min} characters`),
   email: Yup.string()
@@ -27,7 +29,7 @@ const validationSchema = Yup.object().shape({
     .required('*required')
     .label('Email'),
   password: Yup.string()
-    .min(2, ({min}) => `Password must be at least ${min} characters`)
+    .min(6, ({min}) => `Password must be at least ${min} characters`)
     .required('*required')
     .label('Password'),
   passwordConfirmation: Yup.string()
@@ -44,10 +46,12 @@ const SignupWithEmail = () => {
   const [message, setMessage] = useState('');
   const [showLoginButton, setShowLoginButton] = useState(false);
   const [showTryAgainButton, setShowTryAgainButton] = useState(false);
+  const email = useRef('');
 
   const [registerUser, {isLoading, isError, error}] = useRegisterUserMutation();
 
   const submitHandler = async values => {
+    email.current = values.email;
     registerUser({
       name: values.name,
       email: values.email,
@@ -55,17 +59,57 @@ const SignupWithEmail = () => {
       passwordConfirmation: values.passwordConfirmation,
     })
       .then(res => {
+        if (res?.error?.status === 409) {
+          setMessage(res?.error?.data?.message);
+          setShowLoginButton(false);
+          if (!res?.error?.data?.verified) {
+            setShowTryAgainButton(true);
+          }
+          setVisible(true);
+        } else if (
+          res?.data?.message === 'An Email sent to your account please verify'
+        ) {
+          formikRef.current.resetForm();
+          setMessage(`An Email sent to ${email.current}. Please verify and then login`);
+          setShowTryAgainButton(false);
+          setShowLoginButton(true);
+          setVisible(true);
+        } else {
+          setShowTryAgainButton(true);
+          setShowLoginButton(true);
+          setMessage('Something went wrong');
+          setVisible(true);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  const [
+    resendEmailForUserRegistration,
+    {
+      isLoading: resendLoading,
+      isError: resendEmailIsError,
+      error: resendEmailError,
+    },
+  ] = useResendEmailForUserRegistrationMutation();
+
+  const resendEmail = () => {
+    resendEmailForUserRegistration({
+      email: email.current,
+    })
+      .then(res => {
         console.log(res);
         if (res?.error?.status === 409) {
           setMessage(res?.error?.data?.message);
           setVisible(true);
-          setShowTryAgainButton(true);
-          setShowLoginButton(false);
         } else if (
           res?.data?.message === 'An Email sent to your account please verify'
         ) {
+          formikRef.current.resetForm();
           setMessage(
-            'An Email sent to your account. Please verify and then login',
+            'Again! An email sent to your account. Please verify and then login',
           );
           setShowTryAgainButton(false);
           setShowLoginButton(true);
@@ -86,6 +130,8 @@ const SignupWithEmail = () => {
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
 
+  const formikRef = useRef();
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -95,6 +141,7 @@ const SignupWithEmail = () => {
       }}
       showsVerticalScrollIndicator={false}>
       <Formik
+        innerRef={formikRef}
         initialValues={{
           name: '',
           email: '',
@@ -123,9 +170,9 @@ const SignupWithEmail = () => {
                     <Button
                       onPress={() => {
                         setVisible(false);
-                        handleSubmit();
+                        resendEmail();
                       }}>
-                      Try again
+                      Resend Email
                     </Button>
                   )}
 
@@ -133,7 +180,7 @@ const SignupWithEmail = () => {
                     <Button
                       onPress={() => {
                         setVisible(false);
-                        navigation.navigate("Login")
+                        navigation.navigate('Login');
                       }}>
                       Go to login
                     </Button>
@@ -141,7 +188,10 @@ const SignupWithEmail = () => {
 
                   <Button
                     textColor={theme.colors.error}
-                    onPress={() => setVisible(false)}>
+                    onPress={() => {
+                      setVisible(false);
+                      email.current = ''
+                    }}>
                     close
                   </Button>
                 </Dialog.Actions>
@@ -232,13 +282,13 @@ const SignupWithEmail = () => {
             ) : null}
 
             <Button
-              loading={isLoading}
-              disabled={isLoading}
+              loading={isLoading || resendLoading}
+              disabled={isLoading || resendLoading}
               style={{
                 marginTop: '2%',
               }}
               contentStyle={{
-                padding: '2%',
+                padding: '3%',
               }}
               theme={{roundness: 1}}
               mode="contained"

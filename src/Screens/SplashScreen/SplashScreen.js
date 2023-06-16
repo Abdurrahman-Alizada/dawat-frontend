@@ -1,5 +1,5 @@
 // Import React and Component
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useLayoutEffect, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -8,10 +8,11 @@ import {
 } from 'react-native';
 
 import GlobalStyles from '../../GlobalStyles';
-
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({navigation}) => {
+
   const isAppFirstLaunched = useRef(true); //onboarding screen decision
 
   useEffect(() => {
@@ -33,37 +34,51 @@ const SplashScreen = ({navigation}) => {
 
   useEffect(() => {
       //Check if user_id is set or not If not then send for Authentication else send to Home Screen
+     
       AsyncStorage.getItem('isLoggedIn')
         .then(value => {
-          isAppFirstLaunched.current
-            ? navigation.replace('Onboarding')
-            : navigation.replace(!value ? 'Auth' : 'Drawer');
-        })
+          setTimeout(() => {
+            isAppFirstLaunched.current
+              ? navigation.replace('Onboarding')
+              : navigation.replace(!value ? 'Auth' : 'Drawer');
+          }, 3000);
+     
+          })
         .catch(err => {
           console.log(err);
         });
   }, []);
 
+
+  useLayoutEffect( () => {
+  const fun = async()=>{
+   await axios.get(`https://dawat-backend.onrender.com`);
+  }
+  fun();
+}, [])
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flexDirection: 'row', alignItems: "center"}}>
         <View style={{alignItems: 'center'}}>
           <View
             style={{
-              width: 100,
-              height: 100,
+              width: 55,
+              height: 55,
               borderRadius: 100 / 2,
-              borderWidth: 10,
-              borderColor: '#4838D1',
+              borderWidth: 9,
+              borderColor: '#3557b7',
             }}
-          />
+          >
+
+          </View>
 
           <View
             style={{
-              width: 30,
-              height: 30,
+              width: 18.3,
+              height: 18.3,
               alignSelf: 'flex-end',
               borderRadius: 100 / 2,
               backgroundColor: '#F77A55',
@@ -75,7 +90,7 @@ const SplashScreen = ({navigation}) => {
         <Text
           style={{
             color: '#3E3F41',
-            fontSize: 35,
+            fontSize: 31,
             fontWeight: 'bold',
             letterSpacing: 5,
           }}>
@@ -84,7 +99,7 @@ const SplashScreen = ({navigation}) => {
         <Text
           style={{
             color: '#3E3F41',
-            fontSize: 30,
+            fontSize: 29,
             letterSpacing: 1,
           }}>
           Planner 
