@@ -8,12 +8,14 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
 import {Modalize} from 'react-native-modalize';
-import {List, useTheme, Text} from 'react-native-paper';
+import {List, useTheme, Text, IconButton} from 'react-native-paper';
 import {handleCurrentTab} from '../../../../redux/reducers/groups/groups';
 import {handleIsInvitationSearch} from '../../../../redux/reducers/groups/invitations/invitationSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch} from 'react-redux';
-import { selectedMessageIdsClearHandler } from '../../../../redux/reducers/groups/chat/chatSlice';
+import {selectedMessageIdsClearHandler} from '../../../../redux/reducers/groups/chat/chatSlice';
+import InvitaionsSummary from './Invitations/invitaionsSummary';
+import TasksSummary from './Tasks/TasksSummary';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,13 +25,13 @@ const Tabs = ({groupId, navigation}) => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Invitations"
+      initialRouteName="Guests"
       screenOptions={{
         tabBarLabelStyle: {
           // fontSize: 17,
           fontWeight: 'bold',
-          textTransform: "none",
-          justifyContent:"space-evenly",
+          textTransform: 'none',
+          justifyContent: 'space-evenly',
         },
         // tabBarScrollEnabled: true,
         tabBarStyle: {
@@ -67,7 +69,7 @@ const Tabs = ({groupId, navigation}) => {
       />
 
       <Tab.Screen
-        name="Invitations"
+        name="Guests"
         initialParams={{groupId: groupId}}
         component={Invitations}
         listeners={({route}) => ({
@@ -79,7 +81,7 @@ const Tabs = ({groupId, navigation}) => {
       />
 
       <Tab.Screen
-        name="Tasks"
+        name="To-do"
         initialParams={{groupId: groupId}}
         component={Tasks}
         listeners={({route}) => ({
@@ -102,34 +104,76 @@ const Tabs = ({groupId, navigation}) => {
           },
         })}
       />
-      
     </Tab.Navigator>
   );
 };
 
 const Index = ({route, navigation}) => {
   const {groupId} = route.params;
-  const modalizeRef = useRef(null);
-  const onOpen = () => {
-    modalizeRef.current?.open();
+
+  // import export modalize
+  const importExportModalizeRef = useRef(null);
+  const openGuestsImportExportModalize = () => {
+    importExportModalizeRef.current?.open();
+  };
+  const onCloseGuestsImportExport = () => {
+    importExportModalizeRef.current?.close();
   };
 
-  const onClose = () => {
-    modalizeRef.current?.close();
+  // guests Summary modalize
+  const guestsSummaryModalizeRef = useRef(null);
+  const openGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.open();
+  };
+  const closeGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.close();
+  };
+
+  // tasks Summary modalize
+  const tasksSummaryModalizeRef = useRef(null);
+  const openTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.open();
+  };
+  const closeTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.close();
   };
 
   const theme = useTheme();
 
   return (
     <View style={{flex: 1}}>
-      <GroupHeader group={route.params} onOpen={onOpen} />
+      <GroupHeader
+        group={route.params}
+        openGuestsImportExportModalize={openGuestsImportExportModalize}
+        openGuestsSummaryModalize={openGuestsSummaryModalize}
+        openTasksSummaryModalize={openTasksSummaryModalize}
+      />
       <Tabs groupId={groupId} navigation={navigation} />
 
       <Modalize
         modalStyle={{backgroundColor: theme.colors.background}}
-        ref={modalizeRef}
+        ref={importExportModalizeRef}
         snapPoint={400}>
-        <GroupBrief group={route.params.group} onClose={onClose} />
+        <GroupBrief
+          group={route.params.group}
+          onClose={onCloseGuestsImportExport}
+        />
+      </Modalize>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={guestsSummaryModalizeRef}
+        handlePosition="inside"
+        snapPoint={400}>
+        <InvitaionsSummary onClose={closeGuestsSummaryModalize} />
+      </Modalize>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={tasksSummaryModalizeRef}
+        snapPoint={400}
+        handlePosition="inside">
+        <TasksSummary onClose={closeTasksSummaryModalize} />
       </Modalize>
     </View>
   );

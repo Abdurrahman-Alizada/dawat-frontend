@@ -37,11 +37,11 @@ const SplashScreen = ({navigation}) => {
      
       AsyncStorage.getItem('isLoggedIn')
         .then(value => {
-          setTimeout(() => {
+          // setTimeout(() => {
             isAppFirstLaunched.current
               ? navigation.replace('Onboarding')
               : navigation.replace(!value ? 'Auth' : 'Drawer');
-          }, 3000);
+          // }, 2000);
      
           })
         .catch(err => {

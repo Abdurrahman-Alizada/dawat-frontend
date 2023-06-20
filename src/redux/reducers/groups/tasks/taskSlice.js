@@ -6,6 +6,7 @@ const initialState = {
   isTasksSearch: false,
   tasksSearchQuery: '',
   tasksCopyForSearch: [],
+  isTasksSummaryOpen : false
 };
 
 export const invitationSlice = createSlice({
@@ -38,6 +39,9 @@ export const invitationSlice = createSlice({
         state.tasks = [];
       }
     },
+    handleIsTaskSummaryOpen: (state, action) => {
+      state.isTasksSearch = action.payload;
+    },
   },
 });
 
@@ -47,6 +51,7 @@ export const {
   handleTasks,
   handleIsTaskSearch,
   handleTasksSearch,
+  handleIsTaskSummaryOpen
 } = invitationSlice.actions;
 
 export default invitationSlice.reducer;

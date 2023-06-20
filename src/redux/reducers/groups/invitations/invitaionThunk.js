@@ -102,6 +102,10 @@ export const InvitaionsApi = createApi({
       }),
       invalidatesTags: ['Invitations'],
     }),
+    getInvitationsSummary: build.query({
+      query: ({groupId}) => `api/group/invitations/${groupId}/invitiesSummary`,
+      providesTags: ['Invitations'],
+    }),
   }),
 });
 
@@ -113,7 +117,8 @@ export const {
   useUpdateInvitiStatusMutation,
   useAddMultipleInvitiMutation,
   useDeleteMultipleInvitiMutation,
-  useUpdateStatusOfMultipleInvitiesMutation
+  useUpdateStatusOfMultipleInvitiesMutation,
+  useGetInvitationsSummaryQuery
 } = InvitaionsApi;
 
 

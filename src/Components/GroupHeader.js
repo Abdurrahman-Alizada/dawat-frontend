@@ -16,15 +16,22 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
   handleIsInvitationSearch,
   handleInvitationSearch,
+  handleIsInvitaionSummaryOpen,
 } from '../redux/reducers/groups/invitations/invitationSlice';
 import {handleIsSearch} from '../redux/reducers/groups/groups';
 import {
   handleIsTaskSearch,
   handleTasksSearch,
+  handleIsTaskSummaryOpen,
 } from '../redux/reducers/groups/tasks/taskSlice';
 import {isConfirmDialogVisibleHandler} from '../redux/reducers/groups/chat/chatSlice';
 
-const Header = ({onOpen, group}) => {
+const Header = ({
+  openGuestsImportExportModalize,
+  openGuestsSummaryModalize,
+  openTasksSummaryModalize,
+  group,
+}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
@@ -41,7 +48,7 @@ const Header = ({onOpen, group}) => {
 
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
-      return user.name;
+      return user.name + 'sadfk asdkfj askdjf';
     });
     return membersText.toString().length < 25
       ? membersText.toString()
@@ -51,7 +58,7 @@ const Header = ({onOpen, group}) => {
   //search
   const isSearch = useSelector(state => state.groups.isSearch);
 
-  // invitations
+  // invitationsopenTasksSummaryModalize
   const [search, setSearch] = useState('');
   const isInvitaionSearch = useSelector(
     state => state.invitations.isInvitaionSearch,
@@ -154,7 +161,7 @@ const Header = ({onOpen, group}) => {
               alignSelf: 'flex-end',
               justifyContent: 'flex-end',
             }}>
-            {currentTab === 'Chat' && isMessagesSelected && (
+            {currentTab === 'Chat' && isMessagesSelected ? (
               <Appbar.Action
                 icon="delete-outline"
                 color={theme.colors.onBackground}
@@ -162,7 +169,26 @@ const Header = ({onOpen, group}) => {
                   dispatch(isConfirmDialogVisibleHandler(true));
                 }}
               />
+            ) : (
+              <View>
+                {currentTab !== 'Logs' && currentTab !== 'Chat' && (
+                  <Appbar.Action
+                    icon="briefcase-outline"
+                    color={theme.colors.onBackground}
+                    onPress={() => {
+                      if (currentTab === 'Guests') {
+                        dispatch(handleIsInvitaionSummaryOpen(true));
+                        openGuestsSummaryModalize()
+                      } else if (currentTab === 'To-do') {
+                        dispatch(handleIsTaskSummaryOpen(true));
+                        openTasksSummaryModalize();
+                      }
+                    }}
+                  />
+                )}
+              </View>
             )}
+
             <Menu
               visible={visible}
               onDismiss={closeMenu}
@@ -173,7 +199,7 @@ const Header = ({onOpen, group}) => {
                   onPress={() => openMenu()}
                 />
               }>
-              {currentTab === 'Invitations' && (
+              {currentTab === 'Guests' && (
                 <View>
                   <Menu.Item
                     onPress={() => {
@@ -187,7 +213,7 @@ const Header = ({onOpen, group}) => {
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
-                      onOpen();
+                      openGuestsImportExportModalize();
                     }}
                     title="Import/Export"
                     leadingIcon={'microsoft-excel'}
@@ -212,7 +238,7 @@ const Header = ({onOpen, group}) => {
                   />
                 </View>
               )}
-              {currentTab === 'Tasks' && (
+              {currentTab === 'To-do' && (
                 <View>
                   <Menu.Item
                     onPress={() => {

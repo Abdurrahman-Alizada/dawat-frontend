@@ -144,7 +144,7 @@ const MessagesScreen = ({navigation}) => {
                 onPress={() => dispatch(isConfirmDialogVisibleHandler(false))}>
                 cancel
               </Button>
-              <Button onPress={deleteMessgeHandler}>Delete for me</Button>
+              <Button onPress={deleteMessgeHandler}>Delete</Button>
             </Dialog.Actions>
           </Dialog>
         </Portal>

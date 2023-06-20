@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {Button, Avatar, List, Snackbar} from 'react-native-paper';
+import {StyleSheet, View} from 'react-native';
+import {Button, Avatar, List, Snackbar, Text, useTheme} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 import {jsonToCSV, readString} from 'react-native-csv';
 import {useSelector, useDispatch} from 'react-redux';
@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 const Index = ({group, onClose}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const theme = useTheme()
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
@@ -202,14 +203,18 @@ const Index = ({group, onClose}) => {
         onPress={exportCSV}
         mode="contained"
         icon={'download'}
-        style={{marginTop: '5%'}}>
+        contentStyle={{padding:"1%"}}
+        style={{marginTop: '5%'}}
+        buttonColor={theme.colors.secondary}
+        >
         Downlaod Invitations list
       </Button>
       <Button
         loading={addMultipleInvitiLoading}
         onPress={importCSV}
-        mode="contained-tonal"
+        mode="contained"
         icon={'upload'}
+        contentStyle={{padding: '1%'}}
         style={{marginTop: '5%'}}>
         Upload Invitations list to add in this group
       </Button>

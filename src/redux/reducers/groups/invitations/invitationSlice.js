@@ -7,7 +7,8 @@ const initialState = {
   isExportBanner: false,
   currentInviti: {},
   isInvitaionSearch: false,
-  invitationSearchQuery : ''
+  invitationSearchQuery : '',
+  isInvitaionSummaryOpen : false,
 };
 
 export const invitationSlice = createSlice({
@@ -43,6 +44,9 @@ export const invitationSlice = createSlice({
         state.invitations = [];
       }
     },
+    handleIsInvitaionSummaryOpen: (state, action) => {
+      state.isInvitaionSummaryOpen = action.payload;
+    },
   },
 });
 
@@ -53,6 +57,7 @@ export const {
   handleIsInvitationSearch,
   handleInvitions,
   handleInvitationSearch,
+  handleIsInvitaionSummaryOpen
 } = invitationSlice.actions;
 
 export default invitationSlice.reducer;
