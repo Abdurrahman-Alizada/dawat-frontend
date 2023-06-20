@@ -33,8 +33,8 @@ const InvitaionsSummary = ({onClose}) => {
   return (
     <View style={{padding: '5%'}}>
       <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
-      <List.Item
-          title={"Invitations summary of"}
+        <List.Item
+          title={'Guests summary of'}
           description={currentViewingGroup.groupName}
           style={{width: '90%'}}
         />
@@ -65,7 +65,13 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.primary,
             }}
             variant="headlineLarge">
-            {isLoading ? <ActivityIndicator /> : data?.invited ? data?.invited : 0}
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.invited ? (
+              data?.invited
+            ) : (
+              0
+            )}
           </Text>
           <Text
             style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
@@ -92,7 +98,13 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.secondary,
             }}
             variant="headlineLarge">
-            {isLoading ? <ActivityIndicator /> : data?.pending ? data?.pending : 0}
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.pending ? (
+              data?.pending
+            ) : (
+              0
+            )}
           </Text>
           <Text
             style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
@@ -112,7 +124,13 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.error,
             }}
             variant="headlineLarge">
-            {isLoading ? <ActivityIndicator /> : data?.rejected ? data?.rejected : 0}
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.rejected ? (
+              data?.rejected
+            ) : (
+              0
+            )}
           </Text>
           <Text
             style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
@@ -140,18 +158,41 @@ const InvitaionsSummary = ({onClose}) => {
             Others
           </Text>
         </Card>
-
+        <Card
+          style={{marginVertical: '5%', width: '48%', padding: '2%'}}
+          theme={{roundness: 1}}
+          mode="elevated">
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              fontWeight: 'bold',
+              color: theme.colors.onBackground,
+            }}
+            variant="headlineLarge">
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data ? (
+              data?.invited + data?.pending + data?.rejected + data?.other
+            ) : (
+              0
+            )}
+          </Text>
+          <Text
+            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+            variant="bodyLarge">
+            Total
+          </Text>
+        </Card>
+      </View>
         <IconButton
           icon="refresh"
           size={30}
           disabled={isFetching}
           accessibilityLabel="refresh tasks summary"
-          style={{marginTop:"5%"}}
+          style={{marginTop: '5%', }}
           mode="contained"
           onPress={refetch}
         />
-
-      </View>
     </View>
   );
 };

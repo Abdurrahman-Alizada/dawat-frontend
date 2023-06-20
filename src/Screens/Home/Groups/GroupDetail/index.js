@@ -151,8 +151,9 @@ const Index = ({route, navigation}) => {
       <Tabs groupId={groupId} navigation={navigation} />
 
       <Modalize
-        modalStyle={{backgroundColor: theme.colors.background}}
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
         ref={importExportModalizeRef}
+        handlePosition="inside"
         snapPoint={400}>
         <GroupBrief
           group={route.params.group}
@@ -161,17 +162,17 @@ const Index = ({route, navigation}) => {
       </Modalize>
 
       <Modalize
-        modalStyle={{backgroundColor: theme.colors.background}}
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
         ref={guestsSummaryModalizeRef}
         handlePosition="inside"
-        snapPoint={400}>
+        snapPoint={500}>
         <InvitaionsSummary onClose={closeGuestsSummaryModalize} />
       </Modalize>
 
       <Modalize
-        modalStyle={{backgroundColor: theme.colors.background}}
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
         ref={tasksSummaryModalizeRef}
-        snapPoint={400}
+        snapPoint={500}
         handlePosition="inside">
         <TasksSummary onClose={closeTasksSummaryModalize} />
       </Modalize>

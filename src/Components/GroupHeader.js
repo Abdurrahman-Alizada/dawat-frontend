@@ -40,6 +40,10 @@ const Header = ({
     state => state.groups?.currentViewingGroup,
   );
 
+  const currentLoginUser = useSelector(
+    state => state.user?.currentLoginUser,
+  );
+
   const isMessagesSelected = useSelector(
     state => state.chat.isMessagesSelected,
   );
@@ -48,7 +52,7 @@ const Header = ({
 
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
-      return user.name + 'sadfk asdkfj askdjf';
+      return user.name == currentLoginUser.name ? 'You' : ' '+ user.name  ;
     });
     return membersText.toString().length < 25
       ? membersText.toString()

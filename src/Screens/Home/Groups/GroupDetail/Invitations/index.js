@@ -244,7 +244,7 @@ export default function Example({route}) {
           },
         ]}
         icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
-        Invitaions List of this group has been exported in Downlaod folder
+        Guests List of this group has been exported in Downlaod folder
         successfully
       </Banner>
         

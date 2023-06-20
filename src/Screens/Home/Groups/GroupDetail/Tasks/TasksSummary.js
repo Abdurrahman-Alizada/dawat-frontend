@@ -15,7 +15,7 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useGetTaskSummaryQuery } from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import {useGetTaskSummaryQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 const TaskSummary = ({onClose}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -29,13 +29,13 @@ const TaskSummary = ({onClose}) => {
       groupId: currentViewingGroup._id,
     });
 
-    console.log(data)
+  console.log(data);
 
   return (
     <View style={{padding: '5%'}}>
       <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
         <List.Item
-          title={"Tasks summary of"}
+          title={'Tasks summary of'}
           description={currentViewingGroup.groupName}
           style={{width: '90%'}}
         />
@@ -55,7 +55,6 @@ const TaskSummary = ({onClose}) => {
           flexWrap: 'wrap',
           justifyContent: 'space-between',
         }}>
-     
         <Card
           style={{marginVertical: '5%', width: '48%', padding: '2%'}}
           theme={{roundness: 1}}
@@ -67,7 +66,13 @@ const TaskSummary = ({onClose}) => {
               color: theme.colors.primary,
             }}
             variant="headlineLarge">
-            {isLoading ? <ActivityIndicator /> : data?.isCompleted ? data?.isCompleted : 0}
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.isCompleted ? (
+              data?.isCompleted
+            ) : (
+              0
+            )}
           </Text>
           <Text
             style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
@@ -87,7 +92,13 @@ const TaskSummary = ({onClose}) => {
               color: theme.colors.tertiary,
             }}
             variant="headlineLarge">
-            {isLoading ? <ActivityIndicator /> : data?.notCompleted ? data?.notCompleted : 0}
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.notCompleted ? (
+              data?.notCompleted
+            ) : (
+              0
+            )}
           </Text>
           <Text
             style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
@@ -95,18 +106,42 @@ const TaskSummary = ({onClose}) => {
             Not completed
           </Text>
         </Card>
-        <IconButton
-          icon="refresh"
-          disabled={isFetching}
-          size={30}
-          accessibilityLabel="refresh tasks summary"
-          style={{marginTop:"5%"}}
-          mode="contained"
-          onPress={refetch}
-        />
 
+        <Card
+          style={{marginVertical: '5%', width: '48%', padding: '2%'}}
+          theme={{roundness: 1}}
+          mode="elevated">
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              fontWeight: 'bold',
+              color: theme.colors.tertiary,
+            }}
+            variant="headlineLarge">
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : data?.notCompleted || data?.isCompleted ? (
+              data?.notCompleted + data?.isCompleted
+            ) : (
+              0
+            )}
+          </Text>
+          <Text
+            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+            variant="bodyLarge">
+            Total
+          </Text>
+        </Card>
       </View>
-      
+      <IconButton
+        icon="refresh"
+        disabled={isFetching}
+        size={30}
+        accessibilityLabel="refresh tasks summary"
+        style={{marginTop: '5%'}}
+        mode="contained"
+        onPress={refetch}
+      />
     </View>
   );
 };
