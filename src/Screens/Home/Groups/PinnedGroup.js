@@ -295,7 +295,7 @@ const Groups = ({navigation}) => {
           ) : (
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontSize: 22}}>No group</Text>
+              <Text style={{fontSize: 22}}>Nothing here</Text>
               <Button
                 // loading={isLoading}
                 // disabled={!(dirty && isValid) || isLoading}
@@ -312,8 +312,28 @@ const Groups = ({navigation}) => {
                 labelStyle={{fontWeight: 'bold'}}
                 onPress={() => navigation.navigate('AddGroup')}
                 buttonColor={theme.colors.blueBG}>
-                Add group
+                Create group
               </Button>
+           
+              <Button
+                // loading={isLoading}
+                // disabled={!(dirty && isValid) || isLoading}
+                // disabled={isLoading}
+                style={{
+                  marginTop: '3%',
+                  width: '70%',
+                }}
+                contentStyle={{padding: '2%'}}
+                buttonStyle={{padding: '1%', width: '100%'}}
+                theme={{roundness: 2}}
+                mode="contained"
+                icon="pin"
+                labelStyle={{fontWeight: 'bold'}}
+                onPress={() => navigation.navigate('HomeIndex')}
+                buttonColor={theme.colors.blueBG}>
+                Pin group
+              </Button>
+           
             </View>
           )}
         </View>

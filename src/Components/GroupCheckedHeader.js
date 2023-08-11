@@ -19,12 +19,18 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack, theme}) => {
   const closeMenu = () => setVisible(false);
   // end more menu
   return (
-    <>
-      <View>
-        <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
-          <Appbar.BackAction
+    
+        <Appbar.Header elevated style={{backgroundColor: theme.colors.background}}>
+          {/* <Appbar.BackAction
             color={theme.colors.onBackground}
             onPress={() => checkedBack()}
+          /> */}
+          <Appbar.Action
+            color={theme.colors.onBackground}
+            icon="close"
+            onPress={() => {
+              checkedBack();
+            }}
           />
           <Appbar.Content
             title={groupName}
@@ -39,8 +45,7 @@ const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack, theme}) => {
             }}
           />
         </Appbar.Header>
-      </View>
-    </>
+    
   );
 };
 

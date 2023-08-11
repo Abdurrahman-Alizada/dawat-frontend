@@ -93,9 +93,14 @@ const SingleGroup = ({
   const closeMenu = () => setVisible(false);
 
   const [token, setToken] = useState(null);
+  const [pinGroup, setPinGroup] = useState(null);
+
   useEffect(() => {
     const getToken = async () => {
       const t = await AsyncStorage.getItem('token');
+      const p = await AsyncStorage.getItem('pinGroup');
+      const pp = JSON.parse(p);
+      setPinGroup(pp);
       setToken(t);
     };
     getToken();
@@ -142,72 +147,85 @@ const SingleGroup = ({
               )}
             </View>
           ) : (
-            <Menu
-              visible={visible}
-              onDismiss={closeMenu}
-              contentStyle={{backgroundColor: theme.colors.background}}
-              anchor={
-                <IconButton
-                  icon="dots-horizontal"
-                  color={theme.colors.onBackground}
-                  onPress={() => openMenu()}
-                />
-              }>
-              <Menu.Item
-                leadingIcon="eye-outline"
-                title="View"
-                titleStyle={{color: theme.colors.onBackground}}
-                onPress={async () => {
-                  closeMenu();
-                  onPressHandler();
-                }}
-              />
-              <Menu.Item
-                leadingIcon="selection-ellipse-arrow-inside"
-                title="Select"
-                titleStyle={{color: theme.colors.onBackground}}
-                onPress={async () => {
-                  closeMenu();
-                  onLongPressHandler();
-                }}
-              />
+            <View style={{flexDirection: 'row'}}>
+             {
+              pinGroup?._id == item._id &&
 
-              <Menu.Item
-                leadingIcon="pin-outline"
-                title="Pin"
-                titleStyle={{color: theme.colors.onBackground}}
-                onPress={async () => {
-                  closeMenu();
-                  pinHandler();
-                  navigation.navigate('PinnedGroup');
-                }}
+              <IconButton
+                icon="pin"
+                iconColor={theme.colors.blueBG}
+                onPress={() => alert('This group is pin')}
               />
-              <Menu.Item
-                leadingIcon="cog-outline"
-                title="Settings"
-                titleStyle={{color: theme.colors.onBackground}}
-                onPress={async () => {
-                  closeMenu();
-                  settingHandler();
-                }}
-              />
-              {!item.isSyncd && item.isSyncd !==undefined && (
+             }
+              <Menu
+                visible={visible}
+                onDismiss={closeMenu}
+                contentStyle={{backgroundColor: theme.colors.background}}
+                anchor={
+                  <IconButton
+                    icon="dots-horizontal"
+                    color={theme.colors.onBackground}
+                    onPress={() => openMenu()}
+                  />
+                }>
                 <Menu.Item
-                  leadingIcon={() => (
-                    <List.Icon
-                      icon="delete-outline"
-                      color={theme.colors.textRed}
-                    />
-                  )}
-                  title="Delete"
-                  titleStyle={{color: theme.colors.textRed}}
+                  leadingIcon="eye-outline"
+                  title="View"
+                  titleStyle={{color: theme.colors.onBackground}}
                   onPress={async () => {
                     closeMenu();
-                    deleteGroupHandler();
+                    onPressHandler();
                   }}
                 />
-              )}
-            </Menu>
+
+                <Menu.Item
+                  leadingIcon="pin-outline"
+                  disabled={pinGroup?._id == item?._id}
+                  title="Pin"
+                  // titleStyle={{color: theme.colors.onBackground}}
+                  onPress={async () => {
+                    closeMenu();
+                    pinHandler();
+                    navigation.navigate('PinnedGroup');
+                  }}
+                />
+                <Menu.Item
+                  leadingIcon="checkbox-marked-outline"
+                  title="Select"
+                  titleStyle={{color: theme.colors.onBackground}}
+                  onPress={async () => {
+                    closeMenu();
+                    onLongPressHandler();
+                  }}
+                />
+
+                <Menu.Item
+                  leadingIcon="cog-outline"
+                  title="Settings"
+                  titleStyle={{color: theme.colors.onBackground}}
+                  onPress={async () => {
+                    closeMenu();
+                    settingHandler();
+                  }}
+                />
+                {!item.isSyncd && item.isSyncd !== undefined && (
+                  <Menu.Item
+                    leadingIcon={() => (
+                      <List.Icon
+                        icon="delete-outline"
+                        color={theme.colors.textRed}
+                      />
+                    )}
+                    title="Delete"
+                    titleStyle={{color: theme.colors.textRed}}
+                    onPress={async () => {
+                      closeMenu();
+                      deleteGroupHandler();
+                    }}
+                  />
+                )}
+              </Menu>
+            </View>
           )}
         </View>
       )}
