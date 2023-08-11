@@ -13,17 +13,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// const c = [
-//   "#FFC4D0",
-//   "#BDBDFF",
-//   "#8BBBF2",
-//   "#F9CEDF",
-//   "#FCEECB",
-//   "#D7DDE9",
-//   "#CF99FF",
-//   '#4838D1'
-//  ]
-
 export const COLORS = {
   primary: '#282534',
   white: '#fff',
@@ -33,30 +22,26 @@ export const COLORS = {
   red: '#D70F64',
   orange: '#F77A55',
   blueLight: '#4838D1',
-  
 };
 
 export const lightPalette = {
-   background :"#fff",
-  // primary :"#9b78d4",
-  // primaryContainer: "#75d9ff",
-  
-  // secondary:"#835ac3",
-  // secondaryContainer: "#2cc6ff",
-  
-  // tertiary: "#5e3e8b",
-  // tertiaryContainer: "#008fcc",
-  
-  // accent :"#62468d",
-  
-  // surface: palette.neutral99,
-  // surfaceVariant: palette.neutralVariant90,
-  // surfaceDisabled: palette.neutral99 ,
-  // background: "#f2f1fc",
-  // error: palette.error40,
-  // errorContainer: palette.error90,
-  
-}
+  background: '#fff',
+  blueBG: '#265AE8',
+  textGray: '#3E3F41',
+  textRed : "#DD105E",
+  yellow :"#FFAF4F",
+  purpleLight:"#62468d"
+};
 
+export const darkPalette = {
+  background: '#fff',
+  blueBG: '#265AE8',
+  textGray: '#3E3F41',
+  textRed : "#DD105E",
+  yellow :"#FFAF4F",
+  purpleLight:"#AC8DAF"
+
+  // accent :"#62468d",
+};
 
 export default styles;

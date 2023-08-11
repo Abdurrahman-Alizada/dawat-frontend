@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 
 import {
   ScrollView,
@@ -19,9 +19,15 @@ import {
   Banner,
   Portal,
   useTheme,
+  Appbar,
+  Menu,
+  Divider
 } from 'react-native-paper';
 import {useLoginUserMutation} from '../../../redux/reducers/user/userThunk';
-import {handleCurrentLoaginUser, handlePasswordResetSuccessfully} from '../../../redux/reducers/user/user';
+import {
+  handleCurrentLoaginUser,
+  handlePasswordResetSuccessfully,
+} from '../../../redux/reducers/user/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {userApi} from '../../../redux/reducers/user/userThunk';
@@ -95,67 +101,74 @@ const LoginScreen = ({navigation, route}) => {
   };
 
   const [showPassword, setShowPassword] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
+  
+  const openMenu = () => setShowMenu(true);
+  const closeMenu = () => setShowMenu(false);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}
+    <ScrollView
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         flex: 1,
         paddingVertical: '2%',
-      }}
-      >
+      }}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <View style={{alignSelf:"center", flexDirection: 'row', marginTop:"5%" }}>
-        <View style={{alignItems: 'center'}}>
-          <View
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 100 / 2,
-              borderWidth: 8,
-              borderColor: '#3557b7',
+      <Appbar.Header
+          style={{backgroundColor: theme.colors.background}}
+          // elevated={true}
+          >
+          <Appbar.BackAction onPress={()=>navigation.goBack()} />
+          <Appbar.Content
+            title="Login"
+            titleStyle={{
+              color: theme.colors.onBackground,
             }}
           />
 
-          <View
-            style={{
-              width: 16,
-              height: 16,
-              alignSelf: 'flex-end',
-              marginTop:-3,
-              borderRadius: 100 / 2,
-              backgroundColor: '#F77A55',
-            }}
-          />
-        </View>
-        <View style={{marginHorizontal:15,}}>
 
-        <Text
-          style={{
-            color: '#3E3F41',
-            fontSize: 20,
-            fontWeight: 'bold',
-            letterSpacing: 5,
-          }}>
-          Event 
-        </Text>
-        <Text
-          style={{
-            color: '#3E3F41',
-            fontSize: 20,
-            letterSpacing: 1,
-          }}>
-          Planner 
-        </Text>
-        </View>
-      </View>
+          <Menu
+            visible={showMenu}
+            onDismiss={closeMenu}
+            contentStyle={{backgroundColor: theme.colors.background}}
+            anchor={
+              <Appbar.Action
+                icon={"dots-vertical"}
+                color={theme.colors.onBackground}
+                onPress={() => openMenu()}
+              />
+            }>
+            <Menu.Item
+              leadingIcon="help-circle-outline"
+              title="Help"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                navigation.navigate('AppSettingsMain');
+              }}
+            />
 
+            <Menu.Item
+              leadingIcon="message-outline"
+              title="Contact us"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                navigation.navigate('AppSettingsMain');
+              }}
+            />
+          </Menu>
+        </Appbar.Header>
 
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
           <Dialog.Title>Sign in Error</Dialog.Title>
           <Dialog.Content>
-            <Paragraph> {errorMessage} {isError && error?.error}</Paragraph>
+            <Paragraph>
+              {' '}
+              {errorMessage} {isError && error?.error}
+            </Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setVisible(false)}>Ok</Button>
@@ -173,17 +186,18 @@ const LoginScreen = ({navigation, route}) => {
         ]}
         // style={{paddingHorizontal:"5%"}}
         icon={({size}) => <Avatar.Icon size={size} icon="check-bold" />}>
-        Your password has been reset successfully. You can sign in now with the updated password.
+        Your password has been reset successfully. You can sign in now with the
+        updated password.
       </Banner>
 
       <Text
         style={{
           fontSize: 20,
-          marginTop: '10%',
+          marginTop: '3%',
           fontWeight: '700',
           paddingHorizontal: '5%',
         }}>
-        Sign in your account.
+        Login your account.
       </Text>
 
       <Formik
@@ -262,39 +276,69 @@ const LoginScreen = ({navigation, route}) => {
                 theme={{roundness: 1}}
                 mode="contained"
                 onPress={handleSubmit}
-                buttonColor={theme.colors.secondary}>
-                Sign in
+                buttonColor={theme.colors.blueBG}>
+                Login
               </Button>
 
               <TouchableOpacity
-                style={{marginVertical: '4%', alignSelf: 'center'}}
+                style={{marginVertical: '3%', alignSelf: 'center'}}
                 onPress={() => navigation.navigate('ForgotPassword')}>
-                <Text
-                  style={{fontWeight: 'bold', color: theme.colors.tertiary}}>
+                <Text style={{fontWeight: 'bold', color: theme.colors.textRed}}>
                   Forgot password?
                 </Text>
               </TouchableOpacity>
             </View>
-            <View
-              style={{
-                marginVertical: '5%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <Text
+            {/* <View>
+              <View
                 style={{
-                  fontSize: 15,
-                  fontWeight: 'bold',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}>
-                Don't have an account?
-              </Text>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+                <Text
+                  style={{fontSize:16, color: theme.colors.textGray}}>
+                  or
+                </Text>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+              </View>
               <Button
-                mode="text"
-                onPress={() => navigation.navigate('SignUpwithEmail')}>
-                Create account
+                loading={isLoading}
+                // disabled={!(dirty && isValid) || isLoading}
+                disabled={isLoading}
+                style={{
+                  marginVertical: '3%',
+                }}
+                contentStyle={{padding: '3%'}}
+                buttonStyle={{padding: '1%'}}
+                theme={{roundness: 1}}
+                mode="contained"
+                icon={() => (
+                  <Avatar.Image
+                    size={24}
+                    style={{backgroundColor:"#EDEEF0", marginHorizontal:"2%"}}
+                    source={require('../../../assets/icons/google-icon.png')}
+                  />
+                )}
+                onPress={handleSubmit}
+                buttonColor={"#EDEEF0"}
+                labelStyle={{color:theme.colors.textGray, fontWeight:"bold"}}
+                >
+                Login with Google
               </Button>
-            </View>
+            </View> */}
           </View>
         )}
       </Formik>

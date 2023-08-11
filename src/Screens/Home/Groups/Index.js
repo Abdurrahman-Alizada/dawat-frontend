@@ -1,34 +1,37 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {
   RefreshControl,
+  ImageBackground,
   View,
   Image,
   FlatList,
   StatusBar,
+  StyleSheet,
 } from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, Text, useTheme, Button} from 'react-native-paper';
+import {AnimatedFAB, Text, useTheme, Button, Divider, Card} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
 } from '../../../redux/reducers/groups/groupThunk';
 import {Provider} from 'react-native-paper';
-import Header from '../../../Components/Appbar';
+import Header from '../../../Components/Appbars/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 import GroupsList from '../../Skeletons/Groups';
 import {PreferencesContext} from '../../../themeContext';
+import moment from 'moment';
+import {useDispatch, useSelector} from 'react-redux';
 
 const Groups = ({navigation}) => {
-  const {
-    data: allGroups,
-    isError,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-  } = useGetAllGroupsQuery();
+  const [token, setToken] = useState(null);
+
+  const [allGroups, setAllGroups] = useState([]);
+
+  const [localLoading, setLoacalLoading] = useState(true);
+  const {data, isError, isLoading, error, isFetching, refetch} =
+    useGetAllGroupsQuery();
   const [deleteGroupForUser, {isLoading: deleteLoading}] =
     useDeleteGroupForUserMutation();
 
@@ -55,16 +58,22 @@ const Groups = ({navigation}) => {
     setIsExtended(currentScrollPosition <= 0);
   };
 
-  const fabStyle = {['right']: 16};
-  // end fab
-
   // search - start
   const [listEmptyText, setListEmptyText] = useState('No Group yet');
   const [isSearch, setIsSearch] = useState(false);
   const [filteredDataSource, setFilteredDataSource] = useState([]);
   const [masterDataSource, setMasterDataSource] = useState([]);
 
-  const searchFilterFunction = text => {
+  const searchFilterFunction = async text => {
+    setLoacalLoading(true);
+    let localGroups = await getLocalGroups();
+    if (data) {
+      let ids = new Set(localGroups.map(d => d._id));
+      setAllGroups([...localGroups, ...data.filter(d => !ids.has(d._id))]);
+      // setAllGroups([...data, ...localGroups]);
+    } else {
+      setAllGroups(localGroups);
+    }
     setMasterDataSource(allGroups);
     setFilteredDataSource(allGroups);
     if (text) {
@@ -82,11 +91,27 @@ const Groups = ({navigation}) => {
     } else {
       setFilteredDataSource(masterDataSource);
     }
+    setLoacalLoading(false);
   };
+
+  const getLocalGroups = async () => {
+    let retString = await AsyncStorage.getItem('groups');
+    let aa = JSON.parse(retString);
+    return aa ? aa : [];
+  };
+
+  const PG = useSelector(state => state.groups?.pinGroup);
 
   useEffect(() => {
     searchFilterFunction(null);
-  }, [allGroups]);
+  }, [data, PG]);
+
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
   // checked on long Press
   const [checked, setChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -125,71 +150,100 @@ const Groups = ({navigation}) => {
             setIsSearch={setIsSearch}
             searchFilterFunction={searchFilterFunction}
             theme={theme}
+            onOpen={onOpen}
           />
         )}
 
-        {!isLoading ? (
-          <View
-            style={{
-              flex: 1,
-              marginTop: 2,
-              backgroundColor: theme.colors.background,
-            }}>
-            {isError ? (
-              <View style={{flex: 1, alignItems: 'center',marginTop:100}}>
-                <Image
-                  source={require('../../../assets/images/cancel.png')}
-                  style={{width:100, height:100}}
-                />
-                <Text style={{fontSize:20}}>Something went wrong</Text>
-                <Button
-                  icon="refresh"
-                  mode="contained"
-                  style={{marginTop: '5%'}}
-                  onPress={refetch}
-                  >
-                  Refresh
-                </Button>
+        <View
+          style={{
+            flex:1,
+            marginTop: 2,
+            backgroundColor: theme.colors.background,
+          }}>
+          <FlatList
+            onScroll={onScroll}
+            keyExtractor={item => item?._id}
+            data={isSearch ? filteredDataSource : allGroups}
+            ListEmptyComponent={() => (
+              <View style={{marginTop: '60%', alignItems: 'center'}}>
+                {isLoading || localLoading ? (
+                  <Text>Loading...</Text>
+                ) : (
+                  <Text>{listEmptyText}</Text>
+                )}
               </View>
-            ) : (
-              <FlatList
-                onScroll={onScroll}
-                keyExtractor={item => item._id}
-                data={isSearch ? filteredDataSource : allGroups}
-                ListEmptyComponent={() => (
-                  <View style={{marginTop: '60%', alignItems: 'center'}}>
-                    <Text>{listEmptyText}</Text>
-                  </View>
-                )}
-                renderItem={item => (
-                  <RenderItem
-                    item={item.item}
-                    navigation={navigation}
-                    checked={checked}
-                    setChecked={setChecked}
-                    checkedItems={checkedItems}
-                    setCheckedItems={setCheckedItems}
-                    setIsSearch={setIsSearch}
-                    theme={theme}
-                  />
-                )}
-                refreshControl={
-                  <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-                }
+            )}
+            renderItem={item => (
+              <RenderItem
+                item={item.item}
+                navigation={navigation}
+                checked={checked}
+                setChecked={setChecked}
+                checkedItems={checkedItems}
+                setCheckedItems={setCheckedItems}
+                setIsSearch={setIsSearch}
+                theme={theme}
               />
             )}
-          </View>
-        ) : (
-          <View
-            style={{
-              margin: '3%',
-            }}>
-            <GroupsList />
-          </View>
-        )}
+            refreshControl={
+              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+            }
+            // ListFooterComponent={() => (
+            //   <View>
+            //     {true && (
+            //       <Card contentStyle={{bottom:0, alignItems:"center", padding:"3%"}}>
+            //          <View style={{width:"90%"}}>
+            //           <Text style={{fontSize:20, textAlign:"center"}}>Unlock more features</Text>
+            //           <Text style={{textAlign:"center"}} >Add other participant to your groups, Make backup and keep record remotly</Text>
+            //          </View>
+            //         <Card.Actions >
+            //           <Button onPress={()=>navigation.navigate("Auth", {screen :"Login"})}>Login</Button>
+            //           <Button onPress={()=>navigation.navigate("Auth", {screen :"SignUpwithEmail"})}>Create account</Button>
+            //         </Card.Actions>
+            //       </Card>
+            //     )}
+            //     {/* {isError && (
+            //         <View style={{alignItems: 'center', marginTop: 10}}>
+            //           <Divider />
+            //           <View
+            //             style={{
+            //               flexDirection: 'row',
+            //               alignItems: 'center',
+            //               marginTop: 10,
+            //               justifyContent: 'space-between',
+            //             }}>
+            //             <Text style={{fontSize: 20}}>Something went wrong</Text>
+            //             <Button
+            //               icon="refresh"
+            //               mode="text"
+            //               style={{marginHorizontal: '5%'}}
+            //               onPress={refetch}>
+            //               Refresh
+            //             </Button>
+            //           </View>
+            //         </View>
+            //       )} */}
+            //   </View>
+            // )}
+          />
+           <View style={{position:"absolute", bottom:0, width:"100%"}}>
+                {!token && !isLoading && !localLoading && (
+                  <Card contentStyle={{bottom:0, alignItems:"center", padding:"3%"}}>
+                     <View style={{width:"90%"}}>
+                      <Text style={{fontSize:20, textAlign:"center"}}>Unlock more features</Text>
+                      <Text style={{textAlign:"center"}} >Add other participant to your groups, Make backup and keep record remotly</Text>
+                     </View>
+                    <Card.Actions >
+                      <Button onPress={()=>navigation.navigate("Auth", {screen :"Login"})}>Login</Button>
+                      <Button onPress={()=>navigation.navigate("Auth", {screen :"SignUpwithEmail"})}>Create account</Button>
+                    </Card.Actions>
+                  </Card>
+                )}
+              </View>
+        </View>
       </Provider>
 
-      <AnimatedFAB
+      {/* <AnimatedFAB
         icon={'plus'}
         label={'Add New Event'}
         extended={isExtended}
@@ -197,13 +251,13 @@ const Groups = ({navigation}) => {
         visible={true}
         animateFrom={'right'}
         iconMode="static"
-        style={{bottom: snackbarVisible ? 70 : 16, right: 16}}
-      />
+        style={{bottom: snackbarVisible && token? 70 : 16, right: 16}}
+      /> */}
 
       <ErrorSnackBar
-        isVisible={snackbarVisible}
+        isVisible={snackbarVisible && token}
         text={'Something went wrong'}
-        onDismissHandler={()=>setSnackBarVisible(false)}
+        onDismissHandler={() => setSnackBarVisible(false)}
       />
     </View>
   );

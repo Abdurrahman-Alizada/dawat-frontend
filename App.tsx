@@ -32,14 +32,18 @@ import {
   Snackbar,
 } from 'react-native-paper';
 import {PreferencesContext} from './src/themeContext';
-import {lightPalette} from './src/GlobalStyles';
+import {lightPalette, darkPalette} from './src/GlobalStyles';
 export const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   const CombinedDarkTheme = {
     ...PaperDarkTheme,
     ...NavigationDarkTheme,
-    colors: {...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors},
+    colors: {
+      ...PaperDarkTheme?.colors,
+      ...NavigationDarkTheme.colors,
+      ...darkPalette,
+    },
   };
 
   const CombinedDefaultTheme = {
@@ -66,14 +70,13 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
-  const [isNetSnackBarVisible, setIsNetSnackBarVisible ] = useState(false);
+  const [isNetSnackBarVisible, setIsNetSnackBarVisible] = useState(false);
 
   useLayoutEffect(() => {
     setTimeout(() => {
       setIsNetSnackBarVisible(true);
     }, 3000);
   }, []);
-
 
   // internet connection information
   const netInfo = useNetInfo();
@@ -109,14 +112,13 @@ export const App = () => {
               />
             </Stack.Navigator>
 
-          {/* snackbar for checking internet connection */}
+            {/* snackbar for checking internet connection */}
             <Snackbar
               visible={!netInfo.isConnected && isNetSnackBarVisible}
               duration={1000}
               onDismiss={() => console.log('snackbar dismissed')}>
               You are currently offline.
             </Snackbar>
-
           </NavigationContainer>
         </PaperProvider>
       </Provider>

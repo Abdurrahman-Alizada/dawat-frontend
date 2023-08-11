@@ -1,12 +1,15 @@
 import React, {useRef, useState} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {StyleSheet,StatusBar, View, ScrollView} from 'react-native';
 import {
   TextInput,
   Dialog,
   Text,
   Paragraph,
   Portal,
+  Appbar,
+  Avatar,
   useTheme,
+  Menu,
   Button,
 } from 'react-native-paper';
 
@@ -129,17 +132,67 @@ const SignupWithEmail = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
-
+    const [showMenu, setShowMenu] = useState(false);
+    const openMenu = () => setShowMenu(true);
+    const closeMenu = () => setShowMenu(false);
+  
   const formikRef = useRef();
 
   return (
+   <View >
+      <Appbar.Header
+          style={{backgroundColor: theme.colors.background}}
+          elevated={true}>
+          <Appbar.BackAction onPress={()=>navigation.goBack()} />
+          <Appbar.Content
+            title="Event Planner"
+            titleStyle={{
+              color: theme.colors.onBackground,
+            }}
+          />
+
+
+          <Menu
+            visible={showMenu}
+            onDismiss={closeMenu}
+            contentStyle={{backgroundColor: theme.colors.background}}
+            anchor={
+              <Appbar.Action
+                icon={"dots-vertical"}
+                color={theme.colors.onBackground}
+                onPress={() => openMenu()}
+              />
+            }>
+            <Menu.Item
+              leadingIcon="help-circle-outline"
+              title="Help"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                navigation.navigate('AppSettingsMain');
+              }}
+            />
+
+            <Menu.Item
+              leadingIcon="message-outline"
+              title="Contact us"
+              titleStyle={{color: theme.colors.onBackground}}
+              onPress={async () => {
+                closeMenu();
+                navigation.navigate('AppSettingsMain');
+              }}
+            />
+          </Menu>
+        </Appbar.Header>
+
     <ScrollView
       contentContainerStyle={{
-        paddingHorizontal: '5%',
-        flex: 1,
         justifyContent: 'space-between',
       }}
       showsVerticalScrollIndicator={false}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+
       <Formik
         innerRef={formikRef}
         initialValues={{
@@ -158,7 +211,7 @@ const SignupWithEmail = () => {
           errors,
           touched,
         }) => (
-          <View style={{}}>
+          <View style={{paddingHorizontal: '5%',}}>
             <Portal>
               <Dialog visible={visible} onDismiss={() => setVisible(true)}>
                 <Dialog.Title>Sign up</Dialog.Title>
@@ -293,7 +346,7 @@ const SignupWithEmail = () => {
               theme={{roundness: 1}}
               mode="contained"
               onPress={handleSubmit}
-              buttonColor={theme.colors.secondary}>
+              buttonColor={theme.colors.blueBG}>
               Sign up
             </Button>
           </View>
@@ -302,53 +355,68 @@ const SignupWithEmail = () => {
 
       <View
         style={{
-          marginVertical: '10%',
+          marginVertical: '5%',
           flexDirection: 'row',
+          paddingHorizontal: '5%',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>
-          Already have an account?
-        </Text>
-        <Button mode="text" onPress={() => navigation.navigate('Login')}>
-          Sign in
-        </Button>
+          <View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+                <Text
+                  style={{fontSize:16, color: theme.colors.textGray}}>
+                  or
+                </Text>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+              </View>
+              <Button
+                loading={isLoading}
+                // disabled={!(dirty && isValid) || isLoading}
+                disabled={isLoading}
+                style={{
+                  marginVertical: '3%',
+                }}
+                contentStyle={{padding: '3%'}}
+                buttonStyle={{padding: '1%'}}
+                theme={{roundness: 1}}
+                mode="contained"
+                icon={() => (
+                  <Avatar.Image
+                    size={24}
+                    style={{backgroundColor:"#EDEEF0", marginHorizontal:"2%"}}
+                    source={require('../../../assets/icons/google-icon.png')}
+                  />
+                )}
+                // onPress={handleSubmit}
+                buttonColor={"#EDEEF0"}
+                labelStyle={{color:theme.colors.textGray, fontWeight:"bold"}}
+                >
+                Login with Google
+              </Button>
+            </View>
+
       </View>
     </ScrollView>
+   </View>
   );
 };
 
 export default SignupWithEmail;
-
-const styles = StyleSheet.create({
-  buttonStyle: {
-    height: 60,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 50,
-    alignItems: 'center',
-    borderRadius: 10,
-    flexDirection: 'row',
-    marginVertical: '2%',
-    backgroundColor: '#EDEEF0',
-  },
-  buttonTextStyle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
-  borderRed: {
-    borderColor: 'red',
-    borderBottomWidth: 4,
-  },
-  borderGreen: {
-    borderColor: '#ddd',
-    borderBottomWidth: 4,
-  },
-  error: {
-    color: 'red',
-    marginLeft: 20,
-  },
-});

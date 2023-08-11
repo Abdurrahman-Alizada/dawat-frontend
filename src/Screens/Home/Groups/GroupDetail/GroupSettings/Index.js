@@ -464,7 +464,7 @@ const Index = ({route, navigation}) => {
               left={() => <Avatar.Icon size={50} icon="account-plus-outline" />}
             />
             <Divider />
-            {users.map((member, index) => (
+            {users?.map((member, index) => (
               <List.Item
                 key={index}
                 title={member.name}

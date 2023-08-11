@@ -38,10 +38,11 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import GroupBrief from '../GroupBrief/index';
+import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
 
 export default function Example({route}) {
   const navigation = useNavigation();
-
   const {groupId} = route.params;
   const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
@@ -86,7 +87,7 @@ export default function Example({route}) {
     {id: 1, name: 'Rejected', selected: false},
     {id: 2, name: 'Pending', selected: true},
     {id: 3, name: 'Pending', selected: false},
-    {id: 4, name: 'Pending', selected: true},
+    {id: 4, name: 'Other', selected: true},
   ]);
   const [selectedChips, setSelectedChips] = useState([]);
   const selectedChipsHandler = id => {
@@ -230,11 +231,32 @@ export default function Example({route}) {
   };
 
   const [expanded, setExpanded] = useState(true);
-
   const handlePress = () => setExpanded(!expanded);
 
+  // import export modalize
+  const importExportModalizeRef = useRef(null);
+  const openGuestsImportExportModalize = () => {
+    importExportModalizeRef.current?.open();
+  };
+  const onCloseGuestsImportExport = () => {
+    importExportModalizeRef.current?.close();
+  };
+
+  // guests Summary modalize
+  const guestsSummaryModalizeRef = useRef(null);
+  const openGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.open();
+  };
+  const closeGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.close();
+  };
+
   return (
-    <View style={{flexGrow:1, backgroundColor: theme.colors.background}}>
+    <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
+      <GuestsAppbar
+        openGuestsImportExportModalize={openGuestsImportExportModalize}
+        openGuestsSummaryModalize={openGuestsSummaryModalize}
+      />
       <Banner
         visible={isExportBanner}
         actions={[
@@ -247,13 +269,13 @@ export default function Example({route}) {
         Guests List of this group has been exported in Downlaod folder
         successfully
       </Banner>
-        
-        {/* <View>
+
+      {/* <View>
             <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >
               {chips.map((chip, index) => (
                 <View key={index} style={{marginHorizontal: '2%'}}>
                   <Chip
-                    selected={chip.selected}
+                    // selected={chip.selected}
                     mode={chip.selected ? 'flat' : 'outlined'}
                     onPress={() => console.log('Pressed')}>
                     {chip.name}
@@ -262,7 +284,7 @@ export default function Example({route}) {
               ))}
             </ScrollView>
         </View> */}
- 
+
       {isLoading ? (
         <View
           style={{
@@ -304,10 +326,11 @@ export default function Example({route}) {
         HeaderComponent={() => (
           <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
         )}>
-        <List.Accordion style={{padding: '4%'}} title="Statuses" 
-         expanded={expanded}
-         onPress={handlePress}
-        >
+        <List.Accordion
+          style={{padding: '4%'}}
+          title="Statuses"
+          expanded={expanded}
+          onPress={handlePress}>
           <View style={{marginHorizontal: '5%'}}>
             <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
               Added by
@@ -355,7 +378,11 @@ export default function Example({route}) {
                     }}>
                     <View style={{}}>
                       <Text style={{padding: '2%'}}>
-                        marked as <Text style={{fontWeight:"bold"}}>{Status.invitiStatus}</Text> by
+                        marked as{' '}
+                        <Text style={{fontWeight: 'bold'}}>
+                          {Status.invitiStatus}
+                        </Text>{' '}
+                        by
                       </Text>
                       <View
                         style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -366,7 +393,7 @@ export default function Example({route}) {
                               ? {uri: Status?.addedBy?.imageURL}
                               : require('../../../../../assets/drawer/male-user.png')
                           }
-                          />
+                        />
                         {/* <Avatar.Icon size={30} icon="account-circle-outline" /> */}
                         <Text style={{marginHorizontal: '4%'}}>
                           {Status?.addedBy?.name}
@@ -403,6 +430,25 @@ export default function Example({route}) {
             </ScrollView>
           </View>
         </List.Accordion>
+      </Modalize>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={importExportModalizeRef}
+        handlePosition="inside"
+        snapPoint={400}>
+        <GroupBrief
+          group={route.params.group}
+          onClose={onCloseGuestsImportExport}
+        />
+      </Modalize>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={guestsSummaryModalizeRef}
+        handlePosition="inside"
+        snapPoint={500}>
+        {/* <InvitaionsSummary onClose={closeGuestsSummaryModalize} /> */}
       </Modalize>
     </View>
   );

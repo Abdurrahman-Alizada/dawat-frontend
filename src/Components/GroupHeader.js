@@ -54,9 +54,9 @@ const Header = ({
     let membersText = currentViewingGroup.users?.map(user => {
       return user.name == currentLoginUser.name ? 'You' : ' '+ user.name  ;
     });
-    return membersText.toString().length < 25
-      ? membersText.toString()
-      : `${membersText.toString().substring(0, 25)}...`;
+    return membersText?.toString().length < 25
+      ? membersText?.toString()
+      : `${membersText?.toString().substring(0, 25)}...`;
   };
 
   //search

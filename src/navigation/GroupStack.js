@@ -18,12 +18,21 @@ import TaskDetail from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/Task
 import UpdateTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/TaskDetail/UndateTaskMembers';
 import AddTaskMembers from '../Screens/Home/Groups/GroupDetail/Tasks/AddTaskMembers';
 import UpdateGroupMembers from '../Screens/Home/Groups/GroupDetail/GroupSettings/UpdateGroupMembers';
+import PinnedGroup from '../Screens/Home/Groups/PinnedGroup';
+
+import Invitations from '../Screens/Home/Groups/GroupDetail/Invitations';
+import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks'
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeIndex">
+    <Stack.Navigator initialRouteName="PinnedGroup">
+      <Stack.Screen
+        name="PinnedGroup"
+        component={PinnedGroup}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="HomeIndex"
         component={HomeIndex}
@@ -76,6 +85,14 @@ const AppStack = () => {
       />
 
       <Stack.Screen
+        name="Tasks"
+        component={Tasks}
+        options={{
+          title: 'Tasks',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="AddTask"
         component={AddTask}
         options={{
@@ -107,6 +124,16 @@ const AppStack = () => {
           headerShown: false,
         }}
       />
+
+      <Stack.Screen
+        name="Invitations"
+        component={Invitations}
+        options={{
+          title: 'Guests',
+          headerShown: false,
+        }}
+      />
+
       <Stack.Screen
         name="AddInviti"
         component={AddInviti}
@@ -119,17 +146,16 @@ const AppStack = () => {
         name="AddMultipleInviti"
         component={AddMultipleInviti}
         options={{
-          headerShown:false,
+          headerShown: false,
         }}
       />
       <Stack.Screen
         name="MultipleInvitiActions"
         component={MultipleInvitiActions}
         options={{
-          headerShown:false,
+          headerShown: false,
         }}
       />
-
     </Stack.Navigator>
   );
 };

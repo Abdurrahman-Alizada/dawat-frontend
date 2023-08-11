@@ -30,6 +30,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
         <Appbar.Header
           style={{backgroundColor: theme.colors.background}}
           elevated={true}>
+          
           <Appbar.Action
             icon="menu"
             color={theme.colors.onBackground}
@@ -39,14 +40,6 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             title="Event Planner"
             titleStyle={{
               color: theme.colors.onBackground,
-            }}
-          />
-          <Appbar.Action
-            icon="magnify"
-            color={theme.colors.onBackground}
-            onPress={() => {
-              setIsSearch(!isSearch);
-              searchFilterFunction("");
             }}
           />
 

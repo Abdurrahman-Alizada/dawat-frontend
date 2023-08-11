@@ -20,18 +20,17 @@ import {userApi} from '../redux/reducers/user/userThunk';
 import {groupApi} from '../redux/reducers/groups/groupThunk';
 import {friendshipApi} from '../redux/reducers/Friendship/friendshipThunk';
 
-import { version } from "../../package.json"
+import {version} from '../../package.json';
 
 export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const [active, setActive] = useState('');
-  const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
   const id = useRef(null);
+  const token = useRef(null);
   const getUserInfo = async () => {
     id.current = await AsyncStorage.getItem('userId');
-    // console.log('User name', value);
+    token.current = await AsyncStorage.getItem('token');
   };
   useEffect(() => {
     getUserInfo();
@@ -46,7 +45,6 @@ export default function DrawerContent(props) {
   } = useGetCurrentLoginUserQuery(id.current);
 
   const logout = async () => {
-    setActive('logout');
     await AsyncStorage.setItem('isLoggedIn', '');
     await AsyncStorage.setItem('id', '');
     await AsyncStorage.setItem('token', '');
@@ -68,7 +66,7 @@ export default function DrawerContent(props) {
   }, [user]);
 
   const obscureEmail = email => {
-    if(!email) return "*******"
+    if (!email) return '*******';
     const [name, domain] = email?.split('@');
     return `${name[0]}${name[1]}${new Array(name.length - 3).join(
       '*',
@@ -128,7 +126,7 @@ export default function DrawerContent(props) {
           />
         ) : (
           <List.Item
-            title={user?.name ? user?.name : "*****"}
+            title={user?.name ? user?.name : '*****'}
             onPress={async () => {
               navigation.navigate('AppSettingsMain', {
                 screen: 'Profile',
@@ -146,34 +144,29 @@ export default function DrawerContent(props) {
                 size={50}
               />
             )}
-            // right={props => (
-            //   <List.Icon size={30} {...props} icon="chevron-right" />
-            // )}
             description={obscureEmail(user?.email)}
           />
         )}
 
         <Drawer.Item
+          label="Friends"
           onPress={() => {
             navigation.navigate('MakeFriends', {screen: 'MakeFriendsMain'});
           }}
           icon="account-multiple"
-          label="Friends circle"
         />
 
-        {/* <Drawer.Section title="Preferences" >
-          <Drawer.Item
-            icon="weather-night"
-            label="Dark Mode"
-            right={() => (
-              <Switch value={isThemeDark} onValueChange={() => toggleTheme()} />
-            )}
-          />
-        </Drawer.Section> */}
+        <Drawer.Item
+          label="Groups"
+          onPress={() => {
+            navigation.navigate('GroupStack', {screen: 'HomeIndex'});
+          }}
+          icon="account-group"
+        />
 
         <Drawer.Item
-          icon="motion-play"
           label="Watch an ad"
+          icon="motion-play"
           onPress={() => navigation.navigate('SupportUs')}
         />
 
@@ -189,7 +182,7 @@ export default function DrawerContent(props) {
         />
       </View>
 
-      <View style={{marginVertical:"5%"}}>
+      <View style={{marginVertical: '5%'}}>
         <Divider />
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
           <TouchableOpacity

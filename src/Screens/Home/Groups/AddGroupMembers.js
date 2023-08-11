@@ -22,9 +22,12 @@ import {
 } from 'react-native-paper';
 import {useGetAllFriendsQuery} from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
-
+import {handlePinGroup} from '../../../redux/reducers/groups/groups';
 import {useSelector, useDispatch} from 'react-redux';
 import { groupApi } from '../../../redux/reducers/groups/groupThunk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import createRandomId from '../../../utils/createRandomId';
+
 const AddGroup = ({navigation, onClose, route}) => {
   const dispatch = useDispatch();
 
@@ -49,6 +52,25 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [users, setUsers] = useState([]);
   const [userIds, setUserIds] = useState([]);
 
+  const createLocalGroup = async values => {
+    let group = {
+      _id: values._id,
+      isSyncd: true,
+      groupName: values.groupName,
+      groupDescription: values.groupDescription,
+      time: values.dueDate,
+    };
+    let groups = await AsyncStorage.getItem('groups');
+    if (groups) {
+      let data = JSON.parse(groups);
+      let newGroups = [...data, group];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+    } else {
+      let newGroups = [group];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+    }
+    dispatch(handlePinGroup(await AsyncStorage.getItem('pinGroup')));
+  };
   const submitHandler = async () => {
     if (route.params.data) {
       fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
@@ -92,6 +114,12 @@ const AddGroup = ({navigation, onClose, route}) => {
         .then(res => {
           if(res.data?._id){
             navigation.navigate('HomeIndex');
+            createLocalGroup({
+              _id : res.data?._id,
+              groupName: groupName,
+              groupDescription: groupDescription,   
+              dueDate : new Date() 
+            });
           }
         })
         .catch(err => {
