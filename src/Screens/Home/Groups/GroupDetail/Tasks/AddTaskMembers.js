@@ -35,7 +35,6 @@ const AddGroup = ({navigation, route}) => {
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
-
   const [addTask, {isLoading}] = useAddTaskMutation();
 
   const submitHandler = async () => {

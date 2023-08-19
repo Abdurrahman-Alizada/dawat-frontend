@@ -5,8 +5,16 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  KeyboardAvoidingView,
+  Image,
 } from 'react-native';
-import React, {useState, useCallback, useRef, useEffect} from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 import {
   Avatar,
   TextInput,
@@ -19,6 +27,7 @@ import {
   Snackbar,
   useTheme,
   Chip,
+  Card,
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
@@ -31,19 +40,39 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from '../../../Menus/Profile/AvatarModal';
 import {useDispatch, useSelector} from 'react-redux';
-import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/groups';
+import {
+  handleCurrentViewingGroup,
+  handleGroupsFlag,
+  handlePinGroup,
+} from '../../../../../redux/reducers/groups/groups';
 import {Modalize} from 'react-native-modalize';
+import Countdown from 'react-native-countdown-xambra';
+import LoginForMoreFeatures from '../../../../../Components/LoginForMoreFeatures';
+import createRandomId from '../../../../../utils/createRandomId';
 // imports end
 
 const Index = ({route, navigation}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
-
+  const [localDeleteLoding, setLocalDeleteLoading] = useState(false);
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
+  const PG = useSelector(state => state.groups?.pinGroup);
+
+  const [adminIds, setAdminIds] = useState([]);
+  const getMembersLenght = () => {
+    for (let i = 0; i < groupAdmins?.length; i++) {
+      setAdminIds([...adminIds, groupAdmins[i]?._id]);
+    }
+  };
+  useEffect(() => {
+    getMembersLenght();
+  }, []);
+
   // component state - start
-  const {users, groupName, _id, groupDescription} = currentViewingGroup;
+  const {users, groupName, _id, groupDescription, groupAdmins, createdBy} =
+    currentViewingGroup;
   const [name, setName] = useState(groupName);
   const [description, setDescription] = useState(groupDescription);
   const [userId, setUserId] = useState('');
@@ -76,6 +105,8 @@ const Index = ({route, navigation}) => {
   // redux toolkit - start
   const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
 
+  const [updateLocalGroupNameLoading, setUpdateLocalGroupNameLoading] =
+    useState(false);
   const [updateGroupName, {isLoading: updateGroupNameLoading}] =
     useUpdateGroupNameMutation();
   const [updateGroupDescription, {isLoading: updateGroupDescriptionLoading}] =
@@ -137,6 +168,45 @@ const Index = ({route, navigation}) => {
       });
   };
 
+  const groupsFlag = useSelector(state => state.groups?.groupsFlag);
+  const updateLocalPinGroup = async group => {
+    await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
+    dispatch(handlePinGroup(group));
+  };
+
+  const updateLocalGroupS = async groupFromDB => {
+    setUpdateLocalGroupNameLoading(true);
+    let group = groupFromDB
+      ? groupFromDB
+      : {
+          _id: currentViewingGroup?._id,
+          isSyncd: currentViewingGroup?.isSyncd,
+          groupName: name,
+          groupDescription: description,
+          time: new Date(),
+        };
+    let groups = await AsyncStorage.getItem('groups');
+    if (groups) {
+      let data = JSON.parse(groups).filter(
+        grp => grp._id !== currentViewingGroup._id,
+      );
+      let newGroups = [group, ...data];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+    } else {
+      let newGroups = [group];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+    }
+    dispatch(handleGroupsFlag(!groupsFlag));
+    setUpdateLocalGroupNameLoading(false);
+
+    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
+    if (pg?._id === currentViewingGroup._id) {
+     updateLocalPinGroup(group)
+    }
+
+    navigation.navigate('GroupStack', {screen: 'HomeIndex'});
+  };
+
   const handleUpdateGroupDescription = () => {
     updateGroupDescription({
       groupId: _id,
@@ -180,6 +250,29 @@ const Index = ({route, navigation}) => {
       .catch(e => {
         console.log('error in handleLeave', e);
       });
+  };
+
+  const handleDelete = async () => {
+    setSnakeBarMessage('Deleting group');
+    setLocalDeleteLoading(true);
+    setShowSnakeBar(true);
+    let retString = await AsyncStorage.getItem('groups');
+    let grps = JSON.parse(retString);
+    const newArr = grps.filter(object => {
+      return object._id !== currentViewingGroup?._id;
+    });
+    await AsyncStorage.setItem('groups', JSON.stringify(newArr));
+    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
+
+    if (pg?._id === currentViewingGroup._id) {
+      await AsyncStorage.setItem(
+        'pinGroup',
+        JSON.stringify(newArr?.length ? newArr[0] : null),
+      );
+    }
+    dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
+    setLocalDeleteLoading(false);
+    navigation.replace('Drawer');
   };
 
   const handleRemoveUserFromGroup = async userId => {
@@ -329,218 +422,316 @@ const Index = ({route, navigation}) => {
     modalizeRef.current?.close();
   };
 
+  const [token, setToken] = useState(null);
+  useLayoutEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
   return (
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
         <ScrollView>
-          <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.background}}>
-            <TouchableOpacity
-              onPress={() => {
-                seteditGroupName(false);
-                setEditGroupDescription(false);
-                onOpenModalize();
-              }}
-              style={{marginVertical: '4%'}}>
-              {fileDataRef.current ? (
-                <Avatar.Image
-                  source={{uri: fileDataRef.current?.path}}
-                  {...props}
-                  style={{alignSelf: 'center'}}
-                  size={130}
+          <KeyboardAvoidingView
+            enabled={false}
+            keyboardVerticalOffset={0}
+            behavior="height"
+            style={{flex: 1}}>
+            <View>
+              <Image
+                style={{
+                  width: '100%',
+                  opacity: 0.9,
+                  alignSelf: 'center',
+                  resizeMode: 'cover',
+                }}
+                source={require('../../../../../assets/images/main-1.png')}
+              />
+              <View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: '#26231c',
+                  opacity: 0.8,
+                  padding: '5%',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    fontSize: 24,
+                  }}>
+                  {groupName}
+                </Text>
+                <Countdown
+                  // until={pinGroupTime.current ? pinGroupTime.current : 0}
+                  until={200000}
+                  // onFinish={() => alert('finished')}
+                  // onPress={() => alert('hello')}
+                  size={22}
+                  style={{margin: '2%'}}
+                  digitTxtStyle={{color: '#fff'}}
+                  digitStyle={{backgroundColor: '#265AE8'}}
+                  timeLabelStyle={{color: '#fff'}}
+                  // timeToShow={['D','H']}
+                  // showSeparator
+                  separatorStyle={{color: '#fff', alignSelf: 'center'}}
                 />
-              ) : (
-                <View>
-                  {avatarURL === '' ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    marginTop: '2%',
+                  }}>
+                  <Button
+                    style={{
+                      width: '25%',
+                    }}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    textColor={theme.colors.textGray}
+                    theme={{roundness: 2}}
+                    mode="contained"
+                    icon={'pencil-outline'}
+                    // onPress={handleSubmit}
+                    labelStyle={{fontWeight: 'bold'}}
+                    buttonColor={theme.colors.onPrimary}
+                    onPress={() => {
+                      setEditGroupDescription(false);
+                      seteditGroupName(true);
+                    }}>
+                    Name
+                  </Button>
+
+                  <Button
+                    style={{
+                      width: '25%',
+                    }}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    textColor={theme.colors.textGray}
+                    theme={{roundness: 2}}
+                    mode="contained"
+                    icon={'pencil-outline'}
+                    labelStyle={{fontWeight: 'bold'}}
+                    buttonColor={theme.colors.onPrimary}
+                    onPress={async () => {
+                      await AsyncStorage.setItem('isLoggedIn', 'login');
+                      navigation.navigate('SignUpwithEmail');
+                    }}>
+                    Date
+                  </Button>
+
+                  <Button
+                    style={{
+                      width: '40%',
+                    }}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    textColor={theme.colors.textGray}
+                    theme={{roundness: 2}}
+                    mode="contained"
+                    icon={'pencil-outline'}
+                    // onPress={handleSubmit}
+                    labelStyle={{fontWeight: 'bold', width: '60%'}}
+                    buttonColor={theme.colors.onPrimary}
+                    onPress={async () => {
+                      await AsyncStorage.setItem('isLoggedIn', 'login');
+                      navigation.navigate('SignUpwithEmail');
+                    }}>
+                    Background
+                  </Button>
+                </View>
+              </View>
+            </View>
+
+            <Card
+              style={{
+                backgroundColor: theme.colors.cardBG,
+                marginTop: '2%',
+              }}
+              theme={{roundness: 2}}>
+              <Card.Content>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text variant="titleLarge">Description</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      seteditGroupName(false);
+                      setEditGroupDescription(true);
+                    }}>
                     <Avatar.Icon
-                      icon="account-circle-outline"
-                      style={{alignSelf: 'center'}}
-                      size={130}
+                      size={35}
+                      icon="pencil"
+                      style={{backgroundColor: theme.colors.primaryContainer}}
                     />
-                  ) : (
-                    <View>
-                      {avatarURL ? (
+                  </TouchableOpacity>
+                </View>
+                <Text variant="bodyMedium">{description}</Text>
+              </Card.Content>
+            </Card>
+
+            {token ? (
+              <Card
+                style={{
+                  backgroundColor: theme.colors.cardBG,
+                  marginTop: '2%',
+                }}
+                theme={{roundness: 2}}>
+                <List.Section
+                  style={{
+                    padding: '2%',
+                    backgroundColor: theme.colors.cardBG,
+                  }}>
+                  <List.Subheader>
+                    Group members ({users?.length ? users?.length : 1})
+                  </List.Subheader>
+                  <List.Item
+                    onPress={() => {
+                      navigation.navigate('updateGroupMembers');
+                    }}
+                    title="Add Member"
+                    left={() => (
+                      <Avatar.Icon size={50} icon="account-plus-outline" />
+                    )}
+                  />
+
+                  <Divider />
+                  {users?.map((member, index) => (
+                    <List.Item
+                      key={index}
+                      title={member.name}
+                      description={() => (
+                        <View style={{width: '40%', marginTop: 5}}>
+                          {adminIds.includes(member?._id) ? (
+                            <View style={{flexDirection: 'row'}}>
+                              <View
+                                style={{
+                                  backgroundColor: theme.colors.surfaceVariant,
+                                  paddingVertical: '2%',
+                                  paddingHorizontal: '5%',
+                                  borderRadius: 5,
+                                  marginRight: '5%',
+                                }}>
+                                <Text style={{textAlign: 'center'}}>Admin</Text>
+                              </View>
+
+                              {createdBy?._id === member?._id && (
+                                <View
+                                  style={{
+                                    backgroundColor:
+                                      theme.colors.primaryContainer,
+                                    paddingVertical: '2%',
+                                    paddingHorizontal: '5%',
+                                    borderRadius: 5,
+                                  }}>
+                                  <Text style={{textAlign: 'center'}}>
+                                    Creator
+                                  </Text>
+                                </View>
+                              )}
+                            </View>
+                          ) : null}
+                        </View>
+                      )}
+                      // description={member.email}
+                      titleStyle={{fontWeight: 'bold'}}
+                      right={props => (
+                        <View>
+                          {adminIds.includes(userId) ? (
+                            <IconButton
+                              {...props}
+                              disabled={
+                                createdBy?._id === member._id ||
+                                member._id === userId ||
+                                deleteLoading
+                                  ? true
+                                  : false
+                              }
+                              icon="delete"
+                              size={20}
+                              onPress={() =>
+                                handleRemoveUserFromGroup(member._id)
+                              }
+                              mode="contained-tonal"
+                            />
+                          ) : null}
+                        </View>
+                      )}
+                      left={() => (
                         <Avatar.Image
-                          source={{uri: avatarURL}}
-                          style={{alignSelf: 'center'}}
-                          size={130}
-                        />
-                      ) : (
-                        <Avatar.Image
-                          source={{uri: avatarURL}}
-                          style={{alignSelf: 'center'}}
-                          size={130}
+                          source={
+                            member.imageURL
+                              ? {uri: member.imageURL}
+                              : require('../../../../../assets/drawer/male-user.png')
+                          }
+                          size={60}
                         />
                       )}
-                    </View>
-                  )}
-                </View>
-              )}
-
-              <ActivityIndicator
-                style={{position: 'absolute', left: '55%', top: 75}}
-                size="large"
-                animating={updateImageURLLoging || imageUploading}
+                    />
+                  ))}
+                </List.Section>
+              </Card>
+            ) : (
+              <LoginForMoreFeatures
+                token={token}
+                isLoading={isLoading}
+                localLoading={isLoading}
+                navigation={navigation}
               />
-            </TouchableOpacity>
+            )}
 
-            <View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <List.Subheader>Name</List.Subheader>
-                <IconButton
-                  disabled={isLoading}
-                  icon="pencil"
-                  mode="outlined"
-                  size={20}
-                  onPress={() => {
-                    setEditGroupDescription(false);
-                    seteditGroupName(true);
-                  }}
-                />
-              </View>
-              <List.Item title={name} />
-            </View>
-            <View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <List.Subheader>Description</List.Subheader>
-                <IconButton
-                  disabled={isLoading}
-                  icon="pencil"
-                  mode="outlined"
-                  size={20}
-                  onPress={() => {
-                    seteditGroupName(false);
-                    setEditGroupDescription(true);
-                  }}
-                />
-              </View>
-              <List.Item
-                title={() => (
-                  <View style={{}}>
-                    <Text
-                      onTextLayout={onTextLayout}
-                      numberOfLines={textShown ? undefined : 2}
-                      style={{}}>
-                      {description}
-                    </Text>
-
-                    {lengthMore ? (
-                      <TouchableOpacity onPress={() => toggleNumberOfLines()}>
-                        <Text
-                          style={{
-                            fontFamily: 'DM Sans',
-                            fontWeight: 'bold',
-                          }}>
-                          {textShown ? 'Read less...' : 'Read more...'}
-                        </Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <></>
-                    )}
-                  </View>
-                )}
-              />
-            </View>
-          </List.Section>
-
-          <List.Section
-            style={{padding: '2%', backgroundColor: theme.colors.background}}>
-            <List.Subheader>Group members</List.Subheader>
-            <List.Item
-              onPress={() => {
-                navigation.navigate('updateGroupMembers');
+            <Card
+              style={{
+                backgroundColor: theme.colors.cardBG,
+                marginVertical: '2%',
+                paddingHorizontal: '2%',
               }}
-              title="Add Member"
-              left={() => <Avatar.Icon size={50} icon="account-plus-outline" />}
-            />
-            <Divider />
-            {users?.map((member, index) => (
-              <List.Item
-                key={index}
-                title={member.name}
-                description={() => (
-                  <View style={{width: '40%'}}>
-                    {currentViewingGroup?.groupAdmin?._id === member?._id ? (
-                      <View
-                        style={{
-                          backgroundColor: theme.colors.surfaceVariant,
-                          padding: '2%',
-                          borderRadius: 5,
-                        }}>
-                        <Text style={{textAlign: 'center'}}>Group admin</Text>
-                      </View>
-                    ) : null}
-                  </View>
-                )}
-                // description={member.email}
-                titleStyle={{fontWeight: 'bold'}}
-                right={props => (
-                  <View>
-                    {currentViewingGroup?.groupAdmin?._id === userId ? (
-                      <IconButton
-                        {...props}
-                        disabled={
-                          member._id === userId || deleteLoading ? true : false
-                        }
-                        icon="delete"
-                        size={20}
-                        onPress={() => handleRemoveUserFromGroup(member._id)}
-                        mode="contained-tonal"
-                      />
-                    ) : null}
-                  </View>
-                )}
-                left={() => (
-                  <Avatar.Image
-                    source={
-                      member.imageURL
-                        ? {uri: member.imageURL}
-                        : require('../../../../../assets/drawer/male-user.png')
-                    }
-                    size={50}
+              theme={{roundness: 2}}>
+              <List.Section
+                style={{
+                  padding: '2%',
+                }}>
+                {token ? (
+                  <List.Item
+                    onPress={handleLeave}
+                    title="Leave group"
+                    left={() => (
+                      <List.Icon color={theme.colors.error} icon="logout" />
+                    )}
+                    titleStyle={{color: theme.colors.error}}
+                  />
+                ) : (
+                  <List.Item
+                    onPress={handleDelete}
+                    title="Delete group"
+                    left={() => (
+                      <List.Icon color={theme.colors.error} icon="delete" />
+                    )}
+                    titleStyle={{color: theme.colors.error}}
                   />
                 )}
-              />
-            ))}
-          </List.Section>
 
-          <List.Section
-            style={{
-              padding: '2%',
-              backgroundColor: theme.colors.secondaryContainer,
-            }}>
-            <List.Item
-              onPress={handleLeave}
-              title="Leave group"
-              left={() => (
-                <List.Icon color={theme.colors.error} icon="logout" />
-              )}
-              titleStyle={{color: theme.colors.error}}
-            />
-            {/* <Divider />
+                {/* <Divider />
             <List.Item
               title="Report"
               onPress={() => console.log('report pressed')}
               left={() => <List.Icon icon="thumb-down-outline" />}
             /> */}
-          </List.Section>
+              </List.Section>
+            </Card>
+          </KeyboardAvoidingView>
         </ScrollView>
       </View>
 
       <Snackbar
         visible={showSnakeBar}
         icon={
-          deleteLoading
+          deleteLoading || localDeleteLoding
             ? () => <ActivityIndicator animating={true} size="small" />
             : 'check'
         }
@@ -602,10 +793,16 @@ const Index = ({route, navigation}) => {
               }}
               icon="check"
               mode="contained"
-              loading={updateGroupNameLoading}
-              onPress={() => handleUpdateGroupName()}
+              loading={updateGroupNameLoading || updateLocalGroupNameLoading}
+              onPress={() =>
+                token ? handleUpdateGroupName() : updateLocalGroupS()
+              }
               theme={{roundness: 1}}
-              disabled={updateGroupNameLoading || name.length < 1}>
+              disabled={
+                updateGroupNameLoading ||
+                updateLocalGroupNameLoading ||
+                name.length < 1
+              }>
               Ok
             </Button>
           </View>

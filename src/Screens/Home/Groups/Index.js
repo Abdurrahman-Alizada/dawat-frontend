@@ -11,7 +11,14 @@ import {
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, Text, useTheme, Button, Divider, Card} from 'react-native-paper';
+import {
+  AnimatedFAB,
+  Text,
+  useTheme,
+  Button,
+  Divider,
+  Card,
+} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
@@ -23,6 +30,7 @@ import GroupsList from '../../Skeletons/Groups';
 import {PreferencesContext} from '../../../themeContext';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
+import LoginForMoreFeatures from '../../../Components/LoginForMoreFeatures';
 
 const Groups = ({navigation}) => {
   const [token, setToken] = useState(null);
@@ -101,10 +109,11 @@ const Groups = ({navigation}) => {
   };
 
   const PG = useSelector(state => state.groups?.pinGroup);
+  const groupsFlag = useSelector(state => state.groups?.groupsFlag);
 
   useEffect(() => {
     searchFilterFunction(null);
-  }, [data, PG]);
+  }, [data, PG, groupsFlag]);
 
   useEffect(() => {
     const getToken = async () => {
@@ -156,7 +165,7 @@ const Groups = ({navigation}) => {
 
         <View
           style={{
-            flex:1,
+            flex: 1,
             marginTop: 2,
             backgroundColor: theme.colors.background,
           }}>
@@ -190,56 +199,15 @@ const Groups = ({navigation}) => {
             }
             // ListFooterComponent={() => (
             //   <View>
-            //     {true && (
-            //       <Card contentStyle={{bottom:0, alignItems:"center", padding:"3%"}}>
-            //          <View style={{width:"90%"}}>
-            //           <Text style={{fontSize:20, textAlign:"center"}}>Unlock more features</Text>
-            //           <Text style={{textAlign:"center"}} >Add other participant to your groups, Make backup and keep record remotly</Text>
-            //          </View>
-            //         <Card.Actions >
-            //           <Button onPress={()=>navigation.navigate("Auth", {screen :"Login"})}>Login</Button>
-            //           <Button onPress={()=>navigation.navigate("Auth", {screen :"SignUpwithEmail"})}>Create account</Button>
-            //         </Card.Actions>
-            //       </Card>
-            //     )}
-            //     {/* {isError && (
-            //         <View style={{alignItems: 'center', marginTop: 10}}>
-            //           <Divider />
-            //           <View
-            //             style={{
-            //               flexDirection: 'row',
-            //               alignItems: 'center',
-            //               marginTop: 10,
-            //               justifyContent: 'space-between',
-            //             }}>
-            //             <Text style={{fontSize: 20}}>Something went wrong</Text>
-            //             <Button
-            //               icon="refresh"
-            //               mode="text"
-            //               style={{marginHorizontal: '5%'}}
-            //               onPress={refetch}>
-            //               Refresh
-            //             </Button>
-            //           </View>
-            //         </View>
-            //       )} */}
             //   </View>
             // )}
           />
-           <View style={{position:"absolute", bottom:0, width:"100%"}}>
-                {!token && !isLoading && !localLoading && (
-                  <Card contentStyle={{bottom:0, alignItems:"center", padding:"3%"}}>
-                     <View style={{width:"90%"}}>
-                      <Text style={{fontSize:20, textAlign:"center"}}>Unlock more features</Text>
-                      <Text style={{textAlign:"center"}} >Add other participant to your groups, Make backup and keep record remotly</Text>
-                     </View>
-                    <Card.Actions >
-                      <Button onPress={()=>navigation.navigate("Auth", {screen :"Login"})}>Login</Button>
-                      <Button onPress={()=>navigation.navigate("Auth", {screen :"SignUpwithEmail"})}>Create account</Button>
-                    </Card.Actions>
-                  </Card>
-                )}
-              </View>
+            <LoginForMoreFeatures
+              token={token}
+              isLoading={isLoading}
+              localLoading={localLoading}
+              navigation={navigation}
+            />
         </View>
       </Provider>
 

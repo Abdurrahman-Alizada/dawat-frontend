@@ -43,7 +43,7 @@ import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
 
 export default function Example({route}) {
   const navigation = useNavigation();
-  const {groupId} = route.params;
+  const {groupId, isHeader} = route.params;
   const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
   const isExportBanner = useSelector(
@@ -253,10 +253,13 @@ export default function Example({route}) {
 
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
+     {
+      isHeader &&
       <GuestsAppbar
         openGuestsImportExportModalize={openGuestsImportExportModalize}
         openGuestsSummaryModalize={openGuestsSummaryModalize}
       />
+     }
       <Banner
         visible={isExportBanner}
         actions={[

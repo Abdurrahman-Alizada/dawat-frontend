@@ -27,6 +27,7 @@ import CountDown from 'react-native-countdown-xambra';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
 import PinnedGroupHeader from '../../../Components/PinnedGroupHeader';
+import {handleCurrentViewingGroup} from '../../../redux/reducers/groups/groups';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
@@ -35,10 +36,9 @@ const Groups = ({navigation}) => {
   const {isThemeDark} = useContext(PreferencesContext);
   const [loading, setLoading] = useState(true);
 
-  const [pinGroup, setPinGroup] = useState(null);
-  const pinGroupTime = useRef(0);
-
   const PG = useSelector(state => state.groups?.pinGroup);
+  const [pinGroup, setPinGroup] = useState(PG);
+  const pinGroupTime = useRef(0);
   const getPinGroup = async () => {
     setLoading(true);
     let pGroup = await AsyncStorage.getItem('pinGroup');
@@ -128,9 +128,13 @@ const Groups = ({navigation}) => {
                   justifyContent: 'space-around',
                 }}>
                 <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Tasks', {groupId: pinGroup?._id})
-                  }
+                  onPress={() => {
+                    dispatch(handleCurrentViewingGroup(pinGroup));
+                    navigation.navigate('Tasks', {
+                      groupId: pinGroup?._id,
+                      isHeader: true,
+                    });
+                  }}
                   style={{
                     height: '30%',
                     borderRadius: 5,
@@ -156,9 +160,13 @@ const Groups = ({navigation}) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Invitations', {groupId: pinGroup?._id})
-                  }
+                  onPress={() => {
+                    dispatch(handleCurrentViewingGroup(pinGroup));
+                    navigation.navigate('Invitations', {
+                      groupId: pinGroup?._id,
+                      isHeader: true,
+                    });
+                  }}
                   style={{
                     height: '30%',
                     borderRadius: 5,
@@ -183,7 +191,13 @@ const Groups = ({navigation}) => {
                   </Text>
                 </TouchableOpacity>
 
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(handleCurrentViewingGroup(pinGroup));
+                    navigation.navigate('GroupChat', {
+                      isHeader: true,
+                    });
+                  }}
                   style={{
                     height: '30%',
                     borderRadius: 5,
@@ -207,9 +221,15 @@ const Groups = ({navigation}) => {
                     }}>
                     Chat
                   </Text>
-                </View>
+                </TouchableOpacity>
 
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(handleCurrentViewingGroup(pinGroup));
+                    navigation.navigate('SingleGroupSettings', {
+                      group: pinGroup,
+                    });
+                  }}
                   style={{
                     height: '30%',
                     borderRadius: 5,
@@ -234,11 +254,12 @@ const Groups = ({navigation}) => {
                     }}>
                     Settings
                   </Text>
-                </View>
+                </TouchableOpacity>
+
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    justifyContent: 'center',
                     width: '100%',
                   }}>
                   <Button
@@ -247,10 +268,12 @@ const Groups = ({navigation}) => {
                     // disabled={isLoading}
                     style={{
                       marginTop: '3%',
-                      width: false ? '98%' : '75%',
+                      // width: false ? '98%' : '75%',
+                      width: '98%',
+                      alignSelf: 'center',
                     }}
-                    contentStyle={{padding: '2%'}}
-                    buttonStyle={{padding: '1%', width: '100%'}}
+                    contentStyle={{padding: '4%'}}
+                    buttonStyle={{padding: '4%', width: '100%'}}
                     theme={{roundness: 1}}
                     mode="contained"
                     icon={() => (
@@ -260,15 +283,15 @@ const Groups = ({navigation}) => {
                         size={40}
                       />
                     )}
-                    labelStyle={{fontWeight: 'bold'}}
-                    onPress={async () => {
-                      await AsyncStorage.clear();
+                    labelStyle={{fontWeight: 'bold', fontSize:20}}
+                    onPress={() => {
+                      dispatch(handleCurrentViewingGroup(pinGroup));
+                      navigation.navigate('GroupBrief');
                     }}
-                    // onPress={() => navigation.navigate('Login')}
-                    buttonColor={theme.colors.tertiary}>
+s                    buttonColor={theme.colors.tertiary}>
                     Summary
                   </Button>
-                  {true ? (
+                  {/* {true ? (
                     <Button
                       // loading={isLoading}
                       // disabled={!(dirty && isValid) || isLoading}
@@ -288,14 +311,14 @@ const Groups = ({navigation}) => {
                       onPress={() => navigation.navigate('Login')}>
                       Sync
                     </Button>
-                  ) : null}
+                  ) : null} */}
                 </View>
               </View>
             </KeyboardAvoidingView>
           ) : (
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontSize: 22}}>Nothing here</Text>
+              <Text style={{fontSize: 22}}>No group has been pinned</Text>
               <Button
                 // loading={isLoading}
                 // disabled={!(dirty && isValid) || isLoading}
@@ -307,14 +330,15 @@ const Groups = ({navigation}) => {
                 contentStyle={{padding: '2%'}}
                 buttonStyle={{padding: '1%', width: '100%'}}
                 theme={{roundness: 2}}
-                mode="contained"
+                mode="outlined"
                 icon="plus-circle-multiple-outline"
                 labelStyle={{fontWeight: 'bold'}}
                 onPress={() => navigation.navigate('AddGroup')}
-                buttonColor={theme.colors.blueBG}>
+                // buttonColor={theme.colors.blueBG}
+              >
                 Create group
               </Button>
-           
+
               <Button
                 // loading={isLoading}
                 // disabled={!(dirty && isValid) || isLoading}
@@ -331,9 +355,8 @@ const Groups = ({navigation}) => {
                 labelStyle={{fontWeight: 'bold'}}
                 onPress={() => navigation.navigate('HomeIndex')}
                 buttonColor={theme.colors.blueBG}>
-                Pin group
+                Pin from existing groups
               </Button>
-           
             </View>
           )}
         </View>

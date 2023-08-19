@@ -24,14 +24,15 @@ import {
   isConfirmDialogVisibleHandler,
   messagesHandler,
 } from '../../../../../redux/reducers/groups/chat/chatSlice';
-
+import ChatHeader from '../../../../../Components/Appbars/ChatAppbar';
 // for socket.io
 import io from 'socket.io-client';
 
-const MessagesScreen = ({navigation}) => {
+const MessagesScreen = ({navigation, route}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const listRef = useRef();
+  const {isHeader} = route.params;
   const [newMessage, setNewMessage] = useState('');
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const currentViewingGroup = useSelector(
@@ -109,7 +110,9 @@ const MessagesScreen = ({navigation}) => {
   const isConfirmDialogVisible = useSelector(
     state => state.chat?.isConfirmDialogVisible,
   );
-  const selectedMessageIds = useSelector(state => state.chat?.selectedMessageIds);
+  const selectedMessageIds = useSelector(
+    state => state.chat?.selectedMessageIds,
+  );
   const selectedMessages = useSelector(state => state.chat?.selectedMessages);
 
   const [deleteMessages, {isLoading: deleteMessageLoading}] =
@@ -121,16 +124,24 @@ const MessagesScreen = ({navigation}) => {
       groupId: currentViewingGroup._id,
       userId: currentLoginUser._id,
       messages: selectedMessages,
-    }).then(res => {
-      console.log(res)
     })
-    .catch(err => {
-      console.log(err.message);
-    });
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
   };
 
   return (
     <View style={{flexGrow: 1}}>
+      {isHeader && (
+        <ChatHeader
+        // openGuestsImportExportModalize={openGuestsImportExportModalize}
+        // openGuestsSummaryModalize={openGuestsSummaryModalize}
+        />
+      )}
+
       <View style={{flex: 1}}>
         <Portal>
           <Dialog

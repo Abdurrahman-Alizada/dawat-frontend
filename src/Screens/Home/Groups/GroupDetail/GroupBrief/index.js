@@ -181,7 +181,7 @@ const Index = ({group, onClose}) => {
   const [showSnackBar, setShowSnackbar] = useState(false);
 
   return (
-    <View style={{padding: '5%'}}>
+    <View style={{padding: '2%'}}>
       <List.Item
         title={currentViewingGroup.groupName}
         description={currentViewingGroup.groupDescription}
@@ -197,27 +197,6 @@ const Index = ({group, onClose}) => {
           />
         )}
       />
-
-      <Button
-        loading={exportLoading}
-        onPress={exportCSV}
-        mode="contained"
-        icon={'download'}
-        contentStyle={{padding:"1%"}}
-        style={{marginTop: '5%'}}
-        buttonColor={theme.colors.secondary}
-        >
-        Downlaod Invitations list
-      </Button>
-      <Button
-        loading={addMultipleInvitiLoading}
-        onPress={importCSV}
-        mode="contained"
-        icon={'upload'}
-        contentStyle={{padding: '1%'}}
-        style={{marginTop: '5%'}}>
-        Upload Invitations list to add in this group
-      </Button>
 
       <Snackbar
         visible={showSnackBar}

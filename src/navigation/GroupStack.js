@@ -21,7 +21,9 @@ import UpdateGroupMembers from '../Screens/Home/Groups/GroupDetail/GroupSettings
 import PinnedGroup from '../Screens/Home/Groups/PinnedGroup';
 
 import Invitations from '../Screens/Home/Groups/GroupDetail/Invitations';
-import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks'
+import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks';
+import GroupChat from '../Screens/Home/Groups/GroupDetail/Chat';
+import Groupbrief from '../Screens/Home/Groups/GroupDetail/GroupBrief'
 
 const Stack = createStackNavigator();
 
@@ -47,6 +49,16 @@ const AppStack = () => {
           header: props => <GeneralAppbar title="Add group" {...props} />,
         }}
       />
+
+<Stack.Screen
+        name="GroupBrief"
+        component={Groupbrief}
+        options={{
+          title: 'Group brief',
+          // headerShown:false
+          header: props => <GeneralAppbar title="Group brief" {...props} />,
+        }}
+      />
       <Stack.Screen
         name="AddGroupMembers"
         component={AddGroupMembers}
@@ -67,9 +79,9 @@ const AppStack = () => {
         name="SingleGroupSettings"
         component={SingleGroupSettings}
         options={{
-          title: 'Single group settings',
+          title: 'Group settings',
           header: props => (
-            <GeneralAppbar title="Single group settings" {...props} />
+            <GeneralAppbar title="Group settings" {...props} />
           ),
         }}
       />
@@ -153,6 +165,15 @@ const AppStack = () => {
         name="MultipleInvitiActions"
         component={MultipleInvitiActions}
         options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="GroupChat"
+        component={GroupChat}
+        options={{
+          title: 'Guests',
           headerShown: false,
         }}
       />

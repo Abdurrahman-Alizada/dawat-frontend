@@ -32,7 +32,6 @@ const SingleGroup = ({
   const onPressHandler = async () => {
     setIsSearch(false);
     dispatch(handleCurrentViewingGroup(item));
-    // console.log(item)
     navigation.navigate('GroupDetail', {
       group: item,
       groupId: item._id,
@@ -148,15 +147,13 @@ const SingleGroup = ({
             </View>
           ) : (
             <View style={{flexDirection: 'row'}}>
-             {
-              pinGroup?._id == item._id &&
-
-              <IconButton
-                icon="pin"
-                iconColor={theme.colors.blueBG}
-                onPress={() => alert('This group is pin')}
-              />
-             }
+              {pinGroup?._id == item._id && (
+                <IconButton
+                  icon="pin"
+                  iconColor={theme.colors.blueBG}
+                  onPress={() => alert('This group is pin')}
+                />
+              )}
               <Menu
                 visible={visible}
                 onDismiss={closeMenu}

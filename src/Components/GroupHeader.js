@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {
   List,
@@ -25,6 +25,7 @@ import {
   handleIsTaskSummaryOpen,
 } from '../redux/reducers/groups/tasks/taskSlice';
 import {isConfirmDialogVisibleHandler} from '../redux/reducers/groups/chat/chatSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Header = ({
   openGuestsImportExportModalize,
@@ -50,13 +51,22 @@ const Header = ({
 
   const currentTab = useSelector(state => state.groups.currentTab);
 
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
       return user.name == currentLoginUser.name ? 'You' : ' '+ user.name  ;
     });
-    return membersText?.toString().length < 25
+
+    return token ? membersText?.toString().length < 25
       ? membersText?.toString()
-      : `${membersText?.toString().substring(0, 25)}...`;
+      : `${membersText?.toString().substring(0, 25)}...` : "You"
   };
 
   //search

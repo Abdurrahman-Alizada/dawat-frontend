@@ -25,18 +25,21 @@ export const COLORS = {
 };
 
 export const lightPalette = {
-  background: '#fff',
+  // background: '#fff',
   blueBG: '#265AE8',
   textGray: '#3E3F41',
+  cardBG: '#fff',
   textRed : "#DD105E",
   yellow :"#FFAF4F",
-  purpleLight:"#62468d"
+  purpleLight:"#62468d",
+  grayBG : "#D9D9D9"
 };
 
 export const darkPalette = {
-  background: '#fff',
+  background: '#212121',
   blueBG: '#265AE8',
   textGray: '#3E3F41',
+  cardBG: '#3E3F41',
   textRed : "#DD105E",
   yellow :"#FFAF4F",
   purpleLight:"#AC8DAF"

@@ -8,27 +8,29 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
-import {Text} from 'react-native-paper'
+import {Text} from 'react-native-paper';
 import {FAB, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-import { handleTasks } from '../../../../../redux/reducers/groups/tasks/taskSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import {handleTasks} from '../../../../../redux/reducers/groups/tasks/taskSlice';
+import {useSelector, useDispatch} from 'react-redux';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
+import TasksAppbar from '../../../../../Components/Appbars/TasksAppbar';
+
 const Task = ({route}) => {
-  const {groupId} = route.params;
+  const {groupId, isHeader} = route.params;
 
   const navigation = useNavigation();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const [snackbarVisible, setSnackBarVisible] = useState(false)
+  const [snackbarVisible, setSnackBarVisible] = useState(false);
 
   const {data, isError, isLoading, error, isFetching, refetch} =
     useGetAllTasksQuery({
       groupId,
     });
-  
+
   const tasksFromRedux = useSelector(state => state.tasks.tasks);
   const isTaskSearch = useSelector(state => state.tasks.isTasksSearch);
 
@@ -36,12 +38,18 @@ const Task = ({route}) => {
     navigation.navigate('AddTask', {groupId: groupId});
   };
 
-  useEffect(()=>{
-      dispatch(handleTasks(data))
-  },[data])
+  useEffect(() => {
+    dispatch(handleTasks(data));
+  }, [data]);
 
   return (
-    <View style={{flex:1, backgroundColor:theme.colors.background}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+      {isHeader && (
+        <TasksAppbar
+        // openGuestsImportExportModalize={openGuestsImportExportModalize}
+        // openGuestsSummaryModalize={openGuestsSummaryModalize}
+        />
+      )}
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />
@@ -67,7 +75,11 @@ const Task = ({route}) => {
         icon="plus"
         size="medium"
         // variant='tertiary'
-        style={{bottom: snackbarVisible ? 70 : 16, right: 16, position:"absolute"}}
+        style={{
+          bottom: snackbarVisible ? 70 : 16,
+          right: 16,
+          position: 'absolute',
+        }}
         onPress={() => FABHandler()}
       />
 
