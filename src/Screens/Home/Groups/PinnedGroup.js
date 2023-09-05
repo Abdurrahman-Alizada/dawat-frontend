@@ -105,7 +105,7 @@ const Groups = ({navigation}) => {
                 </Text>
                 <CountDown
                   until={pinGroupTime.current ? pinGroupTime.current : 0}
-                  onFinish={() => alert('finished')}
+                  // onFinish={() => alert('finished')}
                   onPress={() => alert('hello')}
                   size={22}
                   style={{margin: '2%'}}

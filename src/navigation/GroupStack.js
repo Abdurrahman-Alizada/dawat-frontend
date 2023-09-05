@@ -23,7 +23,7 @@ import PinnedGroup from '../Screens/Home/Groups/PinnedGroup';
 import Invitations from '../Screens/Home/Groups/GroupDetail/Invitations';
 import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks';
 import GroupChat from '../Screens/Home/Groups/GroupDetail/Chat';
-import Groupbrief from '../Screens/Home/Groups/GroupDetail/GroupBrief'
+import Groupbrief from '../Screens/Home/Groups/GroupDetail/GroupBrief';
 
 const Stack = createStackNavigator();
 
@@ -50,13 +50,13 @@ const AppStack = () => {
         }}
       />
 
-<Stack.Screen
+      <Stack.Screen
         name="GroupBrief"
         component={Groupbrief}
         options={{
           title: 'Group brief',
-          // headerShown:false
-          header: props => <GeneralAppbar title="Group brief" {...props} />,
+          headerShown:false
+          // header: props => <GeneralAppbar title="Group brief" {...props} />,
         }}
       />
       <Stack.Screen
@@ -80,9 +80,7 @@ const AppStack = () => {
         component={SingleGroupSettings}
         options={{
           title: 'Group settings',
-          header: props => (
-            <GeneralAppbar title="Group settings" {...props} />
-          ),
+          header: props => <GeneralAppbar title="Group settings" {...props} />,
         }}
       />
 

@@ -24,7 +24,7 @@ import {useGetAllFriendsQuery} from '../../../redux/reducers/Friendship/friendsh
 import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 import {handlePinGroup} from '../../../redux/reducers/groups/groups';
 import {useSelector, useDispatch} from 'react-redux';
-import { groupApi } from '../../../redux/reducers/groups/groupThunk';
+import {groupApi} from '../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createRandomId from '../../../utils/createRandomId';
 
@@ -39,6 +39,7 @@ const AddGroup = ({navigation, onClose, route}) => {
     isInvitations,
     isMute,
     isTasks,
+    time,
   } = route.params;
   const theme = useTheme();
   const [isSearch, setIsSearch] = useState(false);
@@ -58,7 +59,7 @@ const AddGroup = ({navigation, onClose, route}) => {
       isSyncd: true,
       groupName: values.groupName,
       groupDescription: values.groupDescription,
-      time: values.dueDate,
+      time: JSON.parse(time),
     };
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
@@ -71,6 +72,7 @@ const AddGroup = ({navigation, onClose, route}) => {
     }
     dispatch(handlePinGroup(await AsyncStorage.getItem('pinGroup')));
   };
+
   const submitHandler = async () => {
     if (route.params.data) {
       fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
@@ -79,7 +81,7 @@ const AddGroup = ({navigation, onClose, route}) => {
       })
         .then(res => res.json())
         .then(async data => {
-           addGroup({
+          addGroup({
             groupName: groupName,
             groupDescription: groupDescription,
             imageURL: data.secure_url,
@@ -88,6 +90,7 @@ const AddGroup = ({navigation, onClose, route}) => {
             isInvitations: isInvitations,
             isMute: isMute,
             members: userIds,
+            time: JSON.parse(time),
           })
             .then(res => {
               navigation.navigate('HomeIndex');
@@ -110,15 +113,15 @@ const AddGroup = ({navigation, onClose, route}) => {
         isInvitations: isInvitations,
         isMute: isMute,
         members: userIds,
+        time: JSON.parse(time),
       })
         .then(res => {
-          if(res.data?._id){
+          if (res.data?._id) {
             navigation.navigate('HomeIndex');
             createLocalGroup({
-              _id : res.data?._id,
+              _id: res.data?._id,
               groupName: groupName,
-              groupDescription: groupDescription,   
-              dueDate : new Date() 
+              groupDescription: groupDescription,
             });
           }
         })
@@ -129,7 +132,6 @@ const AddGroup = ({navigation, onClose, route}) => {
   };
 
   const Item = ({itemProps}) => {
-  
     const [include, setInclude] = useState(userIds.includes(itemProps._id));
     const add = () => {
       if (include) {
@@ -142,32 +144,32 @@ const AddGroup = ({navigation, onClose, route}) => {
       setInclude(!include);
     };
     return (
-        <List.Item
-          onPress={add}
-          title={itemProps.name}
-          // description={itemProps.email}
-          left={props => (
-            <View>
-              <Avatar.Image
-                {...props}
-                variant="image"
-                size={50}
-                source={
-                  itemProps?.imageURL
-                    ? {uri: itemProps?.imageURL}
-                    : require('../../../assets/drawer/userImage.png')
-                }
-              />
-            </View>
-          )}
-          right={props => (
-            <Checkbox
+      <List.Item
+        onPress={add}
+        title={itemProps.name}
+        // description={itemProps.email}
+        left={props => (
+          <View>
+            <Avatar.Image
               {...props}
-              status={include ? 'checked' : 'unchecked'}
-              onPress={add}
+              variant="image"
+              size={50}
+              source={
+                itemProps?.imageURL
+                  ? {uri: itemProps?.imageURL}
+                  : require('../../../assets/drawer/userImage.png')
+              }
             />
-          )}
-        />
+          </View>
+        )}
+        right={props => (
+          <Checkbox
+            {...props}
+            status={include ? 'checked' : 'unchecked'}
+            onPress={add}
+          />
+        )}
+      />
     );
   };
 
@@ -189,7 +191,9 @@ const AddGroup = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated={true}>
+        <Appbar.Header
+          style={{backgroundColor: theme.colors.background}}
+          elevated={true}>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
@@ -250,7 +254,9 @@ const AddGroup = ({navigation, onClose, route}) => {
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
               <Text>You don't have any friend to add in this group</Text>
-              <Text>But still you can create group by clicking on Add button</Text>
+              <Text>
+                But still you can create group by clicking on Add button
+              </Text>
               <Button
                 icon="refresh"
                 mode="contained"

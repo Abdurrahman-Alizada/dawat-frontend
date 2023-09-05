@@ -36,6 +36,7 @@ export const groupApi = createApi({
           isInvitations:group.isInvitations,
           isMute:group.isMute,
           users: group.members,
+          time: group.time
         },
       }),
       invalidatesTags: ['Groups','GroupLogs'],

@@ -190,7 +190,7 @@ const SignupWithEmail = () => {
         justifyContent: 'space-between',
       }}
       showsVerticalScrollIndicator={false}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
 
       <Formik

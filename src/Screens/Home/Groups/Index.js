@@ -18,6 +18,9 @@ import {
   Button,
   Divider,
   Card,
+  Banner,
+  Avatar,
+  Dialog,
 } from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
@@ -121,6 +124,7 @@ const Groups = ({navigation}) => {
     };
     getToken();
   }, []);
+
   // checked on long Press
   const [checked, setChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -146,70 +150,68 @@ const Groups = ({navigation}) => {
         backgroundColor={theme.colors.background}
       />
 
-      <Provider>
-        {checked ? (
-          <GroupCheckedHeader
-            deleteF={addGrouptoDelete1}
-            checkedBack={checkedBack}
-            theme={theme}
-          />
-        ) : (
-          <Header
-            isSearch={isSearch}
-            setIsSearch={setIsSearch}
-            searchFilterFunction={searchFilterFunction}
-            theme={theme}
-            onOpen={onOpen}
-          />
-        )}
+      {checked ? (
+        <GroupCheckedHeader
+          deleteF={addGrouptoDelete1}
+          checkedBack={checkedBack}
+          theme={theme}
+        />
+      ) : (
+        <Header
+          isSearch={isSearch}
+          setIsSearch={setIsSearch}
+          searchFilterFunction={searchFilterFunction}
+          theme={theme}
+          onOpen={onOpen}
+        />
+      )}
+      <View
+        style={{
+          flex: 1,
+          marginTop: 2,
+          backgroundColor: theme.colors.background,
+        }}>
 
-        <View
-          style={{
-            flex: 1,
-            marginTop: 2,
-            backgroundColor: theme.colors.background,
-          }}>
-          <FlatList
-            onScroll={onScroll}
-            keyExtractor={item => item?._id}
-            data={isSearch ? filteredDataSource : allGroups}
-            ListEmptyComponent={() => (
-              <View style={{marginTop: '60%', alignItems: 'center'}}>
-                {isLoading || localLoading ? (
-                  <Text>Loading...</Text>
-                ) : (
-                  <Text>{listEmptyText}</Text>
-                )}
-              </View>
-            )}
-            renderItem={item => (
-              <RenderItem
-                item={item.item}
-                navigation={navigation}
-                checked={checked}
-                setChecked={setChecked}
-                checkedItems={checkedItems}
-                setCheckedItems={setCheckedItems}
-                setIsSearch={setIsSearch}
-                theme={theme}
-              />
-            )}
-            refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-            }
-            // ListFooterComponent={() => (
-            //   <View>
-            //   </View>
-            // )}
-          />
-            <LoginForMoreFeatures
-              token={token}
-              isLoading={isLoading}
-              localLoading={localLoading}
+        <FlatList
+          onScroll={onScroll}
+          keyExtractor={item => item?._id}
+          data={isSearch ? filteredDataSource : allGroups}
+          ListEmptyComponent={() => (
+            <View style={{marginTop: '60%', alignItems: 'center'}}>
+              {isLoading || localLoading ? (
+                <Text>Loading...</Text>
+              ) : (
+                <Text>{listEmptyText}</Text>
+              )}
+            </View>
+          )}
+          renderItem={item => (
+            <RenderItem
+              item={item.item}
               navigation={navigation}
+              checked={checked}
+              setChecked={setChecked}
+              checkedItems={checkedItems}
+              setCheckedItems={setCheckedItems}
+              setIsSearch={setIsSearch}
+              theme={theme}
             />
-        </View>
-      </Provider>
+          )}
+          refreshControl={
+            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+          }
+          // ListFooterComponent={() => (
+          //   <View>
+          //   </View>
+          // )}
+        />
+        <LoginForMoreFeatures
+          token={token}
+          isLoading={isLoading}
+          localLoading={localLoading}
+          navigation={navigation}
+        />
+      </View>
 
       {/* <AnimatedFAB
         icon={'plus'}

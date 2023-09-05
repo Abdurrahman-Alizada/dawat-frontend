@@ -49,6 +49,10 @@ const SingleGroup = ({
     dispatch(handlePinGroup(JSON.stringify(item)));
     await AsyncStorage.setItem('pinGroup', JSON.stringify(item));
   };
+  const unPinHandler = async () => {
+    dispatch(handlePinGroup(JSON.stringify(null)));
+    await AsyncStorage.setItem('pinGroup', JSON.stringify(''));
+  };
 
   // logic for checked on longPress
   const [include, setInclude] = useState(checkedItems?.includes(item._id));
@@ -81,10 +85,10 @@ const SingleGroup = ({
     if (pg?._id === item._id) {
       await AsyncStorage.setItem(
         'pinGroup',
-        JSON.stringify(newArr?.length ? newArr[0] : {}),
+        JSON.stringify(newArr?.length ? newArr[0] : ''),
       );
     }
-    dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
+    dispatch(handlePinGroup(newArr?.length ? newArr[0] : ''));
   };
 
   const [visible, setVisible] = useState(false);
@@ -107,25 +111,29 @@ const SingleGroup = ({
 
   return (
     <List.Item
-      // onPress={onPressHandler}
       onLongPress={() => onLongPressHandler()}
       title={item.groupName}
       description={item.groupDescription}
       titleStyle={{color: theme.colors.onBackground}}
-      descriptionStyle={{color: theme.colors.onSurface}}
+      descriptionStyle={{color: theme.colors.textGray}}
       left={props => (
         <View>
           {item.imageURL ? (
             <Avatar.Image
               style={props.style}
               source={{uri: item?.imageURL}}
-              size={40}
+              size={55}
             />
           ) : (
             <Avatar.Text
               style={props.style}
-              label={item.groupName?.charAt(0)}
-              size={40}
+              // label={item.groupName?.charAt(0).toUpperCase()}
+              label={item.groupName
+                ?.match(/\b\w/g)
+                ?.join('')
+                ?.toUpperCase()
+                ?.slice(0, 2)}
+              size={55}
             />
           )}
         </View>
@@ -174,18 +182,28 @@ const SingleGroup = ({
                     onPressHandler();
                   }}
                 />
+                {pinGroup?._id == item?._id ? (
+                  <Menu.Item
+                    leadingIcon="pin-off-outline"
+                    title="Un Pin"
+                    onPress={async () => {
+                      closeMenu();
+                      unPinHandler();
+                      navigation.navigate('PinnedGroup');
+                    }}
+                  />
+                ) : (
+                  <Menu.Item
+                    leadingIcon="pin-outline"
+                    title="Pin"
+                    onPress={async () => {
+                      closeMenu();
+                      pinHandler();
+                      navigation.navigate('PinnedGroup');
+                    }}
+                  />
+                )}
 
-                <Menu.Item
-                  leadingIcon="pin-outline"
-                  disabled={pinGroup?._id == item?._id}
-                  title="Pin"
-                  // titleStyle={{color: theme.colors.onBackground}}
-                  onPress={async () => {
-                    closeMenu();
-                    pinHandler();
-                    navigation.navigate('PinnedGroup');
-                  }}
-                />
                 <Menu.Item
                   leadingIcon="checkbox-marked-outline"
                   title="Select"

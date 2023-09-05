@@ -185,6 +185,13 @@ const Index = ({route, navigation}) => {
           groupDescription: description,
           time: new Date(),
         };
+
+    dispatch(handleCurrentViewingGroup(group));
+    setSnakeBarMessage('Group name has been updated');
+    setShowSnakeBar(true);
+    seteditGroupName(false);
+    setEditGroupDescription(false);
+
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
       let data = JSON.parse(groups).filter(
@@ -201,10 +208,10 @@ const Index = ({route, navigation}) => {
 
     let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
     if (pg?._id === currentViewingGroup._id) {
-     updateLocalPinGroup(group)
+      updateLocalPinGroup(group);
     }
 
-    navigation.navigate('GroupStack', {screen: 'HomeIndex'});
+    // navigation.navigate('GroupStack', {screen: 'HomeIndex'});
   };
 
   const handleUpdateGroupDescription = () => {
@@ -243,9 +250,8 @@ const Index = ({route, navigation}) => {
       userId: await AsyncStorage.getItem('userId'),
     })
       .then(res => {
-        console.log(res);
         setShowSnakeBar(false);
-        navigation.replace('Drawer');
+        handleDelete()
       })
       .catch(e => {
         console.log('error in handleLeave', e);
@@ -490,14 +496,15 @@ const Index = ({route, navigation}) => {
                     style={{
                       width: '25%',
                     }}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
-                    textColor={theme.colors.textGray}
                     theme={{roundness: 2}}
                     mode="contained"
                     icon={'pencil-outline'}
-                    // onPress={handleSubmit}
-                    labelStyle={{fontWeight: 'bold'}}
-                    buttonColor={theme.colors.onPrimary}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    labelStyle={{
+                      fontWeight: 'bold',
+                      color: theme.colors.onBackground,
+                    }}
+                    buttonColor={theme.colors.cardBG}
                     onPress={() => {
                       setEditGroupDescription(false);
                       seteditGroupName(true);
@@ -509,13 +516,15 @@ const Index = ({route, navigation}) => {
                     style={{
                       width: '25%',
                     }}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
-                    textColor={theme.colors.textGray}
                     theme={{roundness: 2}}
                     mode="contained"
                     icon={'pencil-outline'}
-                    labelStyle={{fontWeight: 'bold'}}
-                    buttonColor={theme.colors.onPrimary}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    labelStyle={{
+                      fontWeight: 'bold',
+                      color: theme.colors.onBackground,
+                    }}
+                    buttonColor={theme.colors.cardBG}
                     onPress={async () => {
                       await AsyncStorage.setItem('isLoggedIn', 'login');
                       navigation.navigate('SignUpwithEmail');
@@ -527,14 +536,18 @@ const Index = ({route, navigation}) => {
                     style={{
                       width: '40%',
                     }}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
                     textColor={theme.colors.textGray}
                     theme={{roundness: 2}}
                     mode="contained"
                     icon={'pencil-outline'}
                     // onPress={handleSubmit}
-                    labelStyle={{fontWeight: 'bold', width: '60%'}}
-                    buttonColor={theme.colors.onPrimary}
+                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
+                    labelStyle={{
+                      width: '60%',
+                      fontWeight: 'bold',
+                      color: theme.colors.onBackground,
+                    }}
+                    buttonColor={theme.colors.cardBG}
                     onPress={async () => {
                       await AsyncStorage.setItem('isLoggedIn', 'login');
                       navigation.navigate('SignUpwithEmail');
@@ -548,7 +561,6 @@ const Index = ({route, navigation}) => {
             <Card
               style={{
                 backgroundColor: theme.colors.cardBG,
-                marginTop: '2%',
               }}
               theme={{roundness: 2}}>
               <Card.Content>
@@ -567,7 +579,7 @@ const Index = ({route, navigation}) => {
                     <Avatar.Icon
                       size={35}
                       icon="pencil"
-                      style={{backgroundColor: theme.colors.primaryContainer}}
+                      style={{backgroundColor: theme.colors.cardBG}}
                     />
                   </TouchableOpacity>
                 </View>
@@ -854,11 +866,17 @@ const Index = ({route, navigation}) => {
               }}
               icon="check"
               mode="contained"
-              loading={updateGroupDescriptionLoading}
-              onPress={() => handleUpdateGroupDescription()}
+              loading={
+                updateGroupDescriptionLoading || updateLocalGroupNameLoading
+              }
+              onPress={() =>
+                token ? handleUpdateGroupDescription() : updateLocalGroupS()
+              }
               theme={{roundness: 1}}
               disabled={
-                updateGroupDescriptionLoading || description.length < 1
+                updateLocalGroupNameLoading ||
+                updateGroupDescriptionLoading ||
+                description.length < 1
               }>
               Ok
             </Button>

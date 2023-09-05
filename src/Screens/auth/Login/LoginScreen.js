@@ -113,7 +113,7 @@ const LoginScreen = ({navigation, route}) => {
         flex: 1,
         paddingVertical: '2%',
       }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       <Appbar.Header
           style={{backgroundColor: theme.colors.background}}

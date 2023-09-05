@@ -118,6 +118,7 @@ const AddGroup = ({navigation, onClose}) => {
         isInvitations: true,
         isMute: false,
         members: users,
+        time:JSON.stringify(dueDate)
       });
     }
   };
@@ -130,7 +131,6 @@ const AddGroup = ({navigation, onClose}) => {
       groupDescription: values.groupDescription,
       time: dueDate,
     };
-    await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
       let data = JSON.parse(groups);
@@ -139,8 +139,9 @@ const AddGroup = ({navigation, onClose}) => {
     } else {
       let newGroups = [group];
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+      await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
     }
-    dispatch(handlePinGroup(await AsyncStorage.getItem('pinGroup')));
+    dispatch(handlePinGroup(group));
     navigation.goBack();
   };
 

@@ -10,7 +10,10 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
-import {useGetAllInvitationsQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {
+  useGetAllInvitationsQuery,
+  useDeleteInvitiMutation,
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {
   handleInvitions,
   handleCurrentInviti,
@@ -25,6 +28,9 @@ import {
   useTheme,
   Banner,
   Divider,
+  Dialog,
+  Button,
+  Portal,
 } from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
@@ -58,6 +64,10 @@ export default function Example({route}) {
   const currentInvitiToDisplay = useSelector(
     state => state.invitations?.currentInviti,
   );
+  const currentViewingGroup = useSelector(
+    state => state.groups?.currentViewingGroup,
+  );
+
   const invitationSearchQuery = useSelector(
     state => state.invitations.invitationSearchQuery,
   );
@@ -126,6 +136,30 @@ export default function Example({route}) {
           </Text>
         );
       });
+
+  // delete inviti
+  const [currentItem, setCurrentItem] = useState({});
+
+  const [visible, setVisible] = useState(false);
+  const showDialog = item => {
+    setCurrentItem(item);
+    setVisible(true);
+  };
+  const hideDialog = () => setVisible(false);
+
+  const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
+  const deleteHandler = async item => {
+    await deleteInviti({
+      groupId: currentViewingGroup._id,
+      invitiId: item?._id,
+    })
+      .then(response => {
+        hideDialog();
+      })
+      .catch(e => {
+        console.log('error in deleteHandler', e);
+      });
+  };
 
   // item to render in flatlist
   const AccordionItem = ({item}) => {
@@ -221,6 +255,17 @@ export default function Example({route}) {
                     Detail
                   </Chip>
                 </View>
+                <Chip
+                  icon={() => (
+                    <Icon name="trash-2" size={16} color={theme.colors.error} />
+                  )}
+                  style={{marginLeft: '4%'}}
+                  textStyle={{color: theme.colors.error}}
+                  mode="flat"
+                  // onPress={() => deleteHandler(item)}
+                  onPress={() => showDialog(item)}>
+                  Delete
+                </Chip>
               </View>
             </View>
           </Animated.View>
@@ -253,13 +298,12 @@ export default function Example({route}) {
 
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
-     {
-      isHeader &&
-      <GuestsAppbar
-        openGuestsImportExportModalize={openGuestsImportExportModalize}
-        openGuestsSummaryModalize={openGuestsSummaryModalize}
-      />
-     }
+      {isHeader && (
+        <GuestsAppbar
+          openGuestsImportExportModalize={openGuestsImportExportModalize}
+          openGuestsSummaryModalize={openGuestsSummaryModalize}
+        />
+      )}
       <Banner
         visible={isExportBanner}
         actions={[
@@ -272,6 +316,23 @@ export default function Example({route}) {
         Guests List of this group has been exported in Downlaod folder
         successfully
       </Banner>
+
+      <Portal>
+        <Dialog visible={visible} onDismiss={hideDialog}>
+          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">
+              Do you want to delete "{currentItem?.invitiName}"
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button loading={deleteLoading} disabled={deleteLoading} onPress={()=>deleteHandler(currentItem)} textColor={theme.colors.error}>
+              Yes, delete it
+            </Button>
+            <Button onPress={hideDialog}>No</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       {/* <View>
             <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >

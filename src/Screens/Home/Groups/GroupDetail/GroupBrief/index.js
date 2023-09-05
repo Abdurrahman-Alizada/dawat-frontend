@@ -1,6 +1,16 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Button, Avatar, List, Snackbar, Text, useTheme} from 'react-native-paper';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Button,
+  Avatar,
+  List,
+  Snackbar,
+  Text,
+  useTheme,
+  Appbar,
+  Card,
+  Divider,
+} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 import {jsonToCSV, readString} from 'react-native-csv';
 import {useSelector, useDispatch} from 'react-redux';
@@ -12,12 +22,12 @@ import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitat
 import moment from 'moment';
 import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 import DocumentPicker, {types} from 'react-native-document-picker';
-import { useNavigation } from '@react-navigation/native';
-
+import {useNavigation} from '@react-navigation/native';
+import GeneralAppbar from '../../../../../Components/GeneralAppbar';
 const Index = ({group, onClose}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const theme = useTheme()
+  const theme = useTheme();
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
@@ -78,15 +88,15 @@ const Index = ({group, onClose}) => {
   const uploadCSV = async () => {
     try {
       const res = await DocumentPicker.pickSingle({
-        type: types.csv
+        type: types.csv,
       });
       if (res.type === 'text/comma-separated-values') {
         RNFS.readFile(res.uri, 'ascii')
           .then(response => {
             const results = readString(response);
             onClose();
-            navigation.navigate("AddMultipleInviti", {data:results.data})
-           })
+            navigation.navigate('AddMultipleInviti', {data: results.data});
+          })
           .catch(e => {
             console.log(e);
           });
@@ -165,7 +175,7 @@ const Index = ({group, onClose}) => {
 
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
-        console.log('FILE WRITTEN!',success);
+        console.log('FILE WRITTEN!', success);
         setExportLoading(false);
         onClose();
         dispatch(handleIsExportBanner(true));
@@ -180,23 +190,209 @@ const Index = ({group, onClose}) => {
   const [SnackbarMessage, setSnackbarMessage] = useState('');
   const [showSnackBar, setShowSnackbar] = useState(false);
 
+  const goBack = () => navigation.goBack();
+
   return (
-    <View style={{padding: '2%'}}>
-      <List.Item
-        title={currentViewingGroup.groupName}
-        description={currentViewingGroup.groupDescription}
-        left={props => (
-          <Avatar.Image
-            {...props}
-            size={45}
-            source={
-              currentViewingGroup.imageURL
-                ? {uri: currentViewingGroup.imageURL}
-                : require('../../../../../assets/drawer/male-user.png')
-            }
-          />
-        )}
-      />
+    <View style={{flex: 1}}>
+      <GeneralAppbar title={'Summary'} back={goBack} navigation={navigation} />
+
+      <ScrollView contentContainerStyle={{}}>
+        <Text
+          style={{
+            paddingHorizontal: '5%',
+            marginVertical: '3%',
+            color: theme.colors.textGray,
+            fontWeight: '600',
+          }}
+          variant="bodyMedium">
+          Group: '{currentViewingGroup?.groupName}'
+        </Text>
+
+        <View
+          style={{
+            marginVertical: '2%',
+          }}>
+          <Text style={{paddingVertical:"3%", paddingHorizontal: '5%', fontWeight:"700"}} variant="headlineSmall">
+            Guests
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              paddingHorizontal: '5%',
+            }}>
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.error,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Pending
+                </Text>
+            </Card>
+
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.primary,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Invited
+                </Text>
+            </Card>
+
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.tertiary,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Others
+                </Text>
+            </Card>
+
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.secondary,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Total
+                </Text>
+            </Card>
+          </View>
+          {/* <Divider
+            style={{marginTop: '2%',height:1, marginHorizontal: '5%'}}
+          /> */}
+        </View>
+
+        <View
+          style={{
+            marginVertical: '2%',
+          }}>
+          <Text style={{paddingVertical:"3%", paddingHorizontal: '5%', fontWeight:"700"}} variant="headlineSmall">
+            Tasks
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              paddingHorizontal: '5%',
+            }}>
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.error,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Not completed
+                </Text>
+            </Card>
+
+            <Card
+              style={{marginVertical: '2%', width: '48%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.primary,
+                }}
+                variant="headlineLarge">
+                34
+              </Text>
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Completed
+                </Text>
+            </Card>
+
+            <Card
+              style={{marginVertical: '2%', width: '100%', padding: '2%'}}
+              theme={{roundness: 1}}
+              mode="contained">
+              <Text
+                style={{
+                  paddingHorizontal: 10,
+                  fontWeight: 'bold',
+                  color: theme.colors.secondary,
+                }}
+                variant="headlineLarge">
+                20
+              </Text>
+
+                <Text
+                  style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
+                  variant="bodyLarge">
+                  Total
+                </Text>
+            </Card>
+          </View>
+          
+        </View>
+
+      </ScrollView>
 
       <Snackbar
         visible={showSnackBar}
