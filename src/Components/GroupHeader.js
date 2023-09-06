@@ -64,7 +64,7 @@ const Header = ({
       return user.name == currentLoginUser.name ? 'You' : ' '+ user.name  ;
     });
 
-    return token ? membersText?.toString().length < 25
+    return token && membersText ? membersText?.toString().length < 25
       ? membersText?.toString()
       : `${membersText?.toString().substring(0, 25)}...` : "You"
   };

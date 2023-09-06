@@ -44,7 +44,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import GroupBrief from '../GroupBrief/index';
+import ImportExport from './importExport';
 import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
 
 export default function Example({route}) {
@@ -379,6 +379,8 @@ export default function Example({route}) {
         style={styles.fab}
         onPress={() => FABHandler()}
       />
+
+
       <Modalize
         modalStyle={{backgroundColor: theme.colors.background}}
         ref={invitiBriefModalizeRef}
@@ -501,7 +503,7 @@ export default function Example({route}) {
         ref={importExportModalizeRef}
         handlePosition="inside"
         snapPoint={400}>
-        <GroupBrief
+        <ImportExport
           group={route.params.group}
           onClose={onCloseGuestsImportExport}
         />

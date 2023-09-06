@@ -21,18 +21,7 @@ const InvitiBrief = ({onClose}) => {
   );
 
   const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
-  const deleteHandler = async () => {
-    await deleteInviti({
-      groupId: currentViewingGroup._id,
-      invitiId: currentInviti?._id,
-    })
-      .then(response => {
-        onClose();
-      })
-      .catch(e => {
-        console.log('error in deleteHandler', e);
-      });
-  };
+  
 
   const [status, setStatus] = useState(currentInviti.lastStatus.invitiStatus);
   const [selectedstatus, setSelectedStatus] = useState(
@@ -42,6 +31,7 @@ const InvitiBrief = ({onClose}) => {
     {label: 'Invited', value: 'invited'},
     {label: 'Rejected', value: 'rejected'},
     {label: 'Pending', value: 'pending'},
+    {label: 'Other', value: 'other'},
   ]);
 
   const [updateInviteStatus, {isLoading: updateStatusLoading}] =
@@ -56,7 +46,7 @@ const InvitiBrief = ({onClose}) => {
         onClose();
       })
       .catch(e => {
-        console.log('error in deleteHandler', e);
+        console.log('error in updateHandler', e);
       });
   };
 
@@ -64,7 +54,7 @@ const InvitiBrief = ({onClose}) => {
 
   return (
     <View style={{padding: '2%'}}>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', justifyContent:"space-between"}}>
         <View style={{width: '80%'}}>
           <List.Item
             title={currentInviti.invitiName}
@@ -82,20 +72,14 @@ const InvitiBrief = ({onClose}) => {
             )}
           />
         </View>
-        <View style={{width: '20%'}}>
+
           <IconButton
-            iconColor={theme.colors.onError}
-            icon={
-              deleteLoading
-                ? () => <ActivityIndicator color={theme.colors.onError} size={30} />
-                : 'delete-outline'
-            }
-            mode="contained"
-            containerColor={theme.colors.error}
+            icon={"close"}
+            mode="contained-tonal"
+            containerColor={theme.colors.background}
             size={30}
-            onPress={deleteHandler}
+            onPress={onClose}
           />
-        </View>
       </View>
 
       <View style={{margin: '2%', flexWrap: 'wrap', flexDirection: 'row'}}>
