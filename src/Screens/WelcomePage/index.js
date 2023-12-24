@@ -30,7 +30,7 @@ export default function Index({navigation}) {
             source={require('../../assets/logo/logo.png')}
           />
         </View>
-        <View style={{width: '100%'}}>
+        <View style={{width: '100%', marginBottom:"5%"}}>
           <Button
             // loading={isLoading}
             // disabled={!(dirty && isValid) || isLoading}
@@ -54,7 +54,7 @@ export default function Index({navigation}) {
             labelStyle={{fontWeight: 'bold'}}
             buttonColor={theme.colors.onPrimary}
             onPress={async () => {
-              await AsyncStorage.setItem('isLoggedIn', 'login');
+              // await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('SignUpwithEmail');
             }}>
             Sign up
@@ -107,7 +107,7 @@ export default function Index({navigation}) {
                 color: theme.colors.textRed,
               }}
               onPress={async () => {
-                await AsyncStorage.setItem('isLoggedIn', 'login');
+                // await AsyncStorage.setItem('isLoggedIn', 'login');
                 navigation.navigate('Login');
               }}>
               Login

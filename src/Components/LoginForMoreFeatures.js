@@ -1,6 +1,6 @@
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import React from 'react';
-import {Card, Button} from 'react-native-paper';
+import {Card, Button, Text} from 'react-native-paper';
 const LoginForMoreFeatures = ({token, isLoading, localLoading, navigation}) => {
   return (
     <View style={{marginTop: '2%', bottom: 0, width: '100%'}}>

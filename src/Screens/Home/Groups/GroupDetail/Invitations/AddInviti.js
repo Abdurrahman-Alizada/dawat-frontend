@@ -35,6 +35,7 @@ import {
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import moment from 'moment';
 import {Modalize} from 'react-native-modalize';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string()
     .required('Inviti name is required')
@@ -50,12 +51,6 @@ const AddInviti = ({route, navigation}) => {
   const [updateInviti, {isLoading: updateLoading}] = useUpdateInvitiMutation();
   const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
   const [isEditStart, setIsEditStart] = useState(false);
-  const submitHandler = async values => {
-    currentInviti?._id ? updateHandler(values) : addHandler(values);
-  };
-
-  const [fileData, setfileData] = useState(null);
-  const fileDataRef = useRef(null);
 
   const [invitiImageURL, setInvitiImageURL] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -130,6 +125,14 @@ const AddInviti = ({route, navigation}) => {
     {label: 'Other', value: 'other'},
   ]);
 
+  const submitHandler = async values => {
+    // currentInviti means we are edit mode
+    currentInviti?._id ? updateHandler(values) : addHandler(values);
+  };
+
+  const [fileData, setfileData] = useState(null);
+  const fileDataRef = useRef(null);
+
   const addHandler = async values => {
     const uri = fileData?.path;
     const type = fileData?.mime;
@@ -140,47 +143,50 @@ const AddInviti = ({route, navigation}) => {
     data.append('file', photo);
     data.append('upload_preset', 'bzgif1or');
     data.append('cloud_name', 'dblhm3cbq');
+    
+    const PinGrp = await AsyncStorage.getItem("pinGroup")
+    console.log("first=> ", PinGrp)
     // if user upload image from mobile then execute if otherwise else.
-    if (photo.uri) {
-      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-        method: 'post',
-        body: data,
-      })
-        .then(res => res.json())
-        .then(async data => {
-          setInvitiImageURL(data.secure_url);
-          await addInviti({
-            groupId: groupId,
-            invitiName: values.invitiName,
-            invitiDescription: values.invitiDescription,
-            invitiImageURL: data.secure_url,
-            lastStatus: status,
-          })
-            .then(response => {
-              navigation.goBack();
-            })
-            .catch(e => {
-              console.log('error in addHandler', e);
-            });
-        })
-        .catch(err => {
-          console.log('An Error Occured While Uploading', err);
-        });
-    } else {
-      await addInviti({
-        groupId: groupId,
-        invitiName: values.invitiName,
-        invitiDescription: values.invitiDescription,
-        invitiImageURL: avatarURL,
-        lastStatus: status,
-      })
-        .then(response => {
-          navigation.goBack();
-        })
-        .catch(e => {
-          console.log('error in addHandler', e);
-        });
-    }
+    // if (photo.uri) {
+    //   fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
+    //     method: 'post',
+    //     body: data,
+    //   })
+    //     .then(res => res.json())
+    //     .then(async data => {
+    //       setInvitiImageURL(data.secure_url);
+    //       await addInviti({
+    //         groupId: groupId,
+    //         invitiName: values.invitiName,
+    //         invitiDescription: values.invitiDescription,
+    //         invitiImageURL: data.secure_url,
+    //         lastStatus: status,
+    //       })
+    //         .then(response => {
+    //           navigation.goBack();
+    //         })
+    //         .catch(e => {
+    //           console.log('error in addHandler', e);
+    //         });
+    //     })
+    //     .catch(err => {
+    //       console.log('An Error Occured While Uploading', err);
+    //     });
+    // } else {
+    //   await addInviti({
+    //     groupId: groupId,
+    //     invitiName: values.invitiName,
+    //     invitiDescription: values.invitiDescription,
+    //     invitiImageURL: avatarURL,
+    //     lastStatus: status,
+    //   })
+    //     .then(response => {
+    //       navigation.goBack();
+    //     })
+    //     .catch(e => {
+    //       console.log('error in addHandler', e);
+    //     });
+    // }
   };
 
   const updateHandler = async values => {
@@ -229,7 +235,8 @@ const AddInviti = ({route, navigation}) => {
         invitiName: values.invitiName,
         invitiDescription: values.invitiDescription,
         invitiImageURL: avatarURL,
-        lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
+        lastStatus:
+          status == currentInviti?.lastStatus?.invitiStatus ? null : status,
       })
         .then(response => {
           console.log('group has been updated without image=>', response);

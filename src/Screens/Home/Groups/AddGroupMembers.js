@@ -54,13 +54,16 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
 
   const createLocalGroup = async values => {
-    let group = {
-      _id: values._id,
-      isSyncd: true,
-      groupName: values.groupName,
-      groupDescription: values.groupDescription,
-      time: JSON.parse(time),
-    };
+    console.log('first', values);
+    // let group = {
+    //   _id: values._id,
+    //   isSyncd: true,
+    //   groupName: values.groupName,
+    //   groupDescription: values.groupDescription,
+    //   time: JSON.parse(time),
+    // };
+    let group = values;
+
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
       let data = JSON.parse(groups);
@@ -117,12 +120,8 @@ const AddGroup = ({navigation, onClose, route}) => {
       })
         .then(res => {
           if (res.data?._id) {
+            createLocalGroup(res.data);
             navigation.navigate('HomeIndex');
-            createLocalGroup({
-              _id: res.data?._id,
-              groupName: groupName,
-              groupDescription: groupDescription,
-            });
           }
         })
         .catch(err => {
