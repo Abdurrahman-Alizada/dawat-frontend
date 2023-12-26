@@ -19,9 +19,6 @@ import {
   Banner,
   Portal,
   useTheme,
-  Appbar,
-  Menu,
-  Divider
 } from 'react-native-paper';
 import {useLoginUserMutation} from '../../../redux/reducers/user/userThunk';
 import {
@@ -30,9 +27,7 @@ import {
 } from '../../../redux/reducers/user/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
-import {userApi} from '../../../redux/reducers/user/userThunk';
-import {groupApi} from '../../../redux/reducers/groups/groupThunk';
-import {friendshipApi} from '../../../redux/reducers/Friendship/friendshipThunk';
+import AuthAppbar from '../../../Components/Appbars/AuthAbbar';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -101,10 +96,6 @@ const LoginScreen = ({navigation, route}) => {
   };
 
   const [showPassword, setShowPassword] = useState(true);
-  const [showMenu, setShowMenu] = useState(false);
-  
-  const openMenu = () => setShowMenu(true);
-  const closeMenu = () => setShowMenu(false);
 
   return (
     <ScrollView
@@ -113,92 +104,7 @@ const LoginScreen = ({navigation, route}) => {
         flex: 1,
         paddingVertical: '2%',
       }}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
-
-      <Appbar.Header
-          style={{backgroundColor: theme.colors.background}}
-          // elevated={true}
-          >
-          <Appbar.BackAction onPress={()=>navigation.goBack()} />
-          <Appbar.Content
-            title="Login"
-            titleStyle={{
-              color: theme.colors.onBackground,
-            }}
-          />
-
-
-          <Menu
-            visible={showMenu}
-            onDismiss={closeMenu}
-            contentStyle={{backgroundColor: theme.colors.background}}
-            anchor={
-              <Appbar.Action
-                icon={"dots-vertical"}
-                color={theme.colors.onBackground}
-                onPress={() => openMenu()}
-              />
-            }>
-            <Menu.Item
-              leadingIcon="help-circle-outline"
-              title="Help"
-              titleStyle={{color: theme.colors.onBackground}}
-              onPress={async () => {
-                closeMenu();
-                navigation.navigate('AppSettingsMain');
-              }}
-            />
-
-            <Menu.Item
-              leadingIcon="message-outline"
-              title="Contact us"
-              titleStyle={{color: theme.colors.onBackground}}
-              onPress={async () => {
-                closeMenu();
-                navigation.navigate('AppSettingsMain');
-              }}
-            />
-          </Menu>
-        </Appbar.Header>
-
-      <Portal>
-        <Dialog visible={visible} onDismiss={() => setVisible(true)}>
-          <Dialog.Title>Sign in Error</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>
-              {' '}
-              {errorMessage} {isError && error?.error}
-            </Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setVisible(false)}>Ok</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
-      <Banner
-        visible={passwordResetSuccessflly}
-        actions={[
-          {
-            label: 'Ok',
-            onPress: () => dispatch(handlePasswordResetSuccessfully(false)),
-          },
-        ]}
-        // style={{paddingHorizontal:"5%"}}
-        icon={({size}) => <Avatar.Icon size={size} icon="check-bold" />}>
-        Your password has been reset successfully. You can sign in now with the
-        updated password.
-      </Banner>
-
-      <Text
-        style={{
-          fontSize: 20,
-          marginTop: '3%',
-          fontWeight: '700',
-          paddingHorizontal: '5%',
-        }}>
-        Login your account.
-      </Text>
+      <AuthAppbar title={'Sign in'} />
 
       <Formik
         initialValues={{
@@ -223,7 +129,7 @@ const LoginScreen = ({navigation, route}) => {
             style={{
               flex: 1,
               justifyContent: 'space-between',
-              marginVertical: '2%',
+              marginTop: '8%',
               paddingHorizontal: '5%',
             }}>
             <View>
@@ -232,7 +138,7 @@ const LoginScreen = ({navigation, route}) => {
                 label="Email"
                 // placeholder="Enter your email"
                 mode="outlined"
-                style={{marginTop: '2%'}}
+                style={{marginTop: '2%', height: 55}}
                 value={values.email}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -252,7 +158,7 @@ const LoginScreen = ({navigation, route}) => {
                   />
                 }
                 mode="outlined"
-                style={{marginTop: '2%'}}
+                style={{marginTop: '2%', height: 55}}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
@@ -266,17 +172,16 @@ const LoginScreen = ({navigation, route}) => {
 
               <Button
                 loading={isLoading}
-                // disabled={!(dirty && isValid) || isLoading}
                 disabled={isLoading}
                 style={{
-                  marginVertical: '3%',
+                  marginVertical: '5%',
                 }}
                 contentStyle={{padding: '3%'}}
-                buttonStyle={{padding: '1%'}}
-                theme={{roundness: 1}}
+                theme={{roundness: 20}}
                 mode="contained"
                 onPress={handleSubmit}
-                buttonColor={theme.colors.blueBG}>
+                buttonColor={theme.colors.blueBG}
+                textColor={'#fff'}>
                 Login
               </Button>
 
@@ -342,36 +247,37 @@ const LoginScreen = ({navigation, route}) => {
           </View>
         )}
       </Formik>
+
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => setVisible(true)}>
+          <Dialog.Title>Sign in Error</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>
+              {' '}
+              {errorMessage} {isError && error?.error}
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setVisible(false)}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      <Banner
+        visible={passwordResetSuccessflly}
+        actions={[
+          {
+            label: 'Ok',
+            onPress: () => dispatch(handlePasswordResetSuccessfully(false)),
+          },
+        ]}
+        // style={{paddingHorizontal:"5%"}}
+        icon={({size}) => <Avatar.Icon size={size} icon="check-bold" />}>
+        Your password has been reset successfully. You can sign in now with the
+        updated password.
+      </Banner>
     </ScrollView>
   );
 };
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-  img: {
-    width: 100,
-    alignSelf: 'center',
-    height: 100,
-    borderRadius: 400,
-  },
-
-  buttonStyle: {
-    height: 60,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 50,
-    alignItems: 'center',
-    borderRadius: 10,
-    flexDirection: 'row',
-    marginVertical: '2%',
-    backgroundColor: '#EDEEF0',
-  },
-  buttonTextStyle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
-  error: {
-    color: 'red',
-    // marginLeft: 20,
-  },
-});

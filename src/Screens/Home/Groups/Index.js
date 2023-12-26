@@ -30,7 +30,7 @@ import {Provider} from 'react-native-paper';
 import Header from '../../../Components/Appbars/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 import GroupsList from '../../Skeletons/Groups';
-import {PreferencesContext} from '../../../themeContext';
+import {ThemeContext} from '../../../themeContext';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import LoginForMoreFeatures from '../../../Components/LoginForMoreFeatures';
@@ -134,7 +134,7 @@ const Groups = ({navigation}) => {
   };
 
   const theme = useTheme();
-  const {isThemeDark} = useContext(PreferencesContext);
+  const {isThemeDark} = useContext(ThemeContext);
 
   // snackebar
   const [snackbarVisible, setSnackBarVisible] = useState(false);

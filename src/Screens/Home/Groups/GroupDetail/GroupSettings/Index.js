@@ -38,7 +38,7 @@ import {
 } from '../../../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
-import AvatarModal from '../../../Menus/Profile/AvatarModal';
+import AvatarModal from '../../../../Drawer/Profile/AvatarModal';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   handleCurrentViewingGroup,

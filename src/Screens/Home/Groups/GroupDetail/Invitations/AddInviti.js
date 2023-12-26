@@ -27,7 +27,7 @@ import {
 } from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import AvatarModal from '../../../Menus/Profile/AvatarModal';
+import AvatarModal from '../../../../Drawer/Profile/AvatarModal';
 import {
   useAddInvitiMutation,
   useUpdateInvitiMutation,

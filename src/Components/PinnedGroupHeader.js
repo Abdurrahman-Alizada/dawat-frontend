@@ -16,14 +16,6 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
   };
   // end search
 
-  // "more menu"
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const [visible, setVisible] = React.useState(false);
-
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-  // end more menu
   return (
     <View>
       {!isSearch ? (
@@ -43,27 +35,6 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
             }}
           />
 
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            contentStyle={{backgroundColor: theme.colors.background}}
-            anchor={
-              <Appbar.Action
-                icon={MORE_ICON}
-                color={theme.colors.onBackground}
-                onPress={() => openMenu()}
-              />
-            }>
-            <Menu.Item
-              leadingIcon="cog-outline"
-              title="Settings"
-              titleStyle={{color: theme.colors.onBackground}}
-              onPress={async () => {
-                closeMenu();
-                navigation.navigate('AppSettingsMain');
-              }}
-            />
-          </Menu>
         </Appbar.Header>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>

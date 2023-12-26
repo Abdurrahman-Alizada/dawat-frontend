@@ -9,7 +9,6 @@ import {
   Text,
   Divider,
 } from 'react-native-paper';
-import {PreferencesContext} from '../themeContext';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -52,9 +51,7 @@ export default function DrawerContent(props) {
     await AsyncStorage.setItem('name', '');
     await AsyncStorage.setItem('ImageURL', '');
     dispatch(handleCurrentLoaginUser({}));
-    // dispatch(userApi.util.resetApiState())
     dispatch(groupApi.util.resetApiState());
-    // dispatch(friendshipApi.util.resetApiState())
     navigation.dispatch(DrawerActions.closeDrawer());
     navigation.navigate('Auth');
   };
@@ -73,16 +70,12 @@ export default function DrawerContent(props) {
     )}@${domain}`;
   };
 
-  // privacy policy
   const handlePrivacyPolicyPress = async () => {
-    // Checking if the link is supported for links with custom URL scheme.
     const supported = await Linking.canOpenURL(
       'https://eventplannerapp.netlify.app/privacy-policy',
     );
 
     if (supported) {
-      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-      // by some browser in the mobile
       await Linking.openURL(
         'https://eventplannerapp.netlify.app/privacy-policy',
       );
@@ -97,56 +90,19 @@ export default function DrawerContent(props) {
       style={{backgroundColor: theme.colors.background}}
       contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}>
       <View>
-        {isLoading ? (
-          <List.Item
-            title={props => (
-              <SkeletonPlaceholder borderRadius={4} {...props}>
-                <SkeletonPlaceholder.Item width="60%" height={15} />
-                <SkeletonPlaceholder.Item
-                  marginTop={7}
-                  width="30%"
-                  height={12}
-                />
-              </SkeletonPlaceholder>
-            )}
-            left={props => (
-              <SkeletonPlaceholder borderRadius={4} {...props}>
-                <SkeletonPlaceholder.Item
-                  flexDirection="column"
-                  alignItems="flex-start">
-                  <SkeletonPlaceholder.Item
-                    width={50}
-                    marginLeft={20}
-                    height={50}
-                    borderRadius={50}
-                  />
-                </SkeletonPlaceholder.Item>
-              </SkeletonPlaceholder>
-            )}
-          />
-        ) : (
-          <List.Item
-            title={user?.name ? user?.name : '*****'}
-            onPress={async () => {
-              navigation.navigate('AppSettingsMain', {
-                screen: 'Profile',
-                params: {id: await AsyncStorage.getItem('id')},
-              });
-            }}
-            left={props => (
-              <Avatar.Image
-                {...props}
-                source={
-                  user?.imageURL
-                    ? {uri: user?.imageURL}
-                    : require('../assets/drawer/male-user.png')
-                }
-                size={50}
-              />
-            )}
-            description={obscureEmail(user?.email)}
-          />
-        )}
+        <List.Item
+          title={'Event planner'}
+          description={'Guests, Todos, Chat'}
+          left={props => (
+            <Avatar.Image
+              {...props}
+              source={require('../assets/logo/logo.png')}
+              size={50}
+            />
+          )}
+          titleStyle={{fontWeight: 'bold', fontSize: 20}}
+          style={{padding: '2%'}}
+        />
 
         <Drawer.Item
           label="Friends"
@@ -165,12 +121,12 @@ export default function DrawerContent(props) {
         />
 
         <Drawer.Item
-          label="Watch an ad"
+          label="Watch ad"
           icon="motion-play"
           onPress={() => navigation.navigate('SupportUs')}
         />
 
-        <List.Item
+        {/* <List.Item
           title="Logout"
           onPress={() => logout()}
           left={() => <List.Icon icon="logout" color={theme.colors.error} />}
@@ -179,12 +135,64 @@ export default function DrawerContent(props) {
             marginVertical: '3%',
           }}
           titleStyle={{color: theme.colors.error}}
-        />
+        /> */}
       </View>
 
       <View style={{marginVertical: '5%'}}>
         <Divider />
-        <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+        {isLoading ? (
+          <List.Item
+            title={props => (
+              <SkeletonPlaceholder borderRadius={4} {...props}>
+                <SkeletonPlaceholder.Item width="60%" height={10} />
+                <SkeletonPlaceholder.Item
+                  marginTop={7}
+                  width="30%"
+                  height={10}
+                />
+              </SkeletonPlaceholder>
+            )}
+            left={props => (
+              <SkeletonPlaceholder borderRadius={4} {...props}>
+                <SkeletonPlaceholder.Item
+                  flexDirection="column"
+                  alignItems="flex-start">
+                  <SkeletonPlaceholder.Item
+                    width={50}
+                    marginLeft={20}
+                    height={30}
+                    borderRadius={50}
+                  />
+                </SkeletonPlaceholder.Item>
+              </SkeletonPlaceholder>
+            )}
+          />
+        ) : (
+          <Drawer.Item
+            label="My profile"
+            onPress={async () => {
+              navigation.navigate('AppSettingsMain', {
+                screen: 'Profile',
+                params: {id: await AsyncStorage.getItem('id')},
+              });
+            }}
+            theme={{roundness:0}}
+            rippleColor={theme.colors.background}
+            icon="account-outline"
+          />
+        )}
+        <Divider />
+        <Drawer.Item
+            label="Settings"
+            onPress={async () => {
+              navigation.navigate('AppSettingsMain');
+            }}
+            theme={{roundness:0}}
+            icon="cog-outline"
+            // style={{width:"100%"}}
+          />
+          <Divider />
+        <View style={{flexDirection: 'row',paddingHorizontal:"4%", justifyContent: 'space-around'}}>
           <TouchableOpacity
             onPress={() => handlePrivacyPolicyPress()}
             style={{alignSelf: 'center', margin: '5%'}}>

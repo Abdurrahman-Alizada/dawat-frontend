@@ -15,7 +15,7 @@ import {
   useTheme,
   Button,
 } from 'react-native-paper';
-import AvatarModal from '../Menus/Profile/AvatarModal';
+import AvatarModal from '../../Drawer/Profile/AvatarModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector, useDispatch} from 'react-redux';
 import {handlePinGroup} from '../../../redux/reducers/groups/groups';

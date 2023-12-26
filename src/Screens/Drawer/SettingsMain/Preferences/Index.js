@@ -1,10 +1,10 @@
 import {View} from 'react-native';
 import React,{useContext} from 'react';
 import { List, Switch, Divider } from 'react-native-paper';
-import {PreferencesContext} from '../../../../themeContext';
+import {ThemeContext} from '../../../../themeContext';
 
 const Index = ({navigation}) => {
-    const {toggleTheme, isThemeDark} = useContext(PreferencesContext);
+    const {toggleTheme, isThemeDark} = useContext(ThemeContext);
 
     return (
     <View>

@@ -121,7 +121,7 @@ const FriendsSuggestions = ({navigation}) => {
   };
 
   const getHighlightedText = result =>
-    result.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
+    result?.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
       return (
         <Text
           key={index}

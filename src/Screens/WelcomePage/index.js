@@ -30,57 +30,37 @@ export default function Index({navigation}) {
             source={require('../../assets/logo/logo.png')}
           />
         </View>
-        <View style={{width: '100%', marginBottom:"5%"}}>
+        <View style={{width: '100%', marginBottom: '5%'}}>
           <Button
-            // loading={isLoading}
-            // disabled={!(dirty && isValid) || isLoading}
-            // disabled={isLoading}
             style={{
               marginTop: '3%',
               width: '100%',
             }}
-            contentStyle={{padding: '2%', justifyContent: 'flex-start'}}
+            contentStyle={{padding: '3%', justifyContent: 'flex-start'}}
             textColor={theme.colors.textGray}
             buttonStyle={{padding: '1%', width: '100%'}}
-            theme={{roundness: 2}}
+            theme={{roundness: 10}}
             mode="contained"
-            icon={() => (
-              <Avatar.Image
-                size={24}
-                source={require('../../assets/icons/signup-icon.png')}
-              />
-            )}
-            // onPress={handleSubmit}
+            icon={'account-plus'}
             labelStyle={{fontWeight: 'bold'}}
             buttonColor={theme.colors.onPrimary}
             onPress={async () => {
-              // await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('SignUpwithEmail');
             }}>
             Sign up
           </Button>
 
           <Button
-            // loading={isLoading}
-            // disabled={!(dirty && isValid) || isLoading}
-            // disabled={isLoading}
             style={{
               marginTop: '3%',
-              width: '100%',
             }}
-            contentStyle={{padding: '2%', justifyContent: 'flex-start'}}
+            contentStyle={{padding: '3%', justifyContent: 'flex-start'}}
             textColor={theme.colors.textGray}
             buttonStyle={{padding: '1%', width: '100%'}}
-            theme={{roundness: 2}}
+            theme={{roundness: 10}}
             mode="contained"
-            icon={() => (
-              <Avatar.Image
-                size={24}
-                source={require('../../assets/icons/without-sync-icon.png')}
-              />
-            )}
+            icon={'cloud-off-outline'}
             labelStyle={{fontWeight: 'bold'}}
-            // onPress={handleSubmit}
             onPress={async () => {
               await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('Drawer', {screen: 'PinnedGroup'});

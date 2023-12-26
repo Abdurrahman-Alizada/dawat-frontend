@@ -1,9 +1,15 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Menu, Appbar, Searchbar, useTheme} from 'react-native-paper';
-import {useNavigation, DrawerActions} from '@react-navigation/native';
+import {Appbar, Searchbar} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
 
-const Header = ({isSearch, setIsSearch, searchFilterFunction,onOpen, theme}) => {
+const Header = ({
+  isSearch,
+  setIsSearch,
+  searchFilterFunction,
+  onOpen,
+  theme,
+}) => {
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
@@ -16,14 +22,6 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction,onOpen, theme}) => 
   };
   // end search
 
-  // "more menu"
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const [visible, setVisible] = React.useState(false);
-
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-  // end more menu
   return (
     <View>
       {!isSearch ? (
@@ -53,28 +51,6 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction,onOpen, theme}) => 
               searchFilterFunction('');
             }}
           />
-
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            contentStyle={{backgroundColor: theme.colors.background}}
-            anchor={
-              <Appbar.Action
-                icon={MORE_ICON}
-                color={theme.colors.onBackground}
-                onPress={() => openMenu()}
-              />
-            }>
-            <Menu.Item
-              leadingIcon="cog-outline"
-              title="Settings"
-              titleStyle={{color: theme.colors.onBackground}}
-              onPress={async () => {
-                closeMenu();
-                navigation.navigate('AppSettingsMain');
-              }}
-            />
-          </Menu>
         </Appbar.Header>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>
@@ -89,7 +65,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction,onOpen, theme}) => 
             iconColor={theme.colors.onSurface}
             inputStyle={{color: theme.colors.onSurface}}
             placeholderTextColor={theme.colors.onSurface}
-            style={{backgroundColor:theme.colors.background}}
+            style={{backgroundColor: theme.colors.background}}
             // elevation={6}
             theme={{roundness: 0}}
             // loading={true}

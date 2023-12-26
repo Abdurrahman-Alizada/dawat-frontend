@@ -31,7 +31,7 @@ import {
   Provider as PaperProvider,
   Snackbar,
 } from 'react-native-paper';
-import {PreferencesContext} from './src/themeContext';
+import {ThemeContext} from './src/themeContext';
 import {lightPalette, darkPalette} from './src/GlobalStyles';
 export const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
@@ -82,7 +82,7 @@ export const App = () => {
   const netInfo = useNetInfo();
 
   return (
-    <PreferencesContext.Provider value={preferences}>
+    <ThemeContext.Provider value={preferences}>
       <Provider store={store}>
         <PaperProvider theme={theme}>
           <NavigationContainer theme={theme}>
@@ -122,7 +122,7 @@ export const App = () => {
           </NavigationContainer>
         </PaperProvider>
       </Provider>
-    </PreferencesContext.Provider>
+    </ThemeContext.Provider>
   );
 };
 

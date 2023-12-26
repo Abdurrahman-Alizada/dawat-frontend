@@ -22,7 +22,7 @@ import {
   Avatar,
   ActivityIndicator,
 } from 'react-native-paper';
-import {PreferencesContext} from '../../../themeContext';
+import {ThemeContext} from '../../../themeContext';
 import CountDown from 'react-native-countdown-xambra';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -33,7 +33,7 @@ const Groups = ({navigation}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const {isThemeDark} = useContext(PreferencesContext);
+  const {isThemeDark} = useContext(ThemeContext);
   const [loading, setLoading] = useState(true);
 
   const PG = useSelector(state => state.groups?.pinGroup);
