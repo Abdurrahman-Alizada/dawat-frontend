@@ -4,14 +4,7 @@
 //  createdAt:   25 Oct, 2022
 //  Modified by : -------
 // ==========================================
-import {
-  TouchableOpacity,
-  SafeAreaView,
-  StyleSheet,
-  Modal,
-  View,
-  ScrollView,
-} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import React, {useState, useRef} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {
@@ -33,7 +26,6 @@ import {
   useUpdateInvitiMutation,
   useDeleteInvitiMutation,
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import moment from 'moment';
 import {Modalize} from 'react-native-modalize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const validationSchema = Yup.object().shape({
@@ -126,12 +118,21 @@ const AddInviti = ({route, navigation}) => {
   ]);
 
   const submitHandler = async values => {
-    // currentInviti means we are edit mode
+    // currentInviti means we are in edit mode
     currentInviti?._id ? updateHandler(values) : addHandler(values);
   };
 
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
+
+
+  // const storeGuestsLocally = async (groupId, guests) => {
+  //   try {
+  //     await AsyncStorage.setItem(`guests_${groupId}`, JSON.stringify(guests));
+  //   } catch (error) {
+  //     console.error(`Error storing guests for group ${groupId} locally:`, error);
+  //   }
+  // };
 
   const addHandler = async values => {
     const uri = fileData?.path;
@@ -143,9 +144,11 @@ const AddInviti = ({route, navigation}) => {
     data.append('file', photo);
     data.append('upload_preset', 'bzgif1or');
     data.append('cloud_name', 'dblhm3cbq');
-    
-    const PinGrp = await AsyncStorage.getItem("pinGroup")
-    console.log("first=> ", PinGrp)
+
+    const PinGrp = await AsyncStorage.getItem('pinGroup');
+    const Grp = await AsyncStorage.getItem('groups');
+    console.log("first", JSON.parse(Grp).length)
+
     // if user upload image from mobile then execute if otherwise else.
     // if (photo.uri) {
     //   fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
@@ -247,6 +250,7 @@ const AddInviti = ({route, navigation}) => {
         });
     }
   };
+
   const deleteHandler = async () => {
     await deleteInviti({groupId: groupId, invitiId: currentInviti?._id})
       .then(response => {

@@ -54,7 +54,6 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
 
   const createLocalGroup = async values => {
-    console.log('first', values);
     // let group = {
     //   _id: values._id,
     //   isSyncd: true,

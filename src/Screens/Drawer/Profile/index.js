@@ -21,12 +21,14 @@ import {
   useUpdateImageURLMutation,
   useDeleteUserByItselfMutation,
 } from '../../../redux/reducers/user/userThunk';
-import {handleCurrentLoaginUser} from '../../../redux/reducers/user/user'
+import {handleCurrentLoaginUser} from '../../../redux/reducers/user/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
 import {Modalize} from 'react-native-modalize';
-import { useSelector,useDispatch } from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import { DrawerActions } from '@react-navigation/native';
+import { groupApi } from '../../../redux/reducers/groups/groupThunk';
 
 export default ProfileIndex = ({navigation, route}) => {
   const theme = useTheme();
@@ -214,14 +216,28 @@ export default ProfileIndex = ({navigation, route}) => {
   const deleteUserAccountHandler = async () => {
     deleleUserByItSelf(user._id)
       .then(res => {
-          AsyncStorage.clear();
-          dispatch(handleCurrentLoaginUser({}))
-          setDeleteDialogVisible(false);
-          navigation.navigate('Auth', {screen:"Login"});
+        AsyncStorage.clear();
+        dispatch(handleCurrentLoaginUser({}));
+        setDeleteDialogVisible(false);
+        navigation.navigate('Auth', {screen: 'Login'});
       })
       .catch(e => {
         console.log(e);
       });
+  };
+
+
+  const logout = async () => {
+    await AsyncStorage.setItem('isLoggedIn', '');
+    await AsyncStorage.setItem('id', '');
+    await AsyncStorage.setItem('token', '');
+    await AsyncStorage.setItem('userId', '');
+    await AsyncStorage.setItem('name', '');
+    await AsyncStorage.setItem('ImageURL', '');
+    dispatch(handleCurrentLoaginUser({}));
+    dispatch(groupApi.util.resetApiState());
+    navigation.dispatch(DrawerActions.closeDrawer());
+    navigation.navigate('Auth');
   };
 
   return (
@@ -362,6 +378,19 @@ export default ProfileIndex = ({navigation, route}) => {
                 )}
               />
             </View>
+            <Button
+              // disabled={!groupChecked}
+              contentStyle={{padding: '2%'}}
+              theme={{roundness: 20}}
+              mode="outlined"
+              style={{margin:"4%"}}
+              onPress={logout}
+              // buttonColor={theme.colors.blueBG}
+              // textColor={'#fff'}
+              >
+              Logout
+            </Button>
+
             <List.Item
               onPress={() => setDeleteDialogVisible(true)}
               title="Delete my account"

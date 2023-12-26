@@ -42,6 +42,17 @@ export const groupApi = createApi({
       invalidatesTags: ['Groups','GroupLogs'],
     }),
 
+    addMultipleGroup: build.mutation({
+      query: data => ({
+        url: `/api/group/addMultipleGroups`,
+        method: 'POST',
+        body: {
+          groups: data.groups,
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
     updateGroupInfo: build.mutation({
       query: group => ({
         url: `/api/group/rename`,
@@ -124,6 +135,7 @@ export const groupApi = createApi({
 export const {
   useGetAllGroupsQuery,
   useAddGroupMutation,
+  useAddMultipleGroupMutation,
   useDeleteGroupForUserMutation,
   useAddUserToGroupMutation,
   useUpdateGroupInfoMutation,

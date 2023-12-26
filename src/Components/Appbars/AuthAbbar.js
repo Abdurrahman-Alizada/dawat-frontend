@@ -23,6 +23,7 @@ export default function CustomNavigationBar({title}) {
           barStyle={isThemeDark ? 'light-content' : 'dark-content'}
           backgroundColor={theme.colors.background}
         />
+        
         <Appbar.BackAction
           style={{alignSelf: 'flex-start'}}
           onPress={() => navigation.goBack()}

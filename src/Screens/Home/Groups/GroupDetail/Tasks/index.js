@@ -1,11 +1,10 @@
 // ==========================================
-//  Title:  AddInviti
 //  Author: Abdur Rahman
 //  createdAt:   26 Oct, 2022
 //  Modified by : -------
 // ==========================================
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper';
@@ -44,12 +43,7 @@ const Task = ({route}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: theme.colors.background}}>
-      {isHeader && (
-        <TasksAppbar
-        // openGuestsImportExportModalize={openGuestsImportExportModalize}
-        // openGuestsSummaryModalize={openGuestsSummaryModalize}
-        />
-      )}
+      {isHeader && <TasksAppbar />}
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />

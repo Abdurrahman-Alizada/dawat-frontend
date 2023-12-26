@@ -118,7 +118,7 @@ const AddGroup = ({navigation, onClose}) => {
         isInvitations: true,
         isMute: false,
         members: users,
-        time:JSON.stringify(dueDate)
+        time: JSON.stringify(dueDate),
       });
     }
   };
@@ -222,7 +222,8 @@ const AddGroup = ({navigation, onClose}) => {
               <TextInput
                 style={{marginTop: '4%'}}
                 error={errors.groupName && touched.groupName ? true : false}
-                label="Group Name"
+                label={`Group Name (${30 - values.groupName.length})`}
+                maxLength={30}
                 mode="outlined"
                 onChangeText={handleChange('groupName')}
                 onBlur={handleBlur('groupName')}
@@ -241,15 +242,13 @@ const AddGroup = ({navigation, onClose}) => {
                     ? true
                     : false
                 }
-                // placeholder="Group Description"
                 label={`Group Description (${
-                  99 - values.groupDescription.length
+                  60 - values.groupDescription.length
                 })`}
                 mode="outlined"
                 multiline
-                maxLength={99}
-                numberOfLines={3}
-                // style={{marginVertical: '2%', width: '85%'}}
+                maxLength={60}
+                numberOfLines={2}
                 onChangeText={handleChange('groupDescription')}
                 onBlur={handleBlur('groupDescription')}
                 value={values.groupDescription}
@@ -263,8 +262,6 @@ const AddGroup = ({navigation, onClose}) => {
                 icon="arrow-right"
                 label="Next"
                 style={styles.fab}
-                // disabled={isAddButtonDisable}
-                // loading={isAddButtonDisable}
                 onPress={handleSubmit}
               />
             ) : (
@@ -304,13 +301,17 @@ const AddGroup = ({navigation, onClose}) => {
                     borderRadius: 5,
                     borderColor: '#C1C2B8',
                     borderWidth: 0.5,
-                    padding: '4%',
+                    paddingLeft: '4%',
                     marginVertical: '2%',
                     textAlign: 'center',
+                    flexDirection:"row",
+                    alignItems:"center",
+                    justifyContent:"space-between"
                   }}>
                   <Text style={{fontWeight: 'bold'}}>
                     {moment(dueDate).format('lll')}
                   </Text>
+                  <IconButton icon={"pencil"} />
                 </TouchableOpacity>
               </View>
             </View>

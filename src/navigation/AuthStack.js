@@ -10,6 +10,7 @@ import {
   CheckEmail,
 } from '../Screens/auth/Index';
 import WelcomePage from '../Screens/WelcomePage';
+import SyncDataIndex from '../Screens/Home/syncData/syncDataIndex';
 const Stack = createStackNavigator();
 
 const AuthStack = () => {
@@ -39,6 +40,17 @@ const AuthStack = () => {
         }}
         component={SignupWithEmail}
       />
+
+      <Stack.Screen
+        name="SyncData"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          title: 'Sync your data',
+        }}
+        component={SyncDataIndex}
+      />
+      
       <Stack.Screen
         name="ForgotPassword"
         options={{

@@ -43,19 +43,6 @@ export default function DrawerContent(props) {
     refetch,
   } = useGetCurrentLoginUserQuery(id.current);
 
-  const logout = async () => {
-    await AsyncStorage.setItem('isLoggedIn', '');
-    await AsyncStorage.setItem('id', '');
-    await AsyncStorage.setItem('token', '');
-    await AsyncStorage.setItem('userId', '');
-    await AsyncStorage.setItem('name', '');
-    await AsyncStorage.setItem('ImageURL', '');
-    dispatch(handleCurrentLoaginUser({}));
-    dispatch(groupApi.util.resetApiState());
-    navigation.dispatch(DrawerActions.closeDrawer());
-    navigation.navigate('Auth');
-  };
-
   useEffect(() => {
     if (user) {
       dispatch(handleCurrentLoaginUser(user));
