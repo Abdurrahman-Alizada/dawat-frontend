@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {View, Linking, Alert, TouchableOpacity} from 'react-native';
+import {View, Linking, Alert, TouchableOpacity, Image} from 'react-native';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import {
   Avatar,
@@ -80,16 +80,19 @@ export default function DrawerContent(props) {
         <List.Item
           title={'Event planner'}
           description={'Guests, Todos, Chat'}
-          left={props => (
-            <Avatar.Image
-              {...props}
+          left={() => (
+            <Image
+              style={{
+                width: 60,
+                height: 60,
+                marginLeft: '7%',
+              }}
               source={require('../assets/logo/logo.png')}
-              size={50}
             />
           )}
           titleStyle={{fontWeight: 'bold', fontSize: 20}}
-          style={{padding: '2%'}}
         />
+        <Divider style={{marginBottom: '5%'}} />
 
         <Drawer.Item
           label="Friends"
@@ -163,23 +166,28 @@ export default function DrawerContent(props) {
                 params: {id: await AsyncStorage.getItem('id')},
               });
             }}
-            theme={{roundness:0}}
+            theme={{roundness: 0}}
             rippleColor={theme.colors.background}
             icon="account-outline"
           />
         )}
         <Divider />
         <Drawer.Item
-            label="Settings"
-            onPress={async () => {
-              navigation.navigate('AppSettingsMain');
-            }}
-            theme={{roundness:0}}
-            icon="cog-outline"
-            // style={{width:"100%"}}
-          />
-          <Divider />
-        <View style={{flexDirection: 'row',paddingHorizontal:"4%", justifyContent: 'space-around'}}>
+          label="Settings"
+          onPress={async () => {
+            navigation.navigate('AppSettingsMain');
+          }}
+          theme={{roundness: 0}}
+          icon="cog-outline"
+          // style={{width:"100%"}}
+        />
+        <Divider />
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingHorizontal: '4%',
+            justifyContent: 'space-around',
+          }}>
           <TouchableOpacity
             onPress={() => handlePrivacyPolicyPress()}
             style={{alignSelf: 'center', margin: '5%'}}>

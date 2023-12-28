@@ -7,6 +7,7 @@ const initialState = {
   currentTab: 'Invitations',
   pinGroup: {},
   groupsFlag : false,
+  groupSearchText :""
 };
 
 export const groupSlice = createSlice({
@@ -28,6 +29,9 @@ export const groupSlice = createSlice({
     handleGroupsFlag: (state, action) => {
       state.groupsFlag = action.payload;
     },
+    handleGroupsSearchText: (state, action) => {
+      state.groupSearchText = action.payload;
+    },
   },
 });
 
@@ -37,7 +41,8 @@ export const {
   handleCurrentViewingGroup,
   handleCurrentTab,
   handleIsSearch,
-  handleGroupsFlag
+  handleGroupsFlag,
+  handleGroupsSearchText
 } = groupSlice.actions;
 
 export default groupSlice.reducer;

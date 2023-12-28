@@ -1,49 +1,17 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  RefreshControl,
-  ScrollView,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import {StyleSheet, View, FlatList, RefreshControl, ScrollView, TouchableWithoutFeedback} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
-import {
-  useGetAllInvitationsQuery,
-  useDeleteInvitiMutation,
-} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import {
-  handleInvitions,
-  handleCurrentInviti,
-  handleIsExportBanner,
-} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
-import {
-  List,
-  Avatar,
-  FAB,
-  Text,
-  Chip,
-  useTheme,
-  Banner,
-  Divider,
-  Dialog,
-  Button,
-  Portal,
-} from 'react-native-paper';
+import {useGetAllInvitationsQuery, useDeleteInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {handleInvitions, handleCurrentInviti, handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {List, Avatar, FAB, Text, Chip, useTheme, Banner, Divider, Dialog, Button, Portal} from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
 import moment from 'moment';
 import {FlashList} from '@shopify/flash-list';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
+import Animated, {interpolate, useAnimatedStyle, useSharedValue, withTiming, Easing} from 'react-native-reanimated';
 import ImportExport from './importExport';
 import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
 
@@ -52,43 +20,27 @@ export default function Example({route}) {
   const {groupId, isHeader} = route.params;
   const invitiBriefModalizeRef = useRef(null);
   const dispatch = useDispatch();
-  const isExportBanner = useSelector(
-    state => state.invitations?.isExportBanner,
-  );
+  const isExportBanner = useSelector(state => state.invitations?.isExportBanner);
 
-  const {data, isError, isLoading, error, isFetching, refetch} =
-    useGetAllInvitationsQuery({
-      groupId,
-    });
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetAllInvitationsQuery({
+    groupId,
+  });
 
-  const currentInvitiToDisplay = useSelector(
-    state => state.invitations?.currentInviti,
-  );
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentInvitiToDisplay = useSelector(state => state.invitations?.currentInviti);
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
-  const invitationSearchQuery = useSelector(
-    state => state.invitations.invitationSearchQuery,
-  );
+  const invitationSearchQuery = useSelector(state => state.invitations.invitationSearchQuery);
 
   useEffect(() => {
     dispatch(handleInvitions(data));
   }, [data]);
 
-  const isInvitaionSearch = useSelector(
-    state => state.invitations.isInvitaionSearch,
-  );
-  const invitaionsForSearch = useSelector(
-    state => state.invitations.invitations,
-  );
-  // useState updates lately, and navigation navigate before the update of state, thats why I used useRef
-  const currentInviti = useRef({});
+  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
+  const invitaionsForSearch = useSelector(state => state.invitations.invitations);
+
   const FABHandler = item => {
-    currentInviti.current = item ? item : {};
     navigation.navigate('AddInviti', {
       groupId: groupId,
-      currentInviti: currentInviti.current,
     });
   };
 
@@ -120,22 +72,15 @@ export default function Example({route}) {
   const theme = useTheme();
 
   const getHighlightedText = result =>
-    result
-      .split(new RegExp(`(${invitationSearchQuery})`, `gi`))
-      .map((piece, index) => {
-        return (
-          <Text
-            key={index}
-            style={
-              piece.toLocaleLowerCase() ==
-              invitationSearchQuery.toLocaleLowerCase()
-                ? {fontWeight: 'bold', color: theme.colors.primary}
-                : {}
-            }>
-            {piece}
-          </Text>
-        );
-      });
+    result.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
+      return (
+        <Text
+          key={index}
+          style={piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase() ? {fontWeight: 'bold', color: theme.colors.primary} : {}}>
+          {piece}
+        </Text>
+      );
+    });
 
   // delete inviti
   const [currentItem, setCurrentItem] = useState({});
@@ -196,21 +141,14 @@ export default function Example({route}) {
                 style={props.style}
                 size={45}
                 avatarStyle={{borderRadius: 20}}
-                source={
-                  item.invitiImageURL
-                    ? {uri: item.invitiImageURL}
-                    : require('../../../../../assets/drawer/male-user.png')
-                }
+                source={item.invitiImageURL ? {uri: item.invitiImageURL} : require('../../../../../assets/drawer/male-user.png')}
               />
             )}
             style={{paddingVertical: '1%'}}
             right={props => {
-              if (item.lastStatus.invitiStatus === 'invited')
-                return <List.Icon {...props} icon="check" />;
-              if (item.lastStatus.invitiStatus === 'pending')
-                return <List.Icon {...props} icon="clock-outline" />;
-              else if (item.lastStatus.invitiStatus === 'rejected')
-                return <List.Icon {...props} icon="cancel" />;
+              if (item.lastStatus.invitiStatus === 'invited') return <List.Icon {...props} icon="check" />;
+              if (item.lastStatus.invitiStatus === 'pending') return <List.Icon {...props} icon="clock-outline" />;
+              else if (item.lastStatus.invitiStatus === 'rejected') return <List.Icon {...props} icon="cancel" />;
             }}
           />
           <Animated.View style={[{overflow: 'hidden'}, bodyHeight]}>
@@ -227,27 +165,19 @@ export default function Example({route}) {
                 }}>
                 <View style={{flexDirection: 'row'}}>
                   <Chip
-                    icon={() => (
-                      <Icon
-                        name="edit"
-                        size={16}
-                        color={theme.colors.onBackground}
-                      />
-                    )}
+                    icon={() => <Icon name="edit" size={16} color={theme.colors.onBackground} />}
                     style={{marginLeft: '4%'}}
                     textStyle={{color: theme.colors.onBackground}}
                     mode="flat"
-                    onPress={() => FABHandler(item)}>
+                    onPress={() => {
+                      navigation.navigate('UpdateInviti', {
+                        currentInviti: item,
+                      });
+                    }}>
                     Edit
                   </Chip>
                   <Chip
-                    icon={() => (
-                      <Icon
-                        name="eye"
-                        size={16}
-                        color={theme.colors.onBackground}
-                      />
-                    )}
+                    icon={() => <Icon name="eye" size={16} color={theme.colors.onBackground} />}
                     style={{marginLeft: '4%'}}
                     textStyle={{color: theme.colors.onBackground}}
                     mode="flat"
@@ -256,9 +186,7 @@ export default function Example({route}) {
                   </Chip>
                 </View>
                 <Chip
-                  icon={() => (
-                    <Icon name="trash-2" size={16} color={theme.colors.error} />
-                  )}
+                  icon={() => <Icon name="trash-2" size={16} color={theme.colors.error} />}
                   style={{marginLeft: '4%'}}
                   textStyle={{color: theme.colors.error}}
                   mode="flat"
@@ -299,40 +227,8 @@ export default function Example({route}) {
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
       {isHeader && (
-        <GuestsAppbar
-          openGuestsImportExportModalize={openGuestsImportExportModalize}
-          openGuestsSummaryModalize={openGuestsSummaryModalize}
-        />
+        <GuestsAppbar openGuestsImportExportModalize={openGuestsImportExportModalize} openGuestsSummaryModalize={openGuestsSummaryModalize} />
       )}
-      <Banner
-        visible={isExportBanner}
-        actions={[
-          {
-            label: 'Understood',
-            onPress: () => dispatch(handleIsExportBanner(false)),
-          },
-        ]}
-        icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
-        Guests List of this group has been exported in Downlaod folder
-        successfully
-      </Banner>
-
-      <Portal>
-        <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>Alert</Dialog.Title>
-          <Dialog.Content>
-            <Text variant="bodyMedium">
-              Do you want to delete "{currentItem?.invitiName}"
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button loading={deleteLoading} disabled={deleteLoading} onPress={()=>deleteHandler(currentItem)} textColor={theme.colors.error}>
-              Yes, delete it
-            </Button>
-            <Button onPress={hideDialog}>No</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
 
       {/* <View>
             <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >
@@ -360,26 +256,44 @@ export default function Example({route}) {
         <FlashList
           data={isInvitaionSearch ? invitaionsForSearch : data}
           estimatedItemSize={100}
-          // keyExtractor={item => item._id}
           ListEmptyComponent={() => (
             <View style={{marginTop: '50%', alignItems: 'center'}}>
               <Text>No invitation</Text>
             </View>
           )}
           renderItem={({item}) => <AccordionItem item={item} />}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
 
-      <FAB
-        icon="plus"
-        size="medium"
-        style={styles.fab}
-        onPress={() => FABHandler()}
-      />
+      <FAB icon="plus" size="medium" style={styles.fab} onPress={() => FABHandler()} />
 
+      <Banner
+        visible={isExportBanner}
+        actions={[
+          {
+            label: 'Understood',
+            onPress: () => dispatch(handleIsExportBanner(false)),
+          },
+        ]}
+        icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
+        Guests List of this group has been exported in Downlaod folder successfully
+      </Banner>
+
+      <Portal>
+        <Dialog visible={visible} onDismiss={hideDialog}>
+          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">Do you want to delete "{currentItem?.invitiName}"</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button loading={deleteLoading} disabled={deleteLoading} onPress={() => deleteHandler(currentItem)} textColor={theme.colors.error}>
+              Yes, delete it
+            </Button>
+            <Button onPress={hideDialog}>No</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       <Modalize
         modalStyle={{backgroundColor: theme.colors.background}}
@@ -389,18 +303,10 @@ export default function Example({route}) {
         snapPoint={400}
         handlePosition="inside"
         modalHeight={600}
-        HeaderComponent={() => (
-          <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />
-        )}>
-        <List.Accordion
-          style={{padding: '4%'}}
-          title="Statuses"
-          expanded={expanded}
-          onPress={handlePress}>
+        HeaderComponent={() => <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />}>
+        <List.Accordion style={{padding: '4%'}} title="Statuses" expanded={expanded} onPress={handlePress}>
           <View style={{marginHorizontal: '5%'}}>
-            <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>
-              Added by
-            </Text>
+            <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>Added by</Text>
             <View
               style={{
                 borderRadius: 10,
@@ -415,13 +321,9 @@ export default function Example({route}) {
                 <View>
                   <Avatar.Icon size={30} icon="account-circle-outline" />
                 </View>
-                <Text style={{marginHorizontal: '4%'}}>
-                  {currentInvitiToDisplay?.addedBy?.name}
-                </Text>
+                <Text style={{marginHorizontal: '4%'}}>{currentInvitiToDisplay?.addedBy?.name}</Text>
               </View>
-              <Text style={{}}>
-                {moment(currentInvitiToDisplay?.createdAt).fromNow()}
-              </Text>
+              <Text style={{}}>{moment(currentInvitiToDisplay?.createdAt).fromNow()}</Text>
             </View>
 
             <Text style={{marginTop: '5%', fontWeight: 'bold'}}>History</Text>
@@ -444,51 +346,25 @@ export default function Example({route}) {
                     }}>
                     <View style={{}}>
                       <Text style={{padding: '2%'}}>
-                        marked as{' '}
-                        <Text style={{fontWeight: 'bold'}}>
-                          {Status.invitiStatus}
-                        </Text>{' '}
-                        by
+                        marked as <Text style={{fontWeight: 'bold'}}>{Status.invitiStatus}</Text> by
                       </Text>
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <Avatar.Image
                           size={30}
                           source={
-                            Status?.addedBy?.imageURL
-                              ? {uri: Status?.addedBy?.imageURL}
-                              : require('../../../../../assets/drawer/male-user.png')
+                            Status?.addedBy?.imageURL ? {uri: Status?.addedBy?.imageURL} : require('../../../../../assets/drawer/male-user.png')
                           }
                         />
                         {/* <Avatar.Icon size={30} icon="account-circle-outline" /> */}
-                        <Text style={{marginHorizontal: '4%'}}>
-                          {Status?.addedBy?.name}
-                        </Text>
+                        <Text style={{marginHorizontal: '4%'}}>{Status?.addedBy?.name}</Text>
                       </View>
                     </View>
                     <View style={{alignItems: 'flex-end'}}>
-                      {Status.invitiStatus === 'rejected' && (
-                        <List.Icon
-                          style={{margin: 0, padding: 0}}
-                          icon="cancel"
-                        />
-                      )}
-                      {Status.invitiStatus === 'pending' && (
-                        <List.Icon
-                          style={{margin: 0, padding: 0}}
-                          icon="clock-outline"
-                        />
-                      )}
-                      {Status.invitiStatus === 'invited' && (
-                        <List.Icon
-                          style={{margin: 0, padding: 0}}
-                          icon="check"
-                        />
-                      )}
+                      {Status.invitiStatus === 'rejected' && <List.Icon style={{margin: 0, padding: 0}} icon="cancel" />}
+                      {Status.invitiStatus === 'pending' && <List.Icon style={{margin: 0, padding: 0}} icon="clock-outline" />}
+                      {Status.invitiStatus === 'invited' && <List.Icon style={{margin: 0, padding: 0}} icon="check" />}
 
-                      <Text style={{alignSelf: 'flex-end'}}>
-                        {moment(Status?.createdAt).fromNow()}{' '}
-                      </Text>
+                      <Text style={{alignSelf: 'flex-end'}}>{moment(Status?.createdAt).fromNow()} </Text>
                     </View>
                   </View>
                 </View>
@@ -498,22 +374,11 @@ export default function Example({route}) {
         </List.Accordion>
       </Modalize>
 
-      <Modalize
-        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
-        ref={importExportModalizeRef}
-        handlePosition="inside"
-        snapPoint={400}>
-        <ImportExport
-          group={route.params.group}
-          onClose={onCloseGuestsImportExport}
-        />
+      <Modalize modalStyle={{backgroundColor: theme.colors.surfaceVariant}} ref={importExportModalizeRef} handlePosition="inside" snapPoint={400}>
+        <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
       </Modalize>
 
-      <Modalize
-        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
-        ref={guestsSummaryModalizeRef}
-        handlePosition="inside"
-        snapPoint={500}>
+      <Modalize modalStyle={{backgroundColor: theme.colors.surfaceVariant}} ref={guestsSummaryModalizeRef} handlePosition="inside" snapPoint={500}>
         {/* <InvitaionsSummary onClose={closeGuestsSummaryModalize} /> */}
       </Modalize>
     </View>

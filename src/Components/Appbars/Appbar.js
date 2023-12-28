@@ -2,20 +2,19 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import {Appbar, Searchbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {handleGroupsSearchText} from '../../redux/reducers/groups/groups';
 
-const Header = ({
-  isSearch,
-  setIsSearch,
-  searchFilterFunction,
-  onOpen,
-  theme,
-}) => {
+const Header = ({isSearch, setIsSearch, searchFilterFunction, onOpen, theme}) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
   //search
   const [search, setSearch] = useState('');
   const updateSearch = search => {
     setSearch(search);
     searchFilterFunction(search);
+    dispatch(handleGroupsSearchText(search));
   };
   const BlurHandler = () => {
     setIsSearch(!isSearch);
@@ -25,24 +24,15 @@ const Header = ({
   return (
     <View>
       {!isSearch ? (
-        <Appbar.Header
-          style={{backgroundColor: theme.colors.background}}
-          elevated={true}>
-          <Appbar.BackAction
-            color={theme.colors.onBackground}
-            onPress={() => navigation.replace('PinnedGroup')}
-          />
+        <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated={true}>
+          <Appbar.BackAction color={theme.colors.onBackground} onPress={() => navigation.replace('PinnedGroup')} />
           <Appbar.Content
             title="Groups"
             titleStyle={{
               color: theme.colors.onBackground,
             }}
           />
-          <Appbar.Action
-            icon="plus"
-            color={theme.colors.onBackground}
-            onPress={onOpen}
-          />
+          <Appbar.Action icon="plus" color={theme.colors.onBackground} onPress={onOpen} />
           <Appbar.Action
             icon="magnify"
             color={theme.colors.onBackground}

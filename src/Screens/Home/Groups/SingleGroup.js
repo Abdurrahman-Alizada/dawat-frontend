@@ -9,6 +9,7 @@ import {
   Checkbox,
   ActivityIndicator,
   IconButton,
+  Text,
 } from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -28,6 +29,7 @@ const SingleGroup = ({
   theme,
 }) => {
   const dispatch = useDispatch();
+  const groupSearchText = useSelector(state => state.groups.groupSearchText);
 
   const onPressHandler = async () => {
     setIsSearch(false);
@@ -95,24 +97,36 @@ const SingleGroup = ({
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
-  const [token, setToken] = useState(null);
   const [pinGroup, setPinGroup] = useState(null);
 
   useEffect(() => {
-    const getToken = async () => {
-      const t = await AsyncStorage.getItem('token');
+    const getData = async () => {
       const p = await AsyncStorage.getItem('pinGroup');
       const pp = JSON.parse(p);
       setPinGroup(pp);
-      setToken(t);
     };
-    getToken();
+    getData();
   }, []);
+
+  const getHighlightedText = result =>
+  result?.split(new RegExp(`(${groupSearchText})`, `gi`)).map((piece, index) => {
+    return (
+      <Text
+        key={index}
+        style={
+          piece.toLocaleLowerCase() == groupSearchText.toLocaleLowerCase()
+            ? {color: theme.colors.primary, fontWeight:"bold"}
+            : {}
+        }>
+        {piece}
+      </Text>
+    );
+  });
 
   return (
     <List.Item
       onLongPress={() => onLongPressHandler()}
-      title={item.groupName}
+      title={getHighlightedText(item.groupName)}
       description={item.groupDescription}
       titleStyle={{color: theme.colors.onBackground}}
       descriptionStyle={{color: theme.colors.textGray}}

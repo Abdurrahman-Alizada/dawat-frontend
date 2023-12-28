@@ -3,10 +3,7 @@ import React, {useState} from 'react';
 import {Button, Checkbox, Divider, List, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  useAddGroupMutation,
-  useAddMultipleGroupMutation,
-} from '../../../redux/reducers/groups/groupThunk';
+import {useAddGroupMutation, useAddMultipleGroupMutation} from '../../../redux/reducers/groups/groupThunk';
 
 const SyncDataIndex = () => {
   const navigation = useNavigation();
@@ -16,8 +13,7 @@ const SyncDataIndex = () => {
   const [guestsChecked, setGuestsChecked] = useState(true);
   const [tasksChecked, setTasksChecked] = useState(true);
 
-  const [addMultipleGroup, {isLoading: addGroupLoading}] =
-    useAddMultipleGroupMutation();
+  const [addMultipleGroup, {isLoading: addGroupLoading}] = useAddMultipleGroupMutation();
 
   const syncDataHandler = async () => {
     const Grp = JSON.parse(await AsyncStorage.getItem('groups'));
@@ -27,20 +23,24 @@ const SyncDataIndex = () => {
       setTasksChecked(false);
     }
     let groups = [];
-    for (let i = 0; i < Grp.length; i++) {
+    let groups1 = Grp;
+
+    for (let i = 0; i < Grp?.length; i++) {
       if (Grp[i].isSyncd === false) {
         groups.push(Grp[i]);
+        groups1.splice(i, 1);
       }
     }
     addMultipleGroup({
       groups: groups,
     })
-      .then(res => {
-        console.log('first', res);
+      .then(async res => {
         if (res.data) {
-        //   navigation.navigate('Drawer', {
-        //     sreen: 'Home',
-        //   });
+          let newGroups = [...groups1, ...res.data];
+          await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+          navigation.navigate('Drawer', {
+            sreen: 'Home',
+          });
         }
       })
       .catch(err => {
@@ -107,7 +107,8 @@ const SyncDataIndex = () => {
           margin: '5%',
         }}>
         <Button
-          disabled={!groupChecked}
+          disabled={!groupChecked || addGroupLoading}
+          loading={addGroupLoading}
           contentStyle={{padding: '2%'}}
           theme={{roundness: 20}}
           mode="contained"
@@ -123,7 +124,11 @@ const SyncDataIndex = () => {
           contentStyle={{padding: '2%'}}
           theme={{roundness: 20}}
           mode="outlined"
-          onPress={() => navigation.navigate('SyncData')}>
+          onPress={() =>
+            navigation.navigate('Drawer', {
+              sreen: 'Home',
+            })
+          }>
           Continue without sync
         </Button>
       </View>

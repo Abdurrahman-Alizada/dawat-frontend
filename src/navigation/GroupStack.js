@@ -10,6 +10,7 @@ import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSetting
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
 import InvitiDetails from '../Screens/Home/Groups/GroupDetail/Invitations/InvitiDetails';
 import AddInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddInviti';
+import UpdateInviti from '../Screens/Home/Groups/GroupDetail/Invitations/updateInviti';
 
 import AddMultipleInviti from '../Screens/Home/Groups/GroupDetail/Invitations/AddMultipleInviti';
 import MultipleInvitiActions from '../Screens/Home/Groups/GroupDetail/Invitations/multipleInvitiesActions';
@@ -55,7 +56,7 @@ const AppStack = () => {
         component={Groupbrief}
         options={{
           title: 'Group brief',
-          headerShown:false
+          headerShown: false,
           // header: props => <GeneralAppbar title="Group brief" {...props} />,
         }}
       />
@@ -150,6 +151,14 @@ const AppStack = () => {
         options={{
           // headerShown:false
           header: props => <GeneralAppbar title="Add inviti" {...props} />,
+        }}
+      />
+      <Stack.Screen
+        name="UpdateInviti"
+        component={UpdateInviti}
+        options={{
+          // headerShown:false
+          header: props => <GeneralAppbar title="Update inviti" {...props} />,
         }}
       />
       <Stack.Screen
