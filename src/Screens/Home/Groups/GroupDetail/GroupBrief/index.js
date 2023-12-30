@@ -28,6 +28,7 @@ const Index = ({group, onClose}) => {
 
   const goBack = () => navigation.goBack();
 
+  
   return (
     <View style={{flex: 1}}>
       <GeneralAppbar title={'Summary'} back={goBack} navigation={navigation} />

@@ -16,6 +16,7 @@ import {useDispatch} from 'react-redux';
 import {selectedMessageIdsClearHandler} from '../../../../redux/reducers/groups/chat/chatSlice';
 import InvitaionsSummary from './Invitations/invitaionsSummary';
 import TasksSummary from './Tasks/TasksSummary';
+import ImportExport from './Invitations/importExport'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -155,10 +156,12 @@ const Index = ({route, navigation}) => {
         ref={importExportModalizeRef}
         handlePosition="inside"
         snapPoint={400}>
-        <GroupBrief
+        {/* <GroupBrief
           group={route.params.group}
           onClose={onCloseGuestsImportExport}
-        />
+        /> */}
+        <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
+
       </Modalize>
 
       <Modalize

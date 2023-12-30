@@ -8,13 +8,7 @@ import {
   KeyboardAvoidingView,
   Image,
 } from 'react-native';
-import React, {
-  useState,
-  useCallback,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-} from 'react';
+import React, {useState, useCallback, useRef, useEffect, useLayoutEffect} from 'react';
 import {
   Avatar,
   TextInput,
@@ -55,9 +49,7 @@ const Index = ({route, navigation}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [localDeleteLoding, setLocalDeleteLoading] = useState(false);
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
   const PG = useSelector(state => state.groups?.pinGroup);
 
   const [adminIds, setAdminIds] = useState([]);
@@ -71,8 +63,7 @@ const Index = ({route, navigation}) => {
   }, []);
 
   // component state - start
-  const {users, groupName, _id, groupDescription, groupAdmins, createdBy} =
-    currentViewingGroup;
+  const {users, groupName, _id, groupDescription, groupAdmins, createdBy} = currentViewingGroup;
   const [name, setName] = useState(groupName);
   const [description, setDescription] = useState(groupDescription);
   const [userId, setUserId] = useState('');
@@ -105,18 +96,14 @@ const Index = ({route, navigation}) => {
   // redux toolkit - start
   const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
 
-  const [updateLocalGroupNameLoading, setUpdateLocalGroupNameLoading] =
-    useState(false);
-  const [updateGroupName, {isLoading: updateGroupNameLoading}] =
-    useUpdateGroupNameMutation();
+  const [updateLocalGroupNameLoading, setUpdateLocalGroupNameLoading] = useState(false);
+  const [updateGroupName, {isLoading: updateGroupNameLoading}] = useUpdateGroupNameMutation();
   const [updateGroupDescription, {isLoading: updateGroupDescriptionLoading}] =
     useUpdateGroupDescriptionMutation();
-  const [updateImageURL, {isLoading: updateImageURLLoging}] =
-    useUpdateImageURLMutation();
+  const [updateImageURL, {isLoading: updateImageURLLoging}] = useUpdateImageURLMutation();
   const [imageUploading, setimageUploading] = useState(false);
 
-  const [deleteGroupForUser, {isLoading: deleteLoading}] =
-    useDeleteGroupForUserMutation();
+  const [deleteGroupForUser, {isLoading: deleteLoading}] = useDeleteGroupForUserMutation();
   // redux toolkit - end
 
   // functions - start
@@ -194,9 +181,7 @@ const Index = ({route, navigation}) => {
 
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
-      let data = JSON.parse(groups).filter(
-        grp => grp._id !== currentViewingGroup._id,
-      );
+      let data = JSON.parse(groups).filter(grp => grp._id !== currentViewingGroup._id);
       let newGroups = [group, ...data];
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
     } else {
@@ -251,7 +236,7 @@ const Index = ({route, navigation}) => {
     })
       .then(res => {
         setShowSnakeBar(false);
-        handleDelete()
+        handleDelete();
       })
       .catch(e => {
         console.log('error in handleLeave', e);
@@ -271,10 +256,7 @@ const Index = ({route, navigation}) => {
     let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
 
     if (pg?._id === currentViewingGroup._id) {
-      await AsyncStorage.setItem(
-        'pinGroup',
-        JSON.stringify(newArr?.length ? newArr[0] : null),
-      );
+      await AsyncStorage.setItem('pinGroup', JSON.stringify(newArr?.length ? newArr[0] : null));
     }
     dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
     setLocalDeleteLoading(false);
@@ -607,9 +589,7 @@ const Index = ({route, navigation}) => {
                       navigation.navigate('updateGroupMembers');
                     }}
                     title="Add Member"
-                    left={() => (
-                      <Avatar.Icon size={50} icon="account-plus-outline" />
-                    )}
+                    left={() => <Avatar.Icon size={50} icon="account-plus-outline" />}
                   />
 
                   <Divider />
@@ -635,15 +615,12 @@ const Index = ({route, navigation}) => {
                               {createdBy?._id === member?._id && (
                                 <View
                                   style={{
-                                    backgroundColor:
-                                      theme.colors.primaryContainer,
+                                    backgroundColor: theme.colors.primaryContainer,
                                     paddingVertical: '2%',
                                     paddingHorizontal: '5%',
                                     borderRadius: 5,
                                   }}>
-                                  <Text style={{textAlign: 'center'}}>
-                                    Creator
-                                  </Text>
+                                  <Text style={{textAlign: 'center'}}>Creator</Text>
                                 </View>
                               )}
                             </View>
@@ -666,9 +643,7 @@ const Index = ({route, navigation}) => {
                               }
                               icon="delete"
                               size={20}
-                              onPress={() =>
-                                handleRemoveUserFromGroup(member._id)
-                              }
+                              onPress={() => handleRemoveUserFromGroup(member._id)}
                               mode="contained-tonal"
                             />
                           ) : null}
@@ -712,18 +687,14 @@ const Index = ({route, navigation}) => {
                   <List.Item
                     onPress={handleLeave}
                     title="Leave group"
-                    left={() => (
-                      <List.Icon color={theme.colors.error} icon="logout" />
-                    )}
+                    left={() => <List.Icon color={theme.colors.error} icon="logout" />}
                     titleStyle={{color: theme.colors.error}}
                   />
                 ) : (
                   <List.Item
                     onPress={handleDelete}
                     title="Delete group"
-                    left={() => (
-                      <List.Icon color={theme.colors.error} icon="delete" />
-                    )}
+                    left={() => <List.Icon color={theme.colors.error} icon="delete" />}
                     titleStyle={{color: theme.colors.error}}
                   />
                 )}
@@ -806,15 +777,9 @@ const Index = ({route, navigation}) => {
               icon="check"
               mode="contained"
               loading={updateGroupNameLoading || updateLocalGroupNameLoading}
-              onPress={() =>
-                token ? handleUpdateGroupName() : updateLocalGroupS()
-              }
+              onPress={() => (token ? handleUpdateGroupName() : updateLocalGroupS())}
               theme={{roundness: 1}}
-              disabled={
-                updateGroupNameLoading ||
-                updateLocalGroupNameLoading ||
-                name.length < 1
-              }>
+              disabled={updateGroupNameLoading || updateLocalGroupNameLoading || name.length < 1}>
               Ok
             </Button>
           </View>
@@ -866,12 +831,8 @@ const Index = ({route, navigation}) => {
               }}
               icon="check"
               mode="contained"
-              loading={
-                updateGroupDescriptionLoading || updateLocalGroupNameLoading
-              }
-              onPress={() =>
-                token ? handleUpdateGroupDescription() : updateLocalGroupS()
-              }
+              loading={updateGroupDescriptionLoading || updateLocalGroupNameLoading}
+              onPress={() => (token ? handleUpdateGroupDescription() : updateLocalGroupS())}
               theme={{roundness: 1}}
               disabled={
                 updateLocalGroupNameLoading ||

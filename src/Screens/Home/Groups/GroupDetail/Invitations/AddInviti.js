@@ -5,16 +5,27 @@
 //  Modified by : -------
 // ==========================================
 import {TouchableOpacity, View} from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Avatar, IconButton, TextInput, Button, List, Text, useTheme, Chip, FAB} from 'react-native-paper';
+import {
+  Avatar,
+  IconButton,
+  TextInput,
+  Button,
+  List,
+  Text,
+  useTheme,
+  Chip,
+  FAB,
+} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import AvatarModal from '../../../../Drawer/Profile/AvatarModal';
 import {useAddInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {Modalize} from 'react-native-modalize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
@@ -22,6 +33,7 @@ const validationSchema = Yup.object().shape({
 
 const AddInviti = ({route, navigation}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
   const {groupId} = route.params;
   const [addInviti, {isLoading}] = useAddInvitiMutation();
@@ -31,6 +43,7 @@ const AddInviti = ({route, navigation}) => {
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
 
   const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
+  const invitiFlag = useSelector(state => state.invitations.invitiFlag);
 
   let openCamera = () => {
     setModalVisible(!modalVisible);
@@ -87,6 +100,14 @@ const AddInviti = ({route, navigation}) => {
     {label: 'Other', value: 'other'},
   ]);
 
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
 
@@ -99,8 +120,6 @@ const AddInviti = ({route, navigation}) => {
     data.append('file', photo);
     data.append('upload_preset', 'bzgif1or');
     data.append('cloud_name', 'dblhm3cbq');
-
-    // addInvitiLocally(values)
 
     // if user upload image from mobile then execute if otherwise else.
     if (photo.uri) {
@@ -144,27 +163,31 @@ const AddInviti = ({route, navigation}) => {
     }
   };
 
-  const addInvitiLocally = async values => {
+  const createInvitiLocally = async values => {
+    const user = {name: 'You'};
     const newGuest = {
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
       invitiImageURL: '',
-      addedBy: values.addedBy,
+      addedBy: values.addedBy ? values.addedBy : user,
       lastStatus: {
         invitiStatus: selectedstatus,
-        addedBy: values?.lastStatus?.addedBy,
+        addedBy: values?.lastStatus?.addedBy ? values?.lastStatus?.addedBy : user,
       },
       statuses: values.statuses,
       groupId: currentViewingGroup?._id,
+      isSync: false,
     };
 
     let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
-    if (!guests) {
-      guests = [newGuest];
-    } else {
+    if (guests) {
       guests = [...guests, newGuest];
+    } else {
+      guests = [newGuest];
     }
     await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    navigation.goBack();
   };
 
   const modalizeRef = useRef(null);
@@ -184,18 +207,31 @@ const AddInviti = ({route, navigation}) => {
           invitiDescription: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={values => submitHandler(values)}>
+        // onSubmit={values => submitHandler(values)}
+        onSubmit={values => (token ? submitHandler(values) : createInvitiLocally(values))}>
         {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
           <View style={{marginVertical: '2%', flex: 1}}>
             <TouchableOpacity style={{width: '50%', alignSelf: 'center'}} onPress={onOpenModalize}>
               {fileData ? (
-                <Avatar.Image source={{uri: fileData.path}} style={{alignSelf: 'center'}} size={100} />
+                <Avatar.Image
+                  source={{uri: fileData.path}}
+                  style={{alignSelf: 'center'}}
+                  size={100}
+                />
               ) : (
                 <View>
                   {avatarURL ? (
-                    <Avatar.Image source={{uri: avatarURL}} style={{alignSelf: 'center'}} size={100} />
+                    <Avatar.Image
+                      source={{uri: avatarURL}}
+                      style={{alignSelf: 'center'}}
+                      size={100}
+                    />
                   ) : (
-                    <Avatar.Icon icon="account-circle-outline" style={{alignSelf: 'center'}} size={100} />
+                    <Avatar.Icon
+                      icon="account-circle-outline"
+                      style={{alignSelf: 'center'}}
+                      size={100}
+                    />
                   )}
                 </View>
               )}
@@ -221,7 +257,9 @@ const AddInviti = ({route, navigation}) => {
               onBlur={handleBlur('invitiName')}
               value={values.invitiName}
             />
-            {errors.invitiName && touched.invitiName ? <Text style={{color: theme.colors.error, fontSize: 13}}>{errors.invitiName}</Text> : null}
+            {errors.invitiName && touched.invitiName ? (
+              <Text style={{color: theme.colors.error, fontSize: 13}}>{errors.invitiName}</Text>
+            ) : null}
 
             <TextInput
               error={errors.invitiDescription && touched.invitiDescription ? true : false}
@@ -234,7 +272,9 @@ const AddInviti = ({route, navigation}) => {
               value={values.invitiDescription}
             />
             {errors.invitiDescription && touched.invitiDescription ? (
-              <Text style={{color: theme.colors.error, fontSize: 13}}>{errors.invitiDescription}</Text>
+              <Text style={{color: theme.colors.error, fontSize: 13}}>
+                {errors.invitiDescription}
+              </Text>
             ) : null}
 
             <View>
@@ -273,7 +313,11 @@ const AddInviti = ({route, navigation}) => {
         )}
       </Formik>
 
-      <Modalize modalStyle={{backgroundColor: theme.colors.background}} ref={modalizeRef} adjustToContentHeight={true} handlePosition="inside">
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.background}}
+        ref={modalizeRef}
+        adjustToContentHeight={true}
+        handlePosition="inside">
         <View
           style={{
             paddingVertical: '8%',
@@ -282,11 +326,23 @@ const AddInviti = ({route, navigation}) => {
             backgroundColor: theme.colors.background,
           }}>
           <View style={{alignItems: 'center'}}>
-            <IconButton style={{marginHorizontal: '2%'}} icon="camera-image" mode="outlined" size={40} onPress={openCamera} />
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="camera-image"
+              mode="outlined"
+              size={40}
+              onPress={openCamera}
+            />
             <Text>Camera</Text>
           </View>
           <View style={{alignItems: 'center'}}>
-            <IconButton style={{marginHorizontal: '2%'}} icon="image-outline" mode="outlined" size={40} onPress={openGallery} />
+            <IconButton
+              style={{marginHorizontal: '2%'}}
+              icon="image-outline"
+              mode="outlined"
+              size={40}
+              onPress={openGallery}
+            />
             <Text>Gallery</Text>
           </View>
           <View style={{alignItems: 'center'}}>

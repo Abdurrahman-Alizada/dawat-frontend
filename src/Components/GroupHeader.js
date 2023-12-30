@@ -247,7 +247,7 @@ const Header = ({
                       closeMenu();
                       navigation.navigate('MultipleInvitiActions');
                     }}
-                    title="Edit multiple inviti"
+                    title="Bulk actions"
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
                   />
                 </View>

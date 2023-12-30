@@ -1,59 +1,121 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {StyleSheet, View, FlatList, RefreshControl, ScrollView, TouchableWithoutFeedback} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
 import {Modalize} from 'react-native-modalize';
-import {useGetAllInvitationsQuery, useDeleteInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import {handleInvitions, handleCurrentInviti, handleIsExportBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
-import {List, Avatar, FAB, Text, Chip, useTheme, Banner, Divider, Dialog, Button, Portal} from 'react-native-paper';
+import {
+  useGetAllInvitationsQuery,
+  useDeleteInvitiMutation,
+} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import {
+  handleInvitions,
+  handleCurrentInviti,
+  handleIsExportBanner,
+  handleInvitiFlag,
+} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {
+  List,
+  Avatar,
+  FAB,
+  Text,
+  Chip,
+  useTheme,
+  Banner,
+  Divider,
+  Dialog,
+  Button,
+  Portal,
+} from 'react-native-paper';
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
 import moment from 'moment';
 import {FlashList} from '@shopify/flash-list';
-import Animated, {interpolate, useAnimatedStyle, useSharedValue, withTiming, Easing} from 'react-native-reanimated';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import ImportExport from './importExport';
 import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 export default function Example({route}) {
   const navigation = useNavigation();
-  const {groupId, isHeader} = route.params;
-  const invitiBriefModalizeRef = useRef(null);
+  const theme = useTheme();
   const dispatch = useDispatch();
+  const netInfo = useNetInfo();
+
+  const {groupId, isHeader} = route.params;
+
+  const currentInvitiToDisplay = useSelector(state => state.invitations?.currentInviti);
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const invitationSearchQuery = useSelector(state => state.invitations.invitationSearchQuery);
+  const invitiFlag = useSelector(state => state.invitations.invitiFlag);
+  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
+  const invitaionsForSearch = useSelector(state => state.invitations.invitations);
   const isExportBanner = useSelector(state => state.invitations?.isExportBanner);
+
+  const invitiBriefModalizeRef = useRef(null);
 
   const {data, isError, isLoading, error, isFetching, refetch} = useGetAllInvitationsQuery({
     groupId,
   });
 
-  const currentInvitiToDisplay = useSelector(state => state.invitations?.currentInviti);
-  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const [localLoading, setLoacalLoading] = useState(true);
+  const [filterdInvities, setFilterdInvities] = useState([]);
+  
+  const invitiesHandler = async () => {
+    setLoacalLoading(true);
+    let localInvities = await getLocalInvities();
+  
+    if (data && !isLoading && !isFetching && netInfo.isConnected) {
+      let ids = new Set(localInvities?.map(d => d._id));
+      localInvities = [...localInvities, ...data?.filter(d => !ids.has(d._id))];
+      setFilterdInvities(localInvities);
+      await AsyncStorage.setItem(
+        `guests_${currentViewingGroup?._id}`,
+        JSON.stringify(localInvities),
+      );
+    } else {
+      setFilterdInvities(localInvities);
+    }
+    dispatch(handleInvitions(localInvities));
+    setLoacalLoading(false);
+  };
 
-  const invitationSearchQuery = useSelector(state => state.invitations.invitationSearchQuery);
+  const getLocalInvities = async () => {
+    let retString = await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`);
+    let aa = JSON.parse(retString);
+    return aa ? aa : [];
+  };
+
+  // sync with database if inviti is not uploaded
+  const [notSyncInvities, setNotSyncInvities] = useState([]);
+  const notSyncInvitiHandler = async () => {
+    const notSyncInvitiesArray = filterdInvities.filter(item => item.isSync == false);
+    setNotSyncInvities(notSyncInvitiesArray);
+  };
 
   useEffect(() => {
-    dispatch(handleInvitions(data));
-  }, [data]);
+    invitiesHandler();
+    notSyncInvitiHandler();
+  }, [data, invitiFlag, isFetching]);
 
-  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
-  const invitaionsForSearch = useSelector(state => state.invitations.invitations);
-
-  const FABHandler = item => {
+  const FABHandler = () => {
     navigation.navigate('AddInviti', {
       groupId: groupId,
     });
-  };
-
-  const [chips, setChips] = useState([
-    {id: 0, name: 'Invited', selected: true},
-    {id: 1, name: 'Rejected', selected: false},
-    {id: 2, name: 'Pending', selected: true},
-    {id: 3, name: 'Pending', selected: false},
-    {id: 4, name: 'Other', selected: true},
-  ]);
-  const [selectedChips, setSelectedChips] = useState([]);
-  const selectedChipsHandler = id => {
-    setSelectedChips([...selectedChips, id]);
   };
 
   const BriefHandler = item => {
@@ -69,14 +131,16 @@ export default function Example({route}) {
     invitiBriefModalizeRef.current?.close();
   };
 
-  const theme = useTheme();
-
   const getHighlightedText = result =>
-    result.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
+    result?.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
       return (
         <Text
           key={index}
-          style={piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase() ? {fontWeight: 'bold', color: theme.colors.primary} : {}}>
+          style={
+            piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase()
+              ? {fontWeight: 'bold', color: theme.colors.primary}
+              : {}
+          }>
           {piece}
         </Text>
       );
@@ -93,17 +157,32 @@ export default function Example({route}) {
   const hideDialog = () => setVisible(false);
 
   const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
-  const deleteHandler = async item => {
-    await deleteInviti({
+  const deleteHandler = item => {
+    deleteInviti({
       groupId: currentViewingGroup._id,
       invitiId: item?._id,
     })
-      .then(response => {
+      .then(res => {
         hideDialog();
+        // deleteInvitiFromLocalStorage(res.data?._id);
+
       })
       .catch(e => {
         console.log('error in deleteHandler', e);
-      });
+      }).finally(()=>{
+        deleteInvitiFromLocalStorage(item?._id);
+      })
+  };
+
+  const deleteInvitiFromLocalStorage = async invitiId => {
+    let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
+    guests = guests.filter(object => {
+      return object._id !== invitiId;
+    });
+    console.log("third", guests.length)
+    await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    hideDialog();
   };
 
   // item to render in flatlist
@@ -141,14 +220,21 @@ export default function Example({route}) {
                 style={props.style}
                 size={45}
                 avatarStyle={{borderRadius: 20}}
-                source={item.invitiImageURL ? {uri: item.invitiImageURL} : require('../../../../../assets/drawer/male-user.png')}
+                source={
+                  item.invitiImageURL
+                    ? {uri: item.invitiImageURL}
+                    : require('../../../../../assets/drawer/male-user.png')
+                }
               />
             )}
             style={{paddingVertical: '1%'}}
             right={props => {
-              if (item.lastStatus.invitiStatus === 'invited') return <List.Icon {...props} icon="check" />;
-              if (item.lastStatus.invitiStatus === 'pending') return <List.Icon {...props} icon="clock-outline" />;
-              else if (item.lastStatus.invitiStatus === 'rejected') return <List.Icon {...props} icon="cancel" />;
+              if (item.lastStatus?.invitiStatus === 'invited')
+                return <List.Icon {...props} icon="check" />;
+              if (item.lastStatus?.invitiStatus === 'pending')
+                return <List.Icon {...props} icon="clock-outline" />;
+              else if (item.lastStatus?.invitiStatus === 'rejected')
+                return <List.Icon {...props} icon="cancel" />;
             }}
           />
           <Animated.View style={[{overflow: 'hidden'}, bodyHeight]}>
@@ -190,7 +276,6 @@ export default function Example({route}) {
                   style={{marginLeft: '4%'}}
                   textStyle={{color: theme.colors.error}}
                   mode="flat"
-                  // onPress={() => deleteHandler(item)}
                   onPress={() => showDialog(item)}>
                   Delete
                 </Chip>
@@ -220,14 +305,34 @@ export default function Example({route}) {
   const openGuestsSummaryModalize = () => {
     guestsSummaryModalizeRef.current?.open();
   };
-  const closeGuestsSummaryModalize = () => {
-    guestsSummaryModalizeRef.current?.close();
+
+  const [chips, setChips] = useState([
+    {id: 0, name: 'Invited', selected: true},
+    {id: 1, name: 'Rejected', selected: false},
+    {id: 2, name: 'Pending', selected: true},
+    {id: 3, name: 'Pending', selected: false},
+    {id: 4, name: 'Other', selected: true},
+  ]);
+  const [selectedChips, setSelectedChips] = useState([]);
+  const selectedChipsHandler = id => {
+    setSelectedChips([...selectedChips, id]);
   };
+
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
 
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
       {isHeader && (
-        <GuestsAppbar openGuestsImportExportModalize={openGuestsImportExportModalize} openGuestsSummaryModalize={openGuestsSummaryModalize} />
+        <GuestsAppbar
+          openGuestsImportExportModalize={openGuestsImportExportModalize}
+          openGuestsSummaryModalize={openGuestsSummaryModalize}
+        />
       )}
 
       {/* <View>
@@ -245,26 +350,23 @@ export default function Example({route}) {
             </ScrollView>
         </View> */}
 
-      {isLoading ? (
-        <View
-          style={{
-            margin: '3%',
-          }}>
-          <InvitaionsList />
-        </View>
-      ) : (
-        <FlashList
-          data={isInvitaionSearch ? invitaionsForSearch : data}
-          estimatedItemSize={100}
-          ListEmptyComponent={() => (
-            <View style={{marginTop: '50%', alignItems: 'center'}}>
-              <Text>No invitation</Text>
-            </View>
-          )}
-          renderItem={({item}) => <AccordionItem item={item} />}
-          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
-        />
-      )}
+      <FlashList
+        data={isInvitaionSearch ? invitaionsForSearch : filterdInvities}
+        estimatedItemSize={100}
+        ListEmptyComponent={() => (
+          <View style={{marginTop: '50%', alignItems: 'center'}}>
+            {isLoading || localLoading ? (
+              <Text>Loading...</Text>
+            ) : (
+              <Text>
+                {isInvitaionSearch ? 'Type something fimiliar to search' : 'No invitation'}
+              </Text>
+            )}
+          </View>
+        )}
+        renderItem={({item}) => <AccordionItem item={item} />}
+        refreshControl={<RefreshControl refreshing={isFetching || isLoading} onRefresh={refetch} />}
+      />
 
       <FAB icon="plus" size="medium" style={styles.fab} onPress={() => FABHandler()} />
 
@@ -287,7 +389,13 @@ export default function Example({route}) {
             <Text variant="bodyMedium">Do you want to delete "{currentItem?.invitiName}"</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button loading={deleteLoading} disabled={deleteLoading} onPress={() => deleteHandler(currentItem)} textColor={theme.colors.error}>
+            <Button
+              loading={deleteLoading}
+              disabled={deleteLoading}
+              onPress={() =>
+                token ? deleteHandler(currentItem) : deleteInvitiFromLocalStorage(currentItem._id)
+              }
+              textColor={theme.colors.error}>
               Yes, delete it
             </Button>
             <Button onPress={hideDialog}>No</Button>
@@ -304,7 +412,11 @@ export default function Example({route}) {
         handlePosition="inside"
         modalHeight={600}
         HeaderComponent={() => <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />}>
-        <List.Accordion style={{padding: '4%'}} title="Statuses" expanded={expanded} onPress={handlePress}>
+        <List.Accordion
+          style={{padding: '4%'}}
+          title="Statuses"
+          expanded={expanded}
+          onPress={handlePress}>
           <View style={{marginHorizontal: '5%'}}>
             <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>Added by</Text>
             <View
@@ -321,7 +433,9 @@ export default function Example({route}) {
                 <View>
                   <Avatar.Icon size={30} icon="account-circle-outline" />
                 </View>
-                <Text style={{marginHorizontal: '4%'}}>{currentInvitiToDisplay?.addedBy?.name}</Text>
+                <Text style={{marginHorizontal: '4%'}}>
+                  {currentInvitiToDisplay?.addedBy?.name}
+                </Text>
               </View>
               <Text style={{}}>{moment(currentInvitiToDisplay?.createdAt).fromNow()}</Text>
             </View>
@@ -352,7 +466,9 @@ export default function Example({route}) {
                         <Avatar.Image
                           size={30}
                           source={
-                            Status?.addedBy?.imageURL ? {uri: Status?.addedBy?.imageURL} : require('../../../../../assets/drawer/male-user.png')
+                            Status?.addedBy?.imageURL
+                              ? {uri: Status?.addedBy?.imageURL}
+                              : require('../../../../../assets/drawer/male-user.png')
                           }
                         />
                         {/* <Avatar.Icon size={30} icon="account-circle-outline" /> */}
@@ -360,11 +476,19 @@ export default function Example({route}) {
                       </View>
                     </View>
                     <View style={{alignItems: 'flex-end'}}>
-                      {Status.invitiStatus === 'rejected' && <List.Icon style={{margin: 0, padding: 0}} icon="cancel" />}
-                      {Status.invitiStatus === 'pending' && <List.Icon style={{margin: 0, padding: 0}} icon="clock-outline" />}
-                      {Status.invitiStatus === 'invited' && <List.Icon style={{margin: 0, padding: 0}} icon="check" />}
+                      {Status.invitiStatus === 'rejected' && (
+                        <List.Icon style={{margin: 0, padding: 0}} icon="cancel" />
+                      )}
+                      {Status.invitiStatus === 'pending' && (
+                        <List.Icon style={{margin: 0, padding: 0}} icon="clock-outline" />
+                      )}
+                      {Status.invitiStatus === 'invited' && (
+                        <List.Icon style={{margin: 0, padding: 0}} icon="check" />
+                      )}
 
-                      <Text style={{alignSelf: 'flex-end'}}>{moment(Status?.createdAt).fromNow()} </Text>
+                      <Text style={{alignSelf: 'flex-end'}}>
+                        {moment(Status?.createdAt).fromNow()}{' '}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -374,12 +498,12 @@ export default function Example({route}) {
         </List.Accordion>
       </Modalize>
 
-      <Modalize modalStyle={{backgroundColor: theme.colors.surfaceVariant}} ref={importExportModalizeRef} handlePosition="inside" snapPoint={400}>
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={importExportModalizeRef}
+        handlePosition="inside"
+        snapPoint={400}>
         <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
-      </Modalize>
-
-      <Modalize modalStyle={{backgroundColor: theme.colors.surfaceVariant}} ref={guestsSummaryModalizeRef} handlePosition="inside" snapPoint={500}>
-        {/* <InvitaionsSummary onClose={closeGuestsSummaryModalize} /> */}
       </Modalize>
     </View>
   );

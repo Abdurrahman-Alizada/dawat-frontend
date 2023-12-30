@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Avatar, List, Snackbar, Text, useTheme} from 'react-native-paper';
 import RNFS from 'react-native-fs';
@@ -12,44 +12,30 @@ import {handleIsExportBanner} from '../../../../../redux/reducers/groups/invitat
 import moment from 'moment';
 import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 import DocumentPicker, {types} from 'react-native-document-picker';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Index = ({group, onClose}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const theme = useTheme()
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const theme = useTheme();
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const invitations = useSelector(state => state.invitations?.invitations);
 
-  const {
-    data,
-    isError,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-    getAllInvitations,
-  } = useGetAllInvitationsQuery({
-    groupId: currentViewingGroup._id,
-  });
-
-  const [addMultipleInviti, {isLoading: addMultipleInvitiLoading}] =
-    useAddMultipleInvitiMutation();
+  const {data, isError, isLoading, error, isFetching, refetch, getAllInvitations} =
+    useGetAllInvitationsQuery({
+      groupId: currentViewingGroup._id,
+    });
 
   const importCSV = () => {
     check(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
       .then(result => {
         switch (result) {
           case RESULTS.UNAVAILABLE:
-            console.log(
-              'This feature is not available (on this device / in this context)',
-            );
+            console.log('This feature is not available (on this device / in this context)');
             break;
           case RESULTS.DENIED:
-            console.log(
-              'The permission has not been requested / is denied but requestable',
-            );
+            console.log('The permission has not been requested / is denied but requestable');
             request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
               .then(result => {
                 console.log(result);
@@ -78,15 +64,15 @@ const Index = ({group, onClose}) => {
   const uploadCSV = async () => {
     try {
       const res = await DocumentPicker.pickSingle({
-        type: types.csv
+        type: types.csv,
       });
       if (res.type === 'text/comma-separated-values') {
         RNFS.readFile(res.uri, 'ascii')
           .then(response => {
             const results = readString(response);
             onClose();
-            navigation.navigate("AddMultipleInviti", {data:results.data})
-           })
+            navigation.navigate('AddMultipleInviti', {data: results.data});
+          })
           .catch(e => {
             console.log(e);
           });
@@ -112,14 +98,10 @@ const Index = ({group, onClose}) => {
         console.log(result);
         switch (result) {
           case RESULTS.UNAVAILABLE:
-            console.log(
-              'This feature is not available (on this device / in this context)',
-            );
+            console.log('This feature is not available (on this device / in this context)');
             break;
           case RESULTS.DENIED:
-            console.log(
-              'The permission has not been requested / is denied but requestable',
-            );
+            console.log('The permission has not been requested / is denied but requestable');
             request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE)
               .then(result => {
                 console.log(result);
@@ -146,7 +128,10 @@ const Index = ({group, onClose}) => {
   };
 
   const saveCSV = async () => {
-    const jsonData = data.map(user => {
+    console.log('first', invitatiesFromAsyncStorage);
+    // const jsonData = data?.map(user => {
+
+    const jsonData = invitatiesFromAsyncStorage?.map(user => {
       return {
         'Inviti name': user.invitiName,
         'Inviti Description': user.invitiDescription,
@@ -159,13 +144,11 @@ const Index = ({group, onClose}) => {
     });
     const results = jsonToCSV(jsonData);
     const date = moment(new Date()).format(' d_MMM_YYYY_hh_mm_ss_A');
-    const path =
-      RNFS.DownloadDirectoryPath +
-      `/${currentViewingGroup.groupName}${date}.csv`;
+    const path = RNFS.DownloadDirectoryPath + `/${currentViewingGroup.groupName}${date}.csv`;
 
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
-        console.log('FILE WRITTEN!',success);
+        console.log('FILE WRITTEN!', success);
         setExportLoading(false);
         onClose();
         dispatch(handleIsExportBanner(true));
@@ -176,6 +159,15 @@ const Index = ({group, onClose}) => {
         console.log(err.message);
       });
   };
+
+  const [invitatiesFromAsyncStorage, setInvitiesFromAsyncStorage] = useState([]);
+  const getLocalInvities = async () => {
+    let retString = await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`);
+    setInvitiesFromAsyncStorage(JSON.parse(retString));
+  };
+  useEffect(() => {
+    getLocalInvities();
+  }, []);
 
   const [SnackbarMessage, setSnackbarMessage] = useState('');
   const [showSnackBar, setShowSnackbar] = useState(false);
@@ -203,14 +195,12 @@ const Index = ({group, onClose}) => {
         onPress={exportCSV}
         mode="contained"
         icon={'download'}
-        contentStyle={{padding:"1%"}}
+        contentStyle={{padding: '1%'}}
         style={{marginTop: '5%'}}
-        buttonColor={theme.colors.secondary}
-        >
+        buttonColor={theme.colors.secondary}>
         Downlaod Invitations list
       </Button>
       <Button
-        loading={addMultipleInvitiLoading}
         onPress={importCSV}
         mode="contained"
         icon={'upload'}

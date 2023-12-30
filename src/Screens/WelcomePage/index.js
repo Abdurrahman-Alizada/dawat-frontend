@@ -62,7 +62,7 @@ export default function Index({navigation}) {
             icon={'cloud-off-outline'}
             labelStyle={{fontWeight: 'bold'}}
             onPress={async () => {
-              // await AsyncStorage.setItem('isLoggedIn', 'login');
+              await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('Drawer', {screen: 'PinnedGroup'});
             }}
             buttonColor={theme.colors.onPrimary}>
