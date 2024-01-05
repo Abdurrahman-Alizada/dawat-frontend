@@ -154,7 +154,7 @@ const UpdateInviti = ({route, navigation}) => {
   };
 
   const updateHandler = async values => {
-    console.log("first",values, currentViewingGroup?._id, currentInviti?.invitiName)
+    // console.log("first",values, currentViewingGroup?._id, currentInviti?.invitiName)
     let updatedGuest = {
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
@@ -168,14 +168,15 @@ const UpdateInviti = ({route, navigation}) => {
       groupId: currentViewingGroup?._id,
       isSync: currentInviti?.isSync,
     };
+
     let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
     guests = guests.filter(object => {
       return object._id !== currentInviti?._id;
     });
+    // console.log("first",updatedGuest)
     guests = [updatedGuest, ...guests];
-    dispatch(handleInvitiFlag(!invitiFlag));
-    console.log("first",guests[0])
     await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
     navigation.goBack()
   };
 

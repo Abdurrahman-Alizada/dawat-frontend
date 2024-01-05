@@ -184,7 +184,7 @@ const AddInviti = ({route, navigation}) => {
 
     let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
     if (guests) {
-      guests = [...guests, newGuest];
+      guests = [newGuest, ...guests];
     } else {
       guests = [newGuest];
     }

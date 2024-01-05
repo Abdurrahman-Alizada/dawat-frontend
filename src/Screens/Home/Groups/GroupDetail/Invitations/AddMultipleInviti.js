@@ -65,8 +65,11 @@ export default function DisplayCsvDataTable({props, route}) {
             invitiName: inviti[0],
             invitiDescription: inviti[1],
             invitiImageURL: inviti[6] ? inviti[6] : '',
-            lastStatus: inviti[4],
+            lastStatus: {invitiStatus:  inviti[4], addedBy :{name:"You"}},
             group: currentViewingGroup._id,
+            groupId: currentViewingGroup._id,
+            isSync : false,
+            addedBy : {name:"You"}
           };
           return object;
         });
@@ -337,6 +340,7 @@ export default function DisplayCsvDataTable({props, route}) {
                     invitiImageURL: item.invitiImageURL,
                     lastStatus: selectedstatusSingle,
                     group: currentViewingGroup._id,
+                    addedBy : {name: "You"}
                   };
                   let tempArr = [...invitiToDisplay];
                   tempArr[index] = newInvitiToAdd;
@@ -489,6 +493,7 @@ export default function DisplayCsvDataTable({props, route}) {
                   },
                   group: currentViewingGroup._id,
                   isSync: false,
+                  addedBy : {name: "You"}
                 };
                 setInvitiToDisplay(prevState =>
                   prevState ? [newInvitiToAdd, ...prevState] : [newInvitiToAdd],
