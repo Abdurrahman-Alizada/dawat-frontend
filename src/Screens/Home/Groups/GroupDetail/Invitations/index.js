@@ -165,7 +165,6 @@ export default function Example({route}) {
       .then(res => {
         hideDialog();
         // deleteInvitiFromLocalStorage(res.data?._id);
-
       })
       .catch(e => {
         console.log('error in deleteHandler', e);
@@ -179,7 +178,6 @@ export default function Example({route}) {
     guests = guests.filter(object => {
       return object._id !== invitiId;
     });
-    console.log("third", guests.length)
     await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
     dispatch(handleInvitiFlag(!invitiFlag));
     hideDialog();

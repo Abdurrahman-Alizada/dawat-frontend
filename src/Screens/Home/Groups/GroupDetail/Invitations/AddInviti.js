@@ -26,6 +26,8 @@ import {Modalize} from 'react-native-modalize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import createRandomId from '../../../../../utils/createRandomId';
+
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
@@ -166,6 +168,7 @@ const AddInviti = ({route, navigation}) => {
   const createInvitiLocally = async values => {
     const user = {name: 'You'};
     const newGuest = {
+      _id: createRandomId(6),
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
       invitiImageURL: '',

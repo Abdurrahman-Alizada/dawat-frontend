@@ -34,7 +34,8 @@ import {jsonToCSV} from 'react-native-csv';
 import RNFS from 'react-native-fs';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { handleInvitiFlag } from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import createRandomId from '../../../../../utils/createRandomId';
 
 export default function DisplayCsvDataTable({props, route}) {
   const navigation = useNavigation();
@@ -60,6 +61,7 @@ export default function DisplayCsvDataTable({props, route}) {
       ) {
         const jsonStrings = invitiArray.map(inviti => {
           let object = {
+            _id : createRandomId(6),
             invitiName: inviti[0],
             invitiDescription: inviti[1],
             invitiImageURL: inviti[6] ? inviti[6] : '',
@@ -113,7 +115,6 @@ export default function DisplayCsvDataTable({props, route}) {
   };
 
   const createMultipleLocalInvities = async () => {
-    
     let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
     if (guests) {
       guests = [...guests, ...invitiToDisplay];
@@ -177,6 +178,7 @@ export default function DisplayCsvDataTable({props, route}) {
 
   // accordin item
   const AccordionItem = ({item, index}) => {
+    // console.log('first', index, item.lastStatus);
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
 
@@ -203,7 +205,9 @@ export default function DisplayCsvDataTable({props, route}) {
 
     const [visibleSingle, setVisibleSingle] = useState(false);
 
-    const [selectedstatusSingle, setSelectedStatusSingle] = useState(item.lastStatus);
+    const [selectedstatusSingle, setSelectedStatusSingle] = useState(
+      item.lastStatus?.invitiStatus ? item.lastStatus?.invitiStatus : item.lastStatus,
+    );
 
     return (
       <View>
@@ -224,7 +228,10 @@ export default function DisplayCsvDataTable({props, route}) {
               </DataTable.Cell>
               <DataTable.Cell>{item.invitiName}</DataTable.Cell>
               <DataTable.Cell>{item.invitiDescription}</DataTable.Cell>
-              <DataTable.Cell>{item.lastStatus?.invitiStatus}</DataTable.Cell>
+              <DataTable.Cell>{
+              // item.lastStatus?.invitiStatus
+              item.lastStatus?.invitiStatus ? item.lastStatus?.invitiStatus : item.lastStatus
+              }</DataTable.Cell>
             </DataTable.Row>
             <Animated.View style={[{overflow: 'hidden'}, bodyHeight]}>
               <View
@@ -324,6 +331,7 @@ export default function DisplayCsvDataTable({props, route}) {
               <Button
                 onPress={() => {
                   let newInvitiToAdd = {
+                    _id : createRandomId(6),
                     invitiName: invitiToEditName,
                     invitiDescription: invitiToEditDescription,
                     invitiImageURL: item.invitiImageURL,
@@ -471,6 +479,7 @@ export default function DisplayCsvDataTable({props, route}) {
             <Button
               onPress={() => {
                 let newInvitiToAdd = {
+                  _id : createRandomId(6),
                   invitiName: newInvitiName,
                   invitiDescription: newInvitiDescription,
                   invitiImageURL: '',
