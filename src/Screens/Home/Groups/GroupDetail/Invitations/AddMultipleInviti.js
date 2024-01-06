@@ -61,7 +61,7 @@ export default function DisplayCsvDataTable({props, route}) {
       ) {
         const jsonStrings = invitiArray.map(inviti => {
           let object = {
-            _id : createRandomId(6),
+            _id : createRandomId(12),
             invitiName: inviti[0],
             invitiDescription: inviti[1],
             invitiImageURL: inviti[6] ? inviti[6] : '',
@@ -334,7 +334,7 @@ export default function DisplayCsvDataTable({props, route}) {
               <Button
                 onPress={() => {
                   let newInvitiToAdd = {
-                    _id : createRandomId(6),
+                    _id : createRandomId(12),
                     invitiName: invitiToEditName,
                     invitiDescription: invitiToEditDescription,
                     invitiImageURL: item.invitiImageURL,
@@ -483,7 +483,7 @@ export default function DisplayCsvDataTable({props, route}) {
             <Button
               onPress={() => {
                 let newInvitiToAdd = {
-                  _id : createRandomId(6),
+                  _id : createRandomId(12),
                   invitiName: newInvitiName,
                   invitiDescription: newInvitiDescription,
                   invitiImageURL: '',

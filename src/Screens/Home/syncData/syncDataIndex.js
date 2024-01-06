@@ -38,15 +38,16 @@ const SyncDataIndex = () => {
         if (res.data) {
           let newGroups = [...groups1, ...res.data];
           await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
-          navigation.navigate('Drawer', {
-            sreen: 'Home',
-          });
         }
       })
       .catch(err => {
-        console.log(err);
+        console.log("error in addMultipleGroup =>", err);
       })
-      .finally(() => {});
+      .finally(() => {
+        navigation.navigate('Drawer', {
+          sreen: 'Home',
+        });
+      });
   };
 
   return (

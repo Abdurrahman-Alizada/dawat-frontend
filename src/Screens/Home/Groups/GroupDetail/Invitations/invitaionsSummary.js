@@ -1,13 +1,10 @@
 import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {View} from 'react-native';
 import {
   IconButton,
-  Avatar,
   List,
   Card,
-  Button,
   Text,
-  Menu,
   ActivityIndicator,
   useTheme,
   Divider,
@@ -78,13 +75,6 @@ const InvitaionsSummary = ({onClose}) => {
             variant="bodyLarge">
             Invited
           </Text>
-          {/* <Divider style={{marginVertical: '2%'}} />
-          <TouchableOpacity onPress={refetch} style={{width:"100%",justifyContent:"flex-end",padding:"4%", flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{marginHorizontal: '2%'}} variant="bodyLarge">
-              View
-            </Text>
-            <Icon name="arrow-right" size={20} />
-          </TouchableOpacity> */}
         </Card>
 
         <Card

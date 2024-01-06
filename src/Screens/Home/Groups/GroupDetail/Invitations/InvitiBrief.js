@@ -82,7 +82,7 @@ const InvitiBrief = ({onClose}) => {
           />
       </View>
 
-      <View style={{margin: '2%', flexWrap: 'wrap', flexDirection: 'row'}}>
+      {/* <View style={{margin: '2%', flexWrap: 'wrap', flexDirection: 'row'}}>
         {statuses.map((statuse, index) => (
           <Chip
             key={index}
@@ -97,7 +97,7 @@ const InvitiBrief = ({onClose}) => {
             {statuse.label}
           </Chip>
         ))}
-      </View>
+      </View> */}
       {/* <View style={{margin: '2%', flexDirection: 'row'}}>
         <IconButton
           icon="check"

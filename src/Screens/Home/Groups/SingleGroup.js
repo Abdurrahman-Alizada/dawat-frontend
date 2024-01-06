@@ -130,13 +130,17 @@ const SingleGroup = ({
       description={item.groupDescription}
       titleStyle={{color: theme.colors.onBackground}}
       descriptionStyle={{color: theme.colors.textGray}}
+      onPress={async () => {
+        closeMenu();
+        onPressHandler();
+      }}
       left={props => (
         <View>
           {item.imageURL ? (
             <Avatar.Image
               style={props.style}
               source={{uri: item?.imageURL}}
-              size={55}
+              size={50}
             />
           ) : (
             <Avatar.Text
@@ -147,7 +151,7 @@ const SingleGroup = ({
                 ?.join('')
                 ?.toUpperCase()
                 ?.slice(0, 2)}
-              size={55}
+              size={50}
             />
           )}
         </View>
@@ -185,9 +189,10 @@ const SingleGroup = ({
                     icon="dots-horizontal"
                     color={theme.colors.onBackground}
                     onPress={() => openMenu()}
+                    size={30}
                   />
                 }>
-                <Menu.Item
+                {/* <Menu.Item
                   leadingIcon="eye-outline"
                   title="View"
                   titleStyle={{color: theme.colors.onBackground}}
@@ -195,7 +200,7 @@ const SingleGroup = ({
                     closeMenu();
                     onPressHandler();
                   }}
-                />
+                /> */}
                 {pinGroup?._id == item?._id ? (
                   <Menu.Item
                     leadingIcon="pin-off-outline"

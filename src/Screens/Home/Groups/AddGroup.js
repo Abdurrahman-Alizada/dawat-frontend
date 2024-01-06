@@ -125,7 +125,7 @@ const AddGroup = ({navigation, onClose}) => {
 
   const createLocalGroup = async values => {
     let group = {
-      _id: createRandomId(6),
+      _id: createRandomId(12),
       isSyncd: false,
       groupName: values.groupName,
       groupDescription: values.groupDescription,

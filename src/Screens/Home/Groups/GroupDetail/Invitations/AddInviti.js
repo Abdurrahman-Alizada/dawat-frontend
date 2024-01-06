@@ -168,7 +168,7 @@ const AddInviti = ({route, navigation}) => {
   const createInvitiLocally = async values => {
     const user = {name: 'You'};
     const newGuest = {
-      _id: createRandomId(6),
+      _id: createRandomId(12),
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
       invitiImageURL: '',

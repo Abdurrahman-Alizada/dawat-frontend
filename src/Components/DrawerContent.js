@@ -1,19 +1,12 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
 import {View, Linking, Alert, TouchableOpacity, Image} from 'react-native';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
-import {
-  Avatar,
-  Drawer,
-  List,
-  useTheme,
-  Text,
-  Divider,
-} from 'react-native-paper';
+import {Avatar, Drawer, List, useTheme, Text, Divider} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
 import {userApi} from '../redux/reducers/user/userThunk';
 import {groupApi} from '../redux/reducers/groups/groupThunk';
@@ -27,6 +20,7 @@ export default function DrawerContent(props) {
   const theme = useTheme();
   const id = useRef(null);
   const token = useRef(null);
+  const currentLoginUser = useSelector(state => state.user.currentLoginUser);
   const getUserInfo = async () => {
     id.current = await AsyncStorage.getItem('userId');
     token.current = await AsyncStorage.getItem('token');
@@ -35,13 +29,14 @@ export default function DrawerContent(props) {
     getUserInfo();
   }, []);
 
+  // const {data: user, isError, error, isLoading, refetch} = useGetCurrentLoginUserQuery(id.current);
   const {
     data: user,
     isError,
     error,
     isLoading,
     refetch,
-  } = useGetCurrentLoginUserQuery(id.current);
+  } = useGetCurrentLoginUserQuery(currentLoginUser?._id);
 
   useEffect(() => {
     if (user) {
@@ -52,9 +47,7 @@ export default function DrawerContent(props) {
   const obscureEmail = email => {
     if (!email) return '*******';
     const [name, domain] = email?.split('@');
-    return `${name[0]}${name[1]}${new Array(name.length - 3).join(
-      '*',
-    )}@${domain}`;
+    return `${name[0]}${name[1]}${new Array(name.length - 3).join('*')}@${domain}`;
   };
 
   const handlePrivacyPolicyPress = async () => {
@@ -63,9 +56,7 @@ export default function DrawerContent(props) {
     );
 
     if (supported) {
-      await Linking.openURL(
-        'https://eventplannerapp.netlify.app/privacy-policy',
-      );
+      await Linking.openURL('https://eventplannerapp.netlify.app/privacy-policy');
     } else {
       Alert.alert(`Something went wrong`);
     }
@@ -135,18 +126,12 @@ export default function DrawerContent(props) {
             title={props => (
               <SkeletonPlaceholder borderRadius={4} {...props}>
                 <SkeletonPlaceholder.Item width="60%" height={10} />
-                <SkeletonPlaceholder.Item
-                  marginTop={7}
-                  width="30%"
-                  height={10}
-                />
+                <SkeletonPlaceholder.Item marginTop={7} width="30%" height={10} />
               </SkeletonPlaceholder>
             )}
             left={props => (
               <SkeletonPlaceholder borderRadius={4} {...props}>
-                <SkeletonPlaceholder.Item
-                  flexDirection="column"
-                  alignItems="flex-start">
+                <SkeletonPlaceholder.Item flexDirection="column" alignItems="flex-start">
                   <SkeletonPlaceholder.Item
                     width={50}
                     marginLeft={20}

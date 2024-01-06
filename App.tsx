@@ -115,8 +115,11 @@ export const App = () => {
             {/* snackbar for checking internet connection */}
             <Snackbar
               visible={!netInfo.isConnected && isNetSnackBarVisible}
-              duration={1000}
-              onDismiss={() => console.log('snackbar dismissed')}>
+              duration={5000}
+              onDismiss={() => setIsNetSnackBarVisible(false)}
+              icon={"close"}
+              onIconPress={()=>setIsNetSnackBarVisible(false)}
+              >
               You are currently offline.
             </Snackbar>
           </NavigationContainer>

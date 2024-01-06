@@ -109,53 +109,52 @@ const UpdateInviti = ({route, navigation}) => {
     data.append('upload_preset', 'bzgif1or');
     data.append('cloud_name', 'dblhm3cbq');
     // if user upload image from mobile then execute if block otherwise else block.
-    updateHandler(values);
-    // if (photo.uri) {
-    //   fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-    //     method: 'post',
-    //     body: data,
-    //   })
-    //     .then(res => res.json())
-    //     .then(async data => {
-    //       await updateInviti({
-    //         invitiId: currentInviti?._id,
-    //         invitiName: values.invitiName,
-    //         invitiDescription: values.invitiDescription,
-    //         invitiImageURL: data.secure_url,
-    //         lastStatus: status,
-    //       })
-    //         .then(response => {
-    //           console.log('group has been updated  with image=>', response);
-    //           navigation.goBack();
-    //         })
-    //         .catch(e => {
-    //           console.log('error in updateHandler', e);
-    //         });
-    //     })
-    //     .catch(err => {
-    //       console.log('An Error Occured While image Uploading in update function', err);
-    //     });
-    // } else {
-    //   await updateInviti({
-    //     invitiId: currentInviti?._id,
-    //     invitiName: values.invitiName,
-    //     invitiDescription: values.invitiDescription,
-    //     invitiImageURL: avatarURL,
-    //     lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
-    //   })
-    //     .then(response => {
-    //       console.log('group has been updated without image=>', response);
-    //       navigation.goBack();
-    //     })
-    //     .catch(e => {
-    //       console.log('error in updateHandler', e);
-    //     });
-    // }
+    if (photo.uri) {
+      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
+        method: 'post',
+        body: data,
+      })
+        .then(res => res.json())
+        .then(async data => {
+          await updateInviti({
+            invitiId: currentInviti?._id,
+            invitiName: values.invitiName,
+            invitiDescription: values.invitiDescription,
+            invitiImageURL: data.secure_url,
+            lastStatus: status,
+          })
+            .then(response => {
+              console.log('group has been updated  with image=>', response);
+              navigation.goBack();
+            })
+            .catch(e => {
+              console.log('error in updateHandler', e);
+            });
+        })
+        .catch(err => {
+          console.log('An Error Occured While image Uploading in update function', err);
+        });
+    } else {
+      await updateInviti({
+        invitiId: currentInviti?._id,
+        invitiName: values.invitiName,
+        invitiDescription: values.invitiDescription,
+        invitiImageURL: avatarURL,
+        lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
+      })
+        .then(response => {
+          updateHandler(values)
+          // navigation.goBack();
+        })
+        .catch(e => {
+          console.log('error in updateHandler', e);
+        });
+    }
   };
 
   const updateHandler = async values => {
-    // console.log("first",values, currentViewingGroup?._id, currentInviti?.invitiName)
     let updatedGuest = {
+      _id : currentInviti?._id,
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
       invitiImageURL: currentInviti?.invitiImageURL,

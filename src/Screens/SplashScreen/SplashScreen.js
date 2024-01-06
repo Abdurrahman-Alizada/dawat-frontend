@@ -6,7 +6,11 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTheme, Text, Avatar} from 'react-native-paper';
 import {version} from '../../../package.json';
+import { useDispatch } from 'react-redux';
+import { handleCurrentLoaginUser } from '../../redux/reducers/user/user';
+
 const SplashScreen = ({navigation}) => {
+  const dispatch = useDispatch();  
   const isAppFirstLaunched = useRef(true); //onboarding screen decision
 
   useEffect(() => {
@@ -14,8 +18,6 @@ const SplashScreen = ({navigation}) => {
       const appData = await AsyncStorage.getItem('isAppFirstLaunched1').then(
         value => value,
       );
-
-      console.log(appData);
       if (appData) {
         isAppFirstLaunched.current = false;
       } else {
@@ -29,13 +31,20 @@ const SplashScreen = ({navigation}) => {
   useEffect(() => {
     //Check if user_id is set or not If not then send for Authentication else send to Home Screen
 
-    AsyncStorage.getItem('isLoggedIn')
+     AsyncStorage.getItem('isLoggedIn')
       .then(value => {
-        setTimeout(() => {
+        AsyncStorage.getItem('userId').then(id=>{
+          dispatch(handleCurrentLoaginUser({_id : id}))
           isAppFirstLaunched?.current
-            ? navigation.replace('Onboarding')
-            : navigation.replace(!value ? 'Auth' : 'Drawer');
-        }, 2000);
+          ? navigation.replace('Onboarding')
+          : navigation.replace(!value ? 'Auth' : 'Drawer');
+        })
+
+        // setTimeout(() => {
+        //   isAppFirstLaunched?.current
+        //     ? navigation.replace('Onboarding')
+        //     : navigation.replace(!value ? 'Auth' : 'Drawer');
+        // }, 2000);
       })
       .catch(err => {
         console.log(err);
