@@ -89,11 +89,6 @@ const LoginScreen = ({navigation, route}) => {
       await AsyncStorage.setItem('email', response?.data?.user?.email);
       actions.resetForm();
       navigation.navigate('SyncData')
-
-      // navigation.navigate('Drawer', {
-      //   sreen: 'Home',
-      //   refreshTimeStamp: new Date().toISOString(),
-      // });
     }
   };
 
@@ -185,21 +180,6 @@ const LoginScreen = ({navigation, route}) => {
                 buttonColor={theme.colors.blueBG}
                 textColor={'#fff'}>
                 Login
-              </Button>
-
-              <Button
-                // loading={isLoading}
-                // disabled={isLoading}
-                style={{
-                  marginVertical: '5%',
-                }}
-                contentStyle={{padding: '3%'}}
-                theme={{roundness: 20}}
-                mode="contained"
-                onPress={()=>navigation.navigate("SyncData")}
-                buttonColor={theme.colors.blueBG}
-                textColor={'#fff'}>
-                Sync Data
               </Button>
 
               <TouchableOpacity

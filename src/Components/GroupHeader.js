@@ -209,7 +209,7 @@ const Header = ({
                     title="Search"
                     leadingIcon={'account-search'}
                   />
-                      <Divider />
+                  <Divider />
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
@@ -224,7 +224,7 @@ const Header = ({
                       closeMenu();
                       navigation.navigate('AddMultipleInviti');
                     }}
-                    title="Add multiple inviti"
+                    title="Add multiple guests"
                     leadingIcon={'account-multiple-plus'}
                   />
                   <Menu.Item
@@ -234,16 +234,6 @@ const Header = ({
                     }}
                     title="Bulk actions"
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
-                  />
-                  <Divider />
-
-                  <Menu.Item
-                    onPress={() => {
-                      closeMenu();
-                      navigation.navigate('GroupLogs');
-                    }}
-                    title="Group logs"
-                    leadingIcon={'format-list-bulleted-type'}
                   />
                 </View>
               )}
@@ -270,6 +260,16 @@ const Header = ({
                   />
                 </View>
               )}
+              <Divider />
+
+              <Menu.Item
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('GroupLogs');
+                }}
+                title="Group logs"
+                leadingIcon={'format-list-bulleted-type'}
+              />
             </Menu>
           </View>
         </Appbar>

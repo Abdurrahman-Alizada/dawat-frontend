@@ -6,6 +6,7 @@ import {
   RefreshControl,
   ScrollView,
   TouchableWithoutFeedback,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
@@ -49,6 +50,10 @@ import ImportExport from './importExport';
 import GuestsAppbar from '../../../../../Components/Appbars/GuestsAppbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNetInfo} from '@react-native-community/netinfo';
+import InvitedIcon from '../../../../../Components/invitations/invitedIcon';
+import PendingIcon from '../../../../../Components/invitations/pendingIcon';
+import RejectedIcon from '../../../../../Components/invitations/rejectedIcon';
+import OtherIcon from '../../../../../Components/invitations/otherIcon';
 
 export default function Example({route}) {
   const navigation = useNavigation();
@@ -74,21 +79,24 @@ export default function Example({route}) {
 
   const [localLoading, setLoacalLoading] = useState(true);
   const [filterdInvities, setFilterdInvities] = useState([]);
-  
+  const [masterInvities, setMasterInvities] = useState([]);
+
   const invitiesHandler = async () => {
     setLoacalLoading(true);
     let localInvities = await getLocalInvities();
-  
+
     if (data && !isLoading && !isFetching && netInfo.isConnected) {
       let ids = new Set(localInvities?.map(d => d._id));
       localInvities = [...localInvities, ...data?.filter(d => !ids.has(d._id))];
       setFilterdInvities(localInvities);
+      setMasterInvities(localInvities);
       await AsyncStorage.setItem(
         `guests_${currentViewingGroup?._id}`,
         JSON.stringify(localInvities),
       );
     } else {
       setFilterdInvities(localInvities);
+      setMasterInvities(localInvities);
     }
     dispatch(handleInvitions(localInvities));
     setLoacalLoading(false);
@@ -168,9 +176,10 @@ export default function Example({route}) {
       })
       .catch(e => {
         console.log('error in deleteHandler', e);
-      }).finally(()=>{
-        deleteInvitiFromLocalStorage(item?._id);
       })
+      .finally(() => {
+        deleteInvitiFromLocalStorage(item?._id);
+      });
   };
 
   const deleteInvitiFromLocalStorage = async invitiId => {
@@ -287,7 +296,6 @@ export default function Example({route}) {
   };
 
   const [expanded, setExpanded] = useState(true);
-  const handlePress = () => setExpanded(!expanded);
 
   // import export modalize
   const importExportModalizeRef = useRef(null);
@@ -298,22 +306,41 @@ export default function Example({route}) {
     importExportModalizeRef.current?.close();
   };
 
-  // guests Summary modalize
-  const guestsSummaryModalizeRef = useRef(null);
-  const openGuestsSummaryModalize = () => {
-    guestsSummaryModalizeRef.current?.open();
-  };
-
-  const [chips, setChips] = useState([
-    {id: 0, name: 'Invited', selected: true},
-    {id: 1, name: 'Rejected', selected: false},
-    {id: 2, name: 'Pending', selected: true},
-    {id: 3, name: 'Pending', selected: false},
-    {id: 4, name: 'Other', selected: true},
+  const [isChipsShow, setIsChipsShow] = useState(false);
+  const [chips] = useState([
+    {id: 0, name: 'invited', selected: false},
+    {id: 1, name: 'rejected', selected: false},
+    {id: 2, name: 'pending', selected: false},
+    {id: 3, name: 'other', selected: false},
   ]);
   const [selectedChips, setSelectedChips] = useState([]);
-  const selectedChipsHandler = id => {
-    setSelectedChips([...selectedChips, id]);
+  const selectedChipsRef = useRef([]);
+  const selectedChipsHandler = async name => {
+    if (selectedChipsRef.current?.includes(name)) {
+      setSelectedChips(selectedChips?.filter(chipName => chipName !== name));
+      selectedChipsRef.current = selectedChips?.filter(chipName => chipName !== name);
+    } else {
+      setSelectedChips([...selectedChips, name]);
+      selectedChipsRef.current = [...selectedChips, name];
+    }
+    if (selectedChipsRef.current?.length) {
+      setFilterdInvities(
+        masterInvities.filter(item =>
+          selectedChipsRef.current?.includes(item.lastStatus.invitiStatus),
+        ),
+      );
+    } else {
+      setFilterdInvities(invitaionsForSearch);
+    }
+  };
+
+  const func = async () => {
+    setIsChipsShow(!isChipsShow);
+    if (isChipsShow) {
+      setSelectedChips([]);
+      selectedChipsRef.current = [];
+    }
+    setFilterdInvities(masterInvities);
   };
 
   const [token, setToken] = useState('');
@@ -324,29 +351,58 @@ export default function Example({route}) {
     getToken();
   }, []);
 
+  const [invitedNumber, setInvitedNumber] = useState('');
+  const [rejectedNumber, setRejectedNumber] = useState('');
+  const [pendingNumber, setPendingNumber] = useState('');
+  const [otherNumber, setOtherNumber] = useState('');
+  const getStatusNumbers = () => {
+    setInvitedNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'invited')?.length);
+    setRejectedNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'rejected')?.length);
+    setPendingNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'pending')?.length);
+    setOtherNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'other')?.length);
+  };
+  useEffect(() => {
+    getStatusNumbers();
+  }, [masterInvities]);
+
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
       {isHeader && (
-        <GuestsAppbar
-          openGuestsImportExportModalize={openGuestsImportExportModalize}
-          openGuestsSummaryModalize={openGuestsSummaryModalize}
-        />
+        <View>
+          <GuestsAppbar
+            openGuestsImportExportModalize={openGuestsImportExportModalize}
+            isChipsShow={isChipsShow}
+            setIsChipsShow={setIsChipsShow}
+            func={func}
+          />
+          {isChipsShow && (
+            <View style={{padding: '1%'}}>
+              <ScrollView
+                horizontal
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  minWidth: '100%',
+                  paddingRight:"10%"
+                }}>
+                {chips.map((chip, index) => (
+                  <View key={index} style={{padding: '1%'}}>
+                    <Chip
+                      selected={selectedChips?.includes(chip.name)}
+                      mode={selectedChips?.includes(chip.name) ? 'flat' : 'outlined'}
+                      onPress={() => selectedChipsHandler(chip.name)}>
+                      {chip.name} {' '} 
+                      {chip.name === "invited" && invitedNumber}
+                      {chip.name === "rejected" && rejectedNumber}
+                      {chip.name === "pending" && pendingNumber}
+                      {chip.name === "other" && otherNumber}
+                    </Chip>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
       )}
-
-      {/* <View>
-            <ScrollView scrollEnabled horizontal contentContainerStyle={{flex:1, padding:"2%", height:50}} >
-              {chips.map((chip, index) => (
-                <View key={index} style={{marginHorizontal: '2%'}}>
-                  <Chip
-                    // selected={chip.selected}
-                    mode={chip.selected ? 'flat' : 'outlined'}
-                    onPress={() => console.log('Pressed')}>
-                    {chip.name}
-                  </Chip>
-                </View>
-              ))}
-            </ScrollView>
-        </View> */}
 
       <FlashList
         data={isInvitaionSearch ? invitaionsForSearch : filterdInvities}
@@ -404,96 +460,100 @@ export default function Example({route}) {
       <Modalize
         modalStyle={{backgroundColor: theme.colors.background}}
         ref={invitiBriefModalizeRef}
-        // velocity={800}
         threshold={200}
         snapPoint={400}
         handlePosition="inside"
         modalHeight={600}
         HeaderComponent={() => <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />}>
-        <List.Accordion
-          style={{padding: '4%'}}
-          title="Statuses"
-          expanded={expanded}
-          onPress={handlePress}>
-          <View style={{marginHorizontal: '5%'}}>
-            <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>Added by</Text>
-            <View
-              style={{
-                borderRadius: 10,
-                borderColor: '#C1C2B8',
-                borderWidth: 0.5,
-                padding: '2%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <View>
-                  <Avatar.Icon size={30} icon="account-circle-outline" />
-                </View>
-                <Text style={{marginHorizontal: '4%'}}>
-                  {currentInvitiToDisplay?.addedBy?.name}
-                </Text>
+        <View style={{marginHorizontal: '5%'}}>
+          <View
+            style={{
+              marginBottom: '5%',
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontWeight: 'bold'}}>Current status</Text>
+            {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'invited' && <InvitedIcon />}
+            {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'pending' && <PendingIcon />}
+            {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'rejected' && <RejectedIcon />}
+            {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'other' && <OtherIcon />}
+          </View>
+
+          <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>Added by</Text>
+          <View
+            style={{
+              borderRadius: 10,
+              borderColor: '#C1C2B8',
+              borderWidth: 0.5,
+              padding: '2%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View>
+                <Avatar.Icon size={30} icon="account-circle-outline" />
               </View>
-              <Text style={{}}>{moment(currentInvitiToDisplay?.createdAt).fromNow()}</Text>
+              <Text style={{marginHorizontal: '4%'}}>{currentInvitiToDisplay?.addedBy?.name}</Text>
             </View>
+            <Text style={{}}>{moment(currentInvitiToDisplay?.createdAt).fromNow()}</Text>
+          </View>
 
-            <Text style={{marginTop: '5%', fontWeight: 'bold'}}>History</Text>
-            <ScrollView>
-              {currentInvitiToDisplay?.statuses?.map((Status, index) => (
+          <Text style={{marginTop: '5%', fontWeight: 'bold'}}>History</Text>
+          <ScrollView>
+            {currentInvitiToDisplay?.statuses?.map((Status, index) => (
+              <View
+                key={index}
+                style={{
+                  borderRadius: 10,
+                  borderColor: '#C1C2B8',
+                  borderWidth: 0.5,
+                  padding: '2%',
+                  marginVertical: '2%',
+                }}>
                 <View
-                  key={index}
                   style={{
-                    borderRadius: 10,
-                    borderColor: '#C1C2B8',
-                    borderWidth: 0.5,
-                    padding: '2%',
-                    marginVertical: '2%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                    <View style={{}}>
-                      <Text style={{padding: '2%'}}>
-                        marked as <Text style={{fontWeight: 'bold'}}>{Status.invitiStatus}</Text> by
-                      </Text>
-                      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Avatar.Image
-                          size={30}
-                          source={
-                            Status?.addedBy?.imageURL
-                              ? {uri: Status?.addedBy?.imageURL}
-                              : require('../../../../../assets/drawer/male-user.png')
-                          }
-                        />
-                        {/* <Avatar.Icon size={30} icon="account-circle-outline" /> */}
-                        <Text style={{marginHorizontal: '4%'}}>{Status?.addedBy?.name}</Text>
-                      </View>
-                    </View>
-                    <View style={{alignItems: 'flex-end'}}>
-                      {Status.invitiStatus === 'rejected' && (
-                        <List.Icon style={{margin: 0, padding: 0}} icon="cancel" />
-                      )}
-                      {Status.invitiStatus === 'pending' && (
-                        <List.Icon style={{margin: 0, padding: 0}} icon="clock-outline" />
-                      )}
-                      {Status.invitiStatus === 'invited' && (
-                        <List.Icon style={{margin: 0, padding: 0}} icon="check" />
-                      )}
-
-                      <Text style={{alignSelf: 'flex-end'}}>
-                        {moment(Status?.createdAt).fromNow()}{' '}
-                      </Text>
+                  <View style={{}}>
+                    <Text style={{padding: '2%'}}>
+                      marked as <Text style={{fontWeight: 'bold'}}>{Status.invitiStatus}</Text> by
+                    </Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <Avatar.Image
+                        size={30}
+                        source={
+                          Status?.addedBy?.imageURL
+                            ? {uri: Status?.addedBy?.imageURL}
+                            : require('../../../../../assets/drawer/male-user.png')
+                        }
+                      />
+                      <Text style={{marginHorizontal: '4%'}}>{Status?.addedBy?.name}</Text>
                     </View>
                   </View>
+                  <View style={{alignItems: 'flex-end'}}>
+                    {Status.invitiStatus === 'rejected' && (
+                      <List.Icon style={{margin: 0, padding: 0}} icon="cancel" />
+                    )}
+                    {Status.invitiStatus === 'pending' && (
+                      <List.Icon style={{margin: 0, padding: 0}} icon="clock-outline" />
+                    )}
+                    {Status.invitiStatus === 'invited' && (
+                      <List.Icon style={{margin: 0, padding: 0}} icon="check" />
+                    )}
+
+                    <Text style={{alignSelf: 'flex-end'}}>
+                      {moment(Status?.createdAt).fromNow()}{' '}
+                    </Text>
+                  </View>
                 </View>
-              ))}
-            </ScrollView>
-          </View>
-        </List.Accordion>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       </Modalize>
 
       <Modalize

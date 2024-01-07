@@ -104,7 +104,6 @@ const SingleGroup = ({
       title={getHighlightedText(item.groupName)}
       description={item.groupDescription}
       titleStyle={{color: theme.colors.onBackground}}
-      descriptionStyle={{color: theme.colors.textGray}}
       onPress={() => (checked ? onLongPressHandler() : onPressHandler())}
       left={props => (
         <View>

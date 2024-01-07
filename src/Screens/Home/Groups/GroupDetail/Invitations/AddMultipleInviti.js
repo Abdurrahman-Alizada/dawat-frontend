@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {TouchableWithoutFeedback, View, Image} from 'react-native';
+import {TouchableWithoutFeedback, View} from 'react-native';
 import {
   Avatar,
   Appbar,
@@ -355,7 +355,7 @@ export default function DisplayCsvDataTable({props, route}) {
   };
 
   return (
-    <Provider>
+    <View style={{flex:1}}>
       <Appbar
         style={{
           backgroundColor: theme.colors.background,
@@ -365,7 +365,7 @@ export default function DisplayCsvDataTable({props, route}) {
         // mode="medium"
       >
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`Add multiple invities`} />
+        <Appbar.Content title={`Add multiple invities`} style={{color:theme.colors.onBackground}} />
 
         <Appbar.Action
           icon="account-plus"
@@ -529,6 +529,6 @@ export default function DisplayCsvDataTable({props, route}) {
         onDismiss={() => setSnackbarVisible(false)}>
         {SnackbarText}
       </Snackbar>
-    </Provider>
+    </View>
   );
 }

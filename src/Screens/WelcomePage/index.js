@@ -43,7 +43,7 @@ export default function Index({navigation}) {
             mode="contained"
             icon={'account-plus'}
             labelStyle={{fontWeight: 'bold'}}
-            buttonColor={theme.colors.onPrimary}
+            buttonColor={"#fff"}
             onPress={async () => {
               navigation.navigate('SignUpwithEmail');
             }}>
@@ -65,7 +65,8 @@ export default function Index({navigation}) {
               await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('Drawer', {screen: 'PinnedGroup'});
             }}
-            buttonColor={theme.colors.onPrimary}>
+            buttonColor={"#fff"}
+            >
             Continue without sync
           </Button>
 
@@ -77,7 +78,7 @@ export default function Index({navigation}) {
               marginTop: '2%',
               paddingHorizontal: '1%',
             }}>
-            <Text style={{fontWeight: 'bold', color: theme.colors.onPrimary}}>
+            <Text style={{fontWeight: 'bold', color: "#fff"}}>
               Already have an account?
             </Text>
             <Button

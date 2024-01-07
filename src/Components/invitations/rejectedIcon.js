@@ -1,0 +1,26 @@
+import {Image, View} from 'react-native';
+import React from 'react';
+import {Text} from 'react-native-paper';
+
+const RejectedIcon = () => {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        paddingRight: '5%',
+        paddingLeft: '2%',
+        alignItems: 'center',
+        backgroundColor: '#D85454',
+        borderRadius: 50,
+        paddingVertical: '1.5%',
+      }}>
+      <Image
+        style={{width: 20, height: 20, marginRight: 5}}
+        source={require('../../assets/images/groupDetails/rejected-approve-icon.png')}
+      />
+      <Text style={{color: '#fff'}}>Not invited</Text>
+    </View>
+  );
+};
+
+export default RejectedIcon;

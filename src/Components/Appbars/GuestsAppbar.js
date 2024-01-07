@@ -1,32 +1,14 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
-import {
-  List,
-  Menu,
-  Divider,
-  Appbar,
-  Searchbar,
-  Avatar,
-  useTheme,
-  IconButton,
-  Text,
-} from 'react-native-paper';
+import {Menu, Divider, Appbar, Searchbar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   handleIsInvitationSearch,
   handleInvitationSearch,
-  handleIsInvitaionSummaryOpen,
 } from '../../redux/reducers/groups/invitations/invitationSlice';
 import {handleIsSearch} from '../../redux/reducers/groups/groups';
-import {isConfirmDialogVisibleHandler} from '../../redux/reducers/groups/chat/chatSlice';
 
-const Header = ({
-  openGuestsImportExportModalize,
-  openGuestsSummaryModalize,
-  openTasksSummaryModalize,
-  group,
-}) => {
+const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
@@ -55,7 +37,7 @@ const Header = ({
     <>
       {!isSearch ? (
         <Appbar
-          elevated={true}
+          elevated={isChipsShow ? false : true}
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -72,11 +54,19 @@ const Header = ({
             icon="magnify"
             color={theme.colors.onBackground}
             onPress={() => {
+              func()
               dispatch(handleIsSearch(true));
               dispatch(handleIsInvitationSearch(true));
             }}
           />
 
+          <Appbar.Action
+            icon={isChipsShow ? 'filter-remove' : `filter-outline`}
+            color={theme.colors.onBackground}
+            onPress={() => {
+              func();
+            }}
+          />
           <Menu
             visible={visible}
             onDismiss={closeMenu}
@@ -111,7 +101,7 @@ const Header = ({
                 closeMenu();
                 navigation.navigate('MultipleInvitiActions');
               }}
-              title="Edit multiple inviti"
+              title="Bulk actions"
               leadingIcon={'checkbox-multiple-blank-circle-outline'}
             />
           </Menu>
