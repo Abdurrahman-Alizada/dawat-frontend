@@ -228,12 +228,8 @@ export default ProfileIndex = ({navigation, route}) => {
 
 
   const logout = async () => {
-    await AsyncStorage.setItem('isLoggedIn', '');
-    await AsyncStorage.setItem('id', '');
-    await AsyncStorage.setItem('token', '');
-    await AsyncStorage.setItem('userId', '');
-    await AsyncStorage.setItem('name', '');
-    await AsyncStorage.setItem('ImageURL', '');
+    await AsyncStorage.clear();
+    await AsyncStorage.setItem('isAppFirstLaunched1', '1');
     dispatch(handleCurrentLoaginUser({}));
     dispatch(groupApi.util.resetApiState());
     navigation.dispatch(DrawerActions.closeDrawer());
@@ -379,14 +375,11 @@ export default ProfileIndex = ({navigation, route}) => {
               />
             </View>
             <Button
-              // disabled={!groupChecked}
               contentStyle={{padding: '2%'}}
               theme={{roundness: 20}}
               mode="outlined"
               style={{margin:"4%"}}
               onPress={logout}
-              // buttonColor={theme.colors.blueBG}
-              // textColor={'#fff'}
               >
               Logout
             </Button>
@@ -659,6 +652,8 @@ export default ProfileIndex = ({navigation, route}) => {
           imageUploadHandler={imageUploadHandler}
         />
       )}
+
+
     </SafeAreaView>
   );
 };

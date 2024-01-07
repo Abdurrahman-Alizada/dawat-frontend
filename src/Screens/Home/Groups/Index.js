@@ -1,22 +1,34 @@
 import React, {useEffect, useState, useContext, useLayoutEffect, useRef} from 'react';
-import {RefreshControl, View, FlatList, StatusBar} from 'react-native';
+import {RefreshControl, View, FlatList, StatusBar, BackHandler} from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
 import {Text, useTheme} from 'react-native-paper';
-import {useGetAllGroupsQuery, useDeleteGroupForUserMutation} from '../../../redux/reducers/groups/groupThunk';
+import {
+  useGetAllGroupsQuery,
+  useDeleteGroupForUserMutation,
+} from '../../../redux/reducers/groups/groupThunk';
 import Header from '../../../Components/Appbars/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
 import {ThemeContext} from '../../../themeContext';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import LoginForMoreFeatures from '../../../Components/LoginForMoreFeatures';
+import {
+  handleGroupsFlag,
+  handlePinGroup,
+  handlePinGroupFlag,
+  handlePinGroupLoading,
+  handleSelectedGroupLength,
+} from '../../../redux/reducers/groups/groups';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const {isThemeDark} = useContext(ThemeContext);
 
   const PG = useSelector(state => state.groups?.pinGroup);
   const groupsFlag = useSelector(state => state.groups?.groupsFlag);
+  const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
 
   const [localLoading, setLoacalLoading] = useState(true);
   const {data, isError, isLoading, error, isFetching, refetch} = useGetAllGroupsQuery();
@@ -41,7 +53,7 @@ const Groups = ({navigation}) => {
   };
   useEffect(() => {
     groupHandler();
-  }, [data, groupsFlag, PG]);
+  }, [data, groupsFlag, PG, pinGroupFlag]);
 
   const getLocalGroups = async () => {
     let retString = await AsyncStorage.getItem('groups');
@@ -77,12 +89,44 @@ const Groups = ({navigation}) => {
     let userId = await AsyncStorage.getItem('userId');
     for (i = 0; i < checkedItems.length; i++) {
       let groupId = checkedItems[i];
-      deleteGroupForUser({userId: userId, chatId: groupId});
+      deleteGroupForUser({userId: userId, chatId: groupId}).then(res => {
+        handleGroupDeleteLocal(groupId, i);
+      });
     }
-    setCheckedItems([]);
-    setChecked(false);
   };
 
+  const handleGroupDeleteLocal = async (groupId, index) => {
+    let groups = JSON.parse(await AsyncStorage.getItem('groups'));
+    const newArr = groups.filter(object => {
+      return object._id !== groupId;
+    });
+    await AsyncStorage.setItem('groups', JSON.stringify(newArr));
+
+    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
+    if (pg?._id === groupId) {
+      await AsyncStorage.setItem('pinGroup', JSON.stringify(newArr?.length ? newArr[0] : null));
+      dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
+      dispatch(handlePinGroupFlag(!pinGroupFlag));
+    }
+    if (index == checkedItems.length - 1) {
+      dispatch(handleGroupsFlag(!groupsFlag));
+    }
+    checkedBack();
+  };
+
+  const pinHandler = async () => {
+    dispatch(handlePinGroupLoading(true));
+    let localGroups = await getLocalGroups();
+    localGroups = localGroups.filter(object => {
+      return object._id == checkedItems[0];
+    });
+    dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
+    await AsyncStorage.setItem('pinGroup', JSON.stringify(localGroups[0]));
+    dispatch(handlePinGroupFlag(!pinGroupFlag));
+    localGroups = null;
+    navigation.navigate('PinnedGroup');
+    dispatch(handlePinGroupLoading(false));
+  };
   const onOpen = () => {
     navigation.navigate('AddGroup');
   };
@@ -101,6 +145,7 @@ const Groups = ({navigation}) => {
   const checkedBack = () => {
     setChecked(false);
     setCheckedItems([]);
+    dispatch(handleSelectedGroupLength(0));
   };
 
   // snackebar
@@ -109,14 +154,48 @@ const Groups = ({navigation}) => {
     setSnackBarVisible(isError);
   }, [isError]);
 
+  useEffect(() => {
+    const backAction = () => {
+      if (checkedItems.length > 0) {
+        checkedBack();
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      return backAction();
+    });
+    return () => {
+      backHandler.remove();
+    };
+  }, [checkedItems]);
+
   return (
     <View style={{flex: 1}}>
-      <StatusBar barStyle={isThemeDark ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
+      <StatusBar
+        barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.background}
+      />
 
       {checked ? (
-        <GroupCheckedHeader deleteF={addGrouptoDelete1} checkedBack={checkedBack} theme={theme} />
+        <GroupCheckedHeader
+          deleteF={addGrouptoDelete1}
+          pinHandler={pinHandler}
+          checkedBack={checkedBack}
+          checkedItemsLength={checkedItems.length}
+          deleteLoading={deleteLoading}
+          theme={theme}
+        />
       ) : (
-        <Header isSearch={isSearch} setIsSearch={setIsSearch} searchFilterFunction={searchFilterFunction} theme={theme} onOpen={onOpen} />
+        <Header
+          isSearch={isSearch}
+          setIsSearch={setIsSearch}
+          searchFilterFunction={searchFilterFunction}
+          theme={theme}
+          onOpen={onOpen}
+        />
       )}
       <View
         style={{
@@ -146,10 +225,19 @@ const Groups = ({navigation}) => {
           )}
           refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
-        <LoginForMoreFeatures token={token} isLoading={isLoading} localLoading={localLoading} navigation={navigation} />
+        <LoginForMoreFeatures
+          token={token}
+          isLoading={isLoading}
+          localLoading={localLoading}
+          navigation={navigation}
+        />
       </View>
 
-      <ErrorSnackBar isVisible={snackbarVisible && token} text={'Something went wrong'} onDismissHandler={() => setSnackBarVisible(false)} />
+      <ErrorSnackBar
+        isVisible={snackbarVisible && token}
+        text={'Something went wrong'}
+        onDismissHandler={() => setSnackBarVisible(false)}
+      />
     </View>
   );
 };

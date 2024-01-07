@@ -42,7 +42,9 @@ import {
 import {Modalize} from 'react-native-modalize';
 import Countdown from 'react-native-countdown-xambra';
 import LoginForMoreFeatures from '../../../../../Components/LoginForMoreFeatures';
-import createRandomId from '../../../../../utils/createRandomId';
+import Icon from 'react-native-vector-icons/Feather';
+import moment from 'moment';
+
 // imports end
 
 const Index = ({route, navigation}) => {
@@ -411,6 +413,9 @@ const Index = ({route, navigation}) => {
   };
 
   const [token, setToken] = useState(null);
+  const [time, setTime] = useState(
+    moment(currentViewingGroup?.time).diff(moment(new Date()), 'seconds'),
+  );
   useLayoutEffect(() => {
     const getToken = async () => {
       setToken(await AsyncStorage.getItem('token'));
@@ -454,50 +459,112 @@ const Index = ({route, navigation}) => {
                   }}>
                   {groupName}
                 </Text>
-                <Countdown
-                  // until={pinGroupTime.current ? pinGroupTime.current : 0}
-                  until={200000}
-                  // onFinish={() => alert('finished')}
-                  // onPress={() => alert('hello')}
-                  size={22}
-                  style={{margin: '2%'}}
-                  digitTxtStyle={{color: '#fff'}}
-                  digitStyle={{backgroundColor: '#265AE8'}}
-                  timeLabelStyle={{color: '#fff'}}
-                  // timeToShow={['D','H']}
-                  // showSeparator
-                  separatorStyle={{color: '#fff', alignSelf: 'center'}}
-                />
+                {time < 0 ? (
+                  <View style={{flexDirection:"row", alignItems:"baseline", justifyContent:"center"}}>
+                    <Countdown
+                      until={Math.abs(time)}
+                      size={22}
+                      style={{margin: '2%'}}
+                      digitTxtStyle={{color: '#fff'}}
+                      digitStyle={{backgroundColor: theme.colors.error}}
+                      timeLabelStyle={{color: '#fff'}}
+                      running={false}
+                      separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                    />
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        color: "#fff",
+                      }}>
+                       ago
+                    </Text>
+                  </View>
+                ) : (
+                  <Countdown
+                    until={Math.abs(time)}
+                    // until={-200000}
+                    // onFinish={() => alert('finished')}
+                    // onPress={() => alert('hello')}
+                    size={22}
+                    style={{margin: '2%'}}
+                    digitTxtStyle={{color: '#fff'}}
+                    digitStyle={{backgroundColor: '#265AE8'}}
+                    timeLabelStyle={{color: '#fff'}}
+                    // timeToShow={['D','H']}
+                    // showSeparator
+                    separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                  />
+                )}
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-around',
-                    marginTop: '2%',
+                    marginTop: '4%',
                   }}>
-                  <Button
-                    style={{
-                      width: '25%',
-                    }}
-                    theme={{roundness: 2}}
-                    mode="contained"
-                    icon={'pencil-outline'}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
-                    labelStyle={{
-                      fontWeight: 'bold',
-                      color: theme.colors.onBackground,
-                    }}
-                    buttonColor={theme.colors.cardBG}
+                  <TouchableOpacity
                     onPress={() => {
                       setEditGroupDescription(false);
                       seteditGroupName(true);
-                    }}>
-                    Name
-                  </Button>
-
-                  <Button
-                    style={{
-                      width: '25%',
                     }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: theme.colors.cardBG,
+                      paddingHorizontal: '2%',
+                      paddingVertical: '1%',
+                      borderRadius: 5,
+                    }}>
+                    <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
+                      Name
+                    </Text>
+                    <Icon name="edit" size={16} color={theme.colors.cardBG} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      setEditGroupDescription(false);
+                      seteditGroupName(true);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: theme.colors.cardBG,
+                      paddingHorizontal: '2%',
+                      paddingVertical: '1%',
+                      borderRadius: 5,
+                    }}>
+                    <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
+                      Date
+                    </Text>
+                    <Icon name="edit" size={16} color={theme.colors.cardBG} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      setEditGroupDescription(false);
+                      seteditGroupName(true);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: theme.colors.cardBG,
+                      paddingHorizontal: '2%',
+                      paddingVertical: '1%',
+                      borderRadius: 5,
+                    }}>
+                    <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
+                      Background
+                    </Text>
+                    <Icon name="edit" size={16} color={theme.colors.cardBG} />
+                  </TouchableOpacity>
+
+                  {/* <Button
+                    // style={{
+                    //   width: '25%',
+                    // }}
                     theme={{roundness: 2}}
                     mode="contained"
                     icon={'pencil-outline'}
@@ -508,16 +575,16 @@ const Index = ({route, navigation}) => {
                     }}
                     buttonColor={theme.colors.cardBG}
                     onPress={async () => {
-                      await AsyncStorage.setItem('isLoggedIn', 'login');
-                      navigation.navigate('SignUpwithEmail');
+                      // await AsyncStorage.setItem('isLoggedIn', 'login');
+                      // navigation.navigate('SignUpwithEmail');
                     }}>
                     Date
-                  </Button>
+                  </Button> */}
 
-                  <Button
-                    style={{
-                      width: '40%',
-                    }}
+                  {/* <Button
+                    // style={{
+                    //   width: '40%',
+                    // }}
                     textColor={theme.colors.textGray}
                     theme={{roundness: 2}}
                     mode="contained"
@@ -531,11 +598,11 @@ const Index = ({route, navigation}) => {
                     }}
                     buttonColor={theme.colors.cardBG}
                     onPress={async () => {
-                      await AsyncStorage.setItem('isLoggedIn', 'login');
-                      navigation.navigate('SignUpwithEmail');
+                      // await AsyncStorage.setItem('isLoggedIn', 'login');
+                      // navigation.navigate('SignUpwithEmail');
                     }}>
                     Background
-                  </Button>
+                  </Button> */}
                 </View>
               </View>
             </View>

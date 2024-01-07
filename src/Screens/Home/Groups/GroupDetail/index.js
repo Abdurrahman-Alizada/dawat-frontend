@@ -32,16 +32,17 @@ const Tabs = ({groupId, navigation}) => {
           // fontSize: 17,
           fontWeight: 'bold',
           textTransform: 'none',
-          justifyContent: 'space-evenly',
+          // justifyContent: 'space-evenly',
         },
         // tabBarScrollEnabled: true,
         tabBarStyle: {
-          backgroundColor: theme.colors.elevation.level2,
+          // backgroundColor: theme.colors.elevation.level2,
+          backgroundColor: theme.colors.background,
         },
         // tabBarItemStyle: {width: 'auto',marginLeft:10},
         // tabBarIndicatorStyle: {marginLeft:10},
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Logs"
         initialParams={{groupId: groupId}}
         component={GroupLogs}
@@ -67,7 +68,7 @@ const Tabs = ({groupId, navigation}) => {
           ),
           tabBarLabel: () => null,
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Guests"

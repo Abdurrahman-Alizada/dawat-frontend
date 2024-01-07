@@ -30,7 +30,6 @@ const SplashScreen = ({navigation}) => {
 
   useEffect(() => {
     //Check if user_id is set or not If not then send for Authentication else send to Home Screen
-
      AsyncStorage.getItem('isLoggedIn')
       .then(value => {
         AsyncStorage.getItem('userId').then(id=>{
@@ -39,12 +38,6 @@ const SplashScreen = ({navigation}) => {
           ? navigation.replace('Onboarding')
           : navigation.replace(!value ? 'Auth' : 'Drawer');
         })
-
-        // setTimeout(() => {
-        //   isAppFirstLaunched?.current
-        //     ? navigation.replace('Onboarding')
-        //     : navigation.replace(!value ? 'Auth' : 'Drawer');
-        // }, 2000);
       })
       .catch(err => {
         console.log(err);

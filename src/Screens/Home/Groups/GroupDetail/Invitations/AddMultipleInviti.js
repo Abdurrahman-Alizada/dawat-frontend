@@ -105,7 +105,6 @@ export default function DisplayCsvDataTable({props, route}) {
         invities: invitiToDisplay,
       })
         .then(res => {
-          console.log(res);
           navigation.goBack();
         })
         .catch(e => {
@@ -167,7 +166,6 @@ export default function DisplayCsvDataTable({props, route}) {
 
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
-        console.log('FILE WRITTEN!', success);
         setSnackbarText('Sample file has been downloaded in download folder');
         setSnackbarVisible(true);
         setBannerVisible(false);
@@ -181,7 +179,6 @@ export default function DisplayCsvDataTable({props, route}) {
 
   // accordin item
   const AccordionItem = ({item, index}) => {
-    // console.log('first', index, item.lastStatus);
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
 

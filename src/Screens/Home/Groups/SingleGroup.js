@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   handleCurrentViewingGroup,
   handlePinGroup,
+  handleSelectedGroupLength,
 } from '../../../redux/reducers/groups/groups';
 
 const SingleGroup = ({
@@ -30,6 +31,7 @@ const SingleGroup = ({
 }) => {
   const dispatch = useDispatch();
   const groupSearchText = useSelector(state => state.groups.groupSearchText);
+  const selectedGroupLength = useSelector(state => state.groups?.selectedGroupLength);
 
   const onPressHandler = async () => {
     setIsSearch(false);
@@ -39,12 +41,6 @@ const SingleGroup = ({
       groupId: item._id,
       groupName: item.groupName,
     });
-  };
-
-  const settingHandler = async () => {
-    setIsSearch(false);
-    dispatch(handleCurrentViewingGroup(item));
-    navigation.navigate('SingleGroupSettings', {group: item});
   };
 
   const pinHandler = async () => {
@@ -65,40 +61,19 @@ const SingleGroup = ({
     if (include) {
       if (index !== -1 && index !== 0) {
         checkedItems.splice(include, 1);
-        // console.log('if ',index, props.item._id);
+        dispatch(handleSelectedGroupLength(selectedGroupLength - 1));
       } else if (index == 0) {
         checkedItems.shift();
+        dispatch(handleSelectedGroupLength(selectedGroupLength - 1));
       }
     } else {
       setCheckedItems([...checkedItems, item._id]);
+      dispatch(handleSelectedGroupLength(selectedGroupLength + 1));
     }
     setInclude(!include);
   };
 
-  const deleteGroupHandler = async () => {
-    let retString = await AsyncStorage.getItem('groups');
-    let grps = JSON.parse(retString);
-    const newArr = grps.filter(object => {
-      return object._id !== item?._id;
-    });
-    await AsyncStorage.setItem('groups', JSON.stringify(newArr));
-    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
-
-    if (pg?._id === item._id) {
-      await AsyncStorage.setItem(
-        'pinGroup',
-        JSON.stringify(newArr?.length ? newArr[0] : ''),
-      );
-    }
-    dispatch(handlePinGroup(newArr?.length ? newArr[0] : ''));
-  };
-
-  const [visible, setVisible] = useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-
   const [pinGroup, setPinGroup] = useState(null);
-
   useEffect(() => {
     const getData = async () => {
       const p = await AsyncStorage.getItem('pinGroup');
@@ -109,19 +84,19 @@ const SingleGroup = ({
   }, []);
 
   const getHighlightedText = result =>
-  result?.split(new RegExp(`(${groupSearchText})`, `gi`)).map((piece, index) => {
-    return (
-      <Text
-        key={index}
-        style={
-          piece.toLocaleLowerCase() == groupSearchText.toLocaleLowerCase()
-            ? {color: theme.colors.primary, fontWeight:"bold"}
-            : {}
-        }>
-        {piece}
-      </Text>
-    );
-  });
+    result?.split(new RegExp(`(${groupSearchText})`, `gi`)).map((piece, index) => {
+      return (
+        <Text
+          key={index}
+          style={
+            piece.toLocaleLowerCase() == groupSearchText.toLocaleLowerCase()
+              ? {color: theme.colors.primary, fontWeight: 'bold'}
+              : {}
+          }>
+          {piece}
+        </Text>
+      );
+    });
 
   return (
     <List.Item
@@ -130,27 +105,16 @@ const SingleGroup = ({
       description={item.groupDescription}
       titleStyle={{color: theme.colors.onBackground}}
       descriptionStyle={{color: theme.colors.textGray}}
-      onPress={async () => {
-        closeMenu();
-        onPressHandler();
-      }}
+      onPress={() => (checked ? onLongPressHandler() : onPressHandler())}
       left={props => (
         <View>
           {item.imageURL ? (
-            <Avatar.Image
-              style={props.style}
-              source={{uri: item?.imageURL}}
-              size={50}
-            />
+            <Avatar.Image style={props.style} source={{uri: item?.imageURL}} size={50} />
           ) : (
             <Avatar.Text
               style={props.style}
               // label={item.groupName?.charAt(0).toUpperCase()}
-              label={item.groupName
-                ?.match(/\b\w/g)
-                ?.join('')
-                ?.toUpperCase()
-                ?.slice(0, 2)}
+              label={item.groupName?.match(/\b\w/g)?.join('')?.toUpperCase()?.slice(0, 2)}
               size={50}
             />
           )}
@@ -180,7 +144,7 @@ const SingleGroup = ({
                   onPress={() => alert('This group is pin')}
                 />
               )}
-              <Menu
+              {/* <Menu
                 visible={visible}
                 onDismiss={closeMenu}
                 contentStyle={{backgroundColor: theme.colors.background}}
@@ -192,15 +156,7 @@ const SingleGroup = ({
                     size={30}
                   />
                 }>
-                {/* <Menu.Item
-                  leadingIcon="eye-outline"
-                  title="View"
-                  titleStyle={{color: theme.colors.onBackground}}
-                  onPress={async () => {
-                    closeMenu();
-                    onPressHandler();
-                  }}
-                /> */}
+
                 {pinGroup?._id == item?._id ? (
                   <Menu.Item
                     leadingIcon="pin-off-outline"
@@ -258,7 +214,7 @@ const SingleGroup = ({
                     }}
                   />
                 )}
-              </Menu>
+              </Menu> */}
             </View>
           )}
         </View>

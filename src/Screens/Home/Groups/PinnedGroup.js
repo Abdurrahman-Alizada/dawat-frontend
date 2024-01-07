@@ -37,6 +37,8 @@ const Groups = ({navigation}) => {
   const [loading, setLoading] = useState(true);
 
   const PG = useSelector(state => state.groups?.pinGroup);
+  const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
+
   const [pinGroup, setPinGroup] = useState(PG);
   const pinGroupTime = useRef(0);
   const getPinGroup = async () => {
@@ -52,7 +54,7 @@ const Groups = ({navigation}) => {
 
   useLayoutEffect(() => {
     getPinGroup();
-  }, [PG]);
+  }, [PG, pinGroupFlag]);
 
   const [isError, setIsError] = useState(false);
   useEffect(() => {

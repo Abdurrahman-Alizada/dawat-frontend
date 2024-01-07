@@ -25,22 +25,15 @@ import Invitations from '../Screens/Home/Groups/GroupDetail/Invitations';
 import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks';
 import GroupChat from '../Screens/Home/Groups/GroupDetail/Chat';
 import Groupbrief from '../Screens/Home/Groups/GroupDetail/GroupBrief';
+import GroupLogs from '../Screens/Home/Groups/GroupDetail/GroupLogs/Index';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
   return (
     <Stack.Navigator initialRouteName="PinnedGroup">
-      <Stack.Screen
-        name="PinnedGroup"
-        component={PinnedGroup}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="HomeIndex"
-        component={HomeIndex}
-        options={{headerShown: false}}
-      />
+      <Stack.Screen name="PinnedGroup" component={PinnedGroup} options={{headerShown: false}} />
+      <Stack.Screen name="HomeIndex" component={HomeIndex} options={{headerShown: false}} />
       <Stack.Screen
         name="AddGroup"
         component={AddGroup}
@@ -73,6 +66,15 @@ const AppStack = () => {
         options={{
           title: 'Group detail',
           headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="GroupLogs"
+        component={GroupLogs}
+        options={{
+          title: 'Group Logs',
+          // headerShown: false,
         }}
       />
 

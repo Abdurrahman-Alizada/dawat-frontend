@@ -7,7 +7,10 @@ const initialState = {
   currentTab: 'Invitations',
   pinGroup: {},
   groupsFlag : false,
-  groupSearchText :""
+  groupSearchText :"",
+  pinGroupFlag:true,
+  pinGroupLoading:false,
+  selectedGroupLength:0
 };
 
 export const groupSlice = createSlice({
@@ -26,11 +29,20 @@ export const groupSlice = createSlice({
     handlePinGroup: (state, action) => {
       state.pinGroup = action.payload;
     },
+    handlePinGroupFlag: (state, action) => {
+      state.pinGroup = action.payload;
+    },
+    handlePinGroupLoading: (state, action) => {
+      state.pinGroupLoading = action.payload;
+    },
     handleGroupsFlag: (state, action) => {
       state.groupsFlag = action.payload;
     },
     handleGroupsSearchText: (state, action) => {
       state.groupSearchText = action.payload;
+    },
+    handleSelectedGroupLength: (state, action) => {
+      state.selectedGroupLength = action.payload;
     },
   },
 });
@@ -38,11 +50,14 @@ export const groupSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
   handlePinGroup,
+  handlePinGroupFlag,
+  handlePinGroupLoading,
   handleCurrentViewingGroup,
   handleCurrentTab,
   handleIsSearch,
   handleGroupsFlag,
-  handleGroupsSearchText
+  handleGroupsSearchText,
+  handleSelectedGroupLength
 } = groupSlice.actions;
 
 export default groupSlice.reducer;

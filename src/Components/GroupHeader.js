@@ -37,17 +37,11 @@ const Header = ({
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
-  const currentLoginUser = useSelector(
-    state => state.user?.currentLoginUser,
-  );
+  const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
 
-  const isMessagesSelected = useSelector(
-    state => state.chat.isMessagesSelected,
-  );
+  const isMessagesSelected = useSelector(state => state.chat.isMessagesSelected);
 
   const currentTab = useSelector(state => state.groups.currentTab);
 
@@ -61,12 +55,14 @@ const Header = ({
 
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
-      return user.name == currentLoginUser.name ? 'You' : ' '+ user.name  ;
+      return user.name == currentLoginUser.name ? 'You' : ' ' + user.name;
     });
 
-    return token && membersText ? membersText?.toString().length < 25
-      ? membersText?.toString()
-      : `${membersText?.toString()?.substring(0, 25)}...` : "You"
+    return token && membersText
+      ? membersText?.toString().length < 25
+        ? membersText?.toString()
+        : `${membersText?.toString()?.substring(0, 25)}...`
+      : 'You';
   };
 
   //search
@@ -74,9 +70,7 @@ const Header = ({
 
   // invitationsopenTasksSummaryModalize
   const [search, setSearch] = useState('');
-  const isInvitaionSearch = useSelector(
-    state => state.invitations.isInvitaionSearch,
-  );
+  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
   const updateSearch = search => {
     setSearch(search);
     dispatch(handleInvitationSearch(search));
@@ -143,10 +137,7 @@ const Header = ({
                   }}
                 />
               ) : (
-                <Avatar.Text
-                  label={currentViewingGroup?.groupName?.charAt(0)}
-                  size={40}
-                />
+                <Avatar.Text label={currentViewingGroup?.groupName?.charAt(0)} size={40} />
               )}
               <View style={{marginLeft: 5}}>
                 <Text style={{fontSize: 18, fontWeight: '700'}}>
@@ -192,7 +183,7 @@ const Header = ({
                     onPress={() => {
                       if (currentTab === 'Guests') {
                         dispatch(handleIsInvitaionSummaryOpen(true));
-                        openGuestsSummaryModalize()
+                        openGuestsSummaryModalize();
                       } else if (currentTab === 'To-do') {
                         dispatch(handleIsTaskSummaryOpen(true));
                         openTasksSummaryModalize();
@@ -206,13 +197,7 @@ const Header = ({
             <Menu
               visible={visible}
               onDismiss={closeMenu}
-              anchor={
-                <IconButton
-                  icon="dots-vertical"
-                  size={25}
-                  onPress={() => openMenu()}
-                />
-              }>
+              anchor={<IconButton icon="dots-vertical" size={25} onPress={() => openMenu()} />}>
               {currentTab === 'Guests' && (
                 <View>
                   <Menu.Item
@@ -221,9 +206,10 @@ const Header = ({
                       dispatch(handleIsSearch(true));
                       dispatch(handleIsInvitationSearch(true));
                     }}
-                    title="Search for inviti"
+                    title="Search"
                     leadingIcon={'account-search'}
                   />
+                      <Divider />
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
@@ -232,7 +218,6 @@ const Header = ({
                     title="Import/Export"
                     leadingIcon={'microsoft-excel'}
                   />
-                  <Divider />
 
                   <Menu.Item
                     onPress={() => {
@@ -249,6 +234,16 @@ const Header = ({
                     }}
                     title="Bulk actions"
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
+                  />
+                  <Divider />
+
+                  <Menu.Item
+                    onPress={() => {
+                      closeMenu();
+                      navigation.navigate('GroupLogs');
+                    }}
+                    title="Group logs"
+                    leadingIcon={'format-list-bulleted-type'}
                   />
                 </View>
               )}
