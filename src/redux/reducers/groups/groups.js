@@ -10,7 +10,8 @@ const initialState = {
   groupSearchText :"",
   pinGroupFlag:true,
   pinGroupLoading:false,
-  selectedGroupLength:0
+  selectedGroupLength:0,
+  currentBackgroundImgSrcId : 0
 };
 
 export const groupSlice = createSlice({
@@ -44,6 +45,9 @@ export const groupSlice = createSlice({
     handleSelectedGroupLength: (state, action) => {
       state.selectedGroupLength = action.payload;
     },
+    handleCurrentBackgroundImgSrcId: (state, action) => {
+      state.currentBackgroundImgSrcId = action.payload;
+    },
   },
 });
 
@@ -57,7 +61,8 @@ export const {
   handleIsSearch,
   handleGroupsFlag,
   handleGroupsSearchText,
-  handleSelectedGroupLength
+  handleSelectedGroupLength,
+  handleCurrentBackgroundImgSrcId
 } = groupSlice.actions;
 
 export default groupSlice.reducer;

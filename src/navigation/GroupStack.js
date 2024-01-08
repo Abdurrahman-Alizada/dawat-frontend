@@ -26,6 +26,7 @@ import Tasks from '../Screens/Home/Groups/GroupDetail/Tasks';
 import GroupChat from '../Screens/Home/Groups/GroupDetail/Chat';
 import Groupbrief from '../Screens/Home/Groups/GroupDetail/GroupBrief';
 import GroupLogs from '../Screens/Home/Groups/GroupDetail/GroupLogs/Index';
+import ChangeMainImage from '../Screens/Home/Groups/changeBackMainImage/ChangeMainImage';
 
 const Stack = createStackNavigator();
 
@@ -86,7 +87,15 @@ const AppStack = () => {
           header: props => <GeneralAppbar title="Group settings" {...props} />,
         }}
       />
-
+      <Stack.Screen
+        name="ChangeMainImage"
+        component={ChangeMainImage}
+        options={{
+          title: 'Background image',
+          header: props => <GeneralAppbar title="Background image" {...props} />,
+          presentation: 'modal',
+        }}
+      />
       <Stack.Screen
         name="updateGroupMembers"
         component={UpdateGroupMembers}

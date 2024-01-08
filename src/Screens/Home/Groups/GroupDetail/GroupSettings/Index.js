@@ -44,7 +44,7 @@ import Countdown from 'react-native-countdown-xambra';
 import LoginForMoreFeatures from '../../../../../Components/LoginForMoreFeatures';
 import Icon from 'react-native-vector-icons/Feather';
 import moment from 'moment';
-
+import BackgroundImages from '../../changeBackMainImage/mainBackgroundImages';
 // imports end
 
 const Index = ({route, navigation}) => {
@@ -53,6 +53,7 @@ const Index = ({route, navigation}) => {
   const [localDeleteLoding, setLocalDeleteLoading] = useState(false);
   const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
   const PG = useSelector(state => state.groups?.pinGroup);
+  const currentBackgroundImgSrcId = useSelector(state => state.groups.currentBackgroundImgSrcId)
 
   const [adminIds, setAdminIds] = useState([]);
   const getMembersLenght = () => {
@@ -398,15 +399,11 @@ const Index = ({route, navigation}) => {
     setUserId(id);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     getCurrentUserId();
   }, []);
 
   // functions - end
-
-  const onOpenModalize = () => {
-    modalizeRef.current?.open();
-  };
 
   const onCloseModalize = () => {
     modalizeRef.current?.close();
@@ -432,21 +429,22 @@ const Index = ({route, navigation}) => {
             keyboardVerticalOffset={0}
             behavior="height"
             style={{flex: 1}}>
-            <View>
+            <View
+              style={{
+                maxHeight: '30%',
+              }}>
               <Image
                 style={{
                   width: '100%',
-                  opacity: 0.9,
+                  maxHeight:235,
                   alignSelf: 'center',
                   resizeMode: 'cover',
                 }}
-                source={require('../../../../../assets/images/main-1.png')}
+                source={BackgroundImages[currentBackgroundImgSrcId]}
               />
               <View
                 style={{
                   ...StyleSheet.absoluteFillObject,
-                  backgroundColor: '#26231c',
-                  opacity: 0.8,
                   padding: '5%',
                   justifyContent: 'center',
                 }}>
@@ -460,7 +458,12 @@ const Index = ({route, navigation}) => {
                   {groupName}
                 </Text>
                 {time < 0 ? (
-                  <View style={{flexDirection:"row", alignItems:"baseline", justifyContent:"center"}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'baseline',
+                      justifyContent: 'center',
+                    }}>
                     <Countdown
                       until={Math.abs(time)}
                       size={22}
@@ -474,9 +477,9 @@ const Index = ({route, navigation}) => {
                     <Text
                       style={{
                         fontWeight: 'bold',
-                        color: "#fff",
+                        color: '#fff',
                       }}>
-                       ago
+                      ago
                     </Text>
                   </View>
                 ) : (
@@ -543,8 +546,7 @@ const Index = ({route, navigation}) => {
 
                   <TouchableOpacity
                     onPress={() => {
-                      setEditGroupDescription(false);
-                      seteditGroupName(true);
+                      navigation.navigate('ChangeMainImage');
                     }}
                     style={{
                       flexDirection: 'row',
@@ -560,49 +562,6 @@ const Index = ({route, navigation}) => {
                     </Text>
                     <Icon name="edit" size={16} color={theme.colors.cardBG} />
                   </TouchableOpacity>
-
-                  {/* <Button
-                    // style={{
-                    //   width: '25%',
-                    // }}
-                    theme={{roundness: 2}}
-                    mode="contained"
-                    icon={'pencil-outline'}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
-                    labelStyle={{
-                      fontWeight: 'bold',
-                      color: theme.colors.onBackground,
-                    }}
-                    buttonColor={theme.colors.cardBG}
-                    onPress={async () => {
-                      // await AsyncStorage.setItem('isLoggedIn', 'login');
-                      // navigation.navigate('SignUpwithEmail');
-                    }}>
-                    Date
-                  </Button> */}
-
-                  {/* <Button
-                    // style={{
-                    //   width: '40%',
-                    // }}
-                    textColor={theme.colors.textGray}
-                    theme={{roundness: 2}}
-                    mode="contained"
-                    icon={'pencil-outline'}
-                    // onPress={handleSubmit}
-                    contentStyle={{padding: '2%', flexDirection: 'row-reverse'}}
-                    labelStyle={{
-                      width: '60%',
-                      fontWeight: 'bold',
-                      color: theme.colors.onBackground,
-                    }}
-                    buttonColor={theme.colors.cardBG}
-                    onPress={async () => {
-                      // await AsyncStorage.setItem('isLoggedIn', 'login');
-                      // navigation.navigate('SignUpwithEmail');
-                    }}>
-                    Background
-                  </Button> */}
                 </View>
               </View>
             </View>

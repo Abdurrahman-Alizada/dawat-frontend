@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import React, {useEffect, useState, useContext, useLayoutEffect, useRef} from 'react';
 import {
   View,
   Image,
@@ -15,19 +9,14 @@ import {
 } from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  Text,
-  useTheme,
-  Button,
-  Avatar,
-  ActivityIndicator,
-} from 'react-native-paper';
+import {Text, useTheme, Button, Avatar, ActivityIndicator} from 'react-native-paper';
 import {ThemeContext} from '../../../themeContext';
 import CountDown from 'react-native-countdown-xambra';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
 import PinnedGroupHeader from '../../../Components/PinnedGroupHeader';
 import {handleCurrentViewingGroup} from '../../../redux/reducers/groups/groups';
+import BackgroundImages from './changeBackMainImage/mainBackgroundImages';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
@@ -38,6 +27,7 @@ const Groups = ({navigation}) => {
 
   const PG = useSelector(state => state.groups?.pinGroup);
   const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
+  const currentBackgroundImgSrcId = useSelector(state => state.groups?.currentBackgroundImgSrcId);
 
   const [pinGroup, setPinGroup] = useState(PG);
   const pinGroupTime = useRef(0);
@@ -80,19 +70,15 @@ const Groups = ({navigation}) => {
               style={{flex: 1}}>
               <Image
                 style={{
-                  width: '100%',
-                  height: '28%',
-                  opacity: 0.9,
                   alignSelf: 'center',
                   resizeMode: 'cover',
+                  maxHeight: '30%',
                 }}
-                source={require('../../../assets/images/main-1.png')}
+                source={BackgroundImages[currentBackgroundImgSrcId]}
               />
               <View
                 style={{
                   ...StyleSheet.absoluteFillObject,
-                  backgroundColor: '#26231c',
-                  opacity: 0.8,
                   height: '28%',
                   justifyContent: 'center',
                 }}>
@@ -107,15 +93,12 @@ const Groups = ({navigation}) => {
                 </Text>
                 <CountDown
                   until={pinGroupTime.current ? pinGroupTime.current : 0}
-                  // onFinish={() => alert('finished')}
                   onPress={() => alert('hello')}
                   size={22}
                   style={{margin: '2%'}}
                   digitTxtStyle={{color: '#fff'}}
                   digitStyle={{backgroundColor: '#265AE8'}}
                   timeLabelStyle={{color: '#fff'}}
-                  // timeToShow={['D','H']}
-                  // showSeparator
                   separatorStyle={{color: '#fff', alignSelf: 'center'}}
                 />
               </View>
@@ -285,12 +268,13 @@ const Groups = ({navigation}) => {
                         size={40}
                       />
                     )}
-                    labelStyle={{fontWeight: 'bold', fontSize:20}}
+                    labelStyle={{fontWeight: 'bold', fontSize: 20}}
                     onPress={() => {
                       dispatch(handleCurrentViewingGroup(pinGroup));
                       navigation.navigate('GroupBrief');
                     }}
-s                    buttonColor={theme.colors.tertiary}>
+                    s
+                    buttonColor={theme.colors.tertiary}>
                     Summary
                   </Button>
                   {/* {true ? (
@@ -318,8 +302,7 @@ s                    buttonColor={theme.colors.tertiary}>
               </View>
             </KeyboardAvoidingView>
           ) : (
-            <View
-              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Text style={{fontSize: 22}}>No group has been pinned</Text>
               <Button
                 // loading={isLoading}
