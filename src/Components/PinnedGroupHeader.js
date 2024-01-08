@@ -20,21 +20,19 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
     <View>
       {!isSearch ? (
         <Appbar.Header
-          style={{backgroundColor: theme.colors.background}}
-          elevated={true}>
-          
+          style={{backgroundColor: 'transparent'}}
+        >
           <Appbar.Action
             icon="menu"
-            color={theme.colors.onBackground}
+            color={'#fff'}
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           />
           <Appbar.Content
             title="Event Planner"
             titleStyle={{
-              color: theme.colors.onBackground,
+              color: '#fff',
             }}
           />
-
         </Appbar.Header>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>

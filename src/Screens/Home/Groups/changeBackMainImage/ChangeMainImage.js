@@ -10,11 +10,10 @@ const ChangeMainImage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
   const currentBackgroundImgSrcId = useSelector(state => state.groups.currentBackgroundImgSrcId);
 
   const handleBackgroundImage = async id => {
-    await AsyncStorage.setItem(`backgroundImage_${currentViewingGroup?._id}`, `${id}`);
+    await AsyncStorage.setItem(`pingroup_backgroundImage`, `${id}`);
     dispatch(handleCurrentBackgroundImgSrcId(id));
   };
 
@@ -24,8 +23,10 @@ const ChangeMainImage = () => {
         {BackgroundImages?.map((image, index) => (
           <TouchableOpacity key={index} onPress={() => handleBackgroundImage(index)} style={{}}>
             <ImageBackground
-              style={{height: 150, marginBottom: '5%', overflow: 'hidden', borderRadius: 10}}
-              source={image}>
+              style={{height: 235, marginBottom: '5%', overflow: 'hidden', borderRadius: 10}}
+              source={image}
+              imageStyle={{resizeMode: "cover"}}
+              >
               <View
                 style={{
                   position: 'absolute',
@@ -44,7 +45,7 @@ const ChangeMainImage = () => {
                       borderRadius: 50,
                     }}>
                     <Image
-                      style={{width: 30, height: 30}}
+                      style={{width: 20, height: 20}}
                       source={require('../../../../assets/images/groupDetails/invitation-approve-icon.png')}
                     />
                   </View>

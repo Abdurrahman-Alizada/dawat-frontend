@@ -6,6 +6,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,7 +29,6 @@ const Groups = ({navigation}) => {
   const PG = useSelector(state => state.groups?.pinGroup);
   const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
   const currentBackgroundImgSrcId = useSelector(state => state.groups?.currentBackgroundImgSrcId);
-
   const [pinGroup, setPinGroup] = useState(PG);
   const pinGroupTime = useRef(0);
   const getPinGroup = async () => {
@@ -48,6 +48,9 @@ const Groups = ({navigation}) => {
 
   const [isError, setIsError] = useState(false);
   useEffect(() => {
+    // StatusBar.setTranslucent(true);
+    // StatusBar.setBackgroundColor("transparent");
+
     setIsError(isError);
   }, [isError]);
 
@@ -55,53 +58,41 @@ const Groups = ({navigation}) => {
     <View style={{flex: 1}}>
       <StatusBar
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-        backgroundColor={theme.colors.background}
+        backgroundColor={"transparent"}
       />
-
-      <PinnedGroupHeader theme={theme} />
 
       {!loading ? (
         <View style={{flex: 1}}>
           {pinGroup ? (
-            <KeyboardAvoidingView
-              enabled={false}
-              keyboardVerticalOffset={0}
-              behavior="height"
-              style={{flex: 1}}>
-              <Image
-                style={{
-                  alignSelf: 'center',
-                  resizeMode: 'cover',
-                  maxHeight: '30%',
-                }}
-                source={BackgroundImages[currentBackgroundImgSrcId]}
-              />
-              <View
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  height: '28%',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    fontSize: 24,
-                  }}>
-                  {pinGroup?.groupName}
-                </Text>
-                <CountDown
-                  until={pinGroupTime.current ? pinGroupTime.current : 0}
-                  onPress={() => alert('hello')}
-                  size={22}
-                  style={{margin: '2%'}}
-                  digitTxtStyle={{color: '#fff'}}
-                  digitStyle={{backgroundColor: '#265AE8'}}
-                  timeLabelStyle={{color: '#fff'}}
-                  separatorStyle={{color: '#fff', alignSelf: 'center'}}
-                />
-              </View>
+            <View style={{flex: 1}}>
+              <ImageBackground
+                style={{height: 255, justifyContent:"flex-start"}}
+                imageStyle={{resizeMode: 'stretch'}}
+                source={BackgroundImages[currentBackgroundImgSrcId]}>
+                <PinnedGroupHeader theme={theme} />
+                <View style={{}}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      fontSize: 24,
+                      marginTop: 25,
+                    }}>
+                    {pinGroup?.groupName}
+                  </Text>
+                  <CountDown
+                    until={pinGroupTime.current ? pinGroupTime.current : 0}
+                    onPress={() => alert('hello')}
+                    size={22}
+                    style={{margin: '2%'}}
+                    digitTxtStyle={{color: '#fff'}}
+                    digitStyle={{backgroundColor: '#265AE8'}}
+                    timeLabelStyle={{color: '#fff'}}
+                    separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                  />
+                </View>
+              </ImageBackground>
 
               <View
                 style={{
@@ -300,7 +291,7 @@ const Groups = ({navigation}) => {
                   ) : null} */}
                 </View>
               </View>
-            </KeyboardAvoidingView>
+            </View>
           ) : (
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Text style={{fontSize: 22}}>No group has been pinned</Text>

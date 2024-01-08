@@ -38,16 +38,19 @@ const SplashScreen = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    // getCurrentBackgroundImage();
     //Check if user_id is set or not If not then send for Authentication else send to Home Screen
     AsyncStorage.getItem('isLoggedIn')
       .then(value => {
         AsyncStorage.getItem('userId').then(id => {
           dispatch(handleCurrentLoaginUser({_id: id}));
-          isAppFirstLaunched?.current
-            ? navigation.replace('Onboarding')
-            : navigation.replace(!value ? 'Auth' : 'Drawer');
+          AsyncStorage.getItem('pingroup_backgroundImage').then(bgImgid => {
+            dispatch(handleCurrentBackgroundImgSrcId(bgImgid));
+            isAppFirstLaunched?.current
+              ? navigation.replace('Onboarding')
+              : navigation.replace(!value ? 'Auth' : 'Drawer');
+          });
         });
-        getCurrentBackgroundImage();
       })
       .catch(err => {
         console.log(err);
