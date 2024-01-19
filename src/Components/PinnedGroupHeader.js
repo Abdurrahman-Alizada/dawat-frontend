@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Menu, Appbar, Searchbar, useTheme} from 'react-native-paper';
+import {Appbar, Searchbar} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
+import PinScreenAppbarGift from '../adUnits/pinScreenAppbarGift';
 
-const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
+const Header = ({isSearch, setIsSearch, istransparent, searchFilterFunction, theme}) => {
   const navigation = useNavigation();
   //search
   const [search, setSearch] = useState('');
@@ -20,19 +21,21 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, theme}) => {
     <View>
       {!isSearch ? (
         <Appbar.Header
-          style={{backgroundColor: 'transparent'}}
-        >
+          elevated={istransparent ? false : true}
+          style={{backgroundColor: istransparent ? 'transparent' : theme.colors.background}}>
           <Appbar.Action
             icon="menu"
-            color={'#fff'}
+            color={istransparent ? '#fff' : theme.colors.onBackground}
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           />
           <Appbar.Content
             title="Event Planner"
             titleStyle={{
-              color: '#fff',
+              color: istransparent ? '#fff' : theme.colors.onBackground,
             }}
           />
+
+          <PinScreenAppbarGift />
         </Appbar.Header>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>

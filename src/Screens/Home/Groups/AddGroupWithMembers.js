@@ -22,7 +22,7 @@ import {
 } from 'react-native-paper';
 import {useGetAllFriendsQuery} from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useAddGroupMutation} from '../../../redux/reducers/groups/groupThunk';
-import {handlePinGroup} from '../../../redux/reducers/groups/groups';
+import {handleGroupsFlag, handlePinGroup} from '../../../redux/reducers/groups/groups';
 import {useSelector, useDispatch} from 'react-redux';
 import {groupApi} from '../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,22 +31,17 @@ import createRandomId from '../../../utils/createRandomId';
 const AddGroup = ({navigation, onClose, route}) => {
   const dispatch = useDispatch();
 
-  const {
-    groupName,
-    groupDescription,
-    imageURL,
-    isChat,
-    isInvitations,
-    isMute,
-    isTasks,
-    time,
-  } = route.params;
+  const {groupName, groupDescription, imageURL, isChat, isInvitations, isMute, isTasks, time} =
+    route.params;
   const theme = useTheme();
   const [isSearch, setIsSearch] = useState(false);
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
-  const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllFriendsQuery(currentLoginUser?._id);
+  const groupsFlag = useSelector(state => state.groups?.groupsFlag);
+  
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
+    currentLoginUser?._id,
+  );
 
   const [addGroup, {isLoading: addGroupLoading}] = useAddGroupMutation();
 
@@ -54,25 +49,31 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
 
   const createLocalGroup = async values => {
-    // let group = {
-    //   _id: values._id,
-    //   isSyncd: true,
-    //   groupName: values.groupName,
-    //   groupDescription: values.groupDescription,
-    //   time: JSON.parse(time),
-    // };
-    let group = values;
+    let group = values
+      ? values
+      : {
+          _id: createRandomId(12),
+          isSyncd: false,
+          groupName: groupName,
+          groupDescription: groupDescription,
+          time: JSON.parse(time),
+        };
 
     let groups = await AsyncStorage.getItem('groups');
     if (groups) {
       let data = JSON.parse(groups);
       let newGroups = [...data, group];
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+      data = newGroups = null;
     } else {
       let newGroups = [group];
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+      newGroups = null;
     }
     dispatch(handlePinGroup(await AsyncStorage.getItem('pinGroup')));
+    dispatch(handleGroupsFlag(!groupsFlag));
+    group = groups = null;
+    navigation.navigate('HomeIndex');
   };
 
   const submitHandler = async () => {
@@ -120,7 +121,8 @@ const AddGroup = ({navigation, onClose, route}) => {
         .then(res => {
           if (res.data?._id) {
             createLocalGroup(res.data);
-            navigation.navigate('HomeIndex');
+          } else {
+            createLocalGroup();
           }
         })
         .catch(err => {
@@ -155,17 +157,13 @@ const AddGroup = ({navigation, onClose, route}) => {
               source={
                 itemProps?.imageURL
                   ? {uri: itemProps?.imageURL}
-                  : require('../../../assets/drawer/userImage.png')
+                  : require('../../../assets/drawer/male-user.png')
               }
             />
           </View>
         )}
         right={props => (
-          <Checkbox
-            {...props}
-            status={include ? 'checked' : 'unchecked'}
-            onPress={add}
-          />
+          <Checkbox {...props} status={include ? 'checked' : 'unchecked'} onPress={add} />
         )}
       />
     );
@@ -189,15 +187,13 @@ const AddGroup = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header
-          style={{backgroundColor: theme.colors.background}}
-          elevated={true}>
+        <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated={true}>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Add group members" />
+          <Appbar.Content title="Add event members" />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -226,21 +222,14 @@ const AddGroup = ({navigation, onClose, route}) => {
                   // showsHorizontalScrollIndicator={false}
                 >
                   {users.map((user, index) => (
-                    <TouchableOpacity
-                      style={{marginRight: 15, alignItems: 'center'}}
-                      key={index}>
+                    <TouchableOpacity style={{marginRight: 15, alignItems: 'center'}} key={index}>
                       {user?.imageURL ? (
-                        <Avatar.Image
-                          size={50}
-                          source={{uri: user?.imageURL}}
-                        />
+                        <Avatar.Image size={50} source={{uri: user?.imageURL}} />
                       ) : (
                         <Avatar.Text size={50} label={user.name.charAt(0)} />
                       )}
                       <Text style={{}} maxLength={10}>
-                        {user.name.length > 8
-                          ? user.name.substring(0, 8) + '..'
-                          : user.name}
+                        {user.name.length > 8 ? user.name.substring(0, 8) + '..' : user.name}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -251,10 +240,8 @@ const AddGroup = ({navigation, onClose, route}) => {
           )}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>You don't have any friend to add in this group</Text>
-              <Text>
-                But still you can create group by clicking on Add button
-              </Text>
+              <Text>You don't have any friend left to add in this event</Text>
+              <Text>But still you can create event by clicking on Add button</Text>
               <Button
                 icon="refresh"
                 mode="contained"
@@ -273,9 +260,7 @@ const AddGroup = ({navigation, onClose, route}) => {
             </View>
           )}
           renderItem={({item}) => <Item itemProps={item} />}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
 

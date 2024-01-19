@@ -178,7 +178,7 @@ const InvitaionsSummary = ({onClose}) => {
           icon="refresh"
           size={30}
           disabled={isFetching}
-          accessibilityLabel="refresh tasks summary"
+          accessibilityLabel="refresh to-do summary"
           style={{marginTop: '5%', }}
           mode="contained"
           onPress={refetch}

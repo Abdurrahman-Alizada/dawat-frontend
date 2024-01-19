@@ -4,7 +4,7 @@
 //  Modified by : -------
 // ==========================================
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper';
@@ -16,6 +16,8 @@ import {handleTasks} from '../../../../../redux/reducers/groups/tasks/taskSlice'
 import {useSelector, useDispatch} from 'react-redux';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 import TasksAppbar from '../../../../../Components/Appbars/TasksAppbar';
+import {Modalize} from 'react-native-modalize';
+import TaskSummary from './TasksSummary';
 
 const Task = ({route}) => {
   const {groupId, isHeader} = route.params;
@@ -25,10 +27,9 @@ const Task = ({route}) => {
   const dispatch = useDispatch();
   const [snackbarVisible, setSnackBarVisible] = useState(false);
 
-  const {data, isError, isLoading, error, isFetching, refetch} =
-    useGetAllTasksQuery({
-      groupId,
-    });
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetAllTasksQuery({
+    groupId,
+  });
 
   const tasksFromRedux = useSelector(state => state.tasks.tasks);
   const isTaskSearch = useSelector(state => state.tasks.isTasksSearch);
@@ -41,9 +42,18 @@ const Task = ({route}) => {
     dispatch(handleTasks(data));
   }, [data]);
 
+  // tasks Summary modalize
+  const tasksSummaryModalizeRef = useRef(null);
+  const openTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.open();
+  };
+  const closeTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.close();
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: theme.colors.background}}>
-      {isHeader && <TasksAppbar />}
+      {isHeader && <TasksAppbar openTasksSummaryModalize={openTasksSummaryModalize} />}
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />
@@ -59,9 +69,7 @@ const Task = ({route}) => {
           renderItem={({item}) => (
             <RenderItem item={item} setSnackBarVisible={setSnackBarVisible} />
           )}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
 
@@ -82,17 +90,16 @@ const Task = ({route}) => {
         text={'Something went wrong'}
         onDismissHandler={setSnackBarVisible}
       />
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={tasksSummaryModalizeRef}
+        snapPoint={500}
+        handlePosition="inside">
+        <TaskSummary onClose={closeTasksSummaryModalize} />
+      </Modalize>
     </View>
   );
 };
 
 export default Task;
-
-const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-});

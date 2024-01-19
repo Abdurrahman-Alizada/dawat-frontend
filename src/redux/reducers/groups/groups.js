@@ -1,17 +1,18 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
-  totalgroups: [],
-  currentViewingGroup: {},
-  isSearch: false,
-  currentTab: 'Invitations',
   pinGroup: {},
+  isSearch: false,
   groupsFlag : false,
-  groupSearchText :"",
+  currentTab: 'Invitations',
+  totalgroups: [],
   pinGroupFlag:true,
+  groupSearchText :"",
   pinGroupLoading:false,
+  currentViewingGroup: {},
   selectedGroupLength:0,
-  currentBackgroundImgSrcId : 0
+  currentBackgroundImgSrcId : 1,
+  pinGroupId:null
 };
 
 export const groupSlice = createSlice({
@@ -48,6 +49,9 @@ export const groupSlice = createSlice({
     handleCurrentBackgroundImgSrcId: (state, action) => {
       state.currentBackgroundImgSrcId = action.payload;
     },
+    handlePinGroupId: (state, action) => {
+      state.pinGroupId = action.payload;
+    },
   },
 });
 
@@ -62,7 +66,8 @@ export const {
   handleGroupsFlag,
   handleGroupsSearchText,
   handleSelectedGroupLength,
-  handleCurrentBackgroundImgSrcId
+  handleCurrentBackgroundImgSrcId,
+  handlePinGroupId
 } = groupSlice.actions;
 
 export default groupSlice.reducer;

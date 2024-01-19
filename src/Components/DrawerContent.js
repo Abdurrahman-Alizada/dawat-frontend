@@ -8,9 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
-import {userApi} from '../redux/reducers/user/userThunk';
-import {groupApi} from '../redux/reducers/groups/groupThunk';
-import {friendshipApi} from '../redux/reducers/Friendship/friendshipThunk';
 
 import {version} from '../../package.json';
 
@@ -18,18 +15,8 @@ export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const id = useRef(null);
-  const token = useRef(null);
   const currentLoginUser = useSelector(state => state.user.currentLoginUser);
-  const getUserInfo = async () => {
-    id.current = await AsyncStorage.getItem('userId');
-    token.current = await AsyncStorage.getItem('token');
-  };
-  useEffect(() => {
-    getUserInfo();
-  }, []);
 
-  // const {data: user, isError, error, isLoading, refetch} = useGetCurrentLoginUserQuery(id.current);
   const {
     data: user,
     isError,
@@ -43,24 +30,6 @@ export default function DrawerContent(props) {
       dispatch(handleCurrentLoaginUser(user));
     }
   }, [user]);
-
-  const obscureEmail = email => {
-    if (!email) return '*******';
-    const [name, domain] = email?.split('@');
-    return `${name[0]}${name[1]}${new Array(name.length - 3).join('*')}@${domain}`;
-  };
-
-  const handlePrivacyPolicyPress = async () => {
-    const supported = await Linking.canOpenURL(
-      'https://eventplannerapp.netlify.app/privacy-policy',
-    );
-
-    if (supported) {
-      await Linking.openURL('https://eventplannerapp.netlify.app/privacy-policy');
-    } else {
-      Alert.alert(`Something went wrong`);
-    }
-  };
 
   return (
     <DrawerContentScrollView
@@ -86,42 +55,23 @@ export default function DrawerContent(props) {
         <Divider style={{marginBottom: '5%'}} />
 
         <Drawer.Item
-          label="Friends"
-          onPress={() => {
-            navigation.navigate('MakeFriends', {screen: 'MakeFriendsMain'});
-          }}
-          icon="account-multiple"
-        />
-
-        <Drawer.Item
-          label="Groups"
+          label="Events"
           onPress={() => {
             navigation.navigate('GroupStack', {screen: 'HomeIndex'});
           }}
-          icon="account-group"
+          icon="calendar-month"
         />
-
+        
+        
         <Drawer.Item
-          label="Watch ad"
-          icon="motion-play"
-          onPress={() => navigation.navigate('SupportUs')}
-        />
-
-        {/* <List.Item
-          title="Logout"
-          onPress={() => logout()}
-          left={() => <List.Icon icon="logout" color={theme.colors.error} />}
-          style={{
-            paddingHorizontal: '11%',
-            marginVertical: '3%',
+          label="Settings"
+          onPress={async () => {
+            navigation.navigate('AppSettingsMain');
           }}
-          titleStyle={{color: theme.colors.error}}
-        /> */}
-      </View>
-
-      <View style={{marginVertical: '5%'}}>
-        <Divider />
-        {isLoading ? (
+          theme={{roundness: 0}}
+          icon="cog-outline"
+        />
+        {/* {isLoading ? (
           <List.Item
             title={props => (
               <SkeletonPlaceholder borderRadius={4} {...props}>
@@ -155,41 +105,30 @@ export default function DrawerContent(props) {
             rippleColor={theme.colors.background}
             icon="account-outline"
           />
-        )}
-        <Divider />
+        )} */}
+
         <Drawer.Item
-          label="Settings"
-          onPress={async () => {
-            navigation.navigate('AppSettingsMain');
-          }}
-          theme={{roundness: 0}}
-          icon="cog-outline"
-          // style={{width:"100%"}}
+          label="Watch ad"
+          icon="motion-play"
+          onPress={() => navigation.navigate('SupportUs')}
         />
-        <Divider />
-        <View
+
+        {/* <List.Item
+          title="Logout"
+          onPress={() => logout()}
+          left={() => <List.Icon icon="logout" color={theme.colors.error} />}
           style={{
-            flexDirection: 'row',
-            paddingHorizontal: '4%',
-            justifyContent: 'space-around',
-          }}>
-          <TouchableOpacity
-            onPress={() => handlePrivacyPolicyPress()}
-            style={{alignSelf: 'center', margin: '5%'}}>
-            <Text>Privacy policy</Text>
-          </TouchableOpacity>
-          <Text
-            style={{
-              alignSelf: 'center',
-              fontWeight: 'bold',
-              marginBottom: 6,
-              fontSize: 20,
-            }}>
-            .
-          </Text>
-          <Text style={{alignSelf: 'center', margin: '5%'}}>V {version}</Text>
-        </View>
+            paddingHorizontal: '11%',
+            marginVertical: '3%',
+          }}
+          titleStyle={{color: theme.colors.error}}
+        /> */}
       </View>
+
+      <View style={{marginVertical: '5%'}}>
+        
+        <Text style={{marginVertical:"5%", alignSelf:"center"}}>Version {version}</Text>
+       </View>
     </DrawerContentScrollView>
   );
 }

@@ -27,8 +27,8 @@ import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
 import {Modalize} from 'react-native-modalize';
 import {useSelector, useDispatch} from 'react-redux';
-import { DrawerActions } from '@react-navigation/native';
-import { groupApi } from '../../../redux/reducers/groups/groupThunk';
+import {DrawerActions} from '@react-navigation/native';
+import {groupApi} from '../../../redux/reducers/groups/groupThunk';
 
 export default ProfileIndex = ({navigation, route}) => {
   const theme = useTheme();
@@ -43,12 +43,7 @@ export default ProfileIndex = ({navigation, route}) => {
     modalizeRef.current?.close();
   };
 
-  const {
-    data: user,
-    isError,
-    error,
-    isLoading,
-  } = useGetCurrentLoginUserQuery(route.params?.id);
+  const {data: user, isError, error, isLoading} = useGetCurrentLoginUserQuery(route.params?.id);
 
   const [editNam, setEditName] = useState(false);
   const [name, setName] = useState(user?.name);
@@ -61,12 +56,9 @@ export default ProfileIndex = ({navigation, route}) => {
   const [newPassword, setNewPassword] = useState('');
 
   const [updateName, {isLoading: updateNameLoading}] = useUpdateNameMutation();
-  const [updateEmail, {isLoading: updateEmailLoading}] =
-    useUpdateEmailMutation();
-  const [updatePassword, {isLoading: updatePasswordLoading}] =
-    useUpdatePasswordMutation();
-  const [updateImageURL, {isLoading: updateImageURLLoading}] =
-    useUpdateImageURLMutation();
+  const [updateEmail, {isLoading: updateEmailLoading}] = useUpdateEmailMutation();
+  const [updatePassword, {isLoading: updatePasswordLoading}] = useUpdatePasswordMutation();
+  const [updateImageURL, {isLoading: updateImageURLLoading}] = useUpdateImageURLMutation();
 
   const [snakeBarMessage, setSnakeBarMessage] = useState('');
   const [showSnakeBar, setShowSnakeBar] = useState(false);
@@ -177,9 +169,7 @@ export default ProfileIndex = ({navigation, route}) => {
               return;
             })
             .catch(err => {
-              setSnakeBarMessage(
-                'Something went wrong while updating profile image',
-              );
+              setSnakeBarMessage('Something went wrong while updating profile image');
               fileDataRef.current = null;
               setfileData(null);
               return;
@@ -209,10 +199,8 @@ export default ProfileIndex = ({navigation, route}) => {
   // delete dialog for deleting user by itself
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
 
-  const [
-    deleleUserByItSelf,
-    {isLoading: deleteLoading, isSuccess: isDeleteUserSuccess},
-  ] = useDeleteUserByItselfMutation();
+  const [deleleUserByItSelf, {isLoading: deleteLoading, isSuccess: isDeleteUserSuccess}] =
+    useDeleteUserByItselfMutation();
   const deleteUserAccountHandler = async () => {
     deleleUserByItSelf(user._id)
       .then(res => {
@@ -225,7 +213,6 @@ export default ProfileIndex = ({navigation, route}) => {
         console.log(e);
       });
   };
-
 
   const logout = async () => {
     await AsyncStorage.clear();
@@ -240,21 +227,16 @@ export default ProfileIndex = ({navigation, route}) => {
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
         <Portal>
-          <Dialog
-            visible={deleteDialogVisible}
-            onDismiss={() => setDeleteDialogVisible(false)}>
+          <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
             <Dialog.Icon icon="alert" />
             <Dialog.Title>Are you sure?</Dialog.Title>
             <Dialog.Content>
               <Text variant="bodyMedium">
-                If you delete your account, your account with all asssociated
-                data will be delete.
+                If you delete your account, your account with all asssociated data will be delete.
               </Text>
             </Dialog.Content>
             <Dialog.Actions>
-              <Button onPress={() => setDeleteDialogVisible(false)}>
-                Cancel
-              </Button>
+              <Button onPress={() => setDeleteDialogVisible(false)}>Cancel</Button>
               <Button
                 loading={deleteLoading}
                 textColor={theme.colors.error}
@@ -265,150 +247,171 @@ export default ProfileIndex = ({navigation, route}) => {
           </Dialog>
         </Portal>
 
-        {user ? (
-          <List.Section
-            style={{
-              marginVertical: '2%',
-              paddingVertical: '2%',
-            }}>
-            <TouchableOpacity
-              onPress={onOpenModalize}
-              style={{width: 130, alignSelf: 'center'}}>
-              {fileDataRef.current ? (
-                <Avatar.Image
-                  source={{uri: fileDataRef.current?.path}}
-                  style={{alignSelf: 'center'}}
-                  size={130}
-                />
-              ) : (
-                <View>
-                  {avatarURL === '' && !user?.imageURL ? (
-                    <Avatar.Icon
-                      icon="account-circle-outline"
-                      style={{alignSelf: 'center'}}
-                      size={130}
-                    />
-                  ) : (
-                    <View>
-                      {user?.imageURL ? (
-                        <Avatar.Image
-                          source={{uri: user?.imageURL}}
-                          style={{alignSelf: 'center'}}
-                          size={130}
-                        />
-                      ) : (
-                        <Avatar.Image
-                          source={{uri: avatarURL}}
-                          style={{alignSelf: 'center'}}
-                          size={130}
-                        />
-                      )}
-                    </View>
-                  )}
-                </View>
-              )}
-              {updateImageURLLoading && (
-                <ActivityIndicator
-                  style={{position: 'absolute', left: '55%', top: 75}}
-                  size="large"
-                  animating={updateImageURLLoading}
-                />
-              )}
-            </TouchableOpacity>
-
-            <View style={{padding: '5%'}}>
-              <List.Subheader>Name </List.Subheader>
-
-              <List.Item
-                title={user?.name}
-                left={props => <List.Icon {...props} icon="account-outline" />}
-                right={() => (
-                  <IconButton
-                    icon="pencil"
-                    mode="outlined"
-                    size={20}
-                    onPress={() => {
-                      setEditEmail(false);
-                      setEditName(true);
-                    }}
-                  />
-                )}
-              />
-
-              <List.Subheader>Email</List.Subheader>
-
-              <List.Item
-                title={user?.email}
-                left={props => <List.Icon {...props} icon="email-outline" />}
-                right={() => (
-                  <IconButton
-                    icon="pencil"
-                    mode="outlined"
-                    size={20}
-                    onPress={() => {
-                      setEditName(false);
-                      setEditEmail(true);
-                    }}
-                  />
-                )}
-              />
-
-              <List.Subheader>Password</List.Subheader>
-
-              <List.Item
-                title="*******"
-                left={props => (
-                  <List.Icon {...props} icon="account-lock-outline" />
-                )}
-                right={() => (
-                  <IconButton
-                    icon="pencil"
-                    mode="outlined"
-                    size={20}
-                    onPress={() => {
-                      setEditName(false);
-                      setEditEmail(false);
-                      setEditPassword(true);
-                    }}
-                  />
-                )}
-              />
-            </View>
-            <Button
-              contentStyle={{padding: '2%'}}
-              theme={{roundness: 20}}
-              mode="outlined"
-              style={{margin:"4%"}}
-              onPress={logout}
-              >
-              Logout
-            </Button>
-
-            <List.Item
-              onPress={() => setDeleteDialogVisible(true)}
-              title="Delete my account"
-              style={{
-                backgroundColor: theme.colors.errorContainer,
-                marginVertical: '1%',
-              }}
-              left={props => (
-                <List.Icon
-                  {...props}
-                  color={theme.colors.error}
-                  icon="delete"
-                />
-              )}
-              titleStyle={{color: theme.colors.error}}
-            />
-          </List.Section>
+        {isLoading ? (
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator animating={true} />
+            <Text variant="bodyLarge" style={{marginTop: '3%'}}>
+              Loading....
+            </Text>
+          </View>
         ) : (
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-            }}>
-            <ActivityIndicator animating={isLoading} />
+          <View style={{flex: 1}}>
+            {user ? (
+              <List.Section
+                style={{
+                  marginVertical: '2%',
+                  justifyContent: 'space-between',
+                  flex: 1,
+                  paddingVertical: '2%',
+                }}>
+                <View style={{padding: '5%'}}>
+                  <TouchableOpacity
+                    onPress={onOpenModalize}
+                    style={{width: 130, alignSelf: 'center'}}>
+                    {fileDataRef.current ? (
+                      <Avatar.Image
+                        source={{uri: fileDataRef.current?.path}}
+                        style={{alignSelf: 'center'}}
+                        size={130}
+                      />
+                    ) : (
+                      <View>
+                        {avatarURL === '' && !user?.imageURL ? (
+                          <Avatar.Icon
+                            icon="account-circle-outline"
+                            style={{alignSelf: 'center'}}
+                            size={130}
+                          />
+                        ) : (
+                          <View>
+                            {user?.imageURL ? (
+                              <Avatar.Image
+                                source={{uri: user?.imageURL}}
+                                style={{alignSelf: 'center'}}
+                                size={130}
+                              />
+                            ) : (
+                              <Avatar.Image
+                                source={{uri: avatarURL}}
+                                style={{alignSelf: 'center'}}
+                                size={130}
+                              />
+                            )}
+                          </View>
+                        )}
+                      </View>
+                    )}
+                    {updateImageURLLoading && (
+                      <ActivityIndicator
+                        style={{position: 'absolute', left: '55%', top: 75}}
+                        size="large"
+                        animating={updateImageURLLoading}
+                      />
+                    )}
+                  </TouchableOpacity>
+
+                  <TextInput
+                    label="Name"
+                    style={{
+                      textAlignVertical: 'top',
+                      marginTop: '2%',
+                      backgroundColor: theme.colors.background,
+                    }}
+                    underlineColor={theme.colors.background}
+                    activeOutlineColor={theme.colors.onBackground}
+                    // autoFocus={true}
+                    // mode="outlined"
+                    value={user?.name}
+                    editable={false}
+                    right={
+                      <TextInput.Icon
+                        icon={'pencil'}
+                        onPress={() => {
+                          setEditEmail(false);
+                          setEditName(true);
+                        }}
+                      />
+                    }
+                  />
+
+                  <TextInput
+                    label="Email"
+                    style={{
+                      textAlignVertical: 'top',
+                      marginTop: '5%',
+                      backgroundColor: theme.colors.background,
+                    }}
+                    underlineColor={theme.colors.background}
+                    activeOutlineColor={theme.colors.onBackground}
+                    // autoFocus={true}
+                    // mode="outlined"
+                    value={user?.email}
+                    editable={false}
+                    right={
+                      <TextInput.Icon
+                        icon={'pencil'}
+                        onPress={() => {
+                          setEditName(false);
+                          setEditEmail(true);
+                        }}
+                      />
+                    }
+                  />
+
+                  <TextInput
+                    label="Password"
+                    style={{
+                      textAlignVertical: 'top',
+                      marginTop: '5%',
+                      backgroundColor: theme.colors.background,
+                    }}
+                    underlineColor={theme.colors.background}
+                    activeOutlineColor={theme.colors.onBackground}
+                    // autoFocus={true}
+                    // mode="outlined"
+                    value={'*******'}
+                    editable={false}
+                    right={
+                      <TextInput.Icon
+                        icon={'pencil'}
+                        onPress={() => {
+                          setEditName(false);
+                          setEditEmail(false);
+                          setEditPassword(true);
+                        }}
+                      />
+                    }
+                  />
+                </View>
+                <View>
+                  <Button
+                    contentStyle={{padding: '2%'}}
+                    theme={{roundness: 20}}
+                    buttonColor={theme.colors.secondary}
+                    mode="contained"
+                    style={{marginHorizontal: '9%'}}
+                    onPress={logout}>
+                    Logout
+                  </Button>
+                  <Button
+                    contentStyle={{padding: '2%'}}
+                    theme={{roundness: 20}}
+                    // mode="outlined"
+                    buttonColor={theme.colors.error}
+                    style={{marginHorizontal: '9%', marginVertical: '5%'}}
+                    textColor={theme.colors.onError}
+                    onPress={() => setDeleteDialogVisible(true)}>
+                    Delete my account
+                  </Button>
+                </View>
+              </List.Section>
+            ) : (
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text variant="bodyLarge" style={{marginTop: '3%'}}>
+                  No user data{' '}
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -577,9 +580,7 @@ export default ProfileIndex = ({navigation, route}) => {
               onPress={() => editPasswordHandler()}
               theme={{roundness: 1}}
               disabled={
-                updatePasswordLoading ||
-                newPassword.length < 1 ||
-                newPassword === oldPassword
+                updatePasswordLoading || newPassword.length < 1 || newPassword === oldPassword
               }>
               Ok
             </Button>
@@ -587,10 +588,7 @@ export default ProfileIndex = ({navigation, route}) => {
         </View>
       )}
 
-      <Snackbar
-        visible={showSnakeBar}
-        onDismiss={() => setShowSnakeBar(false)}
-        duration={4000}>
+      <Snackbar visible={showSnakeBar} onDismiss={() => setShowSnakeBar(false)} duration={4000}>
         {snakeBarMessage}
       </Snackbar>
 
@@ -652,8 +650,6 @@ export default ProfileIndex = ({navigation, route}) => {
           imageUploadHandler={imageUploadHandler}
         />
       )}
-
-
     </SafeAreaView>
   );
 };

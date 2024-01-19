@@ -27,7 +27,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, onOpen, theme}) =>
         <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated={true}>
           <Appbar.BackAction color={theme.colors.onBackground} onPress={() => navigation.replace('PinnedGroup')} />
           <Appbar.Content
-            title="Groups"
+            title="Events"
             titleStyle={{
               color: theme.colors.onBackground,
             }}

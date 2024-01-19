@@ -11,7 +11,7 @@ const LoginForMoreFeatures = ({token, isLoading, localLoading, navigation}) => {
               Unlock more features
             </Text>
             <Text style={{textAlign: 'center'}}>
-              Add other participant to your groups, Make backup and keep record
+              Add other participant to your events, Make backup and keep record
               remotly
             </Text>
           </View>

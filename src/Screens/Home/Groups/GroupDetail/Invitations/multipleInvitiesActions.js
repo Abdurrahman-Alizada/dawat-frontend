@@ -202,7 +202,7 @@ const MultipleInvitiAction = ({navigation}) => {
         elevated
         mode="medium">
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`${ids.length} items selected`} />
+        <Appbar.Content title={`${ids.length} selected`} />
 
         <Appbar.Action
           disabled={ids.length ? false : true}

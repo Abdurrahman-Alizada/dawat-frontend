@@ -524,7 +524,7 @@ export default function DisplayCsvDataTable({props, route}) {
       />
 
       <Snackbar
-        visible={SnackbarVisible}
+        visible={SnackbarVisible && token}
         duration={2000}
         onDismiss={() => setSnackbarVisible(false)}>
         {SnackbarText}

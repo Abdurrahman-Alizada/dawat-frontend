@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +22,7 @@ import BackgroundImages from './changeBackMainImage/mainBackgroundImages';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
+
   const dispatch = useDispatch();
 
   const {isThemeDark} = useContext(ThemeContext);
@@ -29,16 +31,24 @@ const Groups = ({navigation}) => {
   const PG = useSelector(state => state.groups?.pinGroup);
   const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
   const currentBackgroundImgSrcId = useSelector(state => state.groups?.currentBackgroundImgSrcId);
+
   const [pinGroup, setPinGroup] = useState(PG);
   const pinGroupTime = useRef(0);
   const getPinGroup = async () => {
     setLoading(true);
-    let pGroup = await AsyncStorage.getItem('pinGroup');
-    let parsePinGroup = JSON.parse(pGroup);
-    setPinGroup(parsePinGroup);
+    let pinGroupId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
+
+    let groups = JSON.parse(await AsyncStorage.getItem('groups'));
+
+    let pinGroup1 = groups?.find(group => group?._id === pinGroupId);
+
+    // let pGroup = await AsyncStorage.getItem('pinGroup');
+    // let parsePinGroup = JSON.parse(pGroup);
+    setPinGroup(pinGroup1);
     let currentTime = moment(new Date());
-    let dueTIme = moment(new Date(parsePinGroup?.time));
+    let dueTIme = moment(new Date(pinGroup1?.time));
     pinGroupTime.current = dueTIme.diff(currentTime, 'seconds');
+    pinGroup1 = groups = pinGroup1 = null;
     setLoading(false);
   };
 
@@ -58,18 +68,19 @@ const Groups = ({navigation}) => {
     <View style={{flex: 1}}>
       <StatusBar
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-        backgroundColor={"transparent"}
+        backgroundColor={'transparent'}
       />
+      {!pinGroup && <PinnedGroupHeader theme={theme} istransparent={false} />}
 
       {!loading ? (
         <View style={{flex: 1}}>
           {pinGroup ? (
             <View style={{flex: 1}}>
               <ImageBackground
-                style={{height: 255, justifyContent:"flex-start"}}
+                style={{height: 280, justifyContent: 'flex-start'}}
                 imageStyle={{resizeMode: 'stretch'}}
                 source={BackgroundImages[currentBackgroundImgSrcId]}>
-                <PinnedGroupHeader theme={theme} />
+                <PinnedGroupHeader theme={theme} istransparent={true} />
                 <View style={{}}>
                   <Text
                     style={{
@@ -83,7 +94,9 @@ const Groups = ({navigation}) => {
                   </Text>
                   <CountDown
                     until={pinGroupTime.current ? pinGroupTime.current : 0}
-                    onPress={() => alert('hello')}
+                    onPress={() =>
+                      Alert.alert(`${moment(pinGroup.time).format('MMM D, YYYY, h:mm a')}`)
+                    }
                     size={22}
                     style={{margin: '2%'}}
                     digitTxtStyle={{color: '#fff'}}
@@ -293,46 +306,43 @@ const Groups = ({navigation}) => {
               </View>
             </View>
           ) : (
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontSize: 22}}>No group has been pinned</Text>
-              <Button
-                // loading={isLoading}
-                // disabled={!(dirty && isValid) || isLoading}
-                // disabled={isLoading}
-                style={{
-                  marginTop: '3%',
-                  width: '70%',
-                }}
-                contentStyle={{padding: '2%'}}
-                buttonStyle={{padding: '1%', width: '100%'}}
-                theme={{roundness: 2}}
-                mode="outlined"
-                icon="plus-circle-multiple-outline"
-                labelStyle={{fontWeight: 'bold'}}
-                onPress={() => navigation.navigate('AddGroup')}
-                // buttonColor={theme.colors.blueBG}
-              >
-                Create group
-              </Button>
+            <View style={{flex: 1}}>
+              {/* <PinnedGroupHeader theme={theme} istransparent={false} /> */}
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{fontSize: 22}}>No event has been pinned</Text>
+                <Button
+                  style={{
+                    marginTop: '3%',
+                    width: '70%',
+                  }}
+                  contentStyle={{padding: '2%'}}
+                  buttonStyle={{padding: '1%', width: '100%'}}
+                  theme={{roundness: 2}}
+                  mode="outlined"
+                  icon="plus-circle-multiple-outline"
+                  labelStyle={{fontWeight: 'bold'}}
+                  onPress={() => navigation.navigate('AddGroup')}
+                  // buttonColor={theme.colors.blueBG}
+                >
+                  Create event
+                </Button>
 
-              <Button
-                // loading={isLoading}
-                // disabled={!(dirty && isValid) || isLoading}
-                // disabled={isLoading}
-                style={{
-                  marginTop: '3%',
-                  width: '70%',
-                }}
-                contentStyle={{padding: '2%'}}
-                buttonStyle={{padding: '1%', width: '100%'}}
-                theme={{roundness: 2}}
-                mode="contained"
-                icon="pin"
-                labelStyle={{fontWeight: 'bold'}}
-                onPress={() => navigation.navigate('HomeIndex')}
-                buttonColor={theme.colors.blueBG}>
-                Pin from existing groups
-              </Button>
+                <Button
+                  style={{
+                    marginTop: '3%',
+                    width: '70%',
+                  }}
+                  contentStyle={{padding: '2%'}}
+                  buttonStyle={{padding: '1%', width: '100%'}}
+                  theme={{roundness: 2}}
+                  mode="contained"
+                  icon="pin"
+                  labelStyle={{fontWeight: 'bold'}}
+                  onPress={() => navigation.navigate('HomeIndex')}
+                  buttonColor={theme.colors.blueBG}>
+                  Pin from existing events
+                </Button>
+              </View>
             </View>
           )}
         </View>

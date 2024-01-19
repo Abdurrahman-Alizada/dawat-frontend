@@ -4,7 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeIndex from '../Screens/Home/Groups/Index';
 import AddGroup from '../Screens/Home/Groups/AddGroup';
-import AddGroupMembers from '../Screens/Home/Groups/AddGroupMembers';
+import AddGroupMembers from '../Screens/Home/Groups/AddGroupWithMembers';
 import GroupDetail from '../Screens/Home/Groups/GroupDetail';
 import SingleGroupSettings from '../Screens/Home/Groups/GroupDetail/GroupSettings/Index';
 import AddTask from '../Screens/Home/Groups/GroupDetail/Tasks/AddTask';
@@ -39,9 +39,9 @@ const AppStack = () => {
         name="AddGroup"
         component={AddGroup}
         options={{
-          title: 'Add Your Group',
+          title: 'Add your event',
           // headerShown:false
-          header: props => <GeneralAppbar title="Add group" {...props} />,
+          header: props => <GeneralAppbar title="Add event" {...props} />,
         }}
       />
 
@@ -75,7 +75,7 @@ const AppStack = () => {
         component={GroupLogs}
         options={{
           title: 'Group Logs',
-          // headerShown: false,
+          header: props => <GeneralAppbar title="Group Logs" {...props} />,
         }}
       />
 
@@ -83,8 +83,8 @@ const AppStack = () => {
         name="SingleGroupSettings"
         component={SingleGroupSettings}
         options={{
-          title: 'Group settings',
-          header: props => <GeneralAppbar title="Group settings" {...props} />,
+          title: 'Event settings',
+          headerShown:false
         }}
       />
       <Stack.Screen
@@ -100,7 +100,7 @@ const AppStack = () => {
         name="updateGroupMembers"
         component={UpdateGroupMembers}
         options={{
-          title: 'Add group members',
+          title: 'Update event members',
           headerShown: false,
           presentation: 'modal',
         }}

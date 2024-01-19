@@ -206,7 +206,7 @@ const Index = ({group, onClose}) => {
         icon={'upload'}
         contentStyle={{padding: '1%'}}
         style={{marginTop: '5%'}}>
-        Upload Invitations list to add in this group
+        Upload Invitations list to add in this event
       </Button>
 
       <Snackbar

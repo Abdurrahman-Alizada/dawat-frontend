@@ -8,21 +8,16 @@ import {useTheme, Text, Avatar} from 'react-native-paper';
 import {version} from '../../../package.json';
 import {useDispatch} from 'react-redux';
 import {handleCurrentLoaginUser} from '../../redux/reducers/user/user';
-import {handleCurrentBackgroundImgSrcId} from '../../redux/reducers/groups/groups';
+import {
+  handleCurrentBackgroundImgSrcId,
+  handlePinGroupId,
+} from '../../redux/reducers/groups/groups';
 
 const SplashScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
 
   const isAppFirstLaunched = useRef(true); //onboarding screen decision
-
-  const getCurrentBackgroundImage = async () => {
-    dispatch(
-      handleCurrentBackgroundImgSrcId(
-        Number(await AsyncStorage.getItem(`pingroup_backgroundImage`)),
-      ),
-    );
-  };
 
   useEffect(() => {
     const firstLaunch = async () => {
@@ -39,16 +34,18 @@ const SplashScreen = ({navigation}) => {
 
   useEffect(() => {
     // getCurrentBackgroundImage();
-    //Check if user_id is set or not If not then send for Authentication else send to Home Screen
     AsyncStorage.getItem('isLoggedIn')
       .then(value => {
         AsyncStorage.getItem('userId').then(id => {
           dispatch(handleCurrentLoaginUser({_id: id}));
-          AsyncStorage.getItem('pingroup_backgroundImage').then(bgImgid => {
-            dispatch(handleCurrentBackgroundImgSrcId(bgImgid));
-            isAppFirstLaunched?.current
-              ? navigation.replace('Onboarding')
-              : navigation.replace(!value ? 'Auth' : 'Drawer');
+          AsyncStorage.getItem('pinGroupId').then(pinGroupId => {
+            dispatch(handlePinGroupId(pinGroupId));
+            AsyncStorage.getItem('pingroup_backgroundImage').then(bgImgid => {
+              dispatch(handleCurrentBackgroundImgSrcId(bgImgid ? bgImgid : 0));
+              isAppFirstLaunched?.current
+                ? navigation.replace('Onboarding')
+                : navigation.replace(!value ? 'Auth' : 'Drawer');
+            });
           });
         });
       })
@@ -65,6 +62,11 @@ const SplashScreen = ({navigation}) => {
         justifyContent: 'center',
         backgroundColor: theme.colors.blueBG,
       }}>
+        <StatusBar
+        barStyle={'light-content'}
+        backgroundColor={'#6288EF'}
+      />
+
       <View
         style={{
           flex: 0.95,

@@ -4,12 +4,9 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  Alert,
-  KeyboardAvoidingView,
-  Image,
   ImageBackground,
 } from 'react-native';
-import React, {useState, useCallback, useRef, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useRef, useEffect, useLayoutEffect, memo} from 'react';
 import {
   Avatar,
   TextInput,
@@ -21,31 +18,29 @@ import {
   IconButton,
   Snackbar,
   useTheme,
-  Chip,
   Card,
 } from 'react-native-paper';
 import {
   useUpdateGroupInfoMutation,
   useUpdateGroupNameMutation,
   useUpdateGroupDescriptionMutation,
-  useUpdateImageURLMutation,
   useDeleteGroupForUserMutation,
+  useUpdateGroupTimeMutation,
 } from '../../../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ImagePicker from 'react-native-image-crop-picker';
-import AvatarModal from '../../../../Drawer/Profile/AvatarModal';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   handleCurrentViewingGroup,
   handleGroupsFlag,
   handlePinGroup,
 } from '../../../../../redux/reducers/groups/groups';
-import {Modalize} from 'react-native-modalize';
 import Countdown from 'react-native-countdown-xambra';
 import LoginForMoreFeatures from '../../../../../Components/LoginForMoreFeatures';
 import Icon from 'react-native-vector-icons/Feather';
 import moment from 'moment';
 import BackgroundImages from '../../changeBackMainImage/mainBackgroundImages';
+import DatePicker from 'react-native-date-picker';
+import EventSettingsAppbar from '../../../../../Components/Appbars/eventSettingsAppbar';
 // imports end
 
 const Index = ({route, navigation}) => {
@@ -53,7 +48,6 @@ const Index = ({route, navigation}) => {
   const dispatch = useDispatch();
   const [localDeleteLoding, setLocalDeleteLoading] = useState(false);
   const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
-  const PG = useSelector(state => state.groups?.pinGroup);
   const currentBackgroundImgSrcId = useSelector(state => state.groups.currentBackgroundImgSrcId);
 
   const [adminIds, setAdminIds] = useState([]);
@@ -72,13 +66,6 @@ const Index = ({route, navigation}) => {
   const [description, setDescription] = useState(groupDescription);
   const [userId, setUserId] = useState('');
 
-  // image uploading state
-  const [modalVisible, setModalVisible] = useState(false);
-  const fileDataRef = useRef(null);
-  // const [avatarURL, setAvatarURL] = useState( route?.params?.group?.group.imageURL,);
-  const [avatarURL, setAvatarURL] = useState(currentViewingGroup?.imageURL);
-  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
-
   // snakebar
   const [snakeBarMessage, setSnakeBarMessage] = useState('');
   const [showSnakeBar, setShowSnakeBar] = useState(false);
@@ -86,9 +73,6 @@ const Index = ({route, navigation}) => {
   // edit data
   const [editGroupName, seteditGroupName] = useState(false);
   const [editGroupDescription, setEditGroupDescription] = useState(false);
-
-  // add member to group
-  const modalizeRef = useRef(null);
 
   // show more for description
   const [textShown, setTextShown] = useState(false); //To show ur remaining Text
@@ -102,34 +86,12 @@ const Index = ({route, navigation}) => {
 
   const [updateLocalGroupNameLoading, setUpdateLocalGroupNameLoading] = useState(false);
   const [updateGroupName, {isLoading: updateGroupNameLoading}] = useUpdateGroupNameMutation();
+  const [updateGroupTime, {isLoading: updateGroupTimeLoading}] = useUpdateGroupTimeMutation();
   const [updateGroupDescription, {isLoading: updateGroupDescriptionLoading}] =
     useUpdateGroupDescriptionMutation();
-  const [updateImageURL, {isLoading: updateImageURLLoging}] = useUpdateImageURLMutation();
-  const [imageUploading, setimageUploading] = useState(false);
 
   const [deleteGroupForUser, {isLoading: deleteLoading}] = useDeleteGroupForUserMutation();
   // redux toolkit - end
-
-  // functions - start
-  const handleSubmit = () => {
-    updateGroupInfo({
-      groupId: _id,
-      groupName: name,
-      groupDescription: description,
-      imageURL: avatarURL,
-    })
-      .then(res => {
-        dispatch(handleCurrentViewingGroup(res.data));
-        setSnakeBarMessage('Group information has been updated');
-        setShowSnakeBar(true);
-        seteditGroupName(false);
-        setEditGroupDescription(false);
-      })
-      .catch(e => {
-        setSnakeBarMessage('Something went wrong. Please try again');
-        setShowSnakeBar(true);
-      });
-  };
 
   const handleUpdateGroupName = () => {
     updateGroupName({
@@ -157,28 +119,57 @@ const Index = ({route, navigation}) => {
         seteditGroupName(false);
         setEditGroupDescription(false);
       });
+
+    updateLocalGroupS();
   };
 
+  const handleUpdateGroupTime = date => {
+    setDueDate(date);
+    setOpenDueDate(false);
+
+    updateGroupTime({
+      groupId: _id,
+      previousGroupTime: currentViewingGroup?.time,
+      newGroupTime: date,
+    })
+      .then(res => {
+        if (res.data._id) {
+          dispatch(handleCurrentViewingGroup(res.data));
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        } else {
+          setSnakeBarMessage('Something went wrong. Please try again');
+          setShowSnakeBar(true);
+          seteditGroupName(false);
+          setEditGroupDescription(false);
+        }
+      })
+      .catch(e => {
+        setSnakeBarMessage('Something went wrong. Please try again');
+        setShowSnakeBar(true);
+        seteditGroupName(false);
+        setEditGroupDescription(false);
+      });
+
+    updateLocalGroupS(date);
+  };
   const groupsFlag = useSelector(state => state.groups?.groupsFlag);
   const updateLocalPinGroup = async group => {
     await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
     dispatch(handlePinGroup(group));
   };
 
-  const updateLocalGroupS = async groupFromDB => {
+  const updateLocalGroupS = async date => {
     setUpdateLocalGroupNameLoading(true);
-    let group = groupFromDB
-      ? groupFromDB
-      : {
-          _id: currentViewingGroup?._id,
-          isSyncd: currentViewingGroup?.isSyncd,
-          groupName: name,
-          groupDescription: description,
-          time: new Date(),
-        };
 
+    let group = {
+      ...currentViewingGroup,
+      groupName: name,
+      groupDescription: description,
+      time: date,
+    };
     dispatch(handleCurrentViewingGroup(group));
-    setSnakeBarMessage('Group name has been updated');
+    setSnakeBarMessage('Event data has been updated');
     setShowSnakeBar(true);
     seteditGroupName(false);
     setEditGroupDescription(false);
@@ -199,8 +190,6 @@ const Index = ({route, navigation}) => {
     if (pg?._id === currentViewingGroup._id) {
       updateLocalPinGroup(group);
     }
-
-    // navigation.navigate('GroupStack', {screen: 'HomeIndex'});
   };
 
   const handleUpdateGroupDescription = () => {
@@ -283,137 +272,24 @@ const Index = ({route, navigation}) => {
       });
   };
 
-  const onTextLayout = useCallback(
-    e => {
-      setLengthMore(e.nativeEvent.lines.length >= 2); //to check the text is more than 4 lines or not
-    },
-    [textShown],
-  );
-
-  // image upload functions
-  let openGallery = () => {
-    setModalVisible(!modalVisible);
-    ImagePicker.openPicker({
-      // cropperCircleOverlay: true,
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        setAvatarURL('');
-        fileDataRef.current = image;
-        imageUploadHandler();
-      })
-      .catch(e => {
-        console.log('Error in image selection', e);
-      });
-    onCloseModalize();
-  };
-
-  let openCamera = () => {
-    setModalVisible(!modalVisible);
-
-    ImagePicker.openCamera({
-      // cropperCircleOverlay: true,
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        setAvatarURL('');
-        fileDataRef.current = image;
-        imageUploadHandler();
-      })
-      .catch(e => {
-        console.log('Error in image selection', e);
-      });
-    onCloseModalize();
-  };
-
-  const imageUploadHandler = async () => {
-    if (fileDataRef.current) {
-      setimageUploading(true);
-      const uri = fileDataRef.current.path;
-      const type = fileDataRef.current.mime;
-      const name = currentViewingGroup?.groupName;
-      const photo = {uri, type, name};
-      const data = new FormData();
-      data.append('file', photo);
-      data.append('upload_preset', 'bzgif1or');
-      data.append('cloud_name', 'dblhm3cbq');
-
-      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-        method: 'post',
-        body: data,
-      })
-        .then(res => res.json())
-        .then(async data => {
-          updateImageURL({
-            groupId: _id,
-            imageURL: data.url,
-          })
-            .then(res => {
-              dispatch(handleCurrentViewingGroup(res.data));
-              setSnakeBarMessage('Group profile image has been updated');
-              setShowSnakeBar(true);
-              seteditGroupName(false);
-              setEditGroupDescription(false);
-              setimageUploading(false);
-            })
-            .catch(e => {
-              setSnakeBarMessage('Something went wrong. Please try again');
-              setShowSnakeBar(true);
-            });
-        })
-        .catch(err => {
-          console.log('An Error Occured While Uploading profile image', err);
-          fileDataRef.current = null;
-          setimageUploading(false);
-          return;
-        });
-    } else if (avatarURL) {
-      setimageUploading(true);
-      updateImageURL({
-        groupId: _id,
-        imageURL: avatarURL,
-      })
-        .then(res => {
-          dispatch(handleCurrentViewingGroup(res.data));
-          setSnakeBarMessage('Group information has been updated');
-          setShowSnakeBar(true);
-          seteditGroupName(false);
-          setEditGroupDescription(false);
-          setimageUploading(false);
-        })
-        .catch(e => {
-          setSnakeBarMessage('Something went wrong. Please try again');
-          setShowSnakeBar(true);
-          setimageUploading(false);
-        });
-    } else {
-      Alert.alert('Image not selected', 'Please select an image');
-    }
-  };
-
   const getCurrentUserId = async () => {
     const id = await AsyncStorage.getItem('userId');
     setUserId(id);
   };
 
-  useLayoutEffect(() => {
-    getCurrentUserId();
-  }, []);
-
   // functions - end
 
-  const onCloseModalize = () => {
-    modalizeRef.current?.close();
-  };
-
   const [token, setToken] = useState(null);
-  const [time, setTime] = useState(
-    moment(currentViewingGroup?.time).diff(moment(new Date()), 'seconds'),
+  const [dueDate, setDueDate] = useState(
+    currentViewingGroup?.time ? new Date(currentViewingGroup?.time) : new Date(),
   );
+  const [openDueDate, setOpenDueDate] = useState(false);
+  const [time, setTime] = useState(moment(dueDate).diff(moment(new Date()), 'seconds'));
+
+  useLayoutEffect(() => {
+    getCurrentUserId();
+  }, [dueDate]);
+
   useLayoutEffect(() => {
     const getToken = async () => {
       setToken(await AsyncStorage.getItem('token'));
@@ -424,10 +300,11 @@ const Index = ({route, navigation}) => {
   return (
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
+        <EventSettingsAppbar />
         <ScrollView>
           <ImageBackground
             style={{height: 235}}
-            imageStyle={{ resizeMode: "cover"}}
+            imageStyle={{resizeMode: 'cover'}}
             source={BackgroundImages[currentBackgroundImgSrcId]}>
             <View
               style={{
@@ -454,7 +331,7 @@ const Index = ({route, navigation}) => {
                   }}>
                   {groupName}
                 </Text>
-                {time < 0 ? (
+                {moment(dueDate).diff(moment(new Date()), 'seconds') < 0 ? (
                   <View
                     style={{
                       flexDirection: 'row',
@@ -462,7 +339,8 @@ const Index = ({route, navigation}) => {
                       justifyContent: 'center',
                     }}>
                     <Countdown
-                      until={Math.abs(time)}
+                      // until={time}
+                      until={Math.abs(moment(dueDate).diff(moment(new Date()), 'seconds'))}
                       size={22}
                       style={{margin: '2%'}}
                       digitTxtStyle={{color: '#fff'}}
@@ -481,17 +359,12 @@ const Index = ({route, navigation}) => {
                   </View>
                 ) : (
                   <Countdown
-                    until={Math.abs(time)}
-                    // until={-200000}
-                    // onFinish={() => alert('finished')}
-                    // onPress={() => alert('hello')}
+                    until={Math.abs(moment(dueDate).diff(moment(new Date()), 'seconds'))}
                     size={22}
                     style={{margin: '2%'}}
                     digitTxtStyle={{color: '#fff'}}
                     digitStyle={{backgroundColor: '#265AE8'}}
                     timeLabelStyle={{color: '#fff'}}
-                    // timeToShow={['D','H']}
-                    // showSeparator
                     separatorStyle={{color: '#fff', alignSelf: 'center'}}
                   />
                 )}
@@ -516,7 +389,7 @@ const Index = ({route, navigation}) => {
                       borderRadius: 5,
                     }}>
                     <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
-                      Name
+                      Title
                     </Text>
                     <Icon name="edit" size={16} color={theme.colors.cardBG} />
                   </TouchableOpacity>
@@ -524,7 +397,8 @@ const Index = ({route, navigation}) => {
                   <TouchableOpacity
                     onPress={() => {
                       setEditGroupDescription(false);
-                      seteditGroupName(true);
+                      seteditGroupName(false);
+                      setOpenDueDate(true);
                     }}
                     style={{
                       flexDirection: 'row',
@@ -576,7 +450,9 @@ const Index = ({route, navigation}) => {
                   alignItems: 'flex-start',
                   justifyContent: 'space-between',
                 }}>
-                <Text variant="titleLarge">Description</Text>
+                <Text variant="bodyMedium" style={{color: theme.colors.textGray}}>
+                  Description
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     seteditGroupName(false);
@@ -589,7 +465,7 @@ const Index = ({route, navigation}) => {
                   />
                 </TouchableOpacity>
               </View>
-              <Text variant="bodyMedium">{description}</Text>
+              <Text variant="bodyLarge">{description}</Text>
             </Card.Content>
           </Card>
 
@@ -605,7 +481,7 @@ const Index = ({route, navigation}) => {
                   padding: '2%',
                   backgroundColor: theme.colors.cardBG,
                 }}>
-                <List.Subheader>Group members ({users?.length ? users?.length : 1})</List.Subheader>
+                <List.Subheader>Event members ({users?.length ? users?.length : 1})</List.Subheader>
                 <List.Item
                   onPress={() => {
                     navigation.navigate('updateGroupMembers');
@@ -708,14 +584,14 @@ const Index = ({route, navigation}) => {
               {token ? (
                 <List.Item
                   onPress={handleLeave}
-                  title="Leave group"
+                  title="Leave event"
                   left={() => <List.Icon color={theme.colors.error} icon="logout" />}
                   titleStyle={{color: theme.colors.error}}
                 />
               ) : (
                 <List.Item
                   onPress={handleDelete}
-                  title="Delete group"
+                  title="Delete event"
                   left={() => <List.Icon color={theme.colors.error} icon="delete" />}
                   titleStyle={{color: theme.colors.error}}
                 />
@@ -730,6 +606,18 @@ const Index = ({route, navigation}) => {
             </List.Section>
           </Card>
         </ScrollView>
+
+        <DatePicker
+          date={dueDate}
+          open={openDueDate}
+          modal
+          onConfirm={date => {
+            handleUpdateGroupTime(date);
+          }}
+          onCancel={() => {
+            setOpenDueDate(false);
+          }}
+        />
       </View>
 
       <Snackbar
@@ -798,7 +686,7 @@ const Index = ({route, navigation}) => {
               icon="check"
               mode="contained"
               loading={updateGroupNameLoading || updateLocalGroupNameLoading}
-              onPress={() => (token ? handleUpdateGroupName() : updateLocalGroupS())}
+              onPress={() => handleUpdateGroupName()}
               theme={{roundness: 1}}
               disabled={updateGroupNameLoading || updateLocalGroupNameLoading || name.length < 1}>
               Ok
@@ -865,91 +753,8 @@ const Index = ({route, navigation}) => {
           </View>
         </View>
       )}
-
-      <Modalize
-        modalStyle={{backgroundColor: theme.colors.background}}
-        ref={modalizeRef}
-        adjustToContentHeight={true}
-        handlePosition="inside">
-        <View
-          style={{
-            paddingVertical: '8%',
-            paddingHorizontal: '5%',
-            flexDirection: 'row',
-            backgroundColor: theme.colors.background,
-          }}>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="camera-image"
-              mode="outlined"
-              size={40}
-              onPress={openCamera}
-            />
-            <Text>Camera</Text>
-          </View>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="image-outline"
-              mode="outlined"
-              size={40}
-              onPress={openGallery}
-            />
-            <Text>Gallery</Text>
-          </View>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="account-circle-outline"
-              mode="outlined"
-              size={40}
-              onPress={() => {
-                onCloseModalize();
-                setAvatarModalVisible(true);
-              }}
-            />
-            <Text>Avatars</Text>
-          </View>
-        </View>
-      </Modalize>
-
-      {avatarModalVisible && (
-        <AvatarModal
-          avatarModalVisible={avatarModalVisible}
-          setAvatarModalVisible={setAvatarModalVisible}
-          setAvatarURL={setAvatarURL}
-          fileDataRef={fileDataRef}
-          imageUploadHandler={imageUploadHandler}
-        />
-      )}
     </SafeAreaView>
   );
 };
 
 export default Index;
-
-const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
-  error: {
-    color: 'red',
-    marginLeft: 20,
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
-  },
-});

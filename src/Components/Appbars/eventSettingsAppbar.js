@@ -1,8 +1,8 @@
 import React from 'react';
 import {Appbar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-
-const Header = () => {
+import EventSettingsScreenAppbarGift from '../../adUnits/eventSettingsScreenAppbarGift';
+const EventSettingsAppbar = () => {
   const theme = useTheme();
   const navigation = useNavigation();
   return (
@@ -16,13 +16,14 @@ const Header = () => {
       }}>
       <Appbar.BackAction onPress={() => navigation.goBack()} />
       <Appbar.Content
-        title="Chat"
+        title="Event settings"
         titleStyle={{
           color: theme.colors.onBackground,
         }}
       />
+      <EventSettingsScreenAppbarGift />
     </Appbar>
   );
 };
 
-export default Header;
+export default EventSettingsAppbar;

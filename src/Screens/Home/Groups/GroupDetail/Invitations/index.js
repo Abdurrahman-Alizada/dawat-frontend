@@ -86,8 +86,11 @@ export default function Example({route}) {
     let localInvities = await getLocalInvities();
 
     if (data && !isLoading && !isFetching && netInfo.isConnected) {
-      let ids = new Set(localInvities?.map(d => d._id));
-      localInvities = [...localInvities, ...data?.filter(d => !ids.has(d._id))];
+      // let ids = new Set(localInvities?.map(d => d._id));
+      // localInvities = [...localInvities, ...data?.filter(d => !ids.has(d._id))];
+      let ids = new Set(data?.map(d => d._id));
+      localInvities = [...data, ...localInvities?.filter(d => !ids.has(d._id))];
+    
       setFilterdInvities(localInvities);
       setMasterInvities(localInvities);
       await AsyncStorage.setItem(
@@ -334,8 +337,8 @@ export default function Example({route}) {
     }
   };
 
-  const func = async () => {
-    setIsChipsShow(!isChipsShow);
+  const func = async (isSearchClick) => {
+    setIsChipsShow(isSearchClick ? false : !isChipsShow);
     if (isChipsShow) {
       setSelectedChips([]);
       selectedChipsRef.current = [];

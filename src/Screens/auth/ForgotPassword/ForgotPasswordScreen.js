@@ -80,14 +80,13 @@ const ForgotPassword = ({navigation}) => {
         </Dialog>
       </Portal>
 
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <View style={{paddingVertical: '5%', paddingHorizontal: '2%'}}>
         
         <TextInput
           label="Enter your Email"
           mode="outlined"
           value={email}
+          style={{marginTop: '2%', height:55}}
           activeOutlineColor={theme.colors.secondary}
           onChangeText={e => checkEmail(e)}
         />
@@ -97,12 +96,12 @@ const ForgotPassword = ({navigation}) => {
           mode="contained"
           disabled={isDisabled}
           style={{
-            marginVertical: '2%',
+            marginVertical: '3%',
           }}
           loading={isLoading}
           contentStyle={{padding: '3%'}}
           buttonStyle={{padding: '1%'}}
-          theme={{roundness: 1}}
+          theme={{roundness: 10}}
           buttonColor={theme.colors.secondary}
           onPress={sendEmail}>
           Continue

@@ -78,7 +78,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
     // search
     const [search, setSearch] = useState('');
     const [isSearch, setIsSearch] = useState(false);
-    const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to group");
+    const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to event");
     const [filteredDataSource, setFilteredDataSource] = useState([]);
   
     const updateSearch = search => {
@@ -147,7 +147,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
                 source={
                   itemProps?.imageURL
                     ? {uri: itemProps?.imageURL}
-                    : require('../../../../../assets/drawer/userImage.png')
+                    : require('../../../../../assets/drawer/male-user.png')
                 }
               />
             </View>
@@ -192,7 +192,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Update group members" />
+          <Appbar.Content title="Update event members" />
           <Appbar.Action
             icon="magnify"
             onPress={() => {

@@ -35,7 +35,7 @@ const TaskSummary = ({onClose}) => {
     <View style={{padding: '5%'}}>
       <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
         <List.Item
-          title={'Tasks summary of'}
+          title={'To-do summary of'}
           description={currentViewingGroup.groupName}
           style={{width: '90%'}}
         />
@@ -137,7 +137,7 @@ const TaskSummary = ({onClose}) => {
         icon="refresh"
         disabled={isFetching}
         size={30}
-        accessibilityLabel="refresh tasks summary"
+        accessibilityLabel="refresh to-do summary"
         style={{marginTop: '5%'}}
         mode="contained"
         onPress={refetch}

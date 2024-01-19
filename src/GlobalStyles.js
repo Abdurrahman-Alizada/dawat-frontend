@@ -38,13 +38,11 @@ export const lightPalette = {
 export const darkPalette = {
   background: '#212121',
   blueBG: '#265AE8',
-  textGray: '#3E3F41',
+  textGray: '#D9D9D9',
   cardBG: '#3E3F41',
   textRed : "#DD105E",
   yellow :"#FFAF4F",
   purpleLight:"#AC8DAF"
-
-  // accent :"#62468d",
 };
 
 export default styles;

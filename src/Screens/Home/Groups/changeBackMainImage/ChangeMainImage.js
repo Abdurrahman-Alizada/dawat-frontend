@@ -5,6 +5,7 @@ import BackgroundImages from './mainBackgroundImages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentBackgroundImgSrcId} from '../../../../redux/reducers/groups/groups';
+import EventBackgroundImageBanner from '../../../../adUnits/eventBackgroundImageBanner';
 
 const ChangeMainImage = () => {
   const theme = useTheme();
@@ -18,8 +19,10 @@ const ChangeMainImage = () => {
   };
 
   return (
-    <View style={{flex: 1, padding: '5%'}}>
-      <ScrollView contentContainerStyle={{}} showsVerticalScrollIndicator={false}>
+    <View style={{flex: 1, }}>
+      <EventBackgroundImageBanner />
+
+      <ScrollView contentContainerStyle={{padding: '5%'}} showsVerticalScrollIndicator={false}>
         {BackgroundImages?.map((image, index) => (
           <TouchableOpacity key={index} onPress={() => handleBackgroundImage(index)} style={{}}>
             <ImageBackground

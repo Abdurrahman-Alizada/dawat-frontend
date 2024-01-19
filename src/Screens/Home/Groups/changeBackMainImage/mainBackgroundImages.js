@@ -6,4 +6,10 @@ export default backgroundImages = [
   require('../../../../assets/images/backgroundImages/main-5.png'),
   require('../../../../assets/images/backgroundImages/main-6.png'),
   require('../../../../assets/images/backgroundImages/main-7.png'),
+  require('../../../../assets/images/backgroundImages/main-8.png'),
+  require('../../../../assets/images/backgroundImages/main-9.png'),
+  require('../../../../assets/images/backgroundImages/main-10.png'),
+  require('../../../../assets/images/backgroundImages/main-11.png'),
+  require('../../../../assets/images/backgroundImages/main-12.png'),
+  require('../../../../assets/images/backgroundImages/main-13.png'),
 ];

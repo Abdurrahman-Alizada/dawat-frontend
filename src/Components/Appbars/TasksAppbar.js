@@ -1,16 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
-import {
-  List,
-  Menu,
-  Divider,
-  Appbar,
-  Searchbar,
-  Avatar,
-  useTheme,
-  IconButton,
-  Text,
-} from 'react-native-paper';
+import {Menu, Divider, Appbar, Searchbar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {handleIsSearch} from '../../redux/reducers/groups/groups';
@@ -20,12 +9,7 @@ import {
   handleIsTaskSummaryOpen,
 } from '../../redux/reducers/groups/tasks/taskSlice';
 
-const Header = ({
-  openGuestsImportExportModalize,
-  openGuestsSummaryModalize,
-  openTasksSummaryModalize,
-  group,
-}) => {
+const Header = ({openTasksSummaryModalize}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
@@ -77,44 +61,14 @@ const Header = ({
             }}
           />
 
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            contentStyle={{backgroundColor: theme.colors.background}}
-            anchor={
-              <Appbar.Action
-                icon={'dots-vertical'}
-                color={theme.colors.onBackground}
-                onPress={() => openMenu()}
-              />
-            }>
-            <Menu.Item
-              onPress={() => {
-                closeMenu();
-                openGuestsImportExportModalize();
-              }}
-              title="Import/Export"
-              leadingIcon={'microsoft-excel'}
-            />
-            <Divider />
-
-            <Menu.Item
-              onPress={() => {
-                closeMenu();
-                navigation.navigate('AddMultipleInviti');
-              }}
-              title="Add multiple inviti"
-              leadingIcon={'account-multiple-plus'}
-            />
-            <Menu.Item
-              onPress={() => {
-                closeMenu();
-                navigation.navigate('MultipleInvitiActions');
-              }}
-              title="Edit multiple inviti"
-              leadingIcon={'checkbox-multiple-blank-circle-outline'}
-            />
-          </Menu>
+          <Appbar.Action
+            icon="briefcase-outline"
+            color={theme.colors.onBackground}
+            onPress={() => {
+              dispatch(handleIsTaskSummaryOpen(true));
+              openTasksSummaryModalize();
+            }}
+          />
         </Appbar>
       ) : (
         <Appbar

@@ -2,14 +2,7 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {View, RefreshControl, Image} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {
-  Button,
-  useTheme,
-  Dialog,
-  Portal,
-  PaperProvider,
-  Text,
-} from 'react-native-paper';
+import {Button, useTheme, Dialog, Portal, PaperProvider, Text} from 'react-native-paper';
 import {
   useGetAllMessagesQuery,
   useAddNewMessageMutation,
@@ -35,17 +28,15 @@ const MessagesScreen = ({navigation, route}) => {
   const {isHeader} = route.params;
   const [newMessage, setNewMessage] = useState('');
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
   const messagesFromRedux = useSelector(state => state.chat?.messages);
 
-  const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllMessagesQuery({groupId: currentViewingGroup?._id});
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllMessagesQuery({
+    groupId: currentViewingGroup?._id,
+  });
 
-  const [addNewMessage, {isLoading: addNewMessageLoading}] =
-    useAddNewMessageMutation();
+  const [addNewMessage, {isLoading: addNewMessageLoading}] = useAddNewMessageMutation();
 
   // socket
 
@@ -107,16 +98,11 @@ const MessagesScreen = ({navigation, route}) => {
   };
 
   // delete message dialog
-  const isConfirmDialogVisible = useSelector(
-    state => state.chat?.isConfirmDialogVisible,
-  );
-  const selectedMessageIds = useSelector(
-    state => state.chat?.selectedMessageIds,
-  );
+  const isConfirmDialogVisible = useSelector(state => state.chat?.isConfirmDialogVisible);
+  const selectedMessageIds = useSelector(state => state.chat?.selectedMessageIds);
   const selectedMessages = useSelector(state => state.chat?.selectedMessages);
 
-  const [deleteMessages, {isLoading: deleteMessageLoading}] =
-    useDeleteMessagesMutation();
+  const [deleteMessages, {isLoading: deleteMessageLoading}] = useDeleteMessagesMutation();
 
   const deleteMessgeHandler = () => {
     dispatch(deleteselectedMessageIds());
@@ -135,26 +121,16 @@ const MessagesScreen = ({navigation, route}) => {
 
   return (
     <View style={{flexGrow: 1}}>
-      {isHeader && (
-        <ChatHeader
-        // openGuestsImportExportModalize={openGuestsImportExportModalize}
-        // openGuestsSummaryModalize={openGuestsSummaryModalize}
-        />
-      )}
+      {isHeader && <ChatHeader />}
 
       <View style={{flex: 1}}>
         <Portal>
           <Dialog
             visible={isConfirmDialogVisible}
             onDismiss={() => isConfirmDialogVisibleHandler(false)}>
-            <Dialog.Title>
-              Delete {selectedMessageIds.length} messages
-            </Dialog.Title>
+            <Dialog.Title>Delete {selectedMessageIds.length} messages</Dialog.Title>
             <Dialog.Actions>
-              <Button
-                onPress={() => dispatch(isConfirmDialogVisibleHandler(false))}>
-                cancel
-              </Button>
+              <Button onPress={() => dispatch(isConfirmDialogVisibleHandler(false))}>cancel</Button>
               <Button onPress={deleteMessgeHandler}>Delete</Button>
             </Dialog.Actions>
           </Dialog>
@@ -165,21 +141,11 @@ const MessagesScreen = ({navigation, route}) => {
             {[1, 2].map((item, index) => (
               <View key={index} style={{marginTop: '3%'}}>
                 <SkeletonPlaceholder height="100%" borderRadius={4}>
-                  <SkeletonPlaceholder.Item
-                    flexDirection="row"
-                    alignItems="center">
-                    <SkeletonPlaceholder.Item
-                      width={50}
-                      height={50}
-                      borderRadius={50}
-                    />
+                  <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
+                    <SkeletonPlaceholder.Item width={50} height={50} borderRadius={50} />
                     <SkeletonPlaceholder.Item width="100%" marginLeft={20}>
                       <SkeletonPlaceholder.Item width="60%" height={10} />
-                      <SkeletonPlaceholder.Item
-                        marginTop={7}
-                        width="30%"
-                        height={8}
-                      />
+                      <SkeletonPlaceholder.Item marginTop={7} width="30%" height={8} />
                     </SkeletonPlaceholder.Item>
                   </SkeletonPlaceholder.Item>
                 </SkeletonPlaceholder>
@@ -189,20 +155,10 @@ const MessagesScreen = ({navigation, route}) => {
             {[1, 2, 3].map((item, index) => (
               <View key={index} style={{marginTop: '3%'}}>
                 <SkeletonPlaceholder height="100%" borderRadius={4}>
-                  <SkeletonPlaceholder.Item
-                    flexDirection="row-reverse"
-                    alignItems="center">
-                    <SkeletonPlaceholder.Item
-                      width={50}
-                      height={50}
-                      borderRadius={50}
-                    />
+                  <SkeletonPlaceholder.Item flexDirection="row-reverse" alignItems="center">
+                    <SkeletonPlaceholder.Item width={50} height={50} borderRadius={50} />
                     <SkeletonPlaceholder.Item width="100%" marginRight={20}>
-                      <SkeletonPlaceholder.Item
-                        alignSelf="flex-end"
-                        width="60%"
-                        height={10}
-                      />
+                      <SkeletonPlaceholder.Item alignSelf="flex-end" width="60%" height={10} />
                       <SkeletonPlaceholder.Item
                         marginTop={7}
                         width="30%"
@@ -218,21 +174,11 @@ const MessagesScreen = ({navigation, route}) => {
             {[1, 2, 3].map((item, index) => (
               <View key={index} style={{marginTop: '3%'}}>
                 <SkeletonPlaceholder height="100%" borderRadius={4}>
-                  <SkeletonPlaceholder.Item
-                    flexDirection="row"
-                    alignItems="center">
-                    <SkeletonPlaceholder.Item
-                      width={50}
-                      height={50}
-                      borderRadius={50}
-                    />
+                  <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
+                    <SkeletonPlaceholder.Item width={50} height={50} borderRadius={50} />
                     <SkeletonPlaceholder.Item width="100%" marginLeft={20}>
                       <SkeletonPlaceholder.Item width="60%" height={10} />
-                      <SkeletonPlaceholder.Item
-                        marginTop={7}
-                        width="30%"
-                        height={8}
-                      />
+                      <SkeletonPlaceholder.Item marginTop={7} width="30%" height={8} />
                     </SkeletonPlaceholder.Item>
                   </SkeletonPlaceholder.Item>
                 </SkeletonPlaceholder>
@@ -242,20 +188,10 @@ const MessagesScreen = ({navigation, route}) => {
             {[1, 2].map((item, index) => (
               <View key={index} style={{marginTop: '3%'}}>
                 <SkeletonPlaceholder height="100%" borderRadius={4}>
-                  <SkeletonPlaceholder.Item
-                    flexDirection="row-reverse"
-                    alignItems="center">
-                    <SkeletonPlaceholder.Item
-                      width={50}
-                      height={50}
-                      borderRadius={50}
-                    />
+                  <SkeletonPlaceholder.Item flexDirection="row-reverse" alignItems="center">
+                    <SkeletonPlaceholder.Item width={50} height={50} borderRadius={50} />
                     <SkeletonPlaceholder.Item width="100%" marginRight={20}>
-                      <SkeletonPlaceholder.Item
-                        alignSelf="flex-end"
-                        width="60%"
-                        height={10}
-                      />
+                      <SkeletonPlaceholder.Item alignSelf="flex-end" width="60%" height={10} />
                       <SkeletonPlaceholder.Item
                         marginTop={7}
                         width="30%"
@@ -282,11 +218,7 @@ const MessagesScreen = ({navigation, route}) => {
                 />
                 <Text>Send message to start conversation</Text>
                 <Text>or</Text>
-                <Button
-                  icon="refresh"
-                  mode="contained"
-                  style={{marginTop: '5%'}}
-                  onPress={refetch}>
+                <Button icon="refresh" mode="contained" style={{marginTop: '5%'}} onPress={refetch}>
                   Refresh
                 </Button>
               </View>
@@ -294,15 +226,9 @@ const MessagesScreen = ({navigation, route}) => {
             disableAutoLayout={true}
             inverted={messagesFromRedux.length !== 0 ? true : false}
             renderItem={({item}) => (
-              <Message
-                item={item}
-                currentLoginUser={currentLoginUser}
-                theme={theme}
-              />
+              <Message item={item} currentLoginUser={currentLoginUser} theme={theme} />
             )}
-            refreshControl={
-              <RefreshControl refreshing={isLoading} onRefresh={refetch} />
-            }
+            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
           />
         )}
       </View>

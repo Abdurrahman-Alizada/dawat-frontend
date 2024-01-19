@@ -7,6 +7,7 @@ import {Text, useTheme} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
+  useAddMultipleGroupMutation,
 } from '../../../redux/reducers/groups/groupThunk';
 import Header from '../../../Components/Appbars/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
@@ -40,8 +41,10 @@ const Groups = ({navigation}) => {
     setLoacalLoading(true);
     let localGroups = await getLocalGroups();
     if (data) {
-      let ids = new Set(localGroups?.map(d => d._id));
-      let updatedGroups = [...localGroups, ...data?.filter(d => !ids.has(d._id))];
+      // let ids = new Set(localGroups?.map(d => d._id));
+      // let updatedGroups = [...localGroups, ...data?.filter(d => !ids.has(d._id))];
+      let ids = new Set(data?.map(d => d._id));
+      let updatedGroups = [...data, ...localGroups?.filter(d => !ids.has(d._id))];
       setGroups(updatedGroups);
       setFilterdGroups(updatedGroups);
       await AsyncStorage.setItem('groups', JSON.stringify(updatedGroups));
@@ -51,18 +54,48 @@ const Groups = ({navigation}) => {
     }
     setLoacalLoading(false);
   };
-  useEffect(() => {
-    groupHandler();
-  }, [data, groupsFlag, PG, pinGroupFlag]);
-
   const getLocalGroups = async () => {
     let retString = await AsyncStorage.getItem('groups');
     let aa = JSON.parse(retString);
     return aa ? aa : [];
   };
 
+  useEffect(() => {
+    groupHandler();
+    notSyncGroupHandler();
+  }, [data, groupsFlag, PG, pinGroupFlag]);
+
+  // sync with database if event is not uploaded to DB
+  const [addMultipleGroup, {isLoading: addGroupLoading}] = useAddMultipleGroupMutation();
+
+  const notSyncGroupHandler = async () => {
+     let localGroups = await getLocalGroups();
+    const notSyncGroupsArray = localGroups.filter(item => item.isSyncd == false);
+    if (notSyncGroupsArray?.length && token) {
+      addMultipleGroup({
+        groups: notSyncGroupsArray,
+      })
+        .then(async res => {
+          if (res.data) {
+            let ids = new Set([
+              ...res.data?.map(d => d._id),
+              ...notSyncGroupsArray?.map(d => d._id),
+            ]);
+            let updatedGroups = [...res.data, ...localGroups?.filter(d => !ids.has(d._id))];
+            setGroups(updatedGroups);
+            setFilterdGroups(updatedGroups);
+            await AsyncStorage.setItem('groups', JSON.stringify(updatedGroups));
+            dispatch(handleGroupsFlag(!groupsFlag));
+          }
+        })
+        .catch(err => {
+          console.log('error in addMultipleGroup =>', err);
+        });
+    }
+  };
+
   // search - start
-  const [listEmptyText, setListEmptyText] = useState('No Group yet');
+  const [listEmptyText, setListEmptyText] = useState('No event yet');
   const [isSearch, setIsSearch] = useState(false);
 
   const searchFilterFunction = async text => {
@@ -122,6 +155,7 @@ const Groups = ({navigation}) => {
     });
     dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
     await AsyncStorage.setItem('pinGroup', JSON.stringify(localGroups[0]));
+    await AsyncStorage.setItem('pinGroupId', JSON.stringify(localGroups[0]?._id));
     dispatch(handlePinGroupFlag(!pinGroupFlag));
     localGroups = null;
     navigation.navigate('PinnedGroup');
@@ -223,7 +257,15 @@ const Groups = ({navigation}) => {
               theme={theme}
             />
           )}
-          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetching}
+              onRefresh={() => {
+                refetch();
+                groupHandler();
+              }}
+            />
+          }
         />
         <LoginForMoreFeatures
           token={token}

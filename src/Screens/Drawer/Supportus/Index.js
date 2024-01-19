@@ -8,15 +8,13 @@ import {
   AdEventType,
   TestIds,
 } from 'react-native-google-mobile-ads';
-import {Appbar, Button, Text, Card} from 'react-native-paper';
+import {Appbar, Button, Text, Card, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 const adUnitIdINTERSTITIAL = __DEV__
   ? TestIds.INTERSTITIAL
   : 'ca-app-pub-9526618780177325/5862732310';
 
-const adUnitIdREWARDED = __DEV__
-  ? TestIds.REWARDED
-  : 'ca-app-pub-9526618780177325/6696531327';
+const adUnitIdREWARDED = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-9526618780177325/6696531327';
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitIdINTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
@@ -28,17 +26,15 @@ const rewarded = RewardedAd.createForAdRequest(adUnitIdREWARDED, {
 
 export default function App() {
   const navigate = useNavigation();
+  const theme = useTheme();
 
   const [loaded, setLoaded] = useState(false);
   const [isInterstitialWatched, setIsInterstitialWatched] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        setLoaded(true);
-      },
-    );
+    const unsubscribe = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      setLoaded(true);
+    });
 
     // Start loading the interstitial straight away
     interstitial.load();
@@ -50,12 +46,9 @@ export default function App() {
   const [isrewardedWatched, setIsrewardedWatched] = useState(false);
 
   useEffect(() => {
-    const unsubscribeLoaded = rewarded.addAdEventListener(
-      RewardedAdEventType.LOADED,
-      () => {
-        setLoaded1(true);
-      },
-    );
+    const unsubscribeLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      setLoaded1(true);
+    });
     const unsubscribeEarned = rewarded.addAdEventListener(
       RewardedAdEventType.EARNED_REWARD,
       reward => {
@@ -74,24 +67,22 @@ export default function App() {
 
   return (
     <View style={{flex: 1}}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor:theme.colors.background}}>
         <Appbar.BackAction onPress={() => navigate.goBack()} />
-        <Appbar.Content title="Watch an ad" />
+        <Appbar.Content title="Watch ad" />
       </Appbar.Header>
 
-      <Card style={{marginVertical: '0%'}}>
+      <Card theme={{roundness:0}} style={{margin: '0%', backgroundColor:theme.colors.background}}>
         <Card.Content>
           <Text variant="headlineMedium">Thank you for coming here.</Text>
           <Text style={{marginVertical: '5%'}} variant="bodyLarge">
-            We greatly appreciate your patience and willingness to watch an Ad.
-            Your support through watching this Ad helps us continue to provide
-            our app for free.
+            We greatly appreciate your patience and willingness to watch an Ad. Your support through
+            watching this Ad helps us continue to provide our app for free.
           </Text>
         </Card.Content>
       </Card>
 
-      <View
-        style={{flex: 1, alignItems: 'center', justifyContent: 'flex-start'}}>
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'flex-start'}}>
         {!isInterstitialWatched ? (
           <View style={{width: '90%', marginVertical: '5%'}}>
             {loaded ? (

@@ -172,7 +172,6 @@ const UpdateInviti = ({route, navigation}) => {
     guests = guests.filter(object => {
       return object._id !== currentInviti?._id;
     });
-    // console.log("first",updatedGuest)
     guests = [updatedGuest, ...guests];
     await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
     dispatch(handleInvitiFlag(!invitiFlag));

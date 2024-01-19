@@ -8,17 +8,15 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import {
   Text,
-  Avatar,
   TextInput,
   IconButton,
   FAB,
   useTheme,
-  Button,
 } from 'react-native-paper';
 import AvatarModal from '../../Drawer/Profile/AvatarModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSelector, useDispatch} from 'react-redux';
-import {handlePinGroup} from '../../../redux/reducers/groups/groups';
+import { useDispatch} from 'react-redux';
+import {handleCurrentBackgroundImgSrcId, handlePinGroup} from '../../../redux/reducers/groups/groups';
 import createRandomId from '../../../utils/createRandomId';
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),
@@ -71,18 +69,6 @@ const AddGroup = ({navigation, onClose}) => {
       })
       .catch(e => {
         console.log('Error in image selection', e);
-      });
-  };
-
-  let removePicture = () => {
-    ImagePicker.clean()
-      .then(() => {
-        setfileData(null);
-        fileDataRef.current = null;
-        setAvatarURL(false);
-      })
-      .catch(e => {
-        console.log(e);
       });
   };
 
@@ -141,6 +127,9 @@ const AddGroup = ({navigation, onClose}) => {
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
       await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
     }
+    await AsyncStorage.setItem(`pingroup_backgroundImage`, `${3}`);
+    dispatch(handleCurrentBackgroundImgSrcId(3));
+  
     dispatch(handlePinGroup(group));
     navigation.goBack();
   };

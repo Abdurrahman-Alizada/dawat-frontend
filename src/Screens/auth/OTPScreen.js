@@ -167,14 +167,12 @@ const OTPScreen = ({navigation, route}) => {
         disabled={isDisabled}
         style={{
           margin: 30,
-          // backgroundColor: '#3557b7',
-          // backgroundColor: '#665a6f',
           justifyContent: 'center',
           minWidth: 300,
         }}
         contentStyle={{padding: '3%'}}
         buttonStyle={{padding: '1%'}}
-        theme={{roundness: 1}}
+        theme={{roundness: 10}}
         mode="contained"
         onPress={verify}
         buttonColor={'#665a6f'}>

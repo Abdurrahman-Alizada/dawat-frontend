@@ -74,7 +74,7 @@ const SyncDataIndex = () => {
         <Divider />
 
         <Checkbox.Item
-          label="Groups"
+          label="Events"
           status={groupChecked ? 'checked' : 'unchecked'}
           onPress={() => {
             if (guestsChecked) {
@@ -87,14 +87,14 @@ const SyncDataIndex = () => {
         <Divider />
         <View>
           <Checkbox.Item
-            label="Guests in every group"
+            label="Guests in every event"
             status={guestsChecked ? 'checked' : 'unchecked'}
             onPress={() => setGuestsChecked(!guestsChecked)}
             disabled={!groupChecked}
           />
           <Divider />
           <Checkbox.Item
-            label="Tasks list in every group"
+            label="Tasks list in every event"
             status={tasksChecked ? 'checked' : 'unchecked'}
             onPress={() => setTasksChecked(!tasksChecked)}
             disabled={!groupChecked}

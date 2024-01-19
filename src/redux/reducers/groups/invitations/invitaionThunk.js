@@ -74,7 +74,6 @@ export const InvitaionsApi = createApi({
               return draft.filter(invitation => invitation._id !== arg?.invitiId);
             }),
           );
-          // console.log("first",aa)
         } catch (err) {
           console.log('error in delete query', err);
         }

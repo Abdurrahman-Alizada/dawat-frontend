@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {Appbar, ActivityIndicator} from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
-import {handleSelectedGroupLength} from '../redux/reducers/groups/groups';
+import { useSelector} from 'react-redux';
 
 const Header = ({deleteF, deleteLoading, pinHandler, groupName, checkedBack, theme}) => {
   const pinGroupLoading = useSelector(state => state.groups?.pinGroupLoading);

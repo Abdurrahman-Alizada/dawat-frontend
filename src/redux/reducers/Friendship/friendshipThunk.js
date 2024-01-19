@@ -27,6 +27,17 @@ export const friendshipApi = createApi({
       }),
       invalidatesTags: ['Friend'],
     }),
+    deleteFriendsSeggestion: build.mutation({
+      query: ({userA, userB}) => ({
+        url: `/api/friendship/deleteFriendsSeggestion`,
+        method: 'POST',
+        body: {
+          userA: userA,
+          userB: userB,
+        },
+      }),
+      invalidatesTags: ['Friend'],
+    }),
 
     acceptFriendRequest: build.mutation({
       query: ({userA, userB}) => ({
@@ -51,6 +62,19 @@ export const friendshipApi = createApi({
       }),
       invalidatesTags: ['Friend'],
     }),
+
+    undoDeleteFriendSuggestion: build.mutation({
+      query: ({userA, userB}) => ({
+        url: `/api/friendship/undoDeleteFriendSuggestion`,
+        method: 'POST',
+        body: {
+          userA: userA,
+          userB: userB,
+        },
+      }),
+      invalidatesTags: ['Friend'],
+    }),
+
     getAllFriends: build.query({
       query: userId => `/api/friendship/getFriends/${userId}`,
       providesTags: ['Friend'],
@@ -62,6 +86,14 @@ export const friendshipApi = createApi({
         method: 'GET',
       }),
     }),
+
+    SearchFriendsForUser: build.mutation({
+      query: data => ({
+        url: `/api/friendship/search/${data.search}/for/${data.userId}`,
+        method: 'GET',
+      }),
+    }),
+
   }),
 });
 
@@ -73,4 +105,7 @@ export const {
   useGetFriendsSuggestionMutation,
   useGetRequestesOfFriendsMutation,
   useSendFriendRequestMutation,
+  useDeleteFriendsSeggestionMutation,
+  useUndoDeleteFriendSuggestionMutation,
+  useSearchFriendsForUserMutation
 } = friendshipApi;

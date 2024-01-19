@@ -54,7 +54,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
             icon="magnify"
             color={theme.colors.onBackground}
             onPress={() => {
-              func()
+              func(true)
               dispatch(handleIsSearch(true));
               dispatch(handleIsInvitationSearch(true));
             }}
