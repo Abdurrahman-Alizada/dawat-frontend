@@ -35,7 +35,6 @@ const AddGroup = ({navigation, route}) => {
   const currentViewingGroup = useSelector(
     state => state.groups?.currentViewingGroup,
   );
-
   const [addTask, {isLoading}] = useAddTaskMutation();
 
   const submitHandler = async () => {
@@ -91,7 +90,7 @@ const AddGroup = ({navigation, route}) => {
                 source={
                   itemProps?.imageURL
                     ? {uri: itemProps?.imageURL}
-                    : require('../../../../../assets/drawer/userImage.png')
+                    : require('../../../../../assets/drawer/male-user.png')
                 }
               />
             </View>

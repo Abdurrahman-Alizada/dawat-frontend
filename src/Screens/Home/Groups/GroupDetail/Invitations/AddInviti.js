@@ -4,15 +4,8 @@
 //  createdAt:   25 Oct, 2022
 //  Modified by : -------
 // ==========================================
-import {
-  TouchableOpacity,
-  SafeAreaView,
-  StyleSheet,
-  Modal,
-  View,
-  ScrollView,
-} from 'react-native';
-import React, {useState, useRef} from 'react';
+import {TouchableOpacity, View} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {
   Avatar,
@@ -27,42 +20,32 @@ import {
 } from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import AvatarModal from '../../../Menus/Profile/AvatarModal';
-import {
-  useAddInvitiMutation,
-  useUpdateInvitiMutation,
-  useDeleteInvitiMutation,
-} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import moment from 'moment';
+import AvatarModal from '../../../../Drawer/Profile/AvatarModal';
+import {useAddInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {Modalize} from 'react-native-modalize';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch, useSelector} from 'react-redux';
+import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import createRandomId from '../../../../../utils/createRandomId';
+
 const validationSchema = Yup.object().shape({
-  invitiName: Yup.string()
-    .required('Inviti name is required')
-    .label('invitiName'),
+  invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
 const AddInviti = ({route, navigation}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
 
-  const {groupId, currentInviti} = route.params;
+  const {groupId} = route.params;
   const [addInviti, {isLoading}] = useAddInvitiMutation();
-  const [updateInviti, {isLoading: updateLoading}] = useUpdateInvitiMutation();
-  const [deleteInviti, {isLoading: deleteLoading}] = useDeleteInvitiMutation();
-  const [isEditStart, setIsEditStart] = useState(false);
-  const submitHandler = async values => {
-    currentInviti?._id ? updateHandler(values) : addHandler(values);
-  };
 
-  const [fileData, setfileData] = useState(null);
-  const fileDataRef = useRef(null);
-
-  const [invitiImageURL, setInvitiImageURL] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [avatarURL, setAvatarURL] = useState(
-    currentInviti.invitiImageURL ? currentInviti.invitiImageURL : '',
-  );
+  const [avatarURL, setAvatarURL] = useState('');
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+
+  const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
+  const invitiFlag = useSelector(state => state.invitations.invitiFlag);
 
   let openCamera = () => {
     setModalVisible(!modalVisible);
@@ -75,7 +58,6 @@ const AddInviti = ({route, navigation}) => {
     })
       .then(image => {
         setfileData(image);
-        setIsEditStart(true);
       })
       .catch(e => {
         console.log('Error in image selection', e);
@@ -93,7 +75,6 @@ const AddInviti = ({route, navigation}) => {
     })
       .then(image => {
         setfileData(image);
-        setIsEditStart(true);
       })
       .catch(e => {
         console.log('Error in image selection', e);
@@ -106,23 +87,14 @@ const AddInviti = ({route, navigation}) => {
       .then(() => {
         setfileData(null);
         setAvatarURL('');
-        setIsEditStart(true);
       })
       .catch(e => {
         alert(e);
       });
   };
 
-  const [status, setStatus] = useState(
-    currentInviti?.lastStatus?.invitiStatus
-      ? currentInviti?.lastStatus?.invitiStatus
-      : 'pending',
-  );
-  const [selectedstatus, setSelectedStatus] = useState(
-    currentInviti?.lastStatus?.invitiStatus
-      ? currentInviti?.lastStatus?.invitiStatus
-      : 'pending',
-  );
+  const [status, setStatus] = useState('pending');
+  const [selectedstatus, setSelectedStatus] = useState('pending');
   const [statuses, setStatuses] = useState([
     {label: 'Invited', value: 'invited'},
     {label: 'Rejected', value: 'rejected'},
@@ -130,16 +102,27 @@ const AddInviti = ({route, navigation}) => {
     {label: 'Other', value: 'other'},
   ]);
 
-  const addHandler = async values => {
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
+  const [fileData, setfileData] = useState(null);
+  const fileDataRef = useRef(null);
+
+  const submitHandler = async values => {
     const uri = fileData?.path;
     const type = fileData?.mime;
     const name = values.invitiName;
     const photo = {uri, type, name};
-    // cloudinaryUpload(source)
     const data = new FormData();
     data.append('file', photo);
     data.append('upload_preset', 'bzgif1or');
     data.append('cloud_name', 'dblhm3cbq');
+
     // if user upload image from mobile then execute if otherwise else.
     if (photo.uri) {
       fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
@@ -148,7 +131,6 @@ const AddInviti = ({route, navigation}) => {
       })
         .then(res => res.json())
         .then(async data => {
-          setInvitiImageURL(data.secure_url);
           await addInviti({
             groupId: groupId,
             invitiName: values.invitiName,
@@ -183,71 +165,32 @@ const AddInviti = ({route, navigation}) => {
     }
   };
 
-  const updateHandler = async values => {
-    const uri = fileData?.path;
-    const type = fileData?.mime;
-    const name = values.invitiName;
-    const photo = {uri, type, name};
-    // cloudinaryUpload(source)
-    const data = new FormData();
-    data.append('file', photo);
-    data.append('upload_preset', 'bzgif1or');
-    data.append('cloud_name', 'dblhm3cbq');
-    // if user upload image from mobile then execute if block otherwise else block.
-    if (photo.uri) {
-      fetch('https://api.cloudinary.com/v1_1/dblhm3cbq/image/upload', {
-        method: 'post',
-        body: data,
-      })
-        .then(res => res.json())
-        .then(async data => {
-          setInvitiImageURL(data.secure_url);
-          await updateInviti({
-            invitiId: currentInviti?._id,
-            invitiName: values.invitiName,
-            invitiDescription: values.invitiDescription,
-            invitiImageURL: data.secure_url,
-            lastStatus: status,
-          })
-            .then(response => {
-              console.log('group has been updated  with image=>', response);
-              navigation.goBack();
-            })
-            .catch(e => {
-              console.log('error in updateHandler', e);
-            });
-        })
-        .catch(err => {
-          console.log(
-            'An Error Occured While image Uploading in update function',
-            err,
-          );
-        });
+  const createInvitiLocally = async values => {
+    const user = {name: 'You'};
+    const newGuest = {
+      _id: createRandomId(12),
+      invitiName: values.invitiName,
+      invitiDescription: values.invitiDescription,
+      invitiImageURL: '',
+      addedBy: values.addedBy ? values.addedBy : user,
+      lastStatus: {
+        invitiStatus: selectedstatus,
+        addedBy: values?.lastStatus?.addedBy ? values?.lastStatus?.addedBy : user,
+      },
+      statuses: values.statuses,
+      groupId: currentViewingGroup?._id,
+      isSync: false,
+    };
+
+    let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
+    if (guests) {
+      guests = [newGuest, ...guests];
     } else {
-      await updateInviti({
-        invitiId: currentInviti?._id,
-        invitiName: values.invitiName,
-        invitiDescription: values.invitiDescription,
-        invitiImageURL: avatarURL,
-        lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
-      })
-        .then(response => {
-          console.log('group has been updated without image=>', response);
-          navigation.goBack();
-        })
-        .catch(e => {
-          console.log('error in updateHandler', e);
-        });
+      guests = [newGuest];
     }
-  };
-  const deleteHandler = async () => {
-    await deleteInviti({groupId: groupId, invitiId: currentInviti?._id})
-      .then(response => {
-        navigation.goBack();
-      })
-      .catch(e => {
-        console.log('error in deleteHandler', e);
-      });
+    await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    navigation.goBack();
   };
 
   const modalizeRef = useRef(null);
@@ -263,23 +206,15 @@ const AddInviti = ({route, navigation}) => {
     <View style={{paddingHorizontal: '5%', flex: 1}}>
       <Formik
         initialValues={{
-          invitiName: currentInviti?.invitiName,
-          invitiDescription: currentInviti?.invitiDescription,
+          invitiName: '',
+          invitiDescription: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={values => submitHandler(values)}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
+        // onSubmit={values => submitHandler(values)}
+        onSubmit={values => (token ? submitHandler(values) : createInvitiLocally(values))}>
+        {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
           <View style={{marginVertical: '2%', flex: 1}}>
-            <TouchableOpacity
-              style={{width: '50%', alignSelf: 'center'}}
-              onPress={onOpenModalize}>
+            <TouchableOpacity style={{width: '50%', alignSelf: 'center'}} onPress={onOpenModalize}>
               {fileData ? (
                 <Avatar.Image
                   source={{uri: fileData.path}}
@@ -322,28 +257,20 @@ const AddInviti = ({route, navigation}) => {
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiName')}
-              onChange={() => setIsEditStart(true)}
               onBlur={handleBlur('invitiName')}
               value={values.invitiName}
             />
             {errors.invitiName && touched.invitiName ? (
-              <Text style={{color: theme.colors.error, fontSize: 13}}>
-                {errors.invitiName}
-              </Text>
+              <Text style={{color: theme.colors.error, fontSize: 13}}>{errors.invitiName}</Text>
             ) : null}
 
             <TextInput
-              error={
-                errors.invitiDescription && touched.invitiDescription
-                  ? true
-                  : false
-              }
+              error={errors.invitiDescription && touched.invitiDescription ? true : false}
               label="Description"
               placeholder="Description about the person"
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiDescription')}
-              onChange={() => setIsEditStart(true)}
               onBlur={handleBlur('invitiDescription')}
               value={values.invitiDescription}
             />
@@ -360,14 +287,11 @@ const AddInviti = ({route, navigation}) => {
                   <Chip
                     key={index}
                     selected={selectedstatus === statuse.value ? true : false}
-                    mode={
-                      selectedstatus === statuse.value ? 'flat' : 'outlined'
-                    }
+                    mode={selectedstatus === statuse.value ? 'flat' : 'outlined'}
                     style={{marginRight: '2%', marginVertical: '2%'}}
                     onPress={() => {
                       setSelectedStatus(statuse.value);
                       setStatus(statuse.value);
-                      setIsEditStart(true);
                     }}>
                     {statuse.label}
                   </Chip>
@@ -375,35 +299,19 @@ const AddInviti = ({route, navigation}) => {
               </View>
             </View>
 
-            {currentInviti?.invitiName ? (
-              <FAB
-                icon="check"
-                loading={updateLoading}
-                disabled={!isEditStart || updateLoading}
-                label={'Update'}
-                style={{
-                  position: 'absolute',
-                  marginVertical: 16,
-                  right: 0,
-                  bottom: 0,
-                }}
-                onPress={handleSubmit}
-              />
-            ) : (
-              <FAB
-                icon="plus"
-                loading={isLoading}
-                disabled={isLoading}
-                label={'Add'}
-                style={{
-                  position: 'absolute',
-                  marginVertical: 16,
-                  right: 0,
-                  bottom: 0,
-                }}
-                onPress={handleSubmit}
-              />
-            )}
+            <FAB
+              icon="plus"
+              loading={isLoading}
+              disabled={isLoading}
+              label={'Add'}
+              style={{
+                position: 'absolute',
+                marginVertical: 16,
+                right: 0,
+                bottom: 0,
+              }}
+              onPress={handleSubmit}
+            />
           </View>
         )}
       </Formik>
@@ -463,7 +371,6 @@ const AddInviti = ({route, navigation}) => {
           setAvatarURL={setAvatarURL}
           setfileData={setfileData}
           fileDataRef={fileDataRef}
-          setIsEditStart={setIsEditStart}
         />
       )}
     </View>

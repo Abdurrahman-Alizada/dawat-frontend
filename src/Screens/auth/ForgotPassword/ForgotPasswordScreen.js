@@ -1,33 +1,110 @@
+import {StyleSheet, View, StatusBar} from 'react-native';
+import React, {useState} from 'react';
 import {
-  StyleSheet,
+  TextInput,
+  Button,
+  useTheme,
+  Portal,
+  Dialog,
   Text,
-  View,
-  StatusBar,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import React from 'react';
-import {TextInput, Button} from 'react-native-paper';
+  Paragraph,
+} from 'react-native-paper';
+import {useForgotPasswordMutation} from '../../../redux/reducers/user/userThunk';
 
 const ForgotPassword = ({navigation}) => {
-  return (
-    <View style={{flex: 1, backgroundColor: '#fff', padding: '2%'}}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+  const regex =
+    /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+  const theme = useTheme();
 
-      <View style={{justifyContent: 'center', flex: 1}}>
+  const [visible, setVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isDisabled, setDisibility] = useState(true);
+  const [message, setMessage] = useState('Something went wrong');
+
+  const checkEmail = e => {
+    setDisibility(!regex.test(e));
+    setEmail(e);
+  };
+
+  const [forgotPassword, {isLoading, isError, error}] =
+    useForgotPasswordMutation();
+  const sendEmail = () => {
+    setDisibility(true);
+    forgotPassword(email)
+      .then(res => {
+        if (res?.error?.data?.message) {
+          setMessage(res?.error?.data?.message);
+          setVisible(true);
+        } else if (res?.error?.error) {
+          setMessage(res?.error?.error);
+          setVisible(true);
+        } else if(res?.data?.message == `OTP has been sent to ${email}`) {
+          navigation.navigate("OTPScreen", {email:email});
+          setEmail('')
+        }else{
+          setMessage("Unknown error");
+          setVisible(true);
+        }
+        setDisibility(false);
+      })
+      .catch(e => {
+        setDisibility(false);
+        console.log(e);
+      });
+  };
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors.background,
+        padding: '2%',
+      }}>
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+          <Dialog.Title>Password recovery error</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph> {message} </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              textColor={theme.colors.tertiary}
+              onPress={() => setVisible(false)}>
+              close
+            </Button>
+            <Button onPress={() => {
+              setVisible(false)
+              sendEmail()
+              }}>Try again</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      <View style={{paddingVertical: '5%', paddingHorizontal: '2%'}}>
+        
         <TextInput
-          placeholder="abc@domin.com"
           label="Enter your Email"
           mode="outlined"
+          value={email}
+          style={{marginTop: '2%', height:55}}
+          activeOutlineColor={theme.colors.secondary}
+          onChangeText={e => checkEmail(e)}
         />
 
         <Button
-          // icon="camera"
+          icon="email-send"
           mode="contained"
-          theme={{roundness: 2}}
-          style={{marginVertical: '4%'}}
-          onPress={() => console.log('Pressed')}>
-          Sent Varification Code
+          disabled={isDisabled}
+          style={{
+            marginVertical: '3%',
+          }}
+          loading={isLoading}
+          contentStyle={{padding: '3%'}}
+          buttonStyle={{padding: '1%'}}
+          theme={{roundness: 10}}
+          buttonColor={theme.colors.secondary}
+          onPress={sendEmail}>
+          Continue
         </Button>
       </View>
     </View>

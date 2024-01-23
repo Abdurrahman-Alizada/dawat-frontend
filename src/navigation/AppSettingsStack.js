@@ -1,9 +1,9 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import Profile from '../Screens/Home/Menus/Profile';
-import AppSettingsMain from '../Screens/Home/Menus/SettingsMain/Index';
-import Preferences from '../Screens/Home/Menus/Preferences/Index';
+import Profile from '../Screens/Drawer/Profile';
+import AppSettingsMain from '../Screens/Drawer/SettingsMain/Index';
+import Preferences from '../Screens/Drawer/SettingsMain/Preferences/Index';
 import GeneralAppbar from '../Components/GeneralAppbar'
 const Stack = createStackNavigator();
 

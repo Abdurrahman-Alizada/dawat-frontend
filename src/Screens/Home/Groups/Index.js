@@ -1,110 +1,210 @@
-import React, {useEffect, useState, useContext} from 'react';
-import {
-  Text,
-  StyleSheet,
-  RefreshControl,
-  View,
-  FlatList,
-  StatusBar,
-} from 'react-native';
+import React, {useEffect, useState, useContext, useLayoutEffect, useRef} from 'react';
+import {RefreshControl, View, FlatList, StatusBar, BackHandler} from 'react-native';
 import ErrorSnackBar from '../../../Components/ErrorSnackBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderItem from './SingleGroup';
-import {AnimatedFAB, Divider, useTheme} from 'react-native-paper';
+import {Text, useTheme} from 'react-native-paper';
 import {
   useGetAllGroupsQuery,
   useDeleteGroupForUserMutation,
+  useAddMultipleGroupMutation,
 } from '../../../redux/reducers/groups/groupThunk';
-import {Provider} from 'react-native-paper';
-import Header from '../../../Components/Appbar';
+import Header from '../../../Components/Appbars/Appbar';
 import GroupCheckedHeader from '../../../Components/GroupCheckedHeader';
-import GroupsList from '../../Skeletons/Groups';
-import {PreferencesContext} from '../../../themeContext';
+import {ThemeContext} from '../../../themeContext';
+import {useDispatch, useSelector} from 'react-redux';
+import LoginForMoreFeatures from '../../../Components/LoginForMoreFeatures';
+import {
+  handleGroupsFlag,
+  handlePinGroup,
+  handlePinGroupFlag,
+  handlePinGroupLoading,
+  handleSelectedGroupLength,
+} from '../../../redux/reducers/groups/groups';
 
 const Groups = ({navigation}) => {
-  const {
-    data: allGroups,
-    isError,
-    isLoading,
-    error,
-    isFetching,
-    refetch,
-  } = useGetAllGroupsQuery();
-  const [deleteGroupForUser, {isLoading: deleteLoading}] =
-    useDeleteGroupForUserMutation();
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const {isThemeDark} = useContext(ThemeContext);
 
-  // groups to delete
-  const addGrouptoDelete1 = async () => {
-    let userId = await AsyncStorage.getItem('userId');
-    for (i = 0; i < checkedItems.length; i++) {
-      let groupId = checkedItems[i];
-      deleteGroupForUser({userId: userId, chatId: groupId});
+  const PG = useSelector(state => state.groups?.pinGroup);
+  const groupsFlag = useSelector(state => state.groups?.groupsFlag);
+  const pinGroupFlag = useSelector(state => state.groups?.pinGroupFlag);
+
+  const [localLoading, setLoacalLoading] = useState(true);
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetAllGroupsQuery();
+
+  const [groups, setGroups] = useState([]);
+  const [filterdGroups, setFilterdGroups] = useState([]);
+
+  const groupHandler = async () => {
+    setLoacalLoading(true);
+    let localGroups = await getLocalGroups();
+    if (data) {
+      // let ids = new Set(localGroups?.map(d => d._id));
+      // let updatedGroups = [...localGroups, ...data?.filter(d => !ids.has(d._id))];
+      let ids = new Set(data?.map(d => d._id));
+      let updatedGroups = [...data, ...localGroups?.filter(d => !ids.has(d._id))];
+      setGroups(updatedGroups);
+      setFilterdGroups(updatedGroups);
+      await AsyncStorage.setItem('groups', JSON.stringify(updatedGroups));
+    } else {
+      setGroups(localGroups);
+      setFilterdGroups(localGroups);
     }
-    setCheckedItems([]);
-    setChecked(false);
+    setLoacalLoading(false);
+  };
+  const getLocalGroups = async () => {
+    let retString = await AsyncStorage.getItem('groups');
+    let aa = JSON.parse(retString);
+    return aa ? aa : [];
   };
 
-  const onOpen = () => {
-    navigation.navigate('AddGroup');
+  useEffect(() => {
+    groupHandler();
+    notSyncGroupHandler();
+  }, [data, groupsFlag, PG, pinGroupFlag]);
+
+  // sync with database if event is not uploaded to DB
+  const [addMultipleGroup, {isLoading: addGroupLoading}] = useAddMultipleGroupMutation();
+
+  const notSyncGroupHandler = async () => {
+     let localGroups = await getLocalGroups();
+    const notSyncGroupsArray = localGroups.filter(item => item.isSyncd == false);
+    if (notSyncGroupsArray?.length && token) {
+      addMultipleGroup({
+        groups: notSyncGroupsArray,
+      })
+        .then(async res => {
+          if (res.data) {
+            let ids = new Set([
+              ...res.data?.map(d => d._id),
+              ...notSyncGroupsArray?.map(d => d._id),
+            ]);
+            let updatedGroups = [...res.data, ...localGroups?.filter(d => !ids.has(d._id))];
+            setGroups(updatedGroups);
+            setFilterdGroups(updatedGroups);
+            await AsyncStorage.setItem('groups', JSON.stringify(updatedGroups));
+            dispatch(handleGroupsFlag(!groupsFlag));
+          }
+        })
+        .catch(err => {
+          console.log('error in addMultipleGroup =>', err);
+        });
+    }
   };
-  const [isExtended, setIsExtended] = React.useState(true);
-
-  const onScroll = ({nativeEvent}) => {
-    const currentScrollPosition =
-      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
-
-    setIsExtended(currentScrollPosition <= 0);
-  };
-
-  const fabStyle = {['right']: 16};
-  // end fab
 
   // search - start
-  const [listEmptyText, setListEmptyText] = useState('No Group yet');
+  const [listEmptyText, setListEmptyText] = useState('No event yet');
   const [isSearch, setIsSearch] = useState(false);
-  const [filteredDataSource, setFilteredDataSource] = useState([]);
-  const [masterDataSource, setMasterDataSource] = useState([]);
 
-  const searchFilterFunction = text => {
-    setMasterDataSource(allGroups);
-    setFilteredDataSource(allGroups);
+  const searchFilterFunction = async text => {
+    setLoacalLoading(true);
     if (text) {
-      const newData = masterDataSource?.filter(item => {
-        const itemData = item.groupName
-          ? item.groupName.toUpperCase()
-          : ''.toUpperCase();
+      const newData = groups?.filter(item => {
+        const itemData = item.groupName ? item.groupName.toUpperCase() : ''.toUpperCase();
         const textData = text.toUpperCase();
         return itemData.indexOf(textData) > -1;
       });
       if (!newData?.length) {
         setListEmptyText('Nothing find. Please enter some other text');
       }
-      setFilteredDataSource(newData);
+      setFilterdGroups(newData);
     } else {
-      setFilteredDataSource(masterDataSource);
+      setFilterdGroups(groups);
+    }
+    setLoacalLoading(false);
+  };
+
+  // groups to delete
+  const [deleteGroupForUser, {isLoading: deleteLoading}] = useDeleteGroupForUserMutation();
+  const addGrouptoDelete1 = async () => {
+    let userId = await AsyncStorage.getItem('userId');
+    for (i = 0; i < checkedItems.length; i++) {
+      let groupId = checkedItems[i];
+      deleteGroupForUser({userId: userId, chatId: groupId}).then(res => {
+        handleGroupDeleteLocal(groupId, i);
+      });
     }
   };
 
+  const handleGroupDeleteLocal = async (groupId, index) => {
+    let groups = JSON.parse(await AsyncStorage.getItem('groups'));
+    const newArr = groups.filter(object => {
+      return object._id !== groupId;
+    });
+    await AsyncStorage.setItem('groups', JSON.stringify(newArr));
+
+    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
+    if (pg?._id === groupId) {
+      await AsyncStorage.setItem('pinGroup', JSON.stringify(newArr?.length ? newArr[0] : null));
+      dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
+      dispatch(handlePinGroupFlag(!pinGroupFlag));
+    }
+    if (index == checkedItems.length - 1) {
+      dispatch(handleGroupsFlag(!groupsFlag));
+    }
+    checkedBack();
+  };
+
+  const pinHandler = async () => {
+    dispatch(handlePinGroupLoading(true));
+    let localGroups = await getLocalGroups();
+    localGroups = localGroups.filter(object => {
+      return object._id == checkedItems[0];
+    });
+    dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
+    await AsyncStorage.setItem('pinGroup', JSON.stringify(localGroups[0]));
+    await AsyncStorage.setItem('pinGroupId', JSON.stringify(localGroups[0]?._id));
+    dispatch(handlePinGroupFlag(!pinGroupFlag));
+    localGroups = null;
+    navigation.navigate('PinnedGroup');
+    dispatch(handlePinGroupLoading(false));
+  };
+  const onOpen = () => {
+    navigation.navigate('AddGroup');
+  };
+
+  const [token, setToken] = useState(null);
   useEffect(() => {
-    searchFilterFunction(null);
-  }, [allGroups]);
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
   // checked on long Press
   const [checked, setChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const checkedBack = () => {
     setChecked(false);
     setCheckedItems([]);
+    dispatch(handleSelectedGroupLength(0));
   };
-
-  const theme = useTheme();
-  const {isThemeDark} = useContext(PreferencesContext);
 
   // snackebar
   const [snackbarVisible, setSnackBarVisible] = useState(false);
-  const [snackebarText, setSnackBarText] = useState('');
   useEffect(() => {
     setSnackBarVisible(isError);
   }, [isError]);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (checkedItems.length > 0) {
+        checkedBack();
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      return backAction();
+    });
+    return () => {
+      backHandler.remove();
+    };
+  }, [checkedItems]);
 
   return (
     <View style={{flex: 1}}>
@@ -113,75 +213,72 @@ const Groups = ({navigation}) => {
         backgroundColor={theme.colors.background}
       />
 
-      <Provider>
-        {checked ? (
-          <GroupCheckedHeader
-            deleteF={addGrouptoDelete1}
-            checkedBack={checkedBack}
-            theme={theme}
-          />
-        ) : (
-          <Header
-            isSearch={isSearch}
-            setIsSearch={setIsSearch}
-            searchFilterFunction={searchFilterFunction}
-            theme={theme}
-          />
-        )}
-
-        {!isLoading ? (
-          <View style={{flex: 1,marginTop:2, backgroundColor: theme.colors.background}}>
-            <FlatList
-              onScroll={onScroll}
-              keyExtractor={item => item._id}
-              data={isSearch ? filteredDataSource : allGroups}
-              ListEmptyComponent={() => (
-                <View style={{marginTop: '60%', alignItems: 'center'}}>
-                  <Text>{listEmptyText}</Text>
-                </View>
-              )}
-              renderItem={item => (
-                <RenderItem
-                  item={item.item}
-                  navigation={navigation}
-                  checked={checked}
-                  setChecked={setChecked}
-                  checkedItems={checkedItems}
-                  setCheckedItems={setCheckedItems}
-                  setIsSearch={setIsSearch}
-                  theme={theme}
-                />
-              )}
-              refreshControl={
-                <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-              }
+      {checked ? (
+        <GroupCheckedHeader
+          deleteF={addGrouptoDelete1}
+          pinHandler={pinHandler}
+          checkedBack={checkedBack}
+          checkedItemsLength={checkedItems.length}
+          deleteLoading={deleteLoading}
+          theme={theme}
+        />
+      ) : (
+        <Header
+          isSearch={isSearch}
+          setIsSearch={setIsSearch}
+          searchFilterFunction={searchFilterFunction}
+          theme={theme}
+          onOpen={onOpen}
+        />
+      )}
+      <View
+        style={{
+          flex: 1,
+          marginTop: 2,
+          backgroundColor: theme.colors.background,
+        }}>
+        <FlatList
+          keyExtractor={item => item?._id}
+          data={filterdGroups}
+          ListEmptyComponent={() => (
+            <View style={{marginTop: '60%', alignItems: 'center'}}>
+              {isLoading || localLoading ? <Text>Loading...</Text> : <Text>{listEmptyText}</Text>}
+            </View>
+          )}
+          renderItem={item => (
+            <RenderItem
+              item={item.item}
+              navigation={navigation}
+              checked={checked}
+              setChecked={setChecked}
+              checkedItems={checkedItems}
+              setCheckedItems={setCheckedItems}
+              setIsSearch={setIsSearch}
+              theme={theme}
             />
-          </View>
-        ) : (
-          <View
-            style={{
-              margin: '3%',
-            }}>
-            <GroupsList />
-           </View>
-        )}
-      </Provider>
-
-      <AnimatedFAB
-        icon={'plus'}
-        label={'Add New Event'}
-        extended={isExtended}
-        onPress={() => onOpen()}
-        visible={true}
-        animateFrom={'right'}
-        iconMode="static"
-        style={{bottom: snackbarVisible ? 70 : 16, right: 16}}
-      />
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetching}
+              onRefresh={() => {
+                refetch();
+                groupHandler();
+              }}
+            />
+          }
+        />
+        <LoginForMoreFeatures
+          token={token}
+          isLoading={isLoading}
+          localLoading={localLoading}
+          navigation={navigation}
+        />
+      </View>
 
       <ErrorSnackBar
-        isVisible={snackbarVisible}
+        isVisible={snackbarVisible && token}
         text={'Something went wrong'}
-        onDismissHandler={setSnackBarVisible}
+        onDismissHandler={() => setSnackBarVisible(false)}
       />
     </View>
   );

@@ -1,10 +1,10 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { baseURL } from '../../../axios';
+import {baseURL} from '../../../axios';
 export const InvitaionsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: baseURL,
-    prepareHeaders: async (headers) => {
+    prepareHeaders: async headers => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
@@ -27,7 +27,7 @@ export const InvitaionsApi = createApi({
           invitiName: message.invitiName,
           invitiDescription: message.invitiDescription,
           invitiImageURL: message.invitiImageURL,
-          lastStatus : message.lastStatus,
+          lastStatus: message.lastStatus,
           groupId: message.groupId,
         },
       }),
@@ -38,7 +38,7 @@ export const InvitaionsApi = createApi({
         url: `/api/group/invitations/addMultiple`,
         method: 'POST',
         body: {
-          invities : data.invities,
+          invities: data.invities,
           groupId: data.groupId,
         },
       }),
@@ -53,7 +53,7 @@ export const InvitaionsApi = createApi({
           invitiName: inviti.invitiName,
           invitiDescription: inviti.invitiDescription,
           lastStatus: inviti.lastStatus,
-          invitiImageURL: inviti.invitiImageURL
+          invitiImageURL: inviti.invitiImageURL,
         },
       }),
       invalidatesTags: ['Invitations'],
@@ -67,6 +67,17 @@ export const InvitaionsApi = createApi({
           groupId: inviti.groupId,
         },
       }),
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+         dispatch(
+            InvitaionsApi.util.updateQueryData('getAllInvitations', undefined, draft => {
+              return draft.filter(invitation => invitation._id !== arg?.invitiId);
+            }),
+          );
+        } catch (err) {
+          console.log('error in delete query', err);
+        }
+      },
       invalidatesTags: ['Invitations'],
     }),
     deleteMultipleInviti: build.mutation({
@@ -75,6 +86,7 @@ export const InvitaionsApi = createApi({
         method: 'DELETE',
         body: {
           invities: inviti.invities,
+
           groupId: inviti.groupId,
         },
       }),
@@ -85,7 +97,7 @@ export const InvitaionsApi = createApi({
         url: `/api/group/invitations/${inviti.id}/updateInviteStatus`,
         method: 'PATCH',
         body: {
-          lastStatus: inviti.lastStatus
+          lastStatus: inviti.lastStatus,
         },
       }),
       invalidatesTags: ['Invitations'],
@@ -95,12 +107,16 @@ export const InvitaionsApi = createApi({
         url: `/api/group/invitations/updateStatusOfMultipleInvities`,
         method: 'PATCH',
         body: {
-          invities : data.invities,
+          invities: data.invities,
           lastStatus: data.lastStatus,
-          groupId : data.groupId
-        }
+          groupId: data.groupId,
+        },
       }),
       invalidatesTags: ['Invitations'],
+    }),
+    getInvitationsSummary: build.query({
+      query: ({groupId}) => `api/group/invitations/${groupId}/invitiesSummary`,
+      providesTags: ['Invitations'],
     }),
   }),
 });
@@ -113,7 +129,6 @@ export const {
   useUpdateInvitiStatusMutation,
   useAddMultipleInvitiMutation,
   useDeleteMultipleInvitiMutation,
-  useUpdateStatusOfMultipleInvitiesMutation
+  useUpdateStatusOfMultipleInvitiesMutation,
+  useGetInvitationsSummaryQuery,
 } = InvitaionsApi;
-
-

@@ -9,25 +9,37 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-
-import GlobalStyles, {height, width, COLORS} from '../../GlobalStyles'
-import slides from './SlidesData'
+import {useTheme} from 'react-native-paper';
+import {height, width} from '../../GlobalStyles';
+import slides from './SlidesData';
 
 const Slide = ({item}) => {
+  const theme = useTheme();
   return (
     <View style={{alignItems: 'center'}}>
       <Image
         source={item?.image}
         style={{height: '75%', width, resizeMode: 'contain'}}
       />
-      <View style={{width:width * 0.9}}>
-        <Text style={styles.title}>{item?.title}</Text>
+      <View style={{width: width * 0.9}}>
+        <Text
+          style={{
+            color: theme.colors.secondary,
+            fontSize: 22,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            lineHeight: 31,
+          }}>
+          {item?.title}
+        </Text>
       </View>
     </View>
   );
 };
 
 const OnboardingScreen = ({navigation}) => {
+  const theme = useTheme();
+
   const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const ref = React.useRef();
   const updateCurrentSlideIndex = e => {
@@ -60,7 +72,7 @@ const OnboardingScreen = ({navigation}) => {
           justifyContent: 'space-between',
           paddingHorizontal: 20,
         }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
         {/* Indicator container */}
         <View
@@ -76,7 +88,7 @@ const OnboardingScreen = ({navigation}) => {
               style={[
                 styles.indicator,
                 currentSlideIndex == index && {
-                  backgroundColor: COLORS.orange,
+                  backgroundColor: '#F77A55',
                   width: 25,
                 },
               ]}
@@ -89,11 +101,11 @@ const OnboardingScreen = ({navigation}) => {
           {currentSlideIndex == slides.length - 1 ? (
             <View style={{height: 50}}>
               <TouchableOpacity
-                style={styles.btn}
+                style={[styles.btn, {backgroundColor: theme.colors.blueBG}]}
                 onPress={() => navigation.replace('Auth')}>
                 <Text
                   style={{
-                    color: COLORS.white,
+                    color: theme.colors.onPrimary,
                     fontWeight: 'bold',
                     fontSize: 15,
                   }}>
@@ -108,7 +120,7 @@ const OnboardingScreen = ({navigation}) => {
                 style={[
                   styles.btn,
                   {
-                    borderColor: COLORS.blueLight,
+                    borderColor: theme.colors.blueBG,
                     borderWidth: 1,
                     backgroundColor: 'transparent',
                   },
@@ -118,7 +130,7 @@ const OnboardingScreen = ({navigation}) => {
                   style={{
                     fontWeight: 'bold',
                     fontSize: 15,
-                    color: COLORS.primary,
+                    color: theme.colors.blueBG,
                   }}>
                   SKIP
                 </Text>
@@ -127,12 +139,12 @@ const OnboardingScreen = ({navigation}) => {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={goToNextSlide}
-                style={styles.btn}>
+                style={[styles.btn, {backgroundColor: theme.colors.blueBG}]}>
                 <Text
                   style={{
                     fontWeight: 'bold',
                     fontSize: 15,
-                    color: COLORS.white,
+                    color: theme.colors.onPrimary,
                   }}>
                   NEXT
                 </Text>
@@ -162,13 +174,6 @@ const OnboardingScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    color: COLORS.primary,
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    lineHeight: 31
-  },
   image: {
     height: '100%',
     width: '100%',
@@ -185,8 +190,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     borderRadius: 5,
-    backgroundColor: COLORS.blueLight,
-    color: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
   },

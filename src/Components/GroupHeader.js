@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {
   List,
@@ -16,37 +16,61 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
   handleIsInvitationSearch,
   handleInvitationSearch,
+  handleIsInvitaionSummaryOpen,
 } from '../redux/reducers/groups/invitations/invitationSlice';
 import {handleIsSearch} from '../redux/reducers/groups/groups';
-import { handleIsTaskSearch, handleTasksSearch } from '../redux/reducers/groups/tasks/taskSlice';
+import {
+  handleIsTaskSearch,
+  handleTasksSearch,
+  handleIsTaskSummaryOpen,
+} from '../redux/reducers/groups/tasks/taskSlice';
+import {isConfirmDialogVisibleHandler} from '../redux/reducers/groups/chat/chatSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Header = ({onOpen, group}) => {
+const Header = ({
+  openGuestsImportExportModalize,
+  openGuestsSummaryModalize,
+  openTasksSummaryModalize,
+  group,
+}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
 
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+
+  const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
+
+  const isMessagesSelected = useSelector(state => state.chat.isMessagesSelected);
+
   const currentTab = useSelector(state => state.groups.currentTab);
+
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
 
   const getMembersOfGroup = () => {
     let membersText = currentViewingGroup.users?.map(user => {
-      return user.name;
+      return user.name == currentLoginUser.name ? 'You' : ' ' + user.name;
     });
-    return membersText.toString().length < 25
-      ? membersText.toString()
-      : `${membersText.toString().substring(0, 25)}...`;
+
+    return token && membersText
+      ? membersText?.toString().length < 25
+        ? membersText?.toString()
+        : `${membersText?.toString()?.substring(0, 25)}...`
+      : 'You';
   };
 
   //search
   const isSearch = useSelector(state => state.groups.isSearch);
-  
-  // invitations
+
+  // invitationsopenTasksSummaryModalize
   const [search, setSearch] = useState('');
-  const isInvitaionSearch = useSelector(
-    state => state.invitations.isInvitaionSearch,
-  );
+  const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
   const updateSearch = search => {
     setSearch(search);
     dispatch(handleInvitationSearch(search));
@@ -69,11 +93,9 @@ const Header = ({onOpen, group}) => {
     dispatch(handleIsTaskSearch(false));
   };
 
-
   // end search
 
   // "more menu"
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const [visible, setVisible] = React.useState(false);
 
   const openMenu = () => setVisible(true);
@@ -107,14 +129,16 @@ const Header = ({onOpen, group}) => {
                 alignItems: 'flex-end',
                 justifyContent: 'flex-start',
               }}>
-              <Avatar.Image
-                size={40}
-                source={
-                  currentViewingGroup.imageURL
-                    ? {uri: currentViewingGroup.imageURL}
-                    : require('../assets/drawer/male-user.png')
-                }
-              />
+              {currentViewingGroup.imageURL ? (
+                <Avatar.Image
+                  size={40}
+                  source={{
+                    uri: currentViewingGroup.imageURL,
+                  }}
+                />
+              ) : (
+                <Avatar.Text label={currentViewingGroup?.groupName?.charAt(0)} size={40} />
+              )}
               <View style={{marginLeft: 5}}>
                 <Text style={{fontSize: 18, fontWeight: '700'}}>
                   {currentViewingGroup.groupName?.length > 18
@@ -137,21 +161,44 @@ const Header = ({onOpen, group}) => {
 
           <View
             style={{
-              maxWidth: '20%',
+              flexDirection: 'row',
+              maxWidth: '25%',
               alignSelf: 'flex-end',
               justifyContent: 'flex-end',
             }}>
+            {currentTab === 'Chat' && isMessagesSelected ? (
+              <Appbar.Action
+                icon="delete-outline"
+                color={theme.colors.onBackground}
+                onPress={() => {
+                  dispatch(isConfirmDialogVisibleHandler(true));
+                }}
+              />
+            ) : (
+              <View>
+                {currentTab !== 'Logs' && currentTab !== 'Chat' && (
+                  <Appbar.Action
+                    icon="briefcase-outline"
+                    color={theme.colors.onBackground}
+                    onPress={() => {
+                      if (currentTab === 'Guests') {
+                        dispatch(handleIsInvitaionSummaryOpen(true));
+                        openGuestsSummaryModalize();
+                      } else if (currentTab === 'To-do') {
+                        dispatch(handleIsTaskSummaryOpen(true));
+                        openTasksSummaryModalize();
+                      }
+                    }}
+                  />
+                )}
+              </View>
+            )}
+
             <Menu
               visible={visible}
               onDismiss={closeMenu}
-              anchor={
-                <IconButton
-                  icon="dots-vertical"
-                  size={25}
-                  onPress={() => openMenu()}
-                />
-              }>
-              {currentTab === 'Invitations' && (
+              anchor={<IconButton icon="dots-vertical" size={25} onPress={() => openMenu()} />}>
+              {currentTab === 'Guests' && (
                 <View>
                   <Menu.Item
                     onPress={() => {
@@ -159,25 +206,25 @@ const Header = ({onOpen, group}) => {
                       dispatch(handleIsSearch(true));
                       dispatch(handleIsInvitationSearch(true));
                     }}
-                    title="Search for inviti"
+                    title="Search"
                     leadingIcon={'account-search'}
                   />
+                  <Divider />
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
-                      onOpen();
+                      openGuestsImportExportModalize();
                     }}
                     title="Import/Export"
                     leadingIcon={'microsoft-excel'}
                   />
-                  <Divider />
 
                   <Menu.Item
                     onPress={() => {
                       closeMenu();
                       navigation.navigate('AddMultipleInviti');
                     }}
-                    title="Add multiple inviti"
+                    title="Add multiple guests"
                     leadingIcon={'account-multiple-plus'}
                   />
                   <Menu.Item
@@ -185,12 +232,12 @@ const Header = ({onOpen, group}) => {
                       closeMenu();
                       navigation.navigate('MultipleInvitiActions');
                     }}
-                    title="Edit multiple inviti"
+                    title="Bulk actions"
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
                   />
                 </View>
               )}
-              {currentTab === 'Tasks' && (
+              {currentTab === 'To-do' && (
                 <View>
                   <Menu.Item
                     onPress={() => {
@@ -213,6 +260,16 @@ const Header = ({onOpen, group}) => {
                   />
                 </View>
               )}
+              <Divider />
+
+              <Menu.Item
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('GroupLogs');
+                }}
+                title="Group logs"
+                leadingIcon={'format-list-bulleted-type'}
+              />
             </Menu>
           </View>
         </Appbar>

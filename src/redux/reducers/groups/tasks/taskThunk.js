@@ -152,6 +152,11 @@ export const TasksApi = createApi({
       query: ({taskId}) => `/api/group/task/logs/${taskId}`,
       providesTags: ['TaskLogs'],
     }),
+
+    getTaskSummary: build.query({
+      query: ({groupId}) => `api/group/tasks/${groupId}/tasksSummary`,
+      providesTags: ['Tasks'],
+    }),
   }),
 });
 
@@ -167,5 +172,6 @@ export const {
   useUpdatePriorityMutation,
   useUpdateResponsiblesMutation,
   useAllLogsForTaskQuery,
-  useMarkAsCompletedMutation
+  useMarkAsCompletedMutation,
+  useGetTaskSummaryQuery
 } = TasksApi;

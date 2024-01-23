@@ -1,34 +1,36 @@
 // ==========================================
-//  Title:  AddInviti
 //  Author: Abdur Rahman
 //  createdAt:   26 Oct, 2022
 //  Modified by : -------
 // ==========================================
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
-import {Text} from 'react-native-paper'
+import {Text} from 'react-native-paper';
 import {FAB, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import TasksSkeleton from '../../../../Skeletons/Tasks';
 import {useGetAllTasksQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-import { handleTasks } from '../../../../../redux/reducers/groups/tasks/taskSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import {handleTasks} from '../../../../../redux/reducers/groups/tasks/taskSlice';
+import {useSelector, useDispatch} from 'react-redux';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
+import TasksAppbar from '../../../../../Components/Appbars/TasksAppbar';
+import {Modalize} from 'react-native-modalize';
+import TaskSummary from './TasksSummary';
+
 const Task = ({route}) => {
-  const {groupId} = route.params;
+  const {groupId, isHeader} = route.params;
 
   const navigation = useNavigation();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const [snackbarVisible, setSnackBarVisible] = useState(false)
+  const [snackbarVisible, setSnackBarVisible] = useState(false);
 
-  const {data, isError, isLoading, error, isFetching, refetch} =
-    useGetAllTasksQuery({
-      groupId,
-    });
-  
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetAllTasksQuery({
+    groupId,
+  });
+
   const tasksFromRedux = useSelector(state => state.tasks.tasks);
   const isTaskSearch = useSelector(state => state.tasks.isTasksSearch);
 
@@ -36,12 +38,22 @@ const Task = ({route}) => {
     navigation.navigate('AddTask', {groupId: groupId});
   };
 
-  useEffect(()=>{
-      dispatch(handleTasks(data))
-  },[data])
+  useEffect(() => {
+    dispatch(handleTasks(data));
+  }, [data]);
+
+  // tasks Summary modalize
+  const tasksSummaryModalizeRef = useRef(null);
+  const openTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.open();
+  };
+  const closeTasksSummaryModalize = () => {
+    tasksSummaryModalizeRef.current?.close();
+  };
 
   return (
-    <View style={{flex:1, backgroundColor:theme.colors.background}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+      {isHeader && <TasksAppbar openTasksSummaryModalize={openTasksSummaryModalize} />}
       {isLoading ? (
         <View style={{padding: '4%'}}>
           <TasksSkeleton />
@@ -57,9 +69,7 @@ const Task = ({route}) => {
           renderItem={({item}) => (
             <RenderItem item={item} setSnackBarVisible={setSnackBarVisible} />
           )}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
 
@@ -67,7 +77,11 @@ const Task = ({route}) => {
         icon="plus"
         size="medium"
         // variant='tertiary'
-        style={{bottom: snackbarVisible ? 70 : 16, right: 16, position:"absolute"}}
+        style={{
+          bottom: snackbarVisible ? 70 : 16,
+          right: 16,
+          position: 'absolute',
+        }}
         onPress={() => FABHandler()}
       />
 
@@ -76,17 +90,16 @@ const Task = ({route}) => {
         text={'Something went wrong'}
         onDismissHandler={setSnackBarVisible}
       />
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={tasksSummaryModalizeRef}
+        snapPoint={500}
+        handlePosition="inside">
+        <TaskSummary onClose={closeTasksSummaryModalize} />
+      </Modalize>
     </View>
   );
 };
 
 export default Task;
-
-const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-});

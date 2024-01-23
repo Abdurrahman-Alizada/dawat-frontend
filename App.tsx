@@ -31,15 +31,19 @@ import {
   Provider as PaperProvider,
   Snackbar,
 } from 'react-native-paper';
-import {PreferencesContext} from './src/themeContext';
-import {lightPalette} from './src/GlobalStyles';
+import {ThemeContext} from './src/themeContext';
+import {lightPalette, darkPalette} from './src/GlobalStyles';
 export const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   const CombinedDarkTheme = {
     ...PaperDarkTheme,
     ...NavigationDarkTheme,
-    colors: {...PaperDarkTheme?.colors, ...NavigationDarkTheme.colors},
+    colors: {
+      ...PaperDarkTheme?.colors,
+      ...NavigationDarkTheme.colors,
+      ...darkPalette,
+    },
   };
 
   const CombinedDefaultTheme = {
@@ -66,7 +70,7 @@ export const App = () => {
     [toggleTheme, isThemeDark],
   );
 
-  const [isNetSnackBarVisible, setIsNetSnackBarVisible ] = useState(false);
+  const [isNetSnackBarVisible, setIsNetSnackBarVisible] = useState(false);
 
   useLayoutEffect(() => {
     setTimeout(() => {
@@ -74,12 +78,11 @@ export const App = () => {
     }, 3000);
   }, []);
 
-
   // internet connection information
   const netInfo = useNetInfo();
 
   return (
-    <PreferencesContext.Provider value={preferences}>
+    <ThemeContext.Provider value={preferences}>
       <Provider store={store}>
         <PaperProvider theme={theme}>
           <NavigationContainer theme={theme}>
@@ -109,21 +112,21 @@ export const App = () => {
               />
             </Stack.Navigator>
 
-          {/* snackbar for checking internet connection */}
+            {/* snackbar for checking internet connection */}
             <Snackbar
               visible={!netInfo.isConnected && isNetSnackBarVisible}
-              duration={1000}
-              onDismiss={() => console.log('snackbar dismissed')}>
+              duration={5000}
+              onDismiss={() => setIsNetSnackBarVisible(false)}
+              icon={"close"}
+              onIconPress={()=>setIsNetSnackBarVisible(false)}
+              >
               You are currently offline.
             </Snackbar>
-
           </NavigationContainer>
         </PaperProvider>
       </Provider>
-    </PreferencesContext.Provider>
+    </ThemeContext.Provider>
   );
 };
 
 export default App;
-
-const styles = StyleSheet.create({});

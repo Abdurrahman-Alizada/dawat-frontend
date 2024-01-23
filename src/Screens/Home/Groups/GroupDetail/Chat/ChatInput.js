@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState} from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   KeyboardAvoidingView,
   TextInput,
@@ -10,16 +9,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useDispatch} from 'react-redux';
-import {addChat} from '../../../../../redux/reducers/groups/chat/chatSlice';
-
-import {addNewMessage} from '../../../../../redux/reducers/groups/chat/chatThunk';
 
 const ChatInput = ({message, setMessage, handleAddNewMessage}) => {
-  
   return (
     <View style={[styles.container]}>
-      
       <KeyboardAvoidingView style={styles.innerContainer}>
         <View style={styles.inputAndMicrophone}>
           <TextInput
@@ -95,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     height: '10%',
-    maxHeight:150
+    maxHeight: 150,
   },
   rightIconButtonStyle: {
     justifyContent: 'center',
