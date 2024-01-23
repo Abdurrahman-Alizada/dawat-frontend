@@ -1,6 +1,6 @@
 {
   "name": "eventplanner",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -26,6 +26,7 @@
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-confirmation-code-field": "^7.3.1",
+    "react-native-countdown-xambra": "^1.0.1",
     "react-native-csv": "^0.2.0",
     "react-native-date-picker": "^4.2.13",
     "react-native-document-picker": "^8.2.0",

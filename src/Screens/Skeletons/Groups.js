@@ -7,7 +7,7 @@ export default function GroupsList() {
     <View>
 
       {
-        [1,2,3,4,5,6].map((item,index)=>(
+        [1,2,3].map((item,index)=>(
       <View style={{marginTop:"4%"}} key={index} >
       <SkeletonPlaceholder borderRadius={4}>
         <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
@@ -22,14 +22,14 @@ export default function GroupsList() {
         ))
       }
 
-<View style={{marginTop:"7%"}} >
+{/* <View style={{marginTop:"7%"}} >
       <SkeletonPlaceholder borderRadius={4} >
         <SkeletonPlaceholder.Item alignItems="center" justifyContent="center" >
             <SkeletonPlaceholder.Item width="30%" height={10} />
             <SkeletonPlaceholder.Item marginTop={7} width="10%" height={10} />
         </SkeletonPlaceholder.Item>
       </SkeletonPlaceholder>
-      </View>
+      </View> */}
 
     </View>
   );

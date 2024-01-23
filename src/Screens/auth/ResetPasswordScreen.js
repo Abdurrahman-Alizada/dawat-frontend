@@ -1,10 +1,6 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 
-import {
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {StatusBar, StyleSheet, View} from 'react-native';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {
@@ -19,7 +15,7 @@ import {
 } from 'react-native-paper';
 import {useResetPasswordMutation} from '../../redux/reducers/user/userThunk';
 import {useDispatch} from 'react-redux';
-import { handlePasswordResetSuccessfully } from '../../redux/reducers/user/user';
+import {handlePasswordResetSuccessfully} from '../../redux/reducers/user/user';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -39,10 +35,9 @@ const ResetPasswordScreen = ({navigation, route}) => {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('Something went wrong');
 
-  const [resetPassword, {isLoading, isError, error}] =
-    useResetPasswordMutation();
+  const [resetPassword, {isLoading, isError, error}] = useResetPasswordMutation();
 
-    const submitHandler = async values => {
+  const submitHandler = async values => {
     resetPassword({
       id: route?.params?.user?._id,
       newPassword: values.password,
@@ -68,13 +63,10 @@ const ResetPasswordScreen = ({navigation, route}) => {
   };
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
           <Dialog.Title>Reset password error</Dialog.Title>
@@ -97,16 +89,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
           submitHandler(values);
           actions.resetForm();
         }}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          dirty, 
-          isValid 
-        }) => (
+        {({handleChange, handleBlur, handleSubmit, values, errors, touched, dirty, isValid}) => (
           <View
             style={{
               flex: 1,
@@ -122,6 +105,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
                   <TextInput.Icon
                     icon={showPassword ? 'eye' : 'eye-off'}
                     onPress={() => setShowPassword(!showPassword)}
+                    style={{marginTop: '2%', height: 55}}
                   />
                 }
                 mode="outlined"
@@ -132,9 +116,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
                 activeOutlineColor={theme.colors.secondary}
               />
               {errors.password && touched.password ? (
-                <Text style={{color: theme.colors.error}}>
-                  {errors.password}
-                </Text>
+                <Text style={{color: theme.colors.error}}>{errors.password}</Text>
               ) : null}
 
               <TextInput
@@ -145,21 +127,18 @@ const ResetPasswordScreen = ({navigation, route}) => {
                 right={
                   <TextInput.Icon
                     icon={showPasswordConfirmation ? 'eye' : 'eye-off'}
-                    onPress={() =>
-                      setShowPasswordConfirmation(!showPasswordConfirmation)
-                    }
+                    onPress={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
                   />
                 }
-                style={{marginVertical: '2%'}}
+          style={{marginTop: '2%', height:55}}
+
                 onChangeText={handleChange('passwordConfirmation')}
                 onBlur={handleBlur('passwordConfirmation')}
                 value={values.passwordConfirmation}
                 activeOutlineColor={theme.colors.secondary}
               />
               {errors.passwordConfirmation && touched.passwordConfirmation ? (
-                <Text style={{color: theme.colors.error}}>
-                  {errors.passwordConfirmation}
-                </Text>
+                <Text style={{color: theme.colors.error}}>{errors.passwordConfirmation}</Text>
               ) : null}
 
               {/* <List.Item
@@ -173,11 +152,11 @@ const ResetPasswordScreen = ({navigation, route}) => {
                 disabled={!(dirty && isValid)}
                 icon="check-bold"
                 style={{
-                  marginVertical: '3%',
+                  marginVertical: '5%',
                 }}
                 contentStyle={{padding: '3%'}}
                 buttonStyle={{padding: '1%'}}
-                theme={{roundness: 1}}
+                theme={{roundness: 10}}
                 mode="contained"
                 onPress={handleSubmit}
                 buttonColor={theme.colors.secondary}>

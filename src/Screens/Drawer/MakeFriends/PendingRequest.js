@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, FlatList, RefreshControl} from 'react-native';
+import { View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {
   useGetAllFriendsQuery,
@@ -6,16 +6,19 @@ import {
   useDeclineFriendRequestMutation,
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
-import {Button, List, Avatar} from 'react-native-paper';
+import {Button, List,Text, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
-const PendingRequest = ({route}) => {
+const PendingRequest = () => {
   const navigation = useNavigation();
+  const theme = useTheme();
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
+  const [selectedItems, setSelectedItems] = useState([]);
 
-  const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllFriendsQuery(currentLoginUser?._id);
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
+    currentLoginUser?._id,
+  );
 
   // single item to render
   const RenderItem = ({item}) => {
@@ -28,6 +31,7 @@ const PendingRequest = ({route}) => {
       useAcceptFriendRequestMutation();
 
     const handleAcceptFriendRequest = userB => {
+      setSelectedItems([...selectedItems, item._id]);
       setTextAfterAction(`You are now friend with ${item.name}.`);
       setClicked(true);
 
@@ -58,27 +62,38 @@ const PendingRequest = ({route}) => {
         title={item.name}
         description={() => (
           <View>
-            {clicked ? (
+            {clicked || selectedItems.includes(item._id) ? (
               <Text>{textAfterAction}</Text>
             ) : (
               <View
                 style={{
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: '5%',
+                  marginTop:"5%"
                 }}>
-                <Button
-                  style={{width: '48%'}}
-                  mode="contained"
-                  onPress={() => handleAcceptFriendRequest(item._id)}>
-                  Add
-                </Button>
-                <Button
-                  style={{width: '48%'}}
-                  mode="outlined"
-                  onPress={() => handleDeclineFriendRequest(item._id)}>
-                  Delete
-                </Button>
+                <TouchableOpacity
+                  onPress={() => handleAcceptFriendRequest(item._id)}
+                  style={{
+                    borderRadius: 5,
+                    width:"45%",
+                    paddingVertical:"3%",
+                    backgroundColor: theme.colors.primary,
+                  }}>
+                  <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Accept</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handleDeclineFriendRequest(item._id)}
+                  style={{
+                    borderRadius: 5,
+                    width:"45%",
+                    paddingVertical:"3%",
+                    backgroundColor: theme.colors.background,
+                    borderColor:theme.colors.error,
+                    borderWidth:1,
+                    marginHorizontal:"4%"
+                  }}>
+                  <Text style={{color: theme.colors.error, textAlign: 'center'}}>Delete</Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -88,9 +103,7 @@ const PendingRequest = ({route}) => {
             size={70}
             {...props}
             source={
-              item.imageURL
-                ? {uri: item.imageURL}
-                : require('../../../assets/drawer/male-user.png')
+              item.imageURL ? {uri: item.imageURL} : require('../../../assets/drawer/male-user.png')
             }
           />
         )}
@@ -101,6 +114,10 @@ const PendingRequest = ({route}) => {
   return (
     <View>
       {/* list of people who sent request to current login user */}
+      <Text
+        style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical: '2%'}}>
+        Friend requests <Text style={{color: theme.colors.error}}>{data?.requested?.length}</Text>
+      </Text>
       <FlatList
         data={data?.requested}
         ListEmptyComponent={() => (
@@ -124,9 +141,7 @@ const PendingRequest = ({route}) => {
           </View>
         )}
         renderItem={({item}) => <RenderItem item={item} />}
-        refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-        }
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
       />
     </View>
   );

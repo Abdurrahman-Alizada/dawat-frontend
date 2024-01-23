@@ -1,42 +1,40 @@
-import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native'
-import React, {useState} from 'react'
+import { View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
 import {
   useGetAllFriendsQuery,
   useAcceptFriendRequestMutation,
   useDeclineFriendRequestMutation,
 } from '../../../redux/reducers/Friendship/friendshipThunk';
-import { useSelector } from 'react-redux';
-import { Button, List, Avatar } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {Button,Text, List, Avatar, useTheme} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
 const PendingRequest = ({route}) => {
   const navigation = useNavigation();
-
+  const theme = useTheme();
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
 
-   const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllFriendsQuery(currentLoginUser?._id);
+  const [selectedItems, setSelectedItems] = useState([]);
 
-   const [acceptFriendRequest, {isLoading: acceptRequestLoading}] =
-  useAcceptFriendRequestMutation();
-const [declineFriendRequest, {isLoading: declineRequestLoading}] =
-  useDeclineFriendRequestMutation();
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
+    currentLoginUser?._id,
+  );
 
   // single item to render
   const RenderItem = ({item}) => {
     const [clicked, setClicked] = useState(false);
-    const [textAfterAction, setTextAfterAction] = useState('');
+    const [textAfterAction, setTextAfterAction] = useState(
+      `Request sent to ${item.name} has been deleted.`,
+    );
 
     const [declineFriendRequest, {isLoading: declineRequestLoading}] =
-    useDeclineFriendRequestMutation();
-
+      useDeclineFriendRequestMutation();
 
     const handleDeclineFriendRequest = userB => {
-      setTextAfterAction(`Request sent to ${item.name} has been deleted.`)
-      setClicked(true)
-      
+      setClicked(true);
+      setSelectedItems([...selectedItems, item._id]);
       declineFriendRequest({userA: currentLoginUser._id, userB: userB})
         .then(res => {
-          console.log(res.data);
+          console.log('freind request has been declined');
         })
         .catch(err => {
           console.log(err.message);
@@ -49,30 +47,19 @@ const [declineFriendRequest, {isLoading: declineRequestLoading}] =
         title={item.name}
         description={() => (
           <View>
-            {clicked ? (
+            {clicked || selectedItems.includes(item._id) ? (
               <Text>{textAfterAction}</Text>
             ) : (
-              <View
+              <TouchableOpacity
+                onPress={() => handleDeclineFriendRequest(item._id)}
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  borderRadius: 5,
+                  padding: '2%',
                   marginTop: '5%',
+                  backgroundColor: theme.colors.backdrop,
                 }}>
-                <Button
-                  style={{width: '48%'}}
-                  mode="contained"
-                  disabled
-                  // onPress={() => handleAcceptFriendRequest(item._id)}
-                  >
-                  Add
-                </Button>
-                <Button
-                  style={{width: '48%'}}
-                  mode="outlined"
-                  onPress={() => handleDeclineFriendRequest(item._id)}>
-                  Delete
-                </Button>
-              </View>
+                <Text style={{color: '#fff', textAlign: 'center'}}>Cancel</Text>
+              </TouchableOpacity>
             )}
           </View>
         )}
@@ -81,9 +68,7 @@ const [declineFriendRequest, {isLoading: declineRequestLoading}] =
             size={70}
             {...props}
             source={
-              item.imageURL
-                ? {uri: item.imageURL}
-                : require('../../../assets/drawer/male-user.png')
+              item.imageURL ? {uri: item.imageURL} : require('../../../assets/drawer/male-user.png')
             }
           />
         )}
@@ -91,12 +76,12 @@ const [declineFriendRequest, {isLoading: declineRequestLoading}] =
     );
   };
 
-
-
   return (
     <View>
       {/* list of people to whom current login user sent request */}
-
+      <Text style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical:"2%"}}>
+        Total request sent{' '} <Text style={{color: theme.colors.error}}>{data?.pending?.length}</Text>
+      </Text>
       <FlatList
         data={data?.pending}
         ListEmptyComponent={() => (
@@ -105,27 +90,24 @@ const [declineFriendRequest, {isLoading: declineRequestLoading}] =
             <Button
               icon="refresh"
               mode="contained"
-              style={{marginTop: '5%', marginHorizontal:"2%"}}
+              style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={refetch}>
               Refresh
             </Button>
             <Button
               icon="account-search"
               mode="text"
-              style={{marginTop: '5%',marginHorizontal:"2%"}}
-              onPress={()=>navigation.navigate('FriendsSuggestions')}
-              >
+              style={{marginTop: '5%', marginHorizontal: '2%'}}
+              onPress={() => navigation.navigate('FriendsSuggestions')}>
               Search for friends
             </Button>
-            </View>
+          </View>
         )}
         renderItem={({item}) => <RenderItem item={item} />}
-        refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-        }
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
       />
     </View>
-  )
-}
+  );
+};
 
-export default PendingRequest
+export default PendingRequest;

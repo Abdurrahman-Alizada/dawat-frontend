@@ -1,0 +1,25 @@
+import {View} from 'react-native';
+import React,{useContext} from 'react';
+import { List, Switch, Divider } from 'react-native-paper';
+import {ThemeContext} from '../../../../themeContext';
+
+const Index = ({navigation}) => {
+    const {toggleTheme, isThemeDark} = useContext(ThemeContext);
+
+    return (
+    <View>
+      <List.Item
+        title="Dark Mode"
+        onPress={() => toggleTheme()}
+        left={(props)=><List.Icon {...props} icon="weather-night" />}
+        right={() => (
+          <Switch value={isThemeDark} onValueChange={() => toggleTheme()} />
+        )}
+        style={{paddingVertical: '5%'}}
+      />
+      <Divider />
+    </View>
+  );
+};
+
+export default Index;

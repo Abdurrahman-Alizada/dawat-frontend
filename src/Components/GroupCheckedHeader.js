@@ -1,46 +1,48 @@
-import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {
-  Button,
-  Menu,
-  Divider,
-  Provider,
-  Appbar,
-  Searchbar,
-} from 'react-native-paper';
-import {useNavigation, DrawerActions} from '@react-navigation/native';
+import React from 'react';
+import {View} from 'react-native';
+import {Appbar, ActivityIndicator} from 'react-native-paper';
+import { useSelector} from 'react-redux';
 
-const Header = ({isSearch, deleteF, onOpen, groupName, checkedBack, theme}) => {
-  const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const [visible, setVisible] = React.useState(false);
+const Header = ({deleteF, deleteLoading, pinHandler, groupName, checkedBack, theme}) => {
+  const pinGroupLoading = useSelector(state => state.groups?.pinGroupLoading);
+  const selectedGroupLength = useSelector(state => state.groups?.selectedGroupLength);
 
-  const openMenu = () => setVisible(true);
-
-  const closeMenu = () => setVisible(false);
-  // end more menu
   return (
-    <>
-      <View>
-        <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
-          <Appbar.BackAction
-            color={theme.colors.onBackground}
-            onPress={() => checkedBack()}
-          />
-          <Appbar.Content
-            title={groupName}
-            titleStyle={{alignSelf: 'center'}}
-          />
+    <Appbar.Header elevated style={{backgroundColor: theme.colors.background}}>
+      <Appbar.Action
+        color={theme.colors.onBackground}
+        icon="close"
+        onPress={() => {
+          checkedBack();
+        }}
+      />
+      <Appbar.Content title={groupName} titleStyle={{alignSelf: 'center'}} />
+      {selectedGroupLength == 1 && (
+        <View>
+          {pinGroupLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <Appbar.Action
+              color={theme.colors.onBackground}
+              icon="pin"
+              onPress={() => pinHandler()}
+            />
+          )}
+        </View>
+      )}
 
-          <Appbar.Action
-            color={theme.colors.onBackground}
-            icon="delete-outline"
-            onPress={() => {
-              deleteF();
-            }}
-          />
-        </Appbar.Header>
-      </View>
-    </>
+      {deleteLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <Appbar.Action
+          color={theme.colors.error}
+          icon="delete"
+          onPress={() => {
+            deleteF();
+          }}
+        />
+      )}
+    </Appbar.Header>
   );
 };
 

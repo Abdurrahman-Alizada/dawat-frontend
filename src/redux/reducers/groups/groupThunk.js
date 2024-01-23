@@ -36,6 +36,18 @@ export const groupApi = createApi({
           isInvitations:group.isInvitations,
           isMute:group.isMute,
           users: group.members,
+          time: group.time
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
+    addMultipleGroup: build.mutation({
+      query: data => ({
+        url: `/api/group/addMultipleGroups`,
+        method: 'POST',
+        body: {
+          groups: data.groups,
         },
       }),
       invalidatesTags: ['Groups','GroupLogs'],
@@ -62,6 +74,18 @@ export const groupApi = createApi({
         body: {
           newGroupName: group.newGroupName,
           previousGroupName : group.previousGroupName,
+        },
+      }),
+      invalidatesTags: ['Groups','GroupLogs'],
+    }),
+
+    updateGroupTime: build.mutation({
+      query: group => ({
+        url: `/api/group/${group.groupId}/updateTime`,
+        method: 'PUT',
+        body: {
+          newGroupTime: group.newGroupTime,
+          previousGroupTime : group.previousGroupTime,
         },
       }),
       invalidatesTags: ['Groups','GroupLogs'],
@@ -98,6 +122,19 @@ export const groupApi = createApi({
           userId: group.userId,
         },
       }),
+
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
+        try {
+         dispatch(
+            groupApi.util.updateQueryData('getAllGroups', undefined, draft => {
+              return draft.filter(group => group._id !== arg?.chatId);
+            }),
+          );
+        } catch (err) {
+          console.log('error in delete query', err);
+        }
+      },
+
       invalidatesTags: ['Groups','GroupLogs'],
     }),
     addUserToGroup: build.mutation({
@@ -123,6 +160,8 @@ export const groupApi = createApi({
 export const {
   useGetAllGroupsQuery,
   useAddGroupMutation,
+  useUpdateGroupTimeMutation,
+  useAddMultipleGroupMutation,
   useDeleteGroupForUserMutation,
   useAddUserToGroupMutation,
   useUpdateGroupInfoMutation,

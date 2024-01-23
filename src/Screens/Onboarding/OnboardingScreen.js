@@ -101,7 +101,7 @@ const OnboardingScreen = ({navigation}) => {
           {currentSlideIndex == slides.length - 1 ? (
             <View style={{height: 50}}>
               <TouchableOpacity
-                style={[styles.btn, {backgroundColor: theme.colors.secondary}]}
+                style={[styles.btn, {backgroundColor: theme.colors.blueBG}]}
                 onPress={() => navigation.replace('Auth')}>
                 <Text
                   style={{
@@ -120,7 +120,7 @@ const OnboardingScreen = ({navigation}) => {
                 style={[
                   styles.btn,
                   {
-                    borderColor: theme.colors.secondary,
+                    borderColor: theme.colors.blueBG,
                     borderWidth: 1,
                     backgroundColor: 'transparent',
                   },
@@ -130,7 +130,7 @@ const OnboardingScreen = ({navigation}) => {
                   style={{
                     fontWeight: 'bold',
                     fontSize: 15,
-                    color: theme.colors.secondary,
+                    color: theme.colors.blueBG,
                   }}>
                   SKIP
                 </Text>
@@ -139,7 +139,7 @@ const OnboardingScreen = ({navigation}) => {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={goToNextSlide}
-                style={[styles.btn, {backgroundColor: theme.colors.secondary}]}>
+                style={[styles.btn, {backgroundColor: theme.colors.blueBG}]}>
                 <Text
                   style={{
                     fontWeight: 'bold',

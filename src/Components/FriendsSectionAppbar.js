@@ -17,54 +17,38 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
   const closeMenu = () => setVisible(false);
   // end more menu
   return (
-      <Appbar.Header elevated={true}
-      style={{backgroundColor: theme.colors.background}}
-      >
-        <Appbar.BackAction
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
+    <Appbar.Header elevated={true} style={{backgroundColor: theme.colors.background}}>
+      <Appbar.BackAction
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
 
-        <Appbar.Content
-          title="Friends circle"
-        />
-        <Appbar.Action
-          icon="magnify"
-          onPress={() => {
-            // setIsSearch(!isSearch);
-            navigation.navigate("FriendsSearch")
-          }}
-        />
+      <Appbar.Content title="Friends" />
+      <Appbar.Action
+        icon="magnify"
+        onPress={() => {
+          // setIsSearch(!isSearch);
+          navigation.navigate('FriendsSearch');
+        }}
+      />
 
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={
-            <Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />
-          }
-          contentStyle={{backgroundColor: theme.colors.background}}
-          >
-          <Menu.Item
-            leadingIcon="account-check"
-            onPress={async () => {
-                closeMenu()
-              navigation.navigate('SeeAllFriends');
-            }}
-            title="Your friends"
-          />
-          <Divider />
-          <Menu.Item
-            leadingIcon="account-arrow-right"
-            onPress={async () => {
-                closeMenu()
-              navigation.navigate('FriendsSuggestions');
-            }}
-            title="Suggestions"
-          />
-        </Menu>
-      </Appbar.Header>
-   );
+      <Menu
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={<Appbar.Action icon={MORE_ICON} onPress={() => openMenu()} />}
+        contentStyle={{backgroundColor: theme.colors.background}}>
+        <Menu.Item
+          leadingIcon="account-cancel"
+          onPress={async () => {
+            closeMenu();
+            navigation.navigate('DeletedFriendsSuggestions');
+          }}
+          title="Deleted suggestions"
+        />
+      </Menu>
+    </Appbar.Header>
+  );
 };
 
 export default Header;

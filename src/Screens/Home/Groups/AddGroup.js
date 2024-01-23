@@ -1,32 +1,38 @@
 import {TouchableOpacity, StyleSheet, View} from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {Modalize} from 'react-native-modalize';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
 import {
   Text,
-  Avatar,
   TextInput,
   IconButton,
   FAB,
   useTheme,
-  Button,
 } from 'react-native-paper';
-import AvatarModal from '../Menus/Profile/AvatarModal';
-
+import AvatarModal from '../../Drawer/Profile/AvatarModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch} from 'react-redux';
+import {handleCurrentBackgroundImgSrcId, handlePinGroup} from '../../../redux/reducers/groups/groups';
+import createRandomId from '../../../utils/createRandomId';
 const validationSchema = Yup.object().shape({
   groupName: Yup.string().required('Group name is required').label('groupName'),
   groupDescription: Yup.string().label('groupDescription'),
 });
 
 const AddGroup = ({navigation, onClose}) => {
-  const [users, setUsers] = useState([]);
+  const theme = useTheme();
+  const dispatch = useDispatch();
 
+  const [users, setUsers] = useState([]);
   const [fileData, setfileData] = useState(null);
   const fileDataRef = useRef(null);
   const [avatarURL, setAvatarURL] = useState('');
   const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+  const [token, setToken] = useState('');
 
   let openCamera = () => {
     onCloseModalize();
@@ -66,18 +72,6 @@ const AddGroup = ({navigation, onClose}) => {
       });
   };
 
-  let removePicture = () => {
-    ImagePicker.clean()
-      .then(() => {
-        setfileData(null);
-        fileDataRef.current = null;
-        setAvatarURL(false);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  };
-
   const submitHandler = async values => {
     if (fileDataRef.current) {
       const uri = fileDataRef.current?.path;
@@ -110,11 +104,35 @@ const AddGroup = ({navigation, onClose}) => {
         isInvitations: true,
         isMute: false,
         members: users,
+        time: JSON.stringify(dueDate),
       });
     }
   };
 
-  const theme = useTheme();
+  const createLocalGroup = async values => {
+    let group = {
+      _id: createRandomId(12),
+      isSyncd: false,
+      groupName: values.groupName,
+      groupDescription: values.groupDescription,
+      time: dueDate,
+    };
+    let groups = await AsyncStorage.getItem('groups');
+    if (groups) {
+      let data = JSON.parse(groups);
+      let newGroups = [...data, group];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+    } else {
+      let newGroups = [group];
+      await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
+      await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
+    }
+    await AsyncStorage.setItem(`pingroup_backgroundImage`, `${3}`);
+    dispatch(handleCurrentBackgroundImgSrcId(3));
+  
+    dispatch(handlePinGroup(group));
+    navigation.goBack();
+  };
 
   const modalizeRef = useRef(null);
   const onOpenModalize = () => {
@@ -125,6 +143,16 @@ const AddGroup = ({navigation, onClose}) => {
     modalizeRef.current?.close();
   };
 
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
+  const [dueDate, setDueDate] = useState(new Date());
+  const [openDueDate, setOpenDueDate] = useState(false);
+
   return (
     <View style={{flex: 1}}>
       <Formik
@@ -133,7 +161,9 @@ const AddGroup = ({navigation, onClose}) => {
           groupDescription: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={values => submitHandler(values)}>
+        onSubmit={values =>
+          token ? submitHandler(values) : createLocalGroup(values)
+        }>
         {({
           handleChange,
           handleBlur,
@@ -145,7 +175,7 @@ const AddGroup = ({navigation, onClose}) => {
           <View
             style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
             <View>
-              <TouchableOpacity onPress={onOpenModalize}>
+              {/* <TouchableOpacity onPress={onOpenModalize}>
                 {fileData ? (
                   <Avatar.Image
                     source={{uri: fileData.path}}
@@ -172,17 +202,17 @@ const AddGroup = ({navigation, onClose}) => {
               </TouchableOpacity>
               {(fileData || avatarURL) && (
                 <Button
-                  // style={{marginTop: '5%'}}
                   icon="delete"
                   mode="text"
                   onPress={removePicture}>
                   Remove image
                 </Button>
-              )}
+              )} */}
               <TextInput
                 style={{marginTop: '4%'}}
                 error={errors.groupName && touched.groupName ? true : false}
-                label="Group Name"
+                label={`Group Name (${30 - values.groupName.length})`}
+                maxLength={30}
                 mode="outlined"
                 onChangeText={handleChange('groupName')}
                 onBlur={handleBlur('groupName')}
@@ -201,15 +231,13 @@ const AddGroup = ({navigation, onClose}) => {
                     ? true
                     : false
                 }
-                // placeholder="Group Description"
                 label={`Group Description (${
-                  99 - values.groupDescription.length
+                  60 - values.groupDescription.length
                 })`}
                 mode="outlined"
                 multiline
-                maxLength={99}
-                numberOfLines={3}
-                // style={{marginVertical: '2%', width: '85%'}}
+                maxLength={60}
+                numberOfLines={2}
                 onChangeText={handleChange('groupDescription')}
                 onBlur={handleBlur('groupDescription')}
                 value={values.groupDescription}
@@ -218,15 +246,64 @@ const AddGroup = ({navigation, onClose}) => {
                 <Text style={styles.error}>{errors.groupDescription}</Text>
               ) : null}
             </View>
-
-            <FAB
-              icon="arrow-right"
-              label="Next"
-              style={styles.fab}
-              // disabled={isAddButtonDisable}
-              // loading={isAddButtonDisable}
-              onPress={handleSubmit}
+            {token ? (
+              <FAB
+                icon="arrow-right"
+                label="Next"
+                style={styles.fab}
+                onPress={handleSubmit}
+              />
+            ) : (
+              <FAB
+                icon="plus"
+                label="Add"
+                style={styles.fab}
+                // disabled={isAddButtonDisable}
+                // loading={isAddButtonDisable}
+                onPress={handleSubmit}
+              />
+            )}
+            <DatePicker
+              date={dueDate}
+              open={openDueDate}
+              modal
+              onConfirm={date => {
+                setDueDate(date);
+                setOpenDueDate(false);
+              }}
+              onCancel={() => {
+                setOpenDueDate(false);
+              }}
             />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginVertical: '4%',
+              }}>
+              <View style={{width: '100%', marginTop: '2%'}}>
+                <Text style={{fontWeight: 'bold'}}>Time</Text>
+                <TouchableOpacity
+                  onPress={() => setOpenDueDate(true)}
+                  style={{
+                    borderRadius: 5,
+                    borderColor: '#C1C2B8',
+                    borderWidth: 0.5,
+                    paddingLeft: '4%',
+                    marginVertical: '2%',
+                    textAlign: 'center',
+                    flexDirection:"row",
+                    alignItems:"center",
+                    justifyContent:"space-between"
+                  }}>
+                  <Text style={{fontWeight: 'bold'}}>
+                    {moment(dueDate).format('lll')}
+                  </Text>
+                  <IconButton icon={"pencil"} />
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         )}
       </Formik>

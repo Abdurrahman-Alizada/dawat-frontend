@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {TouchableWithoutFeedback, View, Image} from 'react-native';
+import {TouchableWithoutFeedback, View} from 'react-native';
 import {
   Avatar,
   Appbar,
@@ -20,7 +20,7 @@ import {
 } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import {FlashList} from '@shopify/flash-list';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useAddMultipleInvitiMutation} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import {useNavigation} from '@react-navigation/native';
 import Animated, {
@@ -33,16 +33,19 @@ import Animated, {
 import {jsonToCSV} from 'react-native-csv';
 import RNFS from 'react-native-fs';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import createRandomId from '../../../../../utils/createRandomId';
 
 export default function DisplayCsvDataTable({props, route}) {
   const navigation = useNavigation();
   const theme = useTheme();
+  const dispatch = useDispatch();
 
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
-  const [addMultipleInviti, {isLoading: addMultipleInvitiLoading}] =
-    useAddMultipleInvitiMutation();
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const invitiFlag = useSelector(state => state.invitations.invitiFlag);
+
+  const [addMultipleInviti, {isLoading: addMultipleInvitiLoading}] = useAddMultipleInvitiMutation();
 
   const invitiArray = route.params?.data ? route.params?.data : [];
   const [invitiToDisplay, setInvitiToDisplay] = useState(null);
@@ -58,11 +61,15 @@ export default function DisplayCsvDataTable({props, route}) {
       ) {
         const jsonStrings = invitiArray.map(inviti => {
           let object = {
+            _id : createRandomId(12),
             invitiName: inviti[0],
             invitiDescription: inviti[1],
             invitiImageURL: inviti[6] ? inviti[6] : '',
-            lastStatus: inviti[4],
+            lastStatus: {invitiStatus:  inviti[4], addedBy :{name:"You"}},
             group: currentViewingGroup._id,
+            groupId: currentViewingGroup._id,
+            isSync : false,
+            addedBy : {name:"You"}
           };
           return object;
         });
@@ -83,6 +90,14 @@ export default function DisplayCsvDataTable({props, route}) {
     stringToJsonHandler();
   }, []);
 
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
+
   const AddMultipleHandler = () => {
     if (invitiToDisplay?.length) {
       addMultipleInviti({
@@ -90,7 +105,6 @@ export default function DisplayCsvDataTable({props, route}) {
         invities: invitiToDisplay,
       })
         .then(res => {
-          console.log(res);
           navigation.goBack();
         })
         .catch(e => {
@@ -102,6 +116,17 @@ export default function DisplayCsvDataTable({props, route}) {
     }
   };
 
+  const createMultipleLocalInvities = async () => {
+    let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
+    if (guests) {
+      guests = [...guests, ...invitiToDisplay];
+    } else {
+      guests = invitiToDisplay;
+    }
+    await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    navigation.goBack();
+  };
   // new inviti
   const [visible, setVisible] = useState(false);
   const [statuses, setStatuses] = useState([
@@ -113,11 +138,6 @@ export default function DisplayCsvDataTable({props, route}) {
 
   const [newInvitiName, setNewInvitiName] = useState('');
   const [newInvitiDescription, setNewInvitiDescription] = useState('');
-
-  // fab
-  const [state, setState] = useState({open: false});
-  const onStateChange = ({open}) => setState({open});
-  const {open} = state;
 
   // snackbar
   const [SnackbarVisible, setSnackbarVisible] = useState(false);
@@ -146,7 +166,6 @@ export default function DisplayCsvDataTable({props, route}) {
 
     RNFS.writeFile(path, results, 'utf8')
       .then(success => {
-        console.log('FILE WRITTEN!', success);
         setSnackbarText('Sample file has been downloaded in download folder');
         setSnackbarVisible(true);
         setBannerVisible(false);
@@ -182,18 +201,12 @@ export default function DisplayCsvDataTable({props, route}) {
     };
 
     const [invitiToEditName, setInvitiToEditName] = useState(item.invitiName);
-    const [invitiToEditDescription, setInvitiToEditDescription] = useState(
-      item.invitiDescription,
-    );
+    const [invitiToEditDescription, setInvitiToEditDescription] = useState(item.invitiDescription);
 
     const [visibleSingle, setVisibleSingle] = useState(false);
-    const [statusesSingle, setStatusesSingle] = useState([
-      {label: 'Invited', value: 'invited'},
-      {label: 'Rejected', value: 'rejected'},
-      {label: 'Pending', value: 'pending'},
-    ]);
+
     const [selectedstatusSingle, setSelectedStatusSingle] = useState(
-      item.lastStatus,
+      item.lastStatus?.invitiStatus ? item.lastStatus?.invitiStatus : item.lastStatus,
     );
 
     return (
@@ -202,18 +215,23 @@ export default function DisplayCsvDataTable({props, route}) {
           <View>
             <DataTable.Row style={{borderBottomWidth: 0}}>
               <DataTable.Cell>
-                <Avatar.Image
-                  source={{
-                    uri: item?.invitiImageURL
-                      ? item?.invitiImageURL
-                      : 'https://res.cloudinary.com/dblhm3cbq/image/upload/v1673329063/avatars-for-user-profile/Bear_nvybp5.png',
-                  }}
-                  size={40}
-                />
+                {item?.invitiImageURL ? (
+                  <Avatar.Image
+                    source={{
+                      uri: item?.invitiImageURL,
+                    }}
+                    size={40}
+                  />
+                ) : (
+                  <Avatar.Text label={item.invitiName?.charAt(0)} size={40} />
+                )}
               </DataTable.Cell>
               <DataTable.Cell>{item.invitiName}</DataTable.Cell>
               <DataTable.Cell>{item.invitiDescription}</DataTable.Cell>
-              <DataTable.Cell>{item.lastStatus}</DataTable.Cell>
+              <DataTable.Cell>{
+              // item.lastStatus?.invitiStatus
+              item.lastStatus?.invitiStatus ? item.lastStatus?.invitiStatus : item.lastStatus
+              }</DataTable.Cell>
             </DataTable.Row>
             <Animated.View style={[{overflow: 'hidden'}, bodyHeight]}>
               <View
@@ -229,13 +247,7 @@ export default function DisplayCsvDataTable({props, route}) {
                   }}>
                   <View style={{flexDirection: 'row'}}>
                     <Chip
-                      icon={() => (
-                        <Icon
-                          name="edit"
-                          size={16}
-                          color={theme.colors.onBackground}
-                        />
-                      )}
+                      icon={() => <Icon name="edit" size={16} color={theme.colors.onBackground} />}
                       style={{marginLeft: '4%'}}
                       textStyle={{color: theme.colors.onBackground}}
                       mode="flat"
@@ -248,13 +260,7 @@ export default function DisplayCsvDataTable({props, route}) {
                       Edit
                     </Chip>
                     <Chip
-                      icon={() => (
-                        <Icon
-                          name="trash"
-                          size={16}
-                          color={theme.colors.onBackground}
-                        />
-                      )}
+                      icon={() => <Icon name="trash" size={16} color={theme.colors.onBackground} />}
                       style={{marginLeft: '4%'}}
                       textStyle={{color: theme.colors.onBackground}}
                       mode="flat"
@@ -274,9 +280,7 @@ export default function DisplayCsvDataTable({props, route}) {
           </View>
         </TouchableWithoutFeedback>
         <Portal>
-          <Dialog
-            visible={visibleSingle}
-            onDismiss={() => setVisibleSingle(false)}>
+          <Dialog visible={visibleSingle} onDismiss={() => setVisibleSingle(false)}>
             <Dialog.ScrollArea>
               <View>
                 <TextInput
@@ -302,14 +306,8 @@ export default function DisplayCsvDataTable({props, route}) {
                     {statuses.map((statuse, index) => (
                       <Chip
                         key={index}
-                        selected={
-                          selectedstatusSingle === statuse.value ? true : false
-                        }
-                        mode={
-                          selectedstatusSingle === statuse.value
-                            ? 'flat'
-                            : 'outlined'
-                        }
+                        selected={selectedstatusSingle === statuse.value ? true : false}
+                        mode={selectedstatusSingle === statuse.value ? 'flat' : 'outlined'}
                         style={{marginRight: '2%', marginVertical: '2%'}}
                         onPress={() => {
                           setSelectedStatusSingle(statuse.value);
@@ -333,11 +331,13 @@ export default function DisplayCsvDataTable({props, route}) {
               <Button
                 onPress={() => {
                   let newInvitiToAdd = {
+                    _id : createRandomId(12),
                     invitiName: invitiToEditName,
                     invitiDescription: invitiToEditDescription,
                     invitiImageURL: item.invitiImageURL,
                     lastStatus: selectedstatusSingle,
                     group: currentViewingGroup._id,
+                    addedBy : {name: "You"}
                   };
                   let tempArr = [...invitiToDisplay];
                   tempArr[index] = newInvitiToAdd;
@@ -355,9 +355,25 @@ export default function DisplayCsvDataTable({props, route}) {
   };
 
   return (
-    <Provider>
-    
+    <View style={{flex:1}}>
+      <Appbar
+        style={{
+          backgroundColor: theme.colors.background,
+          marginBottom: 2,
+        }}
+        elevated
+        // mode="medium"
+      >
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title={`Add multiple invities`} style={{color:theme.colors.onBackground}} />
 
+        <Appbar.Action
+          icon="account-plus"
+          iconColor={theme.colors.error}
+          style={{marginHorizontal: '3%'}}
+          onPress={() => setVisible(true)}
+        />
+      </Appbar>
 
       <Banner
         visible={bannerVisible}
@@ -374,6 +390,42 @@ export default function DisplayCsvDataTable({props, route}) {
         icon={({size}) => <Avatar.Icon size={size} icon="format-list-text" />}>
         {bannerText}
       </Banner>
+
+      <DataTable style={{flex: 1}}>
+        <FlashList
+          data={invitiToDisplay}
+          estimatedItemSize={150}
+          initialNumToRender={10}
+          ref={listRef}
+          ListHeaderComponent={() => (
+            <View>
+              {invitiToDisplay && (
+                <DataTable.Header>
+                  <DataTable.Cell>
+                    <DataTable.Title>Profile</DataTable.Title>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <DataTable.Title>Name</DataTable.Title>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <DataTable.Title>Description</DataTable.Title>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <DataTable.Title>Status</DataTable.Title>
+                  </DataTable.Cell>
+                </DataTable.Header>
+              )}
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{flex: 1, alignItems: 'center', marginTop: '20%'}}>
+              <Text>List is empty</Text>
+              <Text>Press FAB button to add new inviti</Text>
+            </View>
+          )}
+          renderItem={({item, index}) => <AccordionItem item={item} index={index} />}
+        />
+      </DataTable>
 
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(false)}>
@@ -404,14 +456,10 @@ export default function DisplayCsvDataTable({props, route}) {
                     <Chip
                       key={index}
                       selected={selectedstatus === statuse.value ? true : false}
-                      mode={
-                        selectedstatus === statuse.value ? 'flat' : 'outlined'
-                      }
+                      mode={selectedstatus === statuse.value ? 'flat' : 'outlined'}
                       style={{marginRight: '2%', marginVertical: '2%'}}
                       onPress={() => {
                         setSelectedStatus(statuse.value);
-                        // setStatus(statuse.value);
-                        // setIsEditStart(true);
                       }}>
                       {statuse.label}
                     </Chip>
@@ -432,11 +480,17 @@ export default function DisplayCsvDataTable({props, route}) {
             <Button
               onPress={() => {
                 let newInvitiToAdd = {
+                  _id : createRandomId(12),
                   invitiName: newInvitiName,
                   invitiDescription: newInvitiDescription,
                   invitiImageURL: '',
-                  lastStatus: selectedstatus,
+                  lastStatus: {
+                    invitiStatus: selectedstatus,
+                    addedBy: {name: 'You'},
+                  },
                   group: currentViewingGroup._id,
+                  isSync: false,
+                  addedBy : {name: "You"}
                 };
                 setInvitiToDisplay(prevState =>
                   prevState ? [newInvitiToAdd, ...prevState] : [newInvitiToAdd],
@@ -451,84 +505,30 @@ export default function DisplayCsvDataTable({props, route}) {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Appbar
+
+      <FAB
+        label="Add listed invitie(s)"
+        disabled={addMultipleInvitiLoading}
+        icon={
+          addMultipleInvitiLoading
+            ? () => <ActivityIndicator animating />
+            : 'account-multiple-check'
+        }
         style={{
-          backgroundColor: theme.colors.background,
-          marginBottom: 2,
+          position: 'absolute',
+          margin: 16,
+          right: 0,
+          bottom: 0,
         }}
-        elevated
-        // mode="medium"
-        >
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`Add multiple invities`} />
-
-
-        <Appbar.Action
-          icon="account-plus"
-          iconColor={theme.colors.error}
-          style={{marginHorizontal: '3%'}}
-          onPress={() => setVisible(true)}
-        />
-      </Appbar>
-    
-
-      <DataTable style={{flex: 1}}>
-        <FlashList
-          data={invitiToDisplay}
-          estimatedItemSize={150}
-          initialNumToRender={10}
-          ref={listRef}
-          ListHeaderComponent={() => (
-            <View>
-              {invitiToDisplay && (
-                <DataTable.Header>
-                  <DataTable.Cell>
-                    <DataTable.Title></DataTable.Title>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <DataTable.Title>Name</DataTable.Title>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <DataTable.Title>Description</DataTable.Title>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <DataTable.Title>Status</DataTable.Title>
-                  </DataTable.Cell>
-                </DataTable.Header>
-              )}
-            </View>
-          )}
-          ListEmptyComponent={() => (
-            <View style={{flex: 1, alignItems: 'center', marginTop: '20%'}}>
-              <Text>List is empty</Text>
-              <Text>Press FAB button to add new inviti</Text>
-            </View>
-          )}
-          renderItem={({item, index}) => (
-            <AccordionItem item={item} index={index} />
-          )}
-        />
-      </DataTable>
-
-        <FAB
-          label='Add listed invitie(s)'
-          disabled={addMultipleInvitiLoading}
-          icon={addMultipleInvitiLoading ? ()=><ActivityIndicator animating /> : "account-multiple-check"}
-          style={{
-            position: 'absolute',
-            margin: 16,
-            right: 0,
-            bottom: 0,
-          }}
-          onPress={() => AddMultipleHandler()}
-        />
+        onPress={() => (token ? AddMultipleHandler() : createMultipleLocalInvities())}
+      />
 
       <Snackbar
-        visible={SnackbarVisible}
+        visible={SnackbarVisible && token}
         duration={2000}
         onDismiss={() => setSnackbarVisible(false)}>
         {SnackbarText}
       </Snackbar>
-    </Provider>
+    </View>
   );
 }

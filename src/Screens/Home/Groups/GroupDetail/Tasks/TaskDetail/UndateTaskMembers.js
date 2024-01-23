@@ -108,7 +108,7 @@ const AddGroup = ({navigation, onClose, route}) => {
                 source={
                   itemProps?.imageURL
                     ? {uri: itemProps?.imageURL}
-                    : require('../../../../../../assets/drawer/userImage.png')
+                    : require('../../../../../../assets/drawer/male-user.png')
                 }
               />
             </View>

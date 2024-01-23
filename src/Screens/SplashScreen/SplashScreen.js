@@ -1,27 +1,27 @@
 // Import React and Component
 import React, {useLayoutEffect, useEffect, useRef} from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  StatusBar,
-} from 'react-native';
+import {View, StatusBar, Image} from 'react-native';
 
-import GlobalStyles from '../../GlobalStyles';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTheme, Text, Avatar} from 'react-native-paper';
+import {version} from '../../../package.json';
+import {useDispatch} from 'react-redux';
+import {handleCurrentLoaginUser} from '../../redux/reducers/user/user';
+import {
+  handleCurrentBackgroundImgSrcId,
+  handlePinGroupId,
+} from '../../redux/reducers/groups/groups';
 
 const SplashScreen = ({navigation}) => {
+  const dispatch = useDispatch();
+  const theme = useTheme();
 
   const isAppFirstLaunched = useRef(true); //onboarding screen decision
 
   useEffect(() => {
     const firstLaunch = async () => {
-      const appData = await AsyncStorage.getItem('isAppFirstLaunched1').then(
-        value => value,
-      );
-
-      console.log(appData);
+      const appData = await AsyncStorage.getItem('isAppFirstLaunched1').then(value => value);
       if (appData) {
         isAppFirstLaunched.current = false;
       } else {
@@ -33,87 +33,59 @@ const SplashScreen = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-      //Check if user_id is set or not If not then send for Authentication else send to Home Screen
-     
-      AsyncStorage.getItem('isLoggedIn')
-        .then(value => {
-          // setTimeout(() => {
-            isAppFirstLaunched.current
-              ? navigation.replace('Onboarding')
-              : navigation.replace(!value ? 'Auth' : 'Drawer');
-          // }, 2000);
-     
-          })
-        .catch(err => {
-          console.log(err);
+    // getCurrentBackgroundImage();
+    AsyncStorage.getItem('isLoggedIn')
+      .then(value => {
+        AsyncStorage.getItem('userId').then(id => {
+          dispatch(handleCurrentLoaginUser({_id: id}));
+          AsyncStorage.getItem('pinGroupId').then(pinGroupId => {
+            dispatch(handlePinGroupId(pinGroupId));
+            AsyncStorage.getItem('pingroup_backgroundImage').then(bgImgid => {
+              dispatch(handleCurrentBackgroundImgSrcId(bgImgid ? bgImgid : 0));
+              isAppFirstLaunched?.current
+                ? navigation.replace('Onboarding')
+                : navigation.replace(!value ? 'Auth' : 'Drawer');
+            });
+          });
         });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }, []);
 
-
-  useLayoutEffect( () => {
-  const fun = async()=>{
-   await axios.get(`https://dawat-backend.onrender.com`);
-  }
-  fun();
-}, [])
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.blueBG,
+      }}>
+        <StatusBar
+        barStyle={'light-content'}
+        backgroundColor={'#6288EF'}
+      />
 
-      <View style={{flexDirection: 'row', alignItems: "center"}}>
-        <View style={{alignItems: 'center'}}>
-          <View
-            style={{
-              width: 55,
-              height: 55,
-              borderRadius: 100 / 2,
-              borderWidth: 9,
-              borderColor: '#3557b7',
-            }}
-          >
-
-          </View>
-
-          <View
-            style={{
-              width: 18.3,
-              height: 18.3,
-              alignSelf: 'flex-end',
-              borderRadius: 100 / 2,
-              backgroundColor: '#F77A55',
-            }}
-          />
-        </View>
-        <View style={{marginHorizontal:"5%",}}>
-
-        <Text
+      <View
+        style={{
+          flex: 0.95,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.colors.blueBG,
+        }}>
+        <StatusBar barStyle="light-content" backgroundColor={theme.colors.blueBG} />
+        <Image
           style={{
-            color: '#3E3F41',
-            fontSize: 31,
-            fontWeight: 'bold',
-            letterSpacing: 5,
-          }}>
-          Event 
-        </Text>
-        <Text
-          style={{
-            color: '#3E3F41',
-            fontSize: 29,
-            letterSpacing: 1,
-          }}>
-          Planner 
-        </Text>
-        </View>
+            width: 100,
+            height: 100,
+          }}
+          source={require('../../assets/logo/logo.png')}
+        />
       </View>
+      <Text style={{fontWeight: 'bold', color: theme.colors.onPrimary}}>V {version}</Text>
     </View>
   );
 };
 
 export default SplashScreen;
-
-const styles = StyleSheet.create({
-  container: GlobalStyles.container,
-
-  image: {width: 260, height: 260, resizeMode: 'stretch'},
-});

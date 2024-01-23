@@ -16,6 +16,7 @@ import {useDispatch} from 'react-redux';
 import {selectedMessageIdsClearHandler} from '../../../../redux/reducers/groups/chat/chatSlice';
 import InvitaionsSummary from './Invitations/invitaionsSummary';
 import TasksSummary from './Tasks/TasksSummary';
+import ImportExport from './Invitations/importExport'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -31,16 +32,17 @@ const Tabs = ({groupId, navigation}) => {
           // fontSize: 17,
           fontWeight: 'bold',
           textTransform: 'none',
-          justifyContent: 'space-evenly',
+          // justifyContent: 'space-evenly',
         },
         // tabBarScrollEnabled: true,
         tabBarStyle: {
-          backgroundColor: theme.colors.elevation.level2,
+          // backgroundColor: theme.colors.elevation.level2,
+          backgroundColor: theme.colors.background,
         },
         // tabBarItemStyle: {width: 'auto',marginLeft:10},
         // tabBarIndicatorStyle: {marginLeft:10},
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Logs"
         initialParams={{groupId: groupId}}
         component={GroupLogs}
@@ -66,7 +68,7 @@ const Tabs = ({groupId, navigation}) => {
           ),
           tabBarLabel: () => null,
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Guests"
@@ -155,10 +157,12 @@ const Index = ({route, navigation}) => {
         ref={importExportModalizeRef}
         handlePosition="inside"
         snapPoint={400}>
-        <GroupBrief
+        {/* <GroupBrief
           group={route.params.group}
           onClose={onCloseGuestsImportExport}
-        />
+        /> */}
+        <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
+
       </Modalize>
 
       <Modalize

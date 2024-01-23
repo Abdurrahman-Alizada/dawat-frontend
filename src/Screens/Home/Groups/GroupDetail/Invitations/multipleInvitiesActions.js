@@ -1,5 +1,5 @@
-import React, {useRef, useState} from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {View, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -16,57 +16,97 @@ import {
   IconButton,
   Divider,
 } from 'react-native-paper';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {FlashList} from '@shopify/flash-list';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   useDeleteMultipleInvitiMutation,
   useUpdateStatusOfMultipleInvitiesMutation,
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 
 const BOTTOM_APPBAR_HEIGHT = 70;
 
 const MultipleInvitiAction = ({navigation}) => {
   const theme = useTheme();
   const {bottom} = useSafeAreaInsets();
+  const dispatch = useDispatch();
 
-  const invitaionsForSearch = useSelector(
-    state => state.invitations.invitations,
-  );
-  const currentViewingGroup = useSelector(
-    state => state.groups.currentViewingGroup,
-  );
+  const invitationsForSearch = useSelector(state => state.invitations.invitations);
+  const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
+  const invitiFlag = useSelector(state => state.invitations.invitiFlag);
 
-  const [deleteMultipleInviti, {isLoading, error, isError}] =
-    useDeleteMultipleInvitiMutation();
+  const [deleteMultipleInviti, {isLoading, error, isError}] = useDeleteMultipleInvitiMutation();
   const deleteMultipleInvitiHandler = async () => {
-    deleteMultipleInviti({
-      invities: ids,
-      groupId: currentViewingGroup._id,
-    }).then(resp => {
-      if (resp.data.deletedInvitis?.deletedCount) {
-        navigation.goBack();
-      }
-    });
+    if (token) {
+      deleteMultipleInviti({
+        invities: ids,
+        groupId: currentViewingGroup._id,
+      }).then(resp => {
+        if (resp.data.deletedInvitis?.deletedCount) {
+          // navigation.goBack();
+          deleteInvitiLocal();
+        }
+      });
+    } else {
+      deleteInvitiLocal();
+    }
   };
 
-  const [
-    updateStatusOfMultipleInvities,
-    {isLoading: multipleStatusUpdateLoading},
-  ] = useUpdateStatusOfMultipleInvitiesMutation();
+  const deleteInvitiLocal = async () => {
+    let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
+    guests = guests.filter(object => {
+      return !ids.includes(object._id);
+    });
+    await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    guests = null;
+    navigation.goBack();
+  };
+
+  const [updateStatusOfMultipleInvities, {isLoading: multipleStatusUpdateLoading}] =
+    useUpdateStatusOfMultipleInvitiesMutation();
 
   const [currentStatus, setcurrentStatus] = useState('');
 
   const updateStatusOfMultipleInvitiHandler = async lastStatus => {
-    setcurrentStatus(lastStatus);
-    updateStatusOfMultipleInvities({
-      invities: ids,
-      lastStatus: lastStatus,
-      groupId: currentViewingGroup._id,
-    }).then(resp => {
-      console.log(resp);
-      navigation.goBack();
+    if (token) {
+      setcurrentStatus(lastStatus);
+      updateStatusOfMultipleInvities({
+        invities: ids,
+        lastStatus: lastStatus,
+        groupId: currentViewingGroup._id,
+      }).then(resp => {
+        // console.log(resp);
+        // navigation.goBack();
+      updateInvitiLocal(lastStatus);
+
+      });
+    } else {
+      updateInvitiLocal(lastStatus);
+    }
+  };
+
+  const updateInvitiLocal = async lastStatus => {
+    let guests = JSON.parse(await AsyncStorage.getItem(`guests_${currentViewingGroup?._id}`));
+    let guestsToUpdate = guests.filter(object => {
+      return ids.includes(object._id);
     });
+
+    let updatedGuests = guestsToUpdate.map(obj => {
+      return {...obj, lastStatus: {addedBy: {name: 'You'}, invitiStatus: lastStatus}};
+    });
+
+    let guestsNotToUpdate = guests.filter(object => {
+      return !ids.includes(object._id);
+    });
+
+    guests = [...updatedGuests, ...guestsNotToUpdate];
+    await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
+    dispatch(handleInvitiFlag(!invitiFlag));
+    (guests = null), (guestsToUpdate = null), (guestsNotToUpdate = null);
+    navigation.goBack();
   };
 
   const idsRef = useRef([]);
@@ -100,11 +140,7 @@ const MultipleInvitiAction = ({navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Checkbox
-                {...props}
-                status={include ? 'checked' : 'unchecked'}
-                onPress={add}
-              />
+              <Checkbox {...props} status={include ? 'checked' : 'unchecked'} onPress={add} />
               <Avatar.Image
                 size={45}
                 avatarStyle={{borderRadius: 20}}
@@ -118,16 +154,14 @@ const MultipleInvitiAction = ({navigation}) => {
           )}
           style={{
             paddingVertical: '1%',
-            backgroundColor: include
-              ? theme.colors.elevation.level1
-              : theme.colors.background,
+            backgroundColor: include ? theme.colors.elevation.level1 : theme.colors.background,
           }}
           right={props => {
-            if (item.lastStatus.invitiStatus === 'invited')
+            if (item.lastStatus?.invitiStatus === 'invited')
               return <List.Icon {...props} icon="check" />;
-            if (item.lastStatus.invitiStatus === 'pending')
+            if (item.lastStatus?.invitiStatus === 'pending')
               return <List.Icon {...props} icon="clock-outline" />;
-            else if (item.lastStatus.invitiStatus === 'rejected')
+            else if (item.lastStatus?.invitiStatus === 'rejected')
               return <List.Icon {...props} icon="cancel" />;
           }}
         />
@@ -146,12 +180,17 @@ const MultipleInvitiAction = ({navigation}) => {
 
   // dialoges
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const [markAsInvitedDialogVisible, setMarkAsInvitedDialogVisible] =
-    useState(false);
-  const [markAsRejectedDialogVisible, setMarkAsRejectedDialogVisible] =
-    useState(false);
-  const [markAsPendingDialogVisible, setMarkAsPendingDialogVisible] =
-    useState(false);
+  const [markAsInvitedDialogVisible, setMarkAsInvitedDialogVisible] = useState(false);
+  const [markAsRejectedDialogVisible, setMarkAsRejectedDialogVisible] = useState(false);
+  const [markAsPendingDialogVisible, setMarkAsPendingDialogVisible] = useState(false);
+
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    const getToken = async () => {
+      setToken(await AsyncStorage.getItem('token'));
+    };
+    getToken();
+  }, []);
 
   return (
     <View style={{flex: 1}}>
@@ -163,7 +202,7 @@ const MultipleInvitiAction = ({navigation}) => {
         elevated
         mode="medium">
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`${ids.length} items selected`} />
+        <Appbar.Content title={`${ids.length} selected`} />
 
         <Appbar.Action
           disabled={ids.length ? false : true}
@@ -196,10 +235,9 @@ const MultipleInvitiAction = ({navigation}) => {
       </Appbar>
 
       <FlashList
-        data={invitaionsForSearch}
+        data={invitationsForSearch}
         estimatedItemSize={100}
         extraData={extraData || theme}
-        keyExtractor={item => item._id}
         ListEmptyComponent={() => (
           <View style={{marginTop: '50%', alignItems: 'center'}}>
             <Text>No invitation to delete</Text>
@@ -241,22 +279,14 @@ const MultipleInvitiAction = ({navigation}) => {
             <Menu
               visible={visible}
               onDismiss={closeMenu}
-              anchor={
-                <IconButton
-                  icon="dots-vertical"
-                  size={25}
-                  onPress={() => openMenu()}
-                />
-              }>
+              anchor={<IconButton icon="dots-vertical" size={25} onPress={() => openMenu()} />}>
               <Menu.Item
                 leadingIcon="check"
                 onPress={() => {
                   closeMenu();
-                  const invitedUsers = invitaionsForSearch.reduce(
+                  const invitedUsers = invitationsForSearch.reduce(
                     (arr, item) => (
-                      item.lastStatus.invitiStatus == 'invited' &&
-                        arr.push(item._id),
-                      arr
+                      item.lastStatus?.invitiStatus == 'invited' && arr.push(item._id), arr
                     ),
                     [],
                   );
@@ -270,11 +300,9 @@ const MultipleInvitiAction = ({navigation}) => {
                 leadingIcon="clock-outline"
                 onPress={() => {
                   closeMenu();
-                  const invitedUsers = invitaionsForSearch.reduce(
+                  const invitedUsers = invitationsForSearch.reduce(
                     (arr, item) => (
-                      item.lastStatus.invitiStatus === 'pending' &&
-                        arr.push(item._id),
-                      arr
+                      item.lastStatus?.invitiStatus === 'pending' && arr.push(item._id), arr
                     ),
                     [],
                   );
@@ -288,11 +316,9 @@ const MultipleInvitiAction = ({navigation}) => {
                 leadingIcon="cancel"
                 onPress={() => {
                   closeMenu();
-                  const invitedUsers = invitaionsForSearch.reduce(
+                  const invitedUsers = invitationsForSearch.reduce(
                     (arr, item) => (
-                      item.lastStatus.invitiStatus == 'rejected' &&
-                        arr.push(item._id),
-                      arr
+                      item.lastStatus?.invitiStatus == 'rejected' && arr.push(item._id), arr
                     ),
                     [],
                   );
@@ -307,10 +333,10 @@ const MultipleInvitiAction = ({navigation}) => {
                 leadingIcon={'tag-minus-outline'}
                 onPress={() => {
                   closeMenu();
-                  const invitedUsers = invitaionsForSearch.reduce(
+                  const invitedUsers = invitationsForSearch.reduce(
                     (arr, item) => (
-                      (item.lastStatus.invitiStatus == 'other' ||
-                        item.lastStatus.invitiStatus == '') &&
+                      (item.lastStatus?.invitiStatus == 'other' ||
+                        item.lastStatus?.invitiStatus == '') &&
                         arr.push(item._id),
                       arr
                     ),
@@ -326,10 +352,8 @@ const MultipleInvitiAction = ({navigation}) => {
             <Appbar.Action
               icon="check-all"
               onPress={() => {
-                const invitedUsers = invitaionsForSearch.reduce(
-                  (arr, item) => (
-                    item.lastStatus.invitiStatus && arr.push(item._id), arr
-                  ),
+                const invitedUsers = invitationsForSearch.reduce(
+                  (arr, item) => (item.lastStatus?.invitiStatus && arr.push(item._id), arr),
                   [],
                 );
                 idsRef.current = invitedUsers;
@@ -354,8 +378,12 @@ const MultipleInvitiAction = ({navigation}) => {
               alignItems: 'center',
               flexDirection: 'row',
             }}>
-            {isLoading && <Text>Deleting {ids.length} invitie(s)</Text>} 
-            {multipleStatusUpdateLoading && <Text>updating {ids.length} invitie(s) status to {currentStatus}</Text>}
+            {isLoading && <Text>Deleting {ids.length} invitie(s)</Text>}
+            {multipleStatusUpdateLoading && (
+              <Text>
+                updating {ids.length} invitie(s) status to {currentStatus}
+              </Text>
+            )}
             <ActivityIndicator animating />
           </View>
         )}
@@ -363,16 +391,12 @@ const MultipleInvitiAction = ({navigation}) => {
 
       <Portal>
         {/* delete dialog */}
-        <Dialog
-          visible={deleteDialogVisible}
-          onDismiss={() => setDeleteDialogVisible(false)}>
+        <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
           <Dialog.Icon icon="alert" />
           <Dialog.Title>Deleting {ids.length} invitie(s)</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">
-              Are you sure to delete selected invities
-            </Text>
+            <Text variant="bodyMedium">Are you sure to delete selected invities</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -402,9 +426,7 @@ const MultipleInvitiAction = ({navigation}) => {
           <Dialog.Title>Mark {ids.length} invitie(s) as invited</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">
-              Are you sure to mark as invited selected invities
-            </Text>
+            <Text variant="bodyMedium">Are you sure to mark as invited selected invities</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -434,9 +456,7 @@ const MultipleInvitiAction = ({navigation}) => {
           <Dialog.Title>Mark {ids.length} invitie(s) as pending</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">
-              Are you sure to mark as pending selected invities
-            </Text>
+            <Text variant="bodyMedium">Are you sure to mark as pending selected invities</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -466,9 +486,7 @@ const MultipleInvitiAction = ({navigation}) => {
           <Dialog.Title>Mark {ids.length} invitie(s) as rejected</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">
-              Are you sure to mark as rejected selected invities
-            </Text>
+            <Text variant="bodyMedium">Are you sure to mark as rejected selected invities</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -490,9 +508,7 @@ const MultipleInvitiAction = ({navigation}) => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Snackbar
-        visible={snackBarVisible}
-        onDismiss={() => setSnackBarVisible(false)}>
+      <Snackbar visible={snackBarVisible} onDismiss={() => setSnackBarVisible(false)}>
         {snackBarText}
       </Snackbar>
     </View>

@@ -1,12 +1,15 @@
 import React, {useRef, useState} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {StyleSheet, StatusBar, View, ScrollView} from 'react-native';
 import {
   TextInput,
   Dialog,
   Text,
   Paragraph,
   Portal,
+  Appbar,
+  Avatar,
   useTheme,
+  Menu,
   Button,
 } from 'react-native-paper';
 
@@ -17,6 +20,7 @@ import {
   useRegisterUserMutation,
   useResendEmailForUserRegistrationMutation,
 } from '../../../redux/reducers/user/userThunk';
+import AuthAppbar from '../../../Components/Appbars/AuthAbbar';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -70,7 +74,9 @@ const SignupWithEmail = () => {
           res?.data?.message === 'An Email sent to your account please verify'
         ) {
           formikRef.current.resetForm();
-          setMessage(`An Email sent to ${email.current}. Please verify and then login`);
+          setMessage(
+            `An Email sent to ${email.current}. Please verify and then login`,
+          );
           setShowTryAgainButton(false);
           setShowLoginButton(true);
           setVisible(true);
@@ -129,226 +135,241 @@ const SignupWithEmail = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const openMenu = () => setShowMenu(true);
+  const closeMenu = () => setShowMenu(false);
 
   const formikRef = useRef();
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        paddingHorizontal: '5%',
-        flex: 1,
-        justifyContent: 'space-between',
-      }}
-      showsVerticalScrollIndicator={false}>
-      <Formik
-        innerRef={formikRef}
-        initialValues={{
-          name: '',
-          email: '',
-          password: '',
-          passwordConfirmation: '',
+    <View>
+      <AuthAppbar title={'Sign up'} />
+
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: 'space-between',
+          marginTop:"5%"
         }}
-        validationSchema={validationSchema}
-        onSubmit={values => submitHandler(values)}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <View style={{}}>
-            <Portal>
-              <Dialog visible={visible} onDismiss={() => setVisible(true)}>
-                <Dialog.Title>Sign up</Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph> {message}</Paragraph>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  {showTryAgainButton && (
-                    <Button
-                      onPress={() => {
-                        setVisible(false);
-                        resendEmail();
-                      }}>
-                      Resend Email
-                    </Button>
-                  )}
+        showsVerticalScrollIndicator={false}>
+        <Formik
+          innerRef={formikRef}
+          initialValues={{
+            name: '',
+            email: '',
+            password: '',
+            passwordConfirmation: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={values => submitHandler(values)}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <View style={{paddingHorizontal: '5%'}}>
+              <TextInput
+                label="Full name"
+                onChangeText={handleChange('name')}
+                onBlur={handleBlur('name')}
+                mode="outlined"
+                value={values.name}
+                activeOutlineColor={theme.colors.secondary}
+                error={errors.name && touched.name ? true : false}
+                style={{marginTop: '2%', height:55}}
+              />
+              {errors.name && touched.name ? (
+                <Text style={{color: theme.colors.error}}>{errors.name}</Text>
+              ) : null}
 
-                  {showLoginButton && (
-                    <Button
-                      onPress={() => {
-                        setVisible(false);
-                        navigation.navigate('Login');
-                      }}>
-                      Go to login
-                    </Button>
-                  )}
+              <TextInput
+                label="Email"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                mode="outlined"
+                value={values.email}
+                activeOutlineColor={theme.colors.secondary}
+                error={errors.email && touched.email ? true : false}
+                style={{marginTop: '2%', height:55}}
+              />
+              {errors.email && touched.email ? (
+                <Text style={{color: theme.colors.error}}>{errors.email}</Text>
+              ) : null}
 
-                  <Button
-                    textColor={theme.colors.error}
-                    onPress={() => {
-                      setVisible(false);
-                      email.current = ''
-                    }}>
-                    close
-                  </Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
+              <TextInput
+                error={errors.password && touched.password ? true : false}
+                label="Password"
+                mode="outlined"
+                right={
+                  <TextInput.Icon
+                    icon={showPassword ? 'eye' : 'eye-off'}
+                    onPress={() => setShowPassword(!showPassword)}
+                  />
+                }
+                secureTextEntry={!showPassword}
+                style={{marginTop: '2%', height:55}}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                activeOutlineColor={theme.colors.secondary}
+              />
+              {errors.password && touched.password ? (
+                <Text style={{color: theme.colors.error}}>
+                  {errors.password}
+                </Text>
+              ) : null}
 
-            <Text
-              style={{
-                fontSize: 18,
-                marginTop: '10%',
-                fontWeight: '700',
-              }}>
-              Enter the following details to continue.
-            </Text>
+              <TextInput
+                error={errors.password && touched.password ? true : false}
+                label="Confirm password"
+                mode="outlined"
+                right={
+                  <TextInput.Icon
+                    icon={showPasswordConfirmation ? 'eye' : 'eye-off'}
+                    onPress={() =>
+                      setShowPasswordConfirmation(!showPasswordConfirmation)
+                    }
+                  />
+                }
+                secureTextEntry={!showPasswordConfirmation}
+                style={{marginTop: '2%', height:55}}
+                onChangeText={handleChange('passwordConfirmation')}
+                onBlur={handleBlur('passwordConfirmation')}
+                value={values.passwordConfirmation}
+                activeOutlineColor={theme.colors.secondary}
+              />
+              {errors.passwordConfirmation && touched.passwordConfirmation ? (
+                <Text style={{color: theme.colors.error}}>
+                  {errors.passwordConfirmation}
+                </Text>
+              ) : null}
 
-            <TextInput
-              label="Full name"
-              onChangeText={handleChange('name')}
-              onBlur={handleBlur('name')}
-              mode="outlined"
-              value={values.name}
-              activeOutlineColor={theme.colors.secondary}
-              error={errors.name && touched.name ? true : false}
-              style={{marginTop: '2%'}}
-            />
-            {errors.name && touched.name ? (
-              <Text style={{color: theme.colors.error}}>{errors.name}</Text>
-            ) : null}
+              <Button
+                loading={isLoading || resendLoading}
+                disabled={isLoading || resendLoading}
+                style={{
+                  marginTop: '5%',
+                }}
+                contentStyle={{
+                  padding: '3%',
+                }}
+                theme={{roundness: 10}}
+                mode="contained"
+                onPress={handleSubmit}
+                buttonColor={theme.colors.blueBG}
+                textColor="#fff"
+                >
+                Sign up
+              </Button>
+            </View>
+          )}
+        </Formik>
 
-            <TextInput
-              label="Email"
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
-              mode="outlined"
-              value={values.email}
-              activeOutlineColor={theme.colors.secondary}
-              error={errors.email && touched.email ? true : false}
-              style={{marginTop: '2%'}}
-            />
-            {errors.email && touched.email ? (
-              <Text style={{color: theme.colors.error}}>{errors.email}</Text>
-            ) : null}
-
-            <TextInput
-              error={errors.password && touched.password ? true : false}
-              label="Password"
-              mode="outlined"
-              right={
-                <TextInput.Icon
-                  icon={showPassword ? 'eye' : 'eye-off'}
-                  onPress={() => setShowPassword(!showPassword)}
-                />
-              }
-              secureTextEntry={!showPassword}
-              style={{marginVertical: '2%'}}
-              onChangeText={handleChange('password')}
-              onBlur={handleBlur('password')}
-              value={values.password}
-              activeOutlineColor={theme.colors.secondary}
-            />
-            {errors.password && touched.password ? (
-              <Text style={{color: theme.colors.error}}>{errors.password}</Text>
-            ) : null}
-
-            <TextInput
-              error={errors.password && touched.password ? true : false}
-              label="Confirm password"
-              mode="outlined"
-              right={
-                <TextInput.Icon
-                  icon={showPasswordConfirmation ? 'eye' : 'eye-off'}
-                  onPress={() =>
-                    setShowPasswordConfirmation(!showPasswordConfirmation)
-                  }
-                />
-              }
-              secureTextEntry={!showPasswordConfirmation}
-              style={{marginVertical: '2%'}}
-              onChangeText={handleChange('passwordConfirmation')}
-              onBlur={handleBlur('passwordConfirmation')}
-              value={values.passwordConfirmation}
-              activeOutlineColor={theme.colors.secondary}
-            />
-            {errors.passwordConfirmation && touched.passwordConfirmation ? (
-              <Text style={{color: theme.colors.error}}>
-                {errors.passwordConfirmation}
-              </Text>
-            ) : null}
-
-            <Button
-              loading={isLoading || resendLoading}
-              disabled={isLoading || resendLoading}
-              style={{
-                marginTop: '2%',
-              }}
-              contentStyle={{
-                padding: '3%',
-              }}
-              theme={{roundness: 1}}
-              mode="contained"
-              onPress={handleSubmit}
-              buttonColor={theme.colors.secondary}>
-              Sign up
-            </Button>
-          </View>
-        )}
-      </Formik>
-
-      <View
+        {/* <View
         style={{
-          marginVertical: '10%',
+          marginVertical: '5%',
           flexDirection: 'row',
+          paddingHorizontal: '5%',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}>
-          Already have an account?
-        </Text>
-        <Button mode="text" onPress={() => navigation.navigate('Login')}>
-          Sign in
-        </Button>
-      </View>
-    </ScrollView>
+          <View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+                <Text
+                  style={{fontSize:16, color: theme.colors.textGray}}>
+                  or
+                </Text>
+                <View
+                  style={{
+                    width: '46%',
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                  }}
+                />
+              </View>
+              <Button
+                loading={isLoading}
+                // disabled={!(dirty && isValid) || isLoading}
+                disabled={isLoading}
+                style={{
+                  marginVertical: '3%',
+                }}
+                contentStyle={{padding: '3%'}}
+                buttonStyle={{padding: '1%'}}
+                theme={{roundness: 1}}
+                mode="contained"
+                icon={() => (
+                  <Avatar.Image
+                    size={24}
+                    style={{backgroundColor:"#EDEEF0", marginHorizontal:"2%"}}
+                    source={require('../../../assets/icons/google-icon.png')}
+                  />
+                )}
+                // onPress={handleSubmit}
+                buttonColor={"#EDEEF0"}
+                labelStyle={{color:theme.colors.textGray, fontWeight:"bold"}}
+                >
+                Login with Google
+              </Button>
+            </View>
+
+      </View> */}
+      </ScrollView>
+
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => setVisible(true)}>
+          <Dialog.Title>Sign up</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph> {message}</Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            {showTryAgainButton && (
+              <Button
+                onPress={() => {
+                  setVisible(false);
+                  resendEmail();
+                }}>
+                Resend Email
+              </Button>
+            )}
+
+            {showLoginButton && (
+              <Button
+                onPress={() => {
+                  setVisible(false);
+                  navigation.navigate('Login');
+                }}>
+                Go to login
+              </Button>
+            )}
+
+            <Button
+              textColor={theme.colors.error}
+              onPress={() => {
+                setVisible(false);
+                email.current = '';
+              }}>
+              close
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </View>
   );
 };
 
 export default SignupWithEmail;
-
-const styles = StyleSheet.create({
-  buttonStyle: {
-    height: 60,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 50,
-    alignItems: 'center',
-    borderRadius: 10,
-    flexDirection: 'row',
-    marginVertical: '2%',
-    backgroundColor: '#EDEEF0',
-  },
-  buttonTextStyle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
-  borderRed: {
-    borderColor: 'red',
-    borderBottomWidth: 4,
-  },
-  borderGreen: {
-    borderColor: '#ddd',
-    borderBottomWidth: 4,
-  },
-  error: {
-    color: 'red',
-    marginLeft: 20,
-  },
-});
