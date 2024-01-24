@@ -135,9 +135,9 @@ const Groups = ({navigation}) => {
     });
     await AsyncStorage.setItem('groups', JSON.stringify(newArr));
 
-    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
-    if (pg?._id === groupId) {
-      await AsyncStorage.setItem('pinGroup', JSON.stringify(newArr?.length ? newArr[0] : null));
+    let pgId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
+    if (pgId === groupId) {
+      await AsyncStorage.setItem('pinGroupId', JSON.stringify(newArr?.length ? newArr[0]?._id : null));
       dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
       dispatch(handlePinGroupFlag(!pinGroupFlag));
     }
@@ -154,7 +154,6 @@ const Groups = ({navigation}) => {
       return object._id == checkedItems[0];
     });
     dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
-    await AsyncStorage.setItem('pinGroup', JSON.stringify(localGroups[0]));
     await AsyncStorage.setItem('pinGroupId', JSON.stringify(localGroups[0]?._id));
     dispatch(handlePinGroupFlag(!pinGroupFlag));
     localGroups = null;

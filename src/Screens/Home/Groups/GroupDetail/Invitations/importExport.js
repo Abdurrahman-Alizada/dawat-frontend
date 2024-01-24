@@ -128,8 +128,6 @@ const Index = ({group, onClose}) => {
   };
 
   const saveCSV = async () => {
-    console.log('first', invitatiesFromAsyncStorage);
-    // const jsonData = data?.map(user => {
 
     const jsonData = invitatiesFromAsyncStorage?.map(user => {
       return {

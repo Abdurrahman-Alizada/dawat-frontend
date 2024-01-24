@@ -63,7 +63,7 @@ const OTPScreen = ({navigation, route}) => {
   };
 
   useEffect(()=>{
-   if(value.length === 5) {
+   if(value?.length === 5) {
     setDisibility(false)
    }else{
     setDisibility(true)

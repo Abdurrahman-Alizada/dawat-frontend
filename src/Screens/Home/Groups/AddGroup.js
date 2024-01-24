@@ -125,7 +125,7 @@ const AddGroup = ({navigation, onClose}) => {
     } else {
       let newGroups = [group];
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
-      await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
+      await AsyncStorage.setItem('pinGroupId', JSON.stringify(group?._id));
     }
     await AsyncStorage.setItem(`pingroup_backgroundImage`, `${3}`);
     dispatch(handleCurrentBackgroundImgSrcId(3));
@@ -232,7 +232,7 @@ const AddGroup = ({navigation, onClose}) => {
                     : false
                 }
                 label={`Group Description (${
-                  60 - values.groupDescription.length
+                  60 - values.groupDescription?.length
                 })`}
                 mode="outlined"
                 multiline

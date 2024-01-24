@@ -70,7 +70,6 @@ const AddGroup = ({navigation, onClose, route}) => {
       await AsyncStorage.setItem('groups', JSON.stringify(newGroups));
       newGroups = null;
     }
-    dispatch(handlePinGroup(await AsyncStorage.getItem('pinGroup')));
     dispatch(handleGroupsFlag(!groupsFlag));
     group = groups = null;
     navigation.navigate('HomeIndex');
@@ -212,7 +211,7 @@ const AddGroup = ({navigation, onClose, route}) => {
           stickyHeaderIndices={[0]}
           ListHeaderComponent={() => (
             <View style={{backgroundColor: theme.colors.background}}>
-              {users.length > 0 ? (
+              {users?.length > 0 ? (
                 <ScrollView
                   horizontal={true}
                   contentContainerStyle={{

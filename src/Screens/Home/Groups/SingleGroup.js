@@ -43,15 +43,6 @@ const SingleGroup = ({
     });
   };
 
-  const pinHandler = async () => {
-    dispatch(handlePinGroup(JSON.stringify(item)));
-    await AsyncStorage.setItem('pinGroup', JSON.stringify(item));
-  };
-  const unPinHandler = async () => {
-    dispatch(handlePinGroup(JSON.stringify(null)));
-    await AsyncStorage.setItem('pinGroup', JSON.stringify(''));
-  };
-
   // logic for checked on longPress
   const [include, setInclude] = useState(checkedItems?.includes(item._id));
   const index = checkedItems?.indexOf(item._id);
@@ -73,12 +64,10 @@ const SingleGroup = ({
     setInclude(!include);
   };
 
-  const [pinGroup, setPinGroup] = useState(null);
+  const [pinGroupId, setPinGroupId] = useState(null);
   useEffect(() => {
     const getData = async () => {
-      const p = await AsyncStorage.getItem('pinGroup');
-      const pp = JSON.parse(p);
-      setPinGroup(pp);
+      setPinGroupId(JSON.parse(await AsyncStorage.getItem('pinGroupId')))
     };
     getData();
   }, []);
@@ -136,11 +125,11 @@ const SingleGroup = ({
             </View>
           ) : (
             <View style={{flexDirection: 'row'}}>
-              {pinGroup?._id == item._id && (
+              {pinGroupId == item._id && (
                 <IconButton
                   icon="pin"
                   iconColor={theme.colors.blueBG}
-                  onPress={() => alert('This group is pin')}
+                  onPress={() => alert('This event is pin')}
                 />
               )}
               {/* <Menu
@@ -178,25 +167,6 @@ const SingleGroup = ({
                   />
                 )}
 
-                <Menu.Item
-                  leadingIcon="checkbox-marked-outline"
-                  title="Select"
-                  titleStyle={{color: theme.colors.onBackground}}
-                  onPress={async () => {
-                    closeMenu();
-                    onLongPressHandler();
-                  }}
-                />
-
-                <Menu.Item
-                  leadingIcon="cog-outline"
-                  title="Settings"
-                  titleStyle={{color: theme.colors.onBackground}}
-                  onPress={async () => {
-                    closeMenu();
-                    settingHandler();
-                  }}
-                />
                 {!item.isSyncd && item.isSyncd !== undefined && (
                   <Menu.Item
                     leadingIcon={() => (

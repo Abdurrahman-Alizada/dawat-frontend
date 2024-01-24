@@ -42,7 +42,7 @@ export const chatSlice = createSlice({
         state.selectedMessageIds = [...state.selectedMessageIds, action.payload._id];
         state.selectedMessages = [...state.selectedMessages, action.payload];
       }
-      if (state.selectedMessageIds.length < 1) {
+      if (state.selectedMessageIds?.length < 1) {
         state.isMessagesSelected = false;
         state.selectedMessageIds = [];
         state.selectedMessages = [];
@@ -57,7 +57,7 @@ export const chatSlice = createSlice({
 
     deleteselectedMessageIds: (state, action) => {
       let i = 0;
-      for (i = 0; i < state.selectedMessageIds.length; i++) {
+      for (i = 0; i < state.selectedMessageIds?.length; i++) {
           state.messages = state.messages.filter(
             message => message._id !== state.selectedMessageIds[i],
           );
