@@ -54,10 +54,10 @@ export default function DisplayCsvDataTable({props, route}) {
   const stringToJsonHandler = () => {
     if (invitiArray.length) {
       if (
-        invitiArray[0][0] === 'Inviti name' &&
-        invitiArray[0][1] === 'Inviti Description' &&
+        invitiArray[0][0] === 'Guest name' &&
+        invitiArray[0][1] === 'Guest Description' &&
         invitiArray[0][4] === 'Last status' &&
-        invitiArray[0][6] === 'Image URL of inviti'
+        invitiArray[0][6] === 'Image URL of guest'
       ) {
         const jsonStrings = invitiArray.map(inviti => {
           let object = {
@@ -151,13 +151,13 @@ export default function DisplayCsvDataTable({props, route}) {
   const sampleFileDownloadHandler = () => {
     const jsonData = `[
     {
-        "Inviti name": "Gulab",
-        "Inviti Description": "some description about Gulab",
-        "Inviti contact": "contact detail of inviti",
+        "Guest name": "Gulab",
+        "Guest Description": "some description about Gulab",
+        "Guest contact": "contact detail of inviti",
         "Added by": "who is adding Gulab to group",
         "Last status": "status of Gulab invitaion",
         "Last status updated by": "who update the last status of Gulab invitaion",
-        "Image URL of inviti": "Image URL of gulab"
+        "Image URL of guest": "Image URL of gulab"
     }
   ]`;
     const results = jsonToCSV(jsonData);

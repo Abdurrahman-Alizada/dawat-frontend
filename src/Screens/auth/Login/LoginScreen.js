@@ -2,8 +2,6 @@ import React, {useState} from 'react';
 
 import {
   ScrollView,
-  StatusBar,
-  StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';

@@ -5,4 +5,4 @@ export const instance = axios.create({
   });
   
 // export const baseURL = 'https://dawat-backend.onrender.com'
-export const baseURL = 'https://ff39-223-123-88-217.ngrok-free.app'
+export const baseURL = 'https://440a-223-123-89-92.ngrok-free.app'

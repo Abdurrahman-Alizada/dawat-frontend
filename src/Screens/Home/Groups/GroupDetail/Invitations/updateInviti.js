@@ -18,7 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 
 const validationSchema = Yup.object().shape({
-  invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
+  invitiName: Yup.string().required('Guest name is required').label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
 });
 

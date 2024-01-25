@@ -1,12 +1,11 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   View,
-  FlatList,
   RefreshControl,
   ScrollView,
   TouchableWithoutFeedback,
-  Image,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
@@ -19,6 +18,7 @@ import {
   handleInvitions,
   handleCurrentInviti,
   handleIsExportBanner,
+  handleIsExportPDFBanner,
   handleInvitiFlag,
 } from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import {
@@ -54,12 +54,13 @@ import InvitedIcon from '../../../../../Components/invitations/invitedIcon';
 import PendingIcon from '../../../../../Components/invitations/pendingIcon';
 import RejectedIcon from '../../../../../Components/invitations/rejectedIcon';
 import OtherIcon from '../../../../../Components/invitations/otherIcon';
-
+import {ThemeContext} from '../../../../../themeContext';
 export default function Example({route}) {
   const navigation = useNavigation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const netInfo = useNetInfo();
+  const {isThemeDark} = useContext(ThemeContext);
 
   const {groupId, isHeader} = route.params;
 
@@ -70,6 +71,7 @@ export default function Example({route}) {
   const isInvitaionSearch = useSelector(state => state.invitations.isInvitaionSearch);
   const invitaionsForSearch = useSelector(state => state.invitations.invitations);
   const isExportBanner = useSelector(state => state.invitations?.isExportBanner);
+  const isExportPDFBanner = useSelector(state => state.invitations?.isExportPDFBanner);
 
   const invitiBriefModalizeRef = useRef(null);
 
@@ -90,7 +92,7 @@ export default function Example({route}) {
       // localInvities = [...localInvities, ...data?.filter(d => !ids.has(d._id))];
       let ids = new Set(data?.map(d => d._id));
       localInvities = [...data, ...localInvities?.filter(d => !ids.has(d._id))];
-    
+
       setFilterdInvities(localInvities);
       setMasterInvities(localInvities);
       await AsyncStorage.setItem(
@@ -337,7 +339,7 @@ export default function Example({route}) {
     }
   };
 
-  const func = async (isSearchClick) => {
+  const func = async isSearchClick => {
     setIsChipsShow(isSearchClick ? false : !isChipsShow);
     if (isChipsShow) {
       setSelectedChips([]);
@@ -359,10 +361,18 @@ export default function Example({route}) {
   const [pendingNumber, setPendingNumber] = useState('');
   const [otherNumber, setOtherNumber] = useState('');
   const getStatusNumbers = () => {
-    setInvitedNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'invited')?.length);
-    setRejectedNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'rejected')?.length);
-    setPendingNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'pending')?.length);
-    setOtherNumber(masterInvities.filter(item => item.lastStatus?.invitiStatus === 'other')?.length);
+    setInvitedNumber(
+      masterInvities.filter(item => item.lastStatus?.invitiStatus === 'invited')?.length,
+    );
+    setRejectedNumber(
+      masterInvities.filter(item => item.lastStatus?.invitiStatus === 'rejected')?.length,
+    );
+    setPendingNumber(
+      masterInvities.filter(item => item.lastStatus?.invitiStatus === 'pending')?.length,
+    );
+    setOtherNumber(
+      masterInvities.filter(item => item.lastStatus?.invitiStatus === 'other')?.length,
+    );
   };
   useEffect(() => {
     getStatusNumbers();
@@ -370,6 +380,11 @@ export default function Example({route}) {
 
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
+      <StatusBar
+        backgroundColor={theme.colors.background}
+        barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+      />
+
       {isHeader && (
         <View>
           <GuestsAppbar
@@ -385,7 +400,7 @@ export default function Example({route}) {
                 contentContainerStyle={{
                   alignItems: 'center',
                   minWidth: '100%',
-                  paddingRight:"10%"
+                  paddingRight: '10%',
                 }}>
                 {chips.map((chip, index) => (
                   <View key={index} style={{padding: '1%'}}>
@@ -393,11 +408,10 @@ export default function Example({route}) {
                       selected={selectedChips?.includes(chip.name)}
                       mode={selectedChips?.includes(chip.name) ? 'flat' : 'outlined'}
                       onPress={() => selectedChipsHandler(chip.name)}>
-                      {chip.name} {' '} 
-                      {chip.name === "invited" && invitedNumber}
-                      {chip.name === "rejected" && rejectedNumber}
-                      {chip.name === "pending" && pendingNumber}
-                      {chip.name === "other" && otherNumber}
+                      {chip.name} {chip.name === 'invited' && invitedNumber}
+                      {chip.name === 'rejected' && rejectedNumber}
+                      {chip.name === 'pending' && pendingNumber}
+                      {chip.name === 'other' && otherNumber}
                     </Chip>
                   </View>
                 ))}
@@ -436,7 +450,19 @@ export default function Example({route}) {
           },
         ]}
         icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
-        Guests List of this group has been exported in Downlaod folder successfully
+        Guests List as CSV file has been exported in *Downlaod folder successfully
+      </Banner>
+
+      <Banner
+        visible={isExportPDFBanner}
+        actions={[
+          {
+            label: 'Understood',
+            onPress: () => dispatch(handleIsExportPDFBanner(false)),
+          },
+        ]}
+        icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
+        Guests List as PDF file has been exported in *Document folder successfully
       </Banner>
 
       <Portal>

@@ -90,7 +90,45 @@ const Groups = ({navigation}) => {
                     }}>
                     {pinGroup?.groupName}
                   </Text>
-                  <CountDown
+
+                  {moment(pinGroup.time).diff(moment(new Date()), 'seconds') < 0 ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'baseline',
+                        justifyContent: 'center',
+                      }}>
+                      <CountDown
+                        until={Math.abs(moment(pinGroup?.time).diff(moment(new Date()), 'seconds'))}
+                        size={22}
+                        style={{margin: '2%'}}
+                        digitTxtStyle={{color: '#fff'}}
+                        digitStyle={{backgroundColor: theme.colors.error}}
+                        timeLabelStyle={{color: '#fff'}}
+                        running={false}
+                        separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                      />
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                          color: '#fff',
+                        }}>
+                        ago
+                      </Text>
+                    </View>
+                  ) : (
+                    <CountDown
+                      until={pinGroupTime.current ? pinGroupTime.current : 0}
+                      size={22}
+                      style={{margin: '2%'}}
+                      digitTxtStyle={{color: '#fff'}}
+                      digitStyle={{backgroundColor: '#265AE8'}}
+                      timeLabelStyle={{color: '#fff'}}
+                      separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                    />
+                  )}
+
+                  {/* <CountDown
                     until={pinGroupTime.current ? pinGroupTime.current : 0}
                     onPress={() =>
                       Alert.alert(`${moment(pinGroup.time).format('MMM D, YYYY, h:mm a')}`)
@@ -101,7 +139,7 @@ const Groups = ({navigation}) => {
                     digitStyle={{backgroundColor: '#265AE8'}}
                     timeLabelStyle={{color: '#fff'}}
                     separatorStyle={{color: '#fff', alignSelf: 'center'}}
-                  />
+                  /> */}
                 </View>
               </ImageBackground>
 
