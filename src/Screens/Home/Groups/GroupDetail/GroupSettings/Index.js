@@ -155,7 +155,7 @@ const Index = ({route, navigation}) => {
   };
   const groupsFlag = useSelector(state => state.groups?.groupsFlag);
   const updateLocalPinGroup = async group => {
-    await AsyncStorage.setItem('pinGroup', JSON.stringify(group));
+    await AsyncStorage.setItem('pinGroupId', JSON.stringify(group?._id));
     dispatch(handlePinGroup(group));
   };
 
@@ -186,8 +186,8 @@ const Index = ({route, navigation}) => {
     dispatch(handleGroupsFlag(!groupsFlag));
     setUpdateLocalGroupNameLoading(false);
 
-    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
-    if (pg?._id === currentViewingGroup._id) {
+    let pgId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
+    if (pgId === currentViewingGroup._id) {
       updateLocalPinGroup(group);
     }
   };
@@ -246,10 +246,10 @@ const Index = ({route, navigation}) => {
       return object._id !== currentViewingGroup?._id;
     });
     await AsyncStorage.setItem('groups', JSON.stringify(newArr));
-    let pg = JSON.parse(await AsyncStorage.getItem('pinGroup'));
+    let pgId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
 
-    if (pg?._id === currentViewingGroup._id) {
-      await AsyncStorage.setItem('pinGroup', JSON.stringify(newArr?.length ? newArr[0] : null));
+    if (pgId === currentViewingGroup._id) {
+      await AsyncStorage.setItem('pinGroupId', JSON.stringify(newArr?.length ? newArr[0]?._id : null));
     }
     dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
     setLocalDeleteLoading(false);

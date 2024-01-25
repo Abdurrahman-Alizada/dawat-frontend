@@ -59,7 +59,7 @@ const Header = ({
     });
 
     return token && membersText
-      ? membersText?.toString().length < 25
+      ? membersText?.toString()?.length < 25
         ? membersText?.toString()
         : `${membersText?.toString()?.substring(0, 25)}...`
       : 'You';

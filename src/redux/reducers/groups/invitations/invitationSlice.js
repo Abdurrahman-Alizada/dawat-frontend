@@ -5,6 +5,7 @@ const initialState = {
   invitationsCopyForSearch: [],
   invitationRefetch: false,
   isExportBanner: false,
+  isExportPDFBanner: false,
   currentInviti: {},
   isInvitaionSearch: false,
   invitationSearchQuery : '',
@@ -18,6 +19,9 @@ export const invitationSlice = createSlice({
   reducers: {
     handleIsExportBanner: (state, action) => {
       state.isExportBanner = action.payload;
+    },
+    handleIsExportPDFBanner: (state, action) => {
+      state.isExportPDFBanner = action.payload;
     },
     handleCurrentInviti: (state, action) => {
       state.currentInviti = action.payload;
@@ -57,6 +61,7 @@ export const invitationSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const {
   handleIsExportBanner,
+  handleIsExportPDFBanner,
   handleCurrentInviti,
   handleIsInvitationSearch,
   handleInvitions,

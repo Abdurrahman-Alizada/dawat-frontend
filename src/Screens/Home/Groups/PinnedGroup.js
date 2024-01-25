@@ -42,8 +42,6 @@ const Groups = ({navigation}) => {
 
     let pinGroup1 = groups?.find(group => group?._id === pinGroupId);
 
-    // let pGroup = await AsyncStorage.getItem('pinGroup');
-    // let parsePinGroup = JSON.parse(pGroup);
     setPinGroup(pinGroup1);
     let currentTime = moment(new Date());
     let dueTIme = moment(new Date(pinGroup1?.time));
@@ -92,7 +90,45 @@ const Groups = ({navigation}) => {
                     }}>
                     {pinGroup?.groupName}
                   </Text>
-                  <CountDown
+
+                  {moment(pinGroup.time).diff(moment(new Date()), 'seconds') < 0 ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'baseline',
+                        justifyContent: 'center',
+                      }}>
+                      <CountDown
+                        until={Math.abs(moment(pinGroup?.time).diff(moment(new Date()), 'seconds'))}
+                        size={22}
+                        style={{margin: '2%'}}
+                        digitTxtStyle={{color: '#fff'}}
+                        digitStyle={{backgroundColor: theme.colors.error}}
+                        timeLabelStyle={{color: '#fff'}}
+                        running={false}
+                        separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                      />
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                          color: '#fff',
+                        }}>
+                        ago
+                      </Text>
+                    </View>
+                  ) : (
+                    <CountDown
+                      until={pinGroupTime.current ? pinGroupTime.current : 0}
+                      size={22}
+                      style={{margin: '2%'}}
+                      digitTxtStyle={{color: '#fff'}}
+                      digitStyle={{backgroundColor: '#265AE8'}}
+                      timeLabelStyle={{color: '#fff'}}
+                      separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                    />
+                  )}
+
+                  {/* <CountDown
                     until={pinGroupTime.current ? pinGroupTime.current : 0}
                     onPress={() =>
                       Alert.alert(`${moment(pinGroup.time).format('MMM D, YYYY, h:mm a')}`)
@@ -103,7 +139,7 @@ const Groups = ({navigation}) => {
                     digitStyle={{backgroundColor: '#265AE8'}}
                     timeLabelStyle={{color: '#fff'}}
                     separatorStyle={{color: '#fff', alignSelf: 'center'}}
-                  />
+                  /> */}
                 </View>
               </ImageBackground>
 
@@ -307,13 +343,26 @@ const Groups = ({navigation}) => {
             </View>
           ) : (
             <View style={{flex: 1}}>
-              {/* <PinnedGroupHeader theme={theme} istransparent={false} /> */}
-              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                <Text style={{fontSize: 22}}>No event has been pinned</Text>
+              <View style={{flex: 1, justifyContent: 'center'}}>
+                <View style={{alignSelf: 'center', width: '70%'}}>
+                  <Text
+                    style={{
+                      fontSize: 22,
+                    }}>
+                    No event has been pinned
+                  </Text>
+                  <Text style={{}}>i. create event.</Text>
+                  <Text style={{}}>ii. Long press on any event.</Text>
+                  <Text style={{}}>
+                    iii. In the upper menu, a menu icon will appear click on it and the event will
+                    display here as pinned event.
+                  </Text>
+                </View>
                 <Button
                   style={{
-                    marginTop: '3%',
+                    marginTop: '5%',
                     width: '70%',
+                    alignSelf: 'center',
                   }}
                   contentStyle={{padding: '2%'}}
                   buttonStyle={{padding: '1%', width: '100%'}}
@@ -331,6 +380,7 @@ const Groups = ({navigation}) => {
                   style={{
                     marginTop: '3%',
                     width: '70%',
+                    alignSelf: 'center',
                   }}
                   contentStyle={{padding: '2%'}}
                   buttonStyle={{padding: '1%', width: '100%'}}

@@ -29,7 +29,7 @@ import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations
 import createRandomId from '../../../../../utils/createRandomId';
 
 const validationSchema = Yup.object().shape({
-  invitiName: Yup.string().required('Inviti name is required').label('invitiName'),
+  invitiName: Yup.string().required('Guest name is required').label('invitiName'),
   groupDescription: Yup.string().label('invitiDescription'),
 });
 
