@@ -1,4 +1,4 @@
-import {TouchableOpacity, StyleSheet, View} from 'react-native';
+import {TouchableOpacity, StyleSheet, View, I18nManager} from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Formik} from 'formik';
@@ -6,26 +6,25 @@ import * as Yup from 'yup';
 import {Modalize} from 'react-native-modalize';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import {
-  Text,
-  TextInput,
-  IconButton,
-  FAB,
-  useTheme,
-} from 'react-native-paper';
+import {Text, TextInput, IconButton, FAB, useTheme} from 'react-native-paper';
 import AvatarModal from '../../Drawer/Profile/AvatarModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch} from 'react-redux';
-import {handleCurrentBackgroundImgSrcId, handlePinGroup} from '../../../redux/reducers/groups/groups';
+import {useDispatch} from 'react-redux';
+import {
+  handleCurrentBackgroundImgSrcId,
+  handlePinGroup,
+} from '../../../redux/reducers/groups/groups';
 import createRandomId from '../../../utils/createRandomId';
+import {useTranslation} from 'react-i18next';
 const validationSchema = Yup.object().shape({
-  groupName: Yup.string().required('Group name is required').label('groupName'),
+  groupName: Yup.string().required('Event name is required').label('groupName'),
   groupDescription: Yup.string().label('groupDescription'),
 });
 
 const AddGroup = ({navigation, onClose}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const [users, setUsers] = useState([]);
   const [fileData, setfileData] = useState(null);
@@ -129,7 +128,7 @@ const AddGroup = ({navigation, onClose}) => {
     }
     await AsyncStorage.setItem(`pingroup_backgroundImage`, `${3}`);
     dispatch(handleCurrentBackgroundImgSrcId(3));
-  
+
     dispatch(handlePinGroup(group));
     navigation.goBack();
   };
@@ -161,19 +160,9 @@ const AddGroup = ({navigation, onClose}) => {
           groupDescription: '',
         }}
         validationSchema={validationSchema}
-        onSubmit={values =>
-          token ? submitHandler(values) : createLocalGroup(values)
-        }>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <View
-            style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
+        onSubmit={values => (token ? submitHandler(values) : createLocalGroup(values))}>
+        {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
+          <View style={{flex: 1, marginVertical: '2%', paddingHorizontal: '5%'}}>
             <View>
               {/* <TouchableOpacity onPress={onOpenModalize}>
                 {fileData ? (
@@ -211,7 +200,7 @@ const AddGroup = ({navigation, onClose}) => {
               <TextInput
                 style={{marginTop: '4%'}}
                 error={errors.groupName && touched.groupName ? true : false}
-                label={`Group Name (${30 - values.groupName.length})`}
+                label={`${t('Event Name')} (${30 - values?.groupName?.length})`}
                 maxLength={30}
                 mode="outlined"
                 onChangeText={handleChange('groupName')}
@@ -219,21 +208,13 @@ const AddGroup = ({navigation, onClose}) => {
                 value={values.groupName}
               />
               {errors.groupName && touched.groupName ? (
-                <Text style={{color: theme.colors.error}}>
-                  {errors.groupName}
-                </Text>
+                <Text style={{color: theme.colors.error}}>{t(errors.groupName)}</Text>
               ) : null}
 
               <TextInput
                 style={{marginTop: '4%'}}
-                error={
-                  errors.groupDescription && touched.groupDescription
-                    ? true
-                    : false
-                }
-                label={`Group Description (${
-                  60 - values.groupDescription?.length
-                })`}
+                error={errors.groupDescription && touched.groupDescription ? true : false}
+                label={`${t('Event Description')} (${60 - values.groupDescription?.length})`}
                 mode="outlined"
                 multiline
                 maxLength={60}
@@ -247,16 +228,11 @@ const AddGroup = ({navigation, onClose}) => {
               ) : null}
             </View>
             {token ? (
-              <FAB
-                icon="arrow-right"
-                label="Next"
-                style={styles.fab}
-                onPress={handleSubmit}
-              />
+              <FAB icon="arrow-right" label={t('Next')} style={styles.fab} onPress={handleSubmit} />
             ) : (
               <FAB
                 icon="plus"
-                label="Add"
+                label={t('Add')}
                 style={styles.fab}
                 // disabled={isAddButtonDisable}
                 // loading={isAddButtonDisable}
@@ -283,7 +259,7 @@ const AddGroup = ({navigation, onClose}) => {
                 marginVertical: '4%',
               }}>
               <View style={{width: '100%', marginTop: '2%'}}>
-                <Text style={{fontWeight: 'bold'}}>Time</Text>
+                <Text style={{fontWeight: 'bold'}}>{t('Time')}</Text>
                 <TouchableOpacity
                   onPress={() => setOpenDueDate(true)}
                   style={{
@@ -293,14 +269,14 @@ const AddGroup = ({navigation, onClose}) => {
                     paddingLeft: '4%',
                     marginVertical: '2%',
                     textAlign: 'center',
-                    flexDirection:"row",
-                    alignItems:"center",
-                    justifyContent:"space-between"
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}>
                   <Text style={{fontWeight: 'bold'}}>
-                    {moment(dueDate).format('lll')}
+                    {moment(dueDate).format('llll')}
                   </Text>
-                  <IconButton icon={"pencil"} />
+                  <IconButton icon={'pencil'} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -328,7 +304,7 @@ const AddGroup = ({navigation, onClose}) => {
               size={40}
               onPress={openCamera}
             />
-            <Text>Camera</Text>
+            <Text>{t('Camera')}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -338,7 +314,7 @@ const AddGroup = ({navigation, onClose}) => {
               size={40}
               onPress={openGallery}
             />
-            <Text>Gallery</Text>
+            <Text>{t('Gallery')}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -351,7 +327,7 @@ const AddGroup = ({navigation, onClose}) => {
                 setAvatarModalVisible(true);
               }}
             />
-            <Text>Avatars</Text>
+            <Text>{t('Avatars')}</Text>
           </View>
         </View>
       </Modalize>

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, I18nManager} from 'react-native';
 import {
   List,
   Menu,
@@ -26,6 +26,7 @@ import {
 } from '../redux/reducers/groups/tasks/taskSlice';
 import {isConfirmDialogVisibleHandler} from '../redux/reducers/groups/chat/chatSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 const Header = ({
   openGuestsImportExportModalize,
@@ -34,6 +35,7 @@ const Header = ({
   group,
 }) => {
   const dispatch = useDispatch();
+  const {t} = useTranslation()
   const theme = useTheme();
   const navigation = useNavigation();
 
@@ -206,7 +208,7 @@ const Header = ({
                       dispatch(handleIsSearch(true));
                       dispatch(handleIsInvitationSearch(true));
                     }}
-                    title="Search"
+                    title={t("Search for guest")}
                     leadingIcon={'account-search'}
                   />
                   <Divider />
@@ -215,7 +217,7 @@ const Header = ({
                       closeMenu();
                       openGuestsImportExportModalize();
                     }}
-                    title="Import/Export"
+                    title={t("Import/Export")}
                     leadingIcon={'microsoft-excel'}
                   />
 
@@ -224,7 +226,7 @@ const Header = ({
                       closeMenu();
                       navigation.navigate('AddMultipleInviti');
                     }}
-                    title="Add multiple guests"
+                    title={t("Add multiple guests")}
                     leadingIcon={'account-multiple-plus'}
                   />
                   <Menu.Item
@@ -232,7 +234,7 @@ const Header = ({
                       closeMenu();
                       navigation.navigate('MultipleInvitiActions');
                     }}
-                    title="Bulk actions"
+                    title={t("Bulk actions")}
                     leadingIcon={'checkbox-multiple-blank-circle-outline'}
                   />
                 </View>
@@ -244,12 +246,12 @@ const Header = ({
                       dispatch(handleIsSearch(true));
                       dispatch(handleIsTaskSearch(true));
                     }}
-                    title="Search for task"
+                    title={t("Search for task")}
                     leadingIcon={'calendar-search'}
                   />
                 </View>
               )}
-              {currentTab === 'Chat' && (
+              {/* {currentTab === 'Chat' && (
                 <View>
                   <Menu.Item
                     onPress={() => {
@@ -259,15 +261,15 @@ const Header = ({
                     leadingIcon={'comment-search-outline'}
                   />
                 </View>
-              )}
-              <Divider />
+              )} */}
+              {/* <Divider /> */}
 
               <Menu.Item
                 onPress={() => {
                   closeMenu();
                   navigation.navigate('GroupLogs');
                 }}
-                title="Group logs"
+                title={t("Group logs")}
                 leadingIcon={'format-list-bulleted-type'}
               />
             </Menu>
@@ -277,12 +279,12 @@ const Header = ({
         <View>
           {isInvitaionSearch && (
             <Searchbar
-              placeholder="Search..."
+              placeholder={t("Search for guest...")}
               onChangeText={updateSearch}
               value={search}
               cancelButtonTitle="cancel"
               autoFocus
-              icon="arrow-left"
+              icon={I18nManager.isRTL ? "arrow-right" : "arrow-left"}
               onIconPress={BlurHandler}
               theme={{roundness: 0}}
               cancel={() => {
@@ -298,7 +300,7 @@ const Header = ({
               value={search}
               cancelButtonTitle="cancel"
               autoFocus
-              icon="arrow-left"
+              icon={I18nManager.isRTL ? "arrow-right" : "arrow-left"}
               onIconPress={BlurHandlerForTasks}
               theme={{roundness: 0}}
               cancel={() => {

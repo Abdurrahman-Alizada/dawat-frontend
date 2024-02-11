@@ -16,6 +16,7 @@ import {Modalize} from 'react-native-modalize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {useTranslation} from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string().required('Guest name is required').label('invitiName'),
@@ -24,6 +25,7 @@ const validationSchema = Yup.object().shape({
 
 const UpdateInviti = ({route, navigation}) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const dispatch = useDispatch();
 
   const {currentInviti} = route.params;
@@ -143,7 +145,7 @@ const UpdateInviti = ({route, navigation}) => {
         lastStatus: status == currentInviti?.lastStatus?.invitiStatus ? null : status,
       })
         .then(response => {
-          updateHandler(values)
+          updateHandler(values);
           // navigation.goBack();
         })
         .catch(e => {
@@ -154,7 +156,7 @@ const UpdateInviti = ({route, navigation}) => {
 
   const updateHandler = async values => {
     let updatedGuest = {
-      _id : currentInviti?._id,
+      _id: currentInviti?._id,
       invitiName: values.invitiName,
       invitiDescription: values.invitiDescription,
       invitiImageURL: currentInviti?.invitiImageURL,
@@ -175,7 +177,7 @@ const UpdateInviti = ({route, navigation}) => {
     guests = [updatedGuest, ...guests];
     await AsyncStorage.setItem(`guests_${currentViewingGroup?._id}`, JSON.stringify(guests));
     dispatch(handleInvitiFlag(!invitiFlag));
-    navigation.goBack()
+    navigation.goBack();
   };
 
   const modalizeRef = useRef(null);
@@ -234,14 +236,14 @@ const UpdateInviti = ({route, navigation}) => {
 
             {(fileData || avatarURL) && (
               <Button icon="delete" mode="text" onPress={removePicture}>
-                Remove image
+                {t('Remove image')}
               </Button>
             )}
 
             <TextInput
               error={errors.invitiName && touched.invitiName ? true : false}
-              label="Name"
-              placeholder="Name of Person who will be invited"
+              label={t('Name')}
+              placeholder={t("Name of Person who will be invited")}
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiName')}
@@ -255,8 +257,8 @@ const UpdateInviti = ({route, navigation}) => {
 
             <TextInput
               error={errors.invitiDescription && touched.invitiDescription ? true : false}
-              label="Description"
-              placeholder="Description about the person"
+              label={t("Description")}
+              placeholder={t("Description about the person")}
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiDescription')}
@@ -266,12 +268,12 @@ const UpdateInviti = ({route, navigation}) => {
             />
             {errors.invitiDescription && touched.invitiDescription ? (
               <Text style={{color: theme.colors.error, fontSize: 13}}>
-                {errors.invitiDescription}
+                {t(errors.invitiDescription)}
               </Text>
             ) : null}
 
             <View>
-              <Text style={{marginTop: '2%'}}>Inviti statuse</Text>
+              <Text style={{marginTop: '2%'}}>{t("Guest status")}</Text>
               <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
                 {statuses.map((statuse, index) => (
                   <Chip
@@ -284,7 +286,7 @@ const UpdateInviti = ({route, navigation}) => {
                       setStatus(statuse.value);
                       setIsEditStart(true);
                     }}>
-                    {statuse.label}
+                    {t(statuse.label)}
                   </Chip>
                 ))}
               </View>
@@ -294,7 +296,7 @@ const UpdateInviti = ({route, navigation}) => {
               icon="check"
               loading={updateLoading}
               disabled={!isEditStart || updateLoading}
-              label={'Update'}
+              label={t('Update')}
               style={{
                 position: 'absolute',
                 marginVertical: 16,
@@ -327,7 +329,7 @@ const UpdateInviti = ({route, navigation}) => {
               size={40}
               onPress={openCamera}
             />
-            <Text>Camera</Text>
+            <Text>{t("Camera")}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -337,7 +339,7 @@ const UpdateInviti = ({route, navigation}) => {
               size={40}
               onPress={openGallery}
             />
-            <Text>Gallery</Text>
+            <Text>{t("Gallery")}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -350,7 +352,7 @@ const UpdateInviti = ({route, navigation}) => {
                 setAvatarModalVisible(true);
               }}
             />
-            <Text>Avatars</Text>
+            <Text>{t("Avatars")}</Text>
           </View>
         </View>
       </Modalize>

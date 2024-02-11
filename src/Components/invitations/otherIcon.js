@@ -1,8 +1,10 @@
 import {Image, View} from 'react-native';
 import React from 'react';
 import {Text} from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 
 const OtherIcon = () => {
+  const {t} = useTranslation()
   return (
     <View
       style={{
@@ -17,9 +19,8 @@ const OtherIcon = () => {
       <Image
         style={{width: 20, height: 20, marginRight: 5}}
         source={require('../../assets/images/groupDetails/other-approve-icon.png')}
-        //   source={require('../../assets')}
       />
-      <Text style={{color: '#fff'}}>Other</Text>
+      <Text style={{color: '#fff'}}>{t("Other")}</Text>
     </View>
   );
 };

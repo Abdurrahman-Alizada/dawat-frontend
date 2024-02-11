@@ -1,31 +1,29 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {I18nManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import moment from 'moment';
 import {useNavigation} from '@react-navigation/native';
 import {
-  Badge,
-  IconButton,
-  Divider,
-  List,
   useTheme,
   Avatar,
   Menu,
   ActivityIndicator,
+  Checkbox,
 } from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentViewingTask} from '../../../../../redux/reducers/groups/tasks/taskSlice';
-import {
-  useDeleteTaskMutation,
-  useMarkAsCompletedMutation,
-} from '../../../../../redux/reducers/groups/tasks/taskThunk';
-import {groupApi} from '../../../../../redux/reducers/groups/groupThunk';
+import {useMarkAsCompletedMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import {useTranslation} from 'react-i18next';
 
 const RenderGroupMembers = ({task}) => {
+  const {t} = useTranslation();
   const theme = useTheme();
   if (task?.responsibles) {
     return (
-      <View style={styles.groupMembersContent}>
+      <View
+        style={{
+          flexDirection: 'row',
+        }}>
         {task.responsibles.map((user, index) => (
           <View key={index}>
             {index < 5 ? (
@@ -63,9 +61,7 @@ const RenderGroupMembers = ({task}) => {
         ) : (
           <View>
             {task.responsibles.length < 1 && (
-              <Text style={{color: theme.colors.onSurface}}>
-                No participant
-              </Text>
+              <Text style={{color: theme.colors.onSurface}}>{t('No participant')}</Text>
             )}
           </View>
         )}
@@ -74,39 +70,16 @@ const RenderGroupMembers = ({task}) => {
   }
 };
 
-const SingleTask = ({item, setSnackBarVisible}) => {
+const SingleTask = ({item}) => {
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {t, i18n} = useTranslation();
 
   const currentLoginUser = useSelector(state => state.user.currentLoginUser);
-  const currentViewingGroup = useSelector(
-    state => state.groups.currentViewingGroup,
-  );
 
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
 
-  const [deleteTask, {isLoading: deleteLoading}] = useDeleteTaskMutation();
-  const [markAsCompleted, {isLoading: markAsCompletedLoading}] =
-    useMarkAsCompletedMutation();
-
-  const deleteHandler = async () => {
-    deleteTask({groupId: currentViewingGroup._id, taskId: item?._id})
-      .then(response => {
-        if (response.data?._id) {
-          closeMenu();
-          dispatch(groupApi.util.invalidateTags(['GroupLogs']));
-        }else{
-          setSnackBarVisible(true)
-        }
-        console.log('deleted task is =>', response);
-      })
-      .catch(e => {
-        console.log('error in deleteHandler', e);
-      });
-  };
+  const [markAsCompleted, {isLoading: markAsCompletedLoading}] = useMarkAsCompletedMutation();
 
   const markAsCompletedHandler = async () => {
     await markAsCompleted({
@@ -115,7 +88,6 @@ const SingleTask = ({item, setSnackBarVisible}) => {
       taskId: item._id,
     })
       .then(response => {
-        closeMenu();
         console.log('updated task in markAsCompletedHandler is =>', response);
       })
       .catch(e => {
@@ -127,15 +99,12 @@ const SingleTask = ({item, setSnackBarVisible}) => {
 
   const tasksSearchQuery = useSelector(state => state.tasks.tasksSearchQuery);
   const getHighlightedText = result =>
-  result
-    .split(new RegExp(`(${tasksSearchQuery})`, `gi`))
-    .map((piece, index) => {
+    result.split(new RegExp(`(${tasksSearchQuery})`, `gi`)).map((piece, index) => {
       return (
         <Text
           key={index}
           style={
-            piece.toLocaleLowerCase() ==
-            tasksSearchQuery.toLocaleLowerCase()
+            piece.toLocaleLowerCase() == tasksSearchQuery.toLocaleLowerCase()
               ? {fontWeight: 'bold', color: theme.colors.primary}
               : {}
           }>
@@ -144,24 +113,29 @@ const SingleTask = ({item, setSnackBarVisible}) => {
       );
     });
 
+  const [checked, setChecked] = useState(item.isCompleted);
+
   return (
-    <View>
-      <View
-        style={{
-          paddingHorizontal: '5%',
-          paddingVertical: '4%',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          backgroundColor: item.isCompleted
-            ? theme.colors.surfaceVariant
-            : theme.colors.background,
-        }}>
-        <View style={{width: '90%'}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+    <View
+      style={{
+        paddingHorizontal: '5%',
+        paddingVertical: '4%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: checked ? theme.colors.surfaceVariant : theme.colors.background,
+      }}>
+      <View style={{width: '90%'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(handleCurrentViewingTask(item));
+              navigation.navigate('TaskDetail');
             }}>
             <Text
               style={{
@@ -170,123 +144,41 @@ const SingleTask = ({item, setSnackBarVisible}) => {
                 color: theme.colors.onSurface,
                 textDecorationLine: item.isCompleted ? 'line-through' : 'none',
               }}>
-              {getHighlightedText(item.taskName)}
+              {I18nManager.isRTL ? item.taskName : getHighlightedText(item.taskName)}
             </Text>
-          </View>
-          <View
-            style={{
-              marginTop: '2%',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <Icon
-              size={13}
-              name="clock"
-              style={{marginRight: 15}}
-              color={theme.colors.onSurface}
-            />
-            <Text style={{fontSize: 13, color: theme.colors.onSurface}}>
-              {moment(item.dueDate).format('llll')}
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: '2%',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <Icon
-              size={13}
-              name="users"
-              style={{marginRight: 10}}
-              color={theme.colors.onSurface}
-            />
-            <RenderGroupMembers task={item} />
-          </View>
+          </TouchableOpacity>
         </View>
-
-        <View>
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            // anchorPosition="bottom"
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                size={25}
-                onPress={() => openMenu()}
-              />
-            }>
-            <Menu.Item
-              leadingIcon={() => (
-                <View>
-                  {markAsCompletedLoading ? (
-                    <ActivityIndicator animating />
-                  ) : (
-                    <List.Icon
-                      icon={
-                        item?.isCompleted
-                          ? 'checkbox-blank-circle'
-                          : 'checkbox-blank-circle-outline'
-                      }
-                    />
-                  )}
-                </View>
-              )}
-              title={
-                item?.isCompleted ? 'Mark as incompleted' : 'Mark as complete'
-              }
-              onPress={() => {
-                markAsCompletedHandler();
-              }}
-            />
-
-            <Menu.Item
-              leadingIcon="comment-text-multiple"
-              title="Details"
-              titleStyle={{color: theme.colors.onBackground}}
-              onPress={async () => {
-                closeMenu();
-                dispatch(handleCurrentViewingTask(item));
-                navigation.navigate('TaskDetail');
-              }}
-            />
-            <Divider />
-            <Menu.Item
-              leadingIcon={() => (
-                <View>
-                  {deleteLoading ? (
-                    <ActivityIndicator animating />
-                  ) : (
-                    <List.Icon color={theme.colors.error} icon="delete" />
-                  )}
-                </View>
-              )}
-              title="Delete"
-              titleStyle={{color: theme.colors.error}}
-              onPress={async () => {
-                deleteHandler();
-                // navigation.navigate('AppSettingsMain');
-              }}
-            />
-          </Menu>
+        <View
+          style={{
+            marginTop: '2%',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon size={13} name="clock" style={{marginRight: 15}} color={theme.colors.onSurface} />
+          <Text style={{fontSize: 13, color: theme.colors.onSurface}}>
+            {moment(item.dueDate)?.format('llll')}
+          </Text>
+        </View>
+        <View
+          style={{
+            marginTop: '2%',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon size={13} name="users" style={{marginRight: 10}} color={theme.colors.onSurface} />
+          <RenderGroupMembers task={item} />
         </View>
       </View>
-      <Divider style={{backgroundColor: '#000'}} />
-  
+
+      <Checkbox
+        status={checked ? 'checked' : 'unchecked'}
+        onPress={() => {
+          setChecked(!checked);
+          markAsCompletedHandler();
+        }}
+      />
     </View>
   );
 };
 
 export default SingleTask;
-
-const styles = StyleSheet.create({
-  groupMembersContent: {
-    flexDirection: 'row',
-  },
-  memberImage: {
-    height: 20,
-    width: 20,
-    borderRadius: 50,
-  },
-});

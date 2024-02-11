@@ -4,10 +4,12 @@ import {Button, Checkbox, Divider, List, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAddGroupMutation, useAddMultipleGroupMutation} from '../../../redux/reducers/groups/groupThunk';
+import { useTranslation } from 'react-i18next';
 
 const SyncDataIndex = () => {
   const navigation = useNavigation();
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const [groupChecked, setGroupChecked] = useState(true);
   const [guestsChecked, setGuestsChecked] = useState(true);
@@ -67,14 +69,14 @@ const SyncDataIndex = () => {
               fontWeight: '800',
               fontSize: 17,
             }}>
-            What do you want to sync?
+            {t("What do you want to sync?")}
           </Text>
         </View>
 
         <Divider />
 
         <Checkbox.Item
-          label="Events"
+          label={t("Events")}
           status={groupChecked ? 'checked' : 'unchecked'}
           onPress={() => {
             if (guestsChecked) {
@@ -87,14 +89,14 @@ const SyncDataIndex = () => {
         <Divider />
         <View>
           <Checkbox.Item
-            label="Guests in every event"
+            label={t("Guests in every event")}
             status={guestsChecked ? 'checked' : 'unchecked'}
             onPress={() => setGuestsChecked(!guestsChecked)}
             disabled={!groupChecked}
           />
           <Divider />
           <Checkbox.Item
-            label="Tasks list in every event"
+            label={t("Tasks list in every event")}
             status={tasksChecked ? 'checked' : 'unchecked'}
             onPress={() => setTasksChecked(!tasksChecked)}
             disabled={!groupChecked}
@@ -116,7 +118,7 @@ const SyncDataIndex = () => {
           onPress={syncDataHandler}
           buttonColor={theme.colors.blueBG}
           textColor={'#fff'}>
-          Sync data
+          {t("Sync data")}
         </Button>
         <Button
           style={{
@@ -130,7 +132,7 @@ const SyncDataIndex = () => {
               sreen: 'Home',
             })
           }>
-          Continue without sync
+          {t("Continue without sync")}
         </Button>
       </View>
     </View>

@@ -35,7 +35,7 @@ const Header = ({isSearch, setIsSearch, istransparent, searchFilterFunction, the
             }}
           />
 
-          <PinScreenAppbarGift />
+          <PinScreenAppbarGift  istransparent={istransparent} />
         </Appbar.Header>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>

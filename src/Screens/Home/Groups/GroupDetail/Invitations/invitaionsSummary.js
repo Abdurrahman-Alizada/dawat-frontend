@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import {
   IconButton,
@@ -9,29 +9,24 @@ import {
   useTheme,
   Divider,
 } from 'react-native-paper';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {useGetInvitationsSummaryQuery} from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
-import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTranslation} from 'react-i18next';
 
 const InvitaionsSummary = ({onClose}) => {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const {t} = useTranslation();
   const theme = useTheme();
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
-  const {data, isError, isLoading, error, isFetching, refetch} =
-    useGetInvitationsSummaryQuery({
-      groupId: currentViewingGroup._id,
-    });
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetInvitationsSummaryQuery({
+    groupId: currentViewingGroup._id,
+  });
 
   return (
     <View style={{padding: '5%'}}>
       <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
         <List.Item
-          title={'Guests summary of'}
+          title={t('Guests summary of')}
           description={currentViewingGroup.groupName}
           style={{width: '90%'}}
         />
@@ -62,18 +57,10 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.primary,
             }}
             variant="headlineLarge">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : data?.invited ? (
-              data?.invited
-            ) : (
-              0
-            )}
+            {isLoading ? <ActivityIndicator /> : data?.invited ? data?.invited : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Invited
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t("Invited")}
           </Text>
         </Card>
 
@@ -88,18 +75,10 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.secondary,
             }}
             variant="headlineLarge">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : data?.pending ? (
-              data?.pending
-            ) : (
-              0
-            )}
+            {isLoading ? <ActivityIndicator /> : data?.pending ? data?.pending : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Pending
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t("Pending")}
           </Text>
         </Card>
 
@@ -114,18 +93,10 @@ const InvitaionsSummary = ({onClose}) => {
               color: theme.colors.error,
             }}
             variant="headlineLarge">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : data?.rejected ? (
-              data?.rejected
-            ) : (
-              0
-            )}
+            {isLoading ? <ActivityIndicator /> : data?.rejected ? data?.rejected : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Rejected
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t("Rejected")}
           </Text>
         </Card>
 
@@ -142,10 +113,8 @@ const InvitaionsSummary = ({onClose}) => {
             variant="headlineLarge">
             {isLoading ? <ActivityIndicator /> : data?.other ? data?.other : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Others
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t("Other")}
           </Text>
         </Card>
         <Card
@@ -167,22 +136,20 @@ const InvitaionsSummary = ({onClose}) => {
               0
             )}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Total
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t("Total")}
           </Text>
         </Card>
       </View>
-        <IconButton
-          icon="refresh"
-          size={30}
-          disabled={isFetching}
-          accessibilityLabel="refresh to-do summary"
-          style={{marginTop: '5%', }}
-          mode="contained"
-          onPress={refetch}
-        />
+      <IconButton
+        icon="refresh"
+        size={30}
+        disabled={isFetching}
+        accessibilityLabel="refresh to-do summary"
+        style={{marginTop: '5%'}}
+        mode="contained"
+        onPress={refetch}
+      />
     </View>
   );
 };

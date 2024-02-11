@@ -1,16 +1,16 @@
-import { View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
+import {View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import {
   useGetAllFriendsQuery,
   useUndoDeleteFriendSuggestionMutation,
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
-import {Button, List,Text, Avatar, useTheme} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import {Button, List, Text, Avatar, useTheme} from 'react-native-paper';
+import {useTranslation} from 'react-i18next';
 
-const PendingRequest = ({route}) => {
-  const navigation = useNavigation();
+const PendingRequest = () => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
 
   const [selectedItems, setSelectedItems] = useState([]);
@@ -56,7 +56,9 @@ const PendingRequest = ({route}) => {
                   marginTop: '5%',
                   backgroundColor: theme.colors.primary,
                 }}>
-                <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Undo</Text>
+                <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>
+                  {t('Undo')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -79,20 +81,20 @@ const PendingRequest = ({route}) => {
       {/* list of people to whom current login user sent request */}
       <Text
         style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical: '2%'}}>
-        Friend suggestions deleted{' '}
+        {t("Friend suggestions deleted")}
         <Text style={{color: theme.colors.error}}>{data?.deleted?.length}</Text>
       </Text>
       <FlatList
         data={data?.deleted}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>Deleted suggestions will appear here.</Text>
+            <Text>{t('Deleted suggestions will appear here')}</Text>
             <Button
               icon="refresh"
               mode="contained"
               style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={refetch}>
-              Refresh
+              {t('Refresh')}
             </Button>
           </View>
         )}

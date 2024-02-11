@@ -19,11 +19,12 @@ import moment from 'moment';
 import PinnedGroupHeader from '../../../Components/PinnedGroupHeader';
 import {handleCurrentViewingGroup} from '../../../redux/reducers/groups/groups';
 import BackgroundImages from './changeBackMainImage/mainBackgroundImages';
+import {useTranslation} from 'react-i18next';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
-
   const dispatch = useDispatch();
+  const {t, i18n} = useTranslation();
 
   const {isThemeDark} = useContext(ThemeContext);
   const [loading, setLoading] = useState(true);
@@ -66,7 +67,7 @@ const Groups = ({navigation}) => {
     <View style={{flex: 1}}>
       <StatusBar
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-        backgroundColor={'transparent'}
+        backgroundColor={theme.colors.background}
       />
       {!pinGroup && <PinnedGroupHeader theme={theme} istransparent={false} />}
 
@@ -107,39 +108,35 @@ const Groups = ({navigation}) => {
                         timeLabelStyle={{color: '#fff'}}
                         running={false}
                         separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                        timeLabels={{d: t('Days'), h: t('Hours'), m: t('Minutes'), s: t('Seconds')}}
                       />
                       <Text
                         style={{
                           fontWeight: 'bold',
                           color: '#fff',
                         }}>
-                        ago
+                        {t('ago')}
                       </Text>
                     </View>
                   ) : (
                     <CountDown
                       until={pinGroupTime.current ? pinGroupTime.current : 0}
+                      // onPress={() =>
+                      //   Alert.alert(
+                      //     `${moment(pinGroup.time)
+                      //       .locale(i18n.language)
+                      //       .format('MMM D, YYYY, h:mm a')}`,
+                      //   )
+                      // }
                       size={22}
                       style={{margin: '2%'}}
                       digitTxtStyle={{color: '#fff'}}
                       digitStyle={{backgroundColor: '#265AE8'}}
                       timeLabelStyle={{color: '#fff'}}
                       separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                      timeLabels={{d: t('Days'), h: t('Hours'), m: t('Minutes'), s: t('Seconds')}}
                     />
                   )}
-
-                  {/* <CountDown
-                    until={pinGroupTime.current ? pinGroupTime.current : 0}
-                    onPress={() =>
-                      Alert.alert(`${moment(pinGroup.time).format('MMM D, YYYY, h:mm a')}`)
-                    }
-                    size={22}
-                    style={{margin: '2%'}}
-                    digitTxtStyle={{color: '#fff'}}
-                    digitStyle={{backgroundColor: '#265AE8'}}
-                    timeLabelStyle={{color: '#fff'}}
-                    separatorStyle={{color: '#fff', alignSelf: 'center'}}
-                  /> */}
                 </View>
               </ImageBackground>
 
@@ -180,7 +177,7 @@ const Groups = ({navigation}) => {
                       fontSize: 20,
                       fontWeight: 'bold',
                     }}>
-                    Todo list
+                    {t('Todo list')}
                   </Text>
                 </TouchableOpacity>
 
@@ -212,7 +209,7 @@ const Groups = ({navigation}) => {
                       fontSize: 20,
                       fontWeight: 'bold',
                     }}>
-                    Guests
+                    {t('Guests')}
                   </Text>
                 </TouchableOpacity>
 
@@ -244,7 +241,7 @@ const Groups = ({navigation}) => {
                       fontSize: 20,
                       fontWeight: 'bold',
                     }}>
-                    Chat
+                    {t('Chat')}
                   </Text>
                 </TouchableOpacity>
 
@@ -277,7 +274,7 @@ const Groups = ({navigation}) => {
                       fontSize: 20,
                       fontWeight: 'bold',
                     }}>
-                    Settings
+                    {t('Settings')}
                   </Text>
                 </TouchableOpacity>
 
@@ -315,7 +312,7 @@ const Groups = ({navigation}) => {
                     }}
                     s
                     buttonColor={theme.colors.tertiary}>
-                    Summary
+                    {t('Summary')}
                   </Button>
                   {/* {true ? (
                     <Button
@@ -349,13 +346,14 @@ const Groups = ({navigation}) => {
                     style={{
                       fontSize: 22,
                     }}>
-                    No event has been pinned
+                    {t('No event has been pinned')}
                   </Text>
-                  <Text style={{}}>i. create event.</Text>
-                  <Text style={{}}>ii. Long press on any event.</Text>
+                  <Text style={{}}>{t('i. Create event or navigate to events screen.')}</Text>
+                  <Text style={{}}>{t('ii. Long press on any event from list.')}</Text>
                   <Text style={{}}>
-                    iii. In the upper menu, a menu icon will appear click on it and the event will
-                    display here as pinned event.
+                    {t(
+                      'iii. In the upper menu, a pin icon will appear click on it and the event will display here as pinned event.',
+                    )}
                   </Text>
                 </View>
                 <Button
@@ -370,10 +368,8 @@ const Groups = ({navigation}) => {
                   mode="outlined"
                   icon="plus-circle-multiple-outline"
                   labelStyle={{fontWeight: 'bold'}}
-                  onPress={() => navigation.navigate('AddGroup')}
-                  // buttonColor={theme.colors.blueBG}
-                >
-                  Create event
+                  onPress={() => navigation.navigate('AddGroup')}>
+                  {t('Create event')}
                 </Button>
 
                 <Button
@@ -390,7 +386,7 @@ const Groups = ({navigation}) => {
                   labelStyle={{fontWeight: 'bold'}}
                   onPress={() => navigation.navigate('HomeIndex')}
                   buttonColor={theme.colors.blueBG}>
-                  Pin from existing events
+                  {t('Pin from existing events')}
                 </Button>
               </View>
             </View>
@@ -403,7 +399,7 @@ const Groups = ({navigation}) => {
       )}
       <ErrorSnackBar
         isVisible={isError}
-        text={'Something went wrong'}
+        text={t('Something went wrong')}
         onDismissHandler={() => setIsError(false)}
       />
     </View>

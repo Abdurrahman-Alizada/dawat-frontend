@@ -1,0 +1,32 @@
+{
+  "en": {
+    "code": "en",
+    "name": "English",
+    "nativeName": "English",
+    "isoCode": "gb"
+  },
+  "fr": {
+    "code": "fr",
+    "name": "French",
+    "nativeName": "français, langue française",
+    "isoCode": "fr"
+  },
+  "ar": {
+    "code": "ar",
+    "name": "Arabic",
+    "nativeName": "العربية",
+    "isoCode": "sa"
+  },
+  "ur": {
+    "code": "ur",
+    "name": "Urdu",
+    "nativeName": "اردو",
+    "isoCode": "pk"
+  },
+  "hi": {
+    "code": "hi",
+    "name": "Hindi",
+    "nativeName": "हिन्दी, हिंदी",
+    "isoCode": "in"
+  }
+}

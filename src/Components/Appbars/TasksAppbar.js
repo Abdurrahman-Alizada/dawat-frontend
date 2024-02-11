@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Menu, Divider, Appbar, Searchbar, useTheme} from 'react-native-paper';
+import { Appbar, Searchbar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {handleIsSearch} from '../../redux/reducers/groups/groups';
@@ -8,12 +8,13 @@ import {
   handleTasksSearch,
   handleIsTaskSummaryOpen,
 } from '../../redux/reducers/groups/tasks/taskSlice';
-
+import { useTranslation } from 'react-i18next';
+import { I18nManager } from 'react-native';
 const Header = ({openTasksSummaryModalize}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
-
+  const {t} = useTranslation();
   //search
   const isSearch = useSelector(state => state.groups.isSearch);
 
@@ -29,11 +30,6 @@ const Header = ({openTasksSummaryModalize}) => {
     dispatch(handleIsTaskSearch(search));
   };
 
-  // "more menu"
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-  // end more menu
   return (
     <>
       {!isSearch ? (
@@ -47,7 +43,7 @@ const Header = ({openTasksSummaryModalize}) => {
           }}>
           <Appbar.BackAction onPress={() => navigation.goBack()} />
           <Appbar.Content
-            title="To-do"
+            title={t("To-do")}
             titleStyle={{
               color: theme.colors.onBackground,
             }}
@@ -80,12 +76,12 @@ const Header = ({openTasksSummaryModalize}) => {
             marginBottom: 2,
           }}>
           <Searchbar
-            placeholder="Search..."
+            placeholder={t("Search...")}
             onChangeText={updateSearch}
             value={search}
             cancelButtonTitle="cancel"
             autoFocus
-            icon="arrow-left"
+            icon={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
             onIconPress={BlurHandler}
             theme={{roundness: 0}}
             style={{

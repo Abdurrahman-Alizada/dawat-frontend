@@ -118,7 +118,7 @@ const AppStack = () => {
         name="AddTask"
         component={AddTask}
         options={{
-          header: props => <GeneralAppbar title="Add Task" {...props} />,
+          header: props => <GeneralAppbar title="Add task" {...props} />,
         }}
       />
 
@@ -161,7 +161,7 @@ const AppStack = () => {
         component={AddInviti}
         options={{
           // headerShown:false
-          header: props => <GeneralAppbar title="Add inviti" {...props} />,
+          header: props => <GeneralAppbar title="Add guest" {...props} />,
         }}
       />
       <Stack.Screen
@@ -169,7 +169,7 @@ const AppStack = () => {
         component={UpdateInviti}
         options={{
           // headerShown:false
-          header: props => <GeneralAppbar title="Update inviti" {...props} />,
+          header: props => <GeneralAppbar title="Update guest" {...props} />,
         }}
       />
       <Stack.Screen

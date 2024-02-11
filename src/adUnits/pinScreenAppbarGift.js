@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import {InterstitialAd, AdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {Appbar} from 'react-native-paper';
+import {Appbar, useTheme} from 'react-native-paper';
 const adUnitIdINTERSTITIAL = __DEV__
   ? TestIds.INTERSTITIAL
   : 'ca-app-pub-9526618780177325/2233225131';
@@ -10,7 +10,8 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitIdINTERSTITIAL, {
   requestNonPersonalizedAdsOnly: true,
 });
 
-export default function PinScreenAppbarGift() {
+export default function PinScreenAppbarGift({istransparent}) {
+  const theme = useTheme()
   const [loaded, setLoaded] = useState(false);
   const [isInterstitialWatched, setIsInterstitialWatched] = useState(false);
 
@@ -32,7 +33,7 @@ export default function PinScreenAppbarGift() {
           {loaded && (
             <Appbar.Action
               icon="gift-outline"
-              color={'#fff'}
+              color={istransparent ? '#fff' : theme.colors.onBackground}
               onPress={() => {
                 interstitial.show();
                 setIsInterstitialWatched(true);

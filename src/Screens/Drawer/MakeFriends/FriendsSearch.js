@@ -1,19 +1,20 @@
-import {StyleSheet, View, FlatList, TouchableOpacity} from 'react-native';
+import {View, FlatList, TouchableOpacity, I18nManager} from 'react-native';
 import React, {useState} from 'react';
-import {Searchbar, Text, Avatar, List, Button, useTheme} from 'react-native-paper';
+import {Searchbar, Text, Avatar, List, useTheme} from 'react-native-paper';
 import {
   useAcceptFriendRequestMutation,
   useDeclineFriendRequestMutation,
   useDeleteFriendsSeggestionMutation,
-  useSearchForFriendMutation,
   useSearchFriendsForUserMutation,
   useSendFriendRequestMutation,
   useUndoDeleteFriendSuggestionMutation,
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
 
 const FriendsSearch = ({navigation}) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const [search, setSearch] = useState('');
   const [users, setUsers] = useState(null);
   const [SearchFriendsForUser, {isLoading}] = useSearchFriendsForUserMutation();
@@ -45,7 +46,6 @@ const FriendsSearch = ({navigation}) => {
   const [acceptFriendRequest, {}] = useAcceptFriendRequestMutation();
 
   const RenderItem = ({item}) => {
-
     const [clicked, setClicked] = useState(false);
     const [textAfterAction, setTextAfterAction] = useState('');
 
@@ -143,7 +143,7 @@ const FriendsSearch = ({navigation}) => {
                         paddingVertical: '2%',
                         backgroundColor: theme.colors.primary,
                       }}>
-                      <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Add</Text>
+                      <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>{t("Add")}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -158,7 +158,7 @@ const FriendsSearch = ({navigation}) => {
                         marginHorizontal: '4%',
                       }}>
                       <Text style={{color: theme.colors.tertiary, textAlign: 'center'}}>
-                        Delete
+                        {t("Delete")}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -171,40 +171,41 @@ const FriendsSearch = ({navigation}) => {
                   <Text>{textAfterAction}</Text>
                 ) : (
                   <View>
-                   <Text variant="bodySmall" style={{color:theme.colors.secondary}}>Friend request</Text>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      marginTop: '2%',
-                    }}>
-
-                    <TouchableOpacity
-                      onPress={() => handleAcceptFriendRequest(item._id)}
+                    <Text variant="bodySmall" style={{color: theme.colors.secondary}}>
+                      {t("Friend request")}
+                    </Text>
+                    <View
                       style={{
-                        borderRadius: 5,
-                        width: '45%',
-                        paddingVertical: '2%',
-                        backgroundColor: theme.colors.primary,
+                        flexDirection: 'row',
+                        marginTop: '2%',
                       }}>
-                      <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>
-                        Accept
-                      </Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleAcceptFriendRequest(item._id)}
+                        style={{
+                          borderRadius: 5,
+                          width: '45%',
+                          paddingVertical: '2%',
+                          backgroundColor: theme.colors.primary,
+                        }}>
+                        <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>
+                          {t("Accept")}
+                        </Text>
+                      </TouchableOpacity>
 
-                    <TouchableOpacity
-                      onPress={() => handleDeclineFriendRequest(item._id)}
-                      style={{
-                        borderRadius: 5,
-                        width: '45%',
-                        paddingVertical: '2%',
-                        backgroundColor: theme.colors.background,
-                        borderColor: theme.colors.error,
-                        borderWidth: 1,
-                        marginHorizontal: '4%',
-                      }}>
-                      <Text style={{color: theme.colors.error, textAlign: 'center'}}>Delete</Text>
-                    </TouchableOpacity>
-                  </View>
+                      <TouchableOpacity
+                        onPress={() => handleDeclineFriendRequest(item._id)}
+                        style={{
+                          borderRadius: 5,
+                          width: '45%',
+                          paddingVertical: '2%',
+                          backgroundColor: theme.colors.background,
+                          borderColor: theme.colors.error,
+                          borderWidth: 1,
+                          marginHorizontal: '4%',
+                        }}>
+                        <Text style={{color: theme.colors.error, textAlign: 'center'}}>{t("Delete")}</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )}
               </View>
@@ -215,18 +216,20 @@ const FriendsSearch = ({navigation}) => {
                   <Text>{textAfterAction}</Text>
                 ) : (
                   <View>
-                   <Text variant="bodySmall" style={{color:theme.colors.secondary}}>Request sent</Text>
-                    
-                  <TouchableOpacity
-                    onPress={() => handleDeclineFriendRequest(item._id)}
-                    style={{
-                      borderRadius: 5,
-                      padding: '2%',
-                      marginTop: '2%',
-                      backgroundColor: theme.colors.backdrop,
-                    }}>
-                    <Text style={{color: '#fff', textAlign: 'center'}}>Cancel</Text>
-                  </TouchableOpacity>
+                    <Text variant="bodySmall" style={{color: theme.colors.secondary}}>
+                      {t("Request sent")}
+                    </Text>
+
+                    <TouchableOpacity
+                      onPress={() => handleDeclineFriendRequest(item._id)}
+                      style={{
+                        borderRadius: 5,
+                        padding: '2%',
+                        marginTop: '2%',
+                        backgroundColor: theme.colors.backdrop,
+                      }}>
+                      <Text style={{color: '#fff', textAlign: 'center'}}>{t("Cancel")}</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
@@ -237,18 +240,22 @@ const FriendsSearch = ({navigation}) => {
                   <Text>{textAfterAction}</Text>
                 ) : (
                   <View>
-                   <Text variant="bodySmall" style={{color:theme.colors.primary}}>Friend</Text>
+                    <Text variant="bodySmall" style={{color: theme.colors.primary}}>
+                      {t("Friend")}
+                    </Text>
 
-                  <TouchableOpacity
-                    onPress={() => handleDeclineFriendRequest(item._id)}
-                    style={{
-                      borderRadius: 5,
-                      padding: '3%',
-                      marginTop: '2%',
-                      backgroundColor: theme.colors.error,
-                    }}>
-                    <Text style={{color: theme.colors.onError, textAlign: 'center'}}>UnFriend</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeclineFriendRequest(item._id)}
+                      style={{
+                        borderRadius: 5,
+                        padding: '3%',
+                        marginTop: '2%',
+                        backgroundColor: theme.colors.error,
+                      }}>
+                      <Text style={{color: theme.colors.onError, textAlign: 'center'}}>
+                        {t("UnFriend")}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
@@ -259,17 +266,19 @@ const FriendsSearch = ({navigation}) => {
                   <Text>{textAfterAction}</Text>
                 ) : (
                   <View style={{}}>
-                   <Text variant="bodySmall" style={{color:theme.colors.tertiary}}>Friend suggestion deleted</Text>
-                  <TouchableOpacity
-                    onPress={() => handleUndoDeletedFriendSuggestion(item._id)}
-                    style={{
-                      borderRadius: 5,
-                      padding: '3%',
-                      marginTop: '2%',
-                      backgroundColor: theme.colors.primary,
-                    }}>
-                    <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Undo</Text>
-                  </TouchableOpacity>
+                    <Text variant="bodySmall" style={{color: theme.colors.tertiary}}>
+                      {t("Friend suggestion deleted")}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => handleUndoDeletedFriendSuggestion(item._id)}
+                      style={{
+                        borderRadius: 5,
+                        padding: '3%',
+                        marginTop: '2%',
+                        backgroundColor: theme.colors.primary,
+                      }}>
+                      <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>{t("Undo")}</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
@@ -308,10 +317,10 @@ const FriendsSearch = ({navigation}) => {
   return (
     <View style={{flex: 1}}>
       <Searchbar
-        placeholder="Search..."
+        placeholder={t("Search...")}
         onChangeText={updateSearch}
         value={search}
-        icon="arrow-left"
+        icon={I18nManager.isRTL ? "arrow-right": "arrow-left"}
         onIconPress={BlurHandler}
         cancelButtonTitle="cancel"
         autoFocus
@@ -324,8 +333,8 @@ const FriendsSearch = ({navigation}) => {
         keyExtractor={item => item._id}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>There is nothing to appear.</Text>
-            <Text>Please broaden you search keyword</Text>
+            <Text>{t("There is nothing to appear.")}</Text>
+            <Text>{t("Please broaden you search keyword")}</Text>
           </View>
         )}
         renderItem={({item}) => <RenderItem item={item} />}

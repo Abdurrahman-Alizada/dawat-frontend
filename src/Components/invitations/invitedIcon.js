@@ -1,8 +1,10 @@
 import {Image, View} from 'react-native';
 import React from 'react';
 import { Text } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 
 const InvitedIcon = () => {
+  const {t} = useTranslation()
   return (
       <View
         style={{
@@ -19,7 +21,7 @@ const InvitedIcon = () => {
           source={require('../../assets/images/groupDetails/invitation-approve-icon.png')}
         //   source={require('../../assets')}
         />
-        <Text style={{color: '#fff'}}>Invited</Text>
+        <Text style={{color: '#fff'}}>{t("Invited")}</Text>
     </View>
   );
 };

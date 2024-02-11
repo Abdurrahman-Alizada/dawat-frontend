@@ -55,6 +55,7 @@ const AuthStack = () => {
         name="ForgotPassword"
         options={{
           title: 'Forgot password',
+          headerShown:false
         }}
         component={ForgotPasswordScreen}
       />
@@ -63,7 +64,8 @@ const AuthStack = () => {
         name="OTPScreen"
         component={OTPScreen}
         options={{
-          title: 'Verify email',
+          title: 'OTP',
+          headerShown:false
         }}
       />
       <Stack.Screen

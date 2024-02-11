@@ -8,7 +8,7 @@ import MakeFriends from './MakeFriendsStack';
 // import SupportUs from '../Screens/Drawer/Supportus/Index';
 import SupportUs from './SupportUsStatck';
 
-const DrawerStack = props => {
+const DrawerStack = () => {
   return (
     <Drawer1.Navigator  drawerContent={() => <DrawerContent />}>
       <Drawer1.Screen

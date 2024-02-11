@@ -4,10 +4,9 @@ import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import {Avatar, Drawer, List, useTheme, Text, Divider} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import {useGetCurrentLoginUserQuery} from '../redux/reducers/user/userThunk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleCurrentLoaginUser} from '../redux/reducers/user/user';
+import {useTranslation} from 'react-i18next';
 
 import {version} from '../../package.json';
 
@@ -15,6 +14,7 @@ export default function DrawerContent(props) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const {t} = useTranslation();
   const currentLoginUser = useSelector(state => state.user.currentLoginUser);
 
   const {
@@ -35,9 +35,9 @@ export default function DrawerContent(props) {
     <DrawerContentScrollView
       {...props}
       style={{backgroundColor: theme.colors.background}}
-      contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}>
+      contentContainerStyle={{flex: 1,paddingTop:"8%", justifyContent: 'space-between'}}>
       <View>
-        <List.Item
+        {/* <List.Item
           title={'Event planner'}
           description={'Guests, Todos, Chat'}
           left={() => (
@@ -52,24 +52,30 @@ export default function DrawerContent(props) {
           )}
           titleStyle={{fontWeight: 'bold', fontSize: 20}}
         />
-        <Divider style={{marginBottom: '5%'}} />
+        <Divider style={{marginBottom: '5%'}} /> */}
 
         <Drawer.Item
-          label="Events"
+          label={t("Events")}
           onPress={() => {
             navigation.navigate('GroupStack', {screen: 'HomeIndex'});
           }}
           icon="calendar-month"
         />
-        
-        
+
         <Drawer.Item
-          label="Settings"
+          label={t("Friends")}
+          onPress={() => navigation.navigate('MakeFriends', {screen: 'MakeFriendsMain'})}
+          theme={{roundness: 0}}
+          icon="account-multiple"
+        />
+
+        <Drawer.Item
+          label={t("Settings")}
           onPress={async () => {
             navigation.navigate('AppSettingsMain');
           }}
           theme={{roundness: 0}}
-          icon="cog-outline"
+          icon="cog"
         />
         {/* {isLoading ? (
           <List.Item
@@ -108,7 +114,7 @@ export default function DrawerContent(props) {
         )} */}
 
         <Drawer.Item
-          label="Watch ad"
+          label={t("Watch ad")}
           icon="motion-play"
           onPress={() => navigation.navigate('SupportUs')}
         />
@@ -126,9 +132,8 @@ export default function DrawerContent(props) {
       </View>
 
       <View style={{marginVertical: '5%'}}>
-        
-        <Text style={{marginVertical:"5%", alignSelf:"center"}}>Version {version}</Text>
-       </View>
+        <Text style={{marginVertical: '5%', alignSelf: 'center'}}>Version {version}</Text>
+      </View>
     </DrawerContentScrollView>
   );
 }

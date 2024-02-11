@@ -1,26 +1,24 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef} from 'react';
 import {View} from 'react-native';
 import Chat from './Chat';
 import Tasks from './Tasks';
 import Invitations from './Invitations';
-import GroupLogs from './GroupLogs/Index';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import GroupBrief from './GroupBrief';
 import GroupHeader from '../../../../Components/GroupHeader';
 import {Modalize} from 'react-native-modalize';
-import {List, useTheme, Text, IconButton} from 'react-native-paper';
+import {useTheme} from 'react-native-paper';
 import {handleCurrentTab} from '../../../../redux/reducers/groups/groups';
 import {handleIsInvitationSearch} from '../../../../redux/reducers/groups/invitations/invitationSlice';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch} from 'react-redux';
 import {selectedMessageIdsClearHandler} from '../../../../redux/reducers/groups/chat/chatSlice';
 import InvitaionsSummary from './Invitations/invitaionsSummary';
 import TasksSummary from './Tasks/TasksSummary';
-import ImportExport from './Invitations/importExport'
+import ImportExport from './Invitations/importExport';
+import { t } from 'i18next';
 
 const Tab = createMaterialTopTabNavigator();
 
-const Tabs = ({groupId, navigation}) => {
+const Tabs = ({groupId}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -29,19 +27,15 @@ const Tabs = ({groupId, navigation}) => {
       initialRouteName="Guests"
       screenOptions={{
         tabBarLabelStyle: {
-          // fontSize: 17,
           fontWeight: 'bold',
           textTransform: 'none',
-          // justifyContent: 'space-evenly',
         },
-        // tabBarScrollEnabled: true,
         tabBarStyle: {
-          // backgroundColor: theme.colors.elevation.level2,
           backgroundColor: theme.colors.background,
         },
-        // tabBarItemStyle: {width: 'auto',marginLeft:10},
-        // tabBarIndicatorStyle: {marginLeft:10},
-      }}>
+      }}
+      backBehavior="none"
+      >
       {/* <Tab.Screen
         name="Logs"
         initialParams={{groupId: groupId}}
@@ -74,6 +68,8 @@ const Tabs = ({groupId, navigation}) => {
         name="Guests"
         initialParams={{groupId: groupId}}
         component={Invitations}
+        // options={{tabBarIcon: () => <Icon name="users" size={20} />}}
+        options={{tabBarLabel: t("Guests")}}
         listeners={({route}) => ({
           focus: e => {
             dispatch(handleCurrentTab(route.name));
@@ -86,6 +82,8 @@ const Tabs = ({groupId, navigation}) => {
         name="To-do"
         initialParams={{groupId: groupId}}
         component={Tasks}
+        // options={{tabBarIcon: () => <Icon name="tasks" size={20} />}}
+        options={{tabBarLabel: t("To-do")}}
         listeners={({route}) => ({
           focus: e => {
             // dispatch(handleIsInvitationSearch(false));
@@ -97,6 +95,7 @@ const Tabs = ({groupId, navigation}) => {
 
       <Tab.Screen
         name="Chat"
+        options={{tabBarLabel: t("Chat")}}
         initialParams={{groupId: groupId}}
         component={Chat}
         listeners={({route}) => ({
@@ -157,12 +156,8 @@ const Index = ({route, navigation}) => {
         ref={importExportModalizeRef}
         handlePosition="inside"
         snapPoint={400}>
-        {/* <GroupBrief
-          group={route.params.group}
-          onClose={onCloseGuestsImportExport}
-        /> */}
+        
         <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
-
       </Modalize>
 
       <Modalize

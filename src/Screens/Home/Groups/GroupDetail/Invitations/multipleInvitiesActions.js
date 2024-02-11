@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -25,6 +25,7 @@ import {
 } from '../../../../../redux/reducers/groups/invitations/invitaionThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import { useTranslation } from 'react-i18next';
 
 const BOTTOM_APPBAR_HEIGHT = 70;
 
@@ -32,6 +33,7 @@ const MultipleInvitiAction = ({navigation}) => {
   const theme = useTheme();
   const {bottom} = useSafeAreaInsets();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const invitationsForSearch = useSelector(state => state.invitations.invitations);
   const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
@@ -202,7 +204,7 @@ const MultipleInvitiAction = ({navigation}) => {
         elevated
         mode="medium">
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`${ids.length} selected`} />
+        <Appbar.Content title={`${ids.length} ${t("selected")}`} />
 
         <Appbar.Action
           disabled={ids.length ? false : true}
@@ -240,7 +242,7 @@ const MultipleInvitiAction = ({navigation}) => {
         extraData={extraData || theme}
         ListEmptyComponent={() => (
           <View style={{marginTop: '50%', alignItems: 'center'}}>
-            <Text>No invitation to delete</Text>
+            <Text>{t("No invitation to delete")}</Text>
           </View>
         )}
         renderItem={({item}) => <Item item={item} />}
@@ -294,7 +296,7 @@ const MultipleInvitiAction = ({navigation}) => {
                   setIds(invitedUsers);
                   setExtradata(!extraData);
                 }}
-                title="Select all invited"
+                title={t("Select all invited")}
               />
               <Menu.Item
                 leadingIcon="clock-outline"
@@ -310,7 +312,7 @@ const MultipleInvitiAction = ({navigation}) => {
                   setIds(invitedUsers);
                   setExtradata(!extraData);
                 }}
-                title="Select all pending"
+                title={t("Select all pending")}
               />
               <Menu.Item
                 leadingIcon="cancel"
@@ -326,7 +328,7 @@ const MultipleInvitiAction = ({navigation}) => {
                   setIds(invitedUsers);
                   setExtradata(!extraData);
                 }}
-                title="Select all rejected"
+                title={t("Select all rejected")}
               />
               <Divider />
               <Menu.Item
@@ -346,7 +348,7 @@ const MultipleInvitiAction = ({navigation}) => {
                   setIds(invitedUsers);
                   setExtradata(!extraData);
                 }}
-                title="Select all without tag"
+                title={t("Select all without tag")}
               />
             </Menu>
             <Appbar.Action
@@ -378,10 +380,10 @@ const MultipleInvitiAction = ({navigation}) => {
               alignItems: 'center',
               flexDirection: 'row',
             }}>
-            {isLoading && <Text>Deleting {ids.length} invitie(s)</Text>}
+            {isLoading && <Text>{t("Deleting")} {ids.length} {t("guests(s)")}</Text>}
             {multipleStatusUpdateLoading && (
               <Text>
-                updating {ids.length} invitie(s) status to {currentStatus}
+                {t("updating")} {ids.length} {t("invitie(s) status to")} '{t(currentStatus)}'
               </Text>
             )}
             <ActivityIndicator animating />
@@ -393,10 +395,10 @@ const MultipleInvitiAction = ({navigation}) => {
         {/* delete dialog */}
         <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Deleting {ids.length} invitie(s)</Dialog.Title>
+          <Dialog.Title>{t("Deleting")} {ids.length} {t("guests(s)")}</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure to delete selected invities</Text>
+            <Text variant="bodyMedium">{t("Are you sure to delete selected guests")}</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -405,7 +407,7 @@ const MultipleInvitiAction = ({navigation}) => {
                 setDeleteDialogVisible(false);
                 deleteMultipleInvitiHandler();
               }}>
-              Yes, delete it
+              {t("Yes, delete it")}
             </Button>
 
             <Button
@@ -413,7 +415,7 @@ const MultipleInvitiAction = ({navigation}) => {
               onPress={() => {
                 setDeleteDialogVisible(false);
               }}>
-              Cancel
+              {t("Cancel")}
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -423,10 +425,10 @@ const MultipleInvitiAction = ({navigation}) => {
           visible={markAsInvitedDialogVisible}
           onDismiss={() => setMarkAsInvitedDialogVisible(false)}>
           <Dialog.Icon icon="check-all" />
-          <Dialog.Title>Mark {ids.length} invitie(s) as invited</Dialog.Title>
+          <Dialog.Title>{t("Mark")} {ids.length} {t("guests(s) as invited")}</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure to mark as invited selected invities</Text>
+            <Text variant="bodyMedium">{t("Are you sure to mark as invited selected guests")}</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -435,7 +437,7 @@ const MultipleInvitiAction = ({navigation}) => {
                 setMarkAsInvitedDialogVisible(false);
                 updateStatusOfMultipleInvitiHandler('invited');
               }}>
-              Yes, mark as invited
+              {t("Yes, mark as invited")}
             </Button>
 
             <Button
@@ -443,7 +445,7 @@ const MultipleInvitiAction = ({navigation}) => {
               onPress={() => {
                 setMarkAsInvitedDialogVisible(false);
               }}>
-              Cancel
+              {t("Cancel")}
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -453,10 +455,10 @@ const MultipleInvitiAction = ({navigation}) => {
           visible={markAsPendingDialogVisible}
           onDismiss={() => setMarkAsPendingDialogVisible(false)}>
           <Dialog.Icon icon="clock-outline" />
-          <Dialog.Title>Mark {ids.length} invitie(s) as pending</Dialog.Title>
+          <Dialog.Title>{t("Mark")} {ids.length} {t("guests(s) as pending")}</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure to mark as pending selected invities</Text>
+            <Text variant="bodyMedium">{t("Are you sure to mark as pending selected guests")}</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -465,7 +467,7 @@ const MultipleInvitiAction = ({navigation}) => {
                 setMarkAsPendingDialogVisible(false);
                 updateStatusOfMultipleInvitiHandler('pending');
               }}>
-              Yes, mark as pending
+              {t("Yes, mark as pending")}
             </Button>
 
             <Button
@@ -473,7 +475,7 @@ const MultipleInvitiAction = ({navigation}) => {
               onPress={() => {
                 setMarkAsPendingDialogVisible(false);
               }}>
-              Cancel
+              {t("Cancel")}
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -483,10 +485,10 @@ const MultipleInvitiAction = ({navigation}) => {
           visible={markAsRejectedDialogVisible}
           onDismiss={() => setMarkAsRejectedDialogVisible(false)}>
           <Dialog.Icon icon="clock-outline" />
-          <Dialog.Title>Mark {ids.length} invitie(s) as rejected</Dialog.Title>
+          <Dialog.Title>{t("Mark")} {ids.length} {t("guests(s) as rejected")}</Dialog.Title>
 
           <Dialog.Content>
-            <Text variant="bodyMedium">Are you sure to mark as rejected selected invities</Text>
+            <Text variant="bodyMedium">{t("Are you sure to mark as rejected selected guests")}</Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -495,7 +497,7 @@ const MultipleInvitiAction = ({navigation}) => {
                 setMarkAsRejectedDialogVisible(false);
                 updateStatusOfMultipleInvitiHandler('rejected');
               }}>
-              Yes, mark as rejected
+              {t("Yes, mark as rejected")}
             </Button>
 
             <Button
@@ -503,13 +505,13 @@ const MultipleInvitiAction = ({navigation}) => {
               onPress={() => {
                 setMarkAsRejectedDialogVisible(false);
               }}>
-              Cancel
+              {t("Cancel")}
             </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
       <Snackbar visible={snackBarVisible} onDismiss={() => setSnackBarVisible(false)}>
-        {snackBarText}
+        {t(snackBarText)}
       </Snackbar>
     </View>
   );

@@ -1,17 +1,9 @@
-import {
-  View,
-  FlatList,
-  RefreshControl,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import {View, FlatList, ScrollView, TouchableOpacity, StyleSheet, I18nManager} from 'react-native';
 import React, {useState} from 'react';
 import {
   Text,
   FAB,
   Searchbar,
-  Button,
   Appbar,
   List,
   Avatar,
@@ -24,17 +16,18 @@ import {useAddTaskMutation} from '../../../../../redux/reducers/groups/tasks/tas
 import {useSelector, useDispatch} from 'react-redux';
 import {groupApi} from '../../../../../redux/reducers/groups/groupThunk';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
+import {useTranslation} from 'react-i18next';
 
 const AddGroup = ({navigation, route}) => {
   const {values, startDate, dueDate, priority} = route.params;
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const [isSearch, setIsSearch] = useState(false);
 
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const [addTask, {isLoading}] = useAddTaskMutation();
 
   const submitHandler = async () => {
@@ -79,8 +72,7 @@ const AddGroup = ({navigation, route}) => {
       <View>
         <List.Item
           onPress={add}
-          title={itemProps?.name}
-          // description={itemProps?.responsible?.email}
+          title={`${itemProps?.name} ${itemProps?.name === currentLoginUser?.name ? t('(You)') : ''}`}
           left={props => (
             <View>
               <Avatar.Image
@@ -96,11 +88,7 @@ const AddGroup = ({navigation, route}) => {
             </View>
           )}
           right={props => (
-            <Checkbox
-              {...props}
-              status={include ? 'checked' : 'unchecked'}
-              onPress={add}
-            />
+            <Checkbox {...props} status={include ? 'checked' : 'unchecked'} onPress={add} />
           )}
         />
       </View>
@@ -115,8 +103,9 @@ const AddGroup = ({navigation, route}) => {
       {isSearch ? (
         <Appbar.Header>
           <Searchbar
-            placeholder="Search"
-            icon={'arrow-left'}
+            placeholder={t('Search...')}
+            icon={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
+            style={{backgroundColor: theme.colors.background}}
             autoFocus
             onIconPress={() => {
               setIsSearch(false);
@@ -133,7 +122,7 @@ const AddGroup = ({navigation, route}) => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Add participant members" />
+          <Appbar.Content title={t('Add participant members')} />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -162,9 +151,7 @@ const AddGroup = ({navigation, route}) => {
                     style={{marginRight: 15, alignItems: 'center'}}
                     key={index}
                     onPress={() => {
-                      setUserIds(
-                        userIds.filter(userId => userId !== user?._id),
-                      );
+                      setUserIds(userIds.filter(userId => userId !== user?._id));
                       setUsers(users.filter(user1 => user1._id !== user?._id));
                     }}>
                     {user?.imageURL ? (
@@ -173,22 +160,18 @@ const AddGroup = ({navigation, route}) => {
                       <Avatar.Text size={50} label={'A'} />
                     )}
                     <Text style={{}} maxLength={10}>
-                      {user?.name.length > 8
-                        ? user?.name.substring(0, 8) + '..'
-                        : user?.name}
+                      {user?.name.length > 8 ? user?.name.substring(0, 8) + '..' : user?.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
             ) : null}
-            {users.length > 0 ? (
-              <Divider bold style={{marginBottom: '1%'}} />
-            ) : null}
+            {users.length > 0 ? <Divider bold style={{marginBottom: '1%'}} /> : null}
           </View>
         )}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>There isn't any participant in this group</Text>
+            <Text>{t("There isn't any participant in this group")}</Text>
           </View>
         )}
         renderItem={({item}) => <Item itemProps={item} />}
@@ -196,7 +179,7 @@ const AddGroup = ({navigation, route}) => {
 
       <FAB
         icon="check"
-        label="Ok"
+        label={t('Ok')}
         style={{
           bottom: snackbarVisible ? 70 : 16,
           right: 16,
@@ -209,7 +192,7 @@ const AddGroup = ({navigation, route}) => {
 
       <ErrorSnackBar
         isVisible={snackbarVisible}
-        text={'Something went wrong'}
+        text={t('Something went wrong')}
         onDismissHandler={setSnackBarVisible}
       />
     </View>
@@ -217,33 +200,3 @@ const AddGroup = ({navigation, route}) => {
 };
 
 export default AddGroup;
-
-const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-  error: {
-    color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
-  },
-});

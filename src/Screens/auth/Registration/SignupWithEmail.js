@@ -21,6 +21,7 @@ import {
   useResendEmailForUserRegistrationMutation,
 } from '../../../redux/reducers/user/userThunk';
 import AuthAppbar from '../../../Components/Appbars/AuthAbbar';
+import {useTranslation} from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -28,10 +29,7 @@ const validationSchema = Yup.object().shape({
     .trim('Full name can not include leading and trailing spaces')
     .label('Name')
     .min(2, ({min}) => `Name must be at least ${min} characters`),
-  email: Yup.string()
-    .email('Please enter valid email')
-    .required('*required')
-    .label('Email'),
+  email: Yup.string().email('Please enter valid email').required('*required').label('Email'),
   password: Yup.string()
     .min(6, ({min}) => `Password must be at least ${min} characters`)
     .required('*required')
@@ -45,6 +43,7 @@ const validationSchema = Yup.object().shape({
 const SignupWithEmail = () => {
   const navigation = useNavigation();
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('');
@@ -70,12 +69,10 @@ const SignupWithEmail = () => {
             setShowTryAgainButton(true);
           }
           setVisible(true);
-        } else if (
-          res?.data?.message === 'An Email sent to your account please verify'
-        ) {
+        } else if (res?.data?.message === 'An Email sent to your account please verify') {
           formikRef.current.resetForm();
           setMessage(
-            `An Email sent to ${email.current}. Please verify and then login`,
+            `${t('An Email sent to')} ${email.current}. ${t('Please verify and then login')}`,
           );
           setShowTryAgainButton(false);
           setShowLoginButton(true);
@@ -94,11 +91,7 @@ const SignupWithEmail = () => {
 
   const [
     resendEmailForUserRegistration,
-    {
-      isLoading: resendLoading,
-      isError: resendEmailIsError,
-      error: resendEmailError,
-    },
+    {isLoading: resendLoading, isError: resendEmailIsError, error: resendEmailError},
   ] = useResendEmailForUserRegistrationMutation();
 
   const resendEmail = () => {
@@ -110,20 +103,16 @@ const SignupWithEmail = () => {
         if (res?.error?.status === 409) {
           setMessage(res?.error?.data?.message);
           setVisible(true);
-        } else if (
-          res?.data?.message === 'An Email sent to your account please verify'
-        ) {
+        } else if (res?.data?.message === 'An Email sent to your account please verify') {
           formikRef.current.resetForm();
-          setMessage(
-            'Again! An email sent to your account. Please verify and then login',
-          );
+          setMessage(`${t('Again! An email sent to your account. Please verify and then login')}`);
           setShowTryAgainButton(false);
           setShowLoginButton(true);
           setVisible(true);
         } else {
           setShowTryAgainButton(true);
           setShowLoginButton(true);
-          setMessage('Something went wrong');
+          setMessage(`${t('Something went wrong')}`);
           setVisible(true);
         }
       })
@@ -133,8 +122,7 @@ const SignupWithEmail = () => {
   };
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const openMenu = () => setShowMenu(true);
   const closeMenu = () => setShowMenu(false);
@@ -143,12 +131,12 @@ const SignupWithEmail = () => {
 
   return (
     <View>
-      <AuthAppbar title={'Sign up'} />
+      <AuthAppbar title={'Create account'} />
 
       <ScrollView
         contentContainerStyle={{
           justifyContent: 'space-between',
-          marginTop:"5%"
+          marginTop: '5%',
         }}
         showsVerticalScrollIndicator={false}>
         <Formik
@@ -161,38 +149,31 @@ const SignupWithEmail = () => {
           }}
           validationSchema={validationSchema}
           onSubmit={values => submitHandler(values)}>
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched,
-          }) => (
+          {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
             <View style={{paddingHorizontal: '5%'}}>
               <TextInput
-                label="Full name"
+                label={t('Full name')}
                 onChangeText={handleChange('name')}
                 onBlur={handleBlur('name')}
                 mode="outlined"
                 value={values.name}
                 activeOutlineColor={theme.colors.secondary}
                 error={errors.name && touched.name ? true : false}
-                style={{marginTop: '2%', height:55}}
+                style={{marginTop: '2%', height: 55}}
               />
               {errors.name && touched.name ? (
                 <Text style={{color: theme.colors.error}}>{errors.name}</Text>
               ) : null}
 
               <TextInput
-                label="Email"
+                label={t('Email')}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 mode="outlined"
                 value={values.email}
                 activeOutlineColor={theme.colors.secondary}
                 error={errors.email && touched.email ? true : false}
-                style={{marginTop: '2%', height:55}}
+                style={{marginTop: '2%', height: 55}}
               />
               {errors.email && touched.email ? (
                 <Text style={{color: theme.colors.error}}>{errors.email}</Text>
@@ -200,7 +181,7 @@ const SignupWithEmail = () => {
 
               <TextInput
                 error={errors.password && touched.password ? true : false}
-                label="Password"
+                label={t('Password')}
                 mode="outlined"
                 right={
                   <TextInput.Icon
@@ -209,41 +190,35 @@ const SignupWithEmail = () => {
                   />
                 }
                 secureTextEntry={!showPassword}
-                style={{marginTop: '2%', height:55}}
+                style={{marginTop: '2%', height: 55}}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
                 activeOutlineColor={theme.colors.secondary}
               />
               {errors.password && touched.password ? (
-                <Text style={{color: theme.colors.error}}>
-                  {errors.password}
-                </Text>
+                <Text style={{color: theme.colors.error}}>{errors.password}</Text>
               ) : null}
 
               <TextInput
                 error={errors.password && touched.password ? true : false}
-                label="Confirm password"
+                label={t('Confirm password')}
                 mode="outlined"
                 right={
                   <TextInput.Icon
                     icon={showPasswordConfirmation ? 'eye' : 'eye-off'}
-                    onPress={() =>
-                      setShowPasswordConfirmation(!showPasswordConfirmation)
-                    }
+                    onPress={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
                   />
                 }
                 secureTextEntry={!showPasswordConfirmation}
-                style={{marginTop: '2%', height:55}}
+                style={{marginTop: '2%', height: 55}}
                 onChangeText={handleChange('passwordConfirmation')}
                 onBlur={handleBlur('passwordConfirmation')}
                 value={values.passwordConfirmation}
                 activeOutlineColor={theme.colors.secondary}
               />
               {errors.passwordConfirmation && touched.passwordConfirmation ? (
-                <Text style={{color: theme.colors.error}}>
-                  {errors.passwordConfirmation}
-                </Text>
+                <Text style={{color: theme.colors.error}}>{errors.passwordConfirmation}</Text>
               ) : null}
 
               <Button
@@ -259,9 +234,8 @@ const SignupWithEmail = () => {
                 mode="contained"
                 onPress={handleSubmit}
                 buttonColor={theme.colors.blueBG}
-                textColor="#fff"
-                >
-                Sign up
+                textColor="#fff">
+                {t('Create')}
               </Button>
             </View>
           )}
@@ -332,7 +306,7 @@ const SignupWithEmail = () => {
 
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
-          <Dialog.Title>Sign up</Dialog.Title>
+          <Dialog.Title>{t('Create account')}</Dialog.Title>
           <Dialog.Content>
             <Paragraph> {message}</Paragraph>
           </Dialog.Content>
@@ -343,7 +317,7 @@ const SignupWithEmail = () => {
                   setVisible(false);
                   resendEmail();
                 }}>
-                Resend Email
+                {t('Resend Email')}
               </Button>
             )}
 
@@ -353,7 +327,7 @@ const SignupWithEmail = () => {
                   setVisible(false);
                   navigation.navigate('Login');
                 }}>
-                Go to login
+                {t('Go to login')}
               </Button>
             )}
 
@@ -363,7 +337,7 @@ const SignupWithEmail = () => {
                 setVisible(false);
                 email.current = '';
               }}>
-              close
+              {t('close')}
             </Button>
           </Dialog.Actions>
         </Dialog>

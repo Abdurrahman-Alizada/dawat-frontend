@@ -25,49 +25,47 @@ import {handleCurrentViewingGroup} from '../../../../../redux/reducers/groups/gr
 import {useAddUserToGroupMutation} from '../../../../../redux/reducers/groups/groupThunk';
 import {useSelector, useDispatch} from 'react-redux';
 import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
+import {useTranslation} from 'react-i18next';
 
 const UpdateGroupMembers = ({navigation, onClose, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
+    currentLoginUser?._id,
   );
-  const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllFriendsQuery(currentLoginUser?._id);
 
   const [friends, setFriends] = useState(data?.accepted);
-  useEffect(()=>{
-   setFriends(data?.accepted)
-  },[data])
+  useEffect(() => {
+    setFriends(data?.accepted);
+  }, [data]);
 
-  const [addUserToGroup, {isLoading: addUserLoading}] =
-    useAddUserToGroupMutation();
+  const [addUserToGroup, {isLoading: addUserLoading}] = useAddUserToGroupMutation();
 
   const [users, setUsers] = useState([]);
   const [userIds, setUserIds] = useState([]);
 
   const handleAddMember = async () => {
-      addUserToGroup({
-        chatId: currentViewingGroup._id,
-        userId: users,
+    addUserToGroup({
+      chatId: currentViewingGroup._id,
+      userId: users,
+    })
+      .then(res => {
+        dispatch(handleCurrentViewingGroup(res.data));
+        navigation.navigate('SingleGroupSettings');
       })
-        .then(res => {
-            dispatch(handleCurrentViewingGroup(res.data));
-            navigation.navigate('SingleGroupSettings');
-        })
-        .catch(e => {
-          console.log('error in handleAddMember', e);
-        });
+      .catch(e => {
+        console.log('error in handleAddMember', e);
+      });
   };
 
   const getResponsibles = () => {
     if (friends) {
       for (let i = 0; i < currentViewingGroup.users?.length; i++) {
-        let foundUser = friends.find(
-          e => e._id === currentViewingGroup?.users[i]?._id,
-        );
+        let foundUser = friends.find(e => e._id === currentViewingGroup?.users[i]?._id);
         if (foundUser) {
           setFriends(friends.filter(friend => friend._id !== foundUser._id));
         }
@@ -75,50 +73,51 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
     }
   };
 
-    // search
-    const [search, setSearch] = useState('');
-    const [isSearch, setIsSearch] = useState(false);
-    const [listEmptyText, setListEmptyText] = useState("You don't have any friend left to add to event");
-    const [filteredDataSource, setFilteredDataSource] = useState([]);
-  
-    const updateSearch = search => {
-      setSearch(search);
-      searchFilterFunction(search);
-    };
-  
-    const searchFilterFunction = text => {
-      setFilteredDataSource(friends);
-      if (text) {
-        const newData = friends?.filter(item => {
-          const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
-          const textData = text.toUpperCase();
-          return itemData.indexOf(textData) > -1;
-        });
-        if (!newData?.length) {
-          setListEmptyText('Nothing found.');
-        }
-        setFilteredDataSource(newData);
-      } 
-      else {
-        setFilteredDataSource(friends);
+  // search
+  const [search, setSearch] = useState('');
+  const [isSearch, setIsSearch] = useState(false);
+  const [listEmptyText, setListEmptyText] = useState(
+    "You don't have any friend left to add to event"
+  );
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
+
+  const updateSearch = search => {
+    setSearch(search);
+    searchFilterFunction(search);
+  };
+
+  const searchFilterFunction = text => {
+    setFilteredDataSource(friends);
+    if (text) {
+      const newData = friends?.filter(item => {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      if (!newData?.length) {
+        setListEmptyText('Nothing found');
       }
-    };
-  
-    const getHighlightedText = result =>
+      setFilteredDataSource(newData);
+    } else {
+      setFilteredDataSource(friends);
+    }
+  };
+
+  const getHighlightedText = result =>
     result?.split(new RegExp(`(${search})`, `gi`)).map((piece, index) => {
       return (
         <Text
           key={index}
           style={
             piece.toLocaleLowerCase() == search.toLocaleLowerCase()
-              ? {fontWeight:"bold", color: theme.colors.primary}
-              : {fontWeight:"bold",}
+              ? {fontWeight: 'bold', color: theme.colors.primary}
+              : {fontWeight: 'bold'}
           }>
           {piece}
         </Text>
       );
     });
-  
+
   const Item = ({itemProps}) => {
     const [include, setInclude] = useState(userIds.includes(itemProps._id));
     const add = () => {
@@ -153,11 +152,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
             </View>
           )}
           right={props => (
-            <Checkbox
-              {...props}
-              status={include ? 'checked' : 'unchecked'}
-              onPress={add}
-            />
+            <Checkbox {...props} status={include ? 'checked' : 'unchecked'} onPress={add} />
           )}
         />
       </View>
@@ -170,15 +165,15 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header elevated style={{backgroundColor:theme.colors.elevation.level3}}>
+        <Appbar.Header elevated style={{backgroundColor:isSearch? theme.colors.elevation.level3 : theme.colors.background}}>
           <Searchbar
             elevation={7}
-            theme={{roundness:0}}
-            placeholder="Search"
+            theme={{roundness: 0}}
+            placeholder={t("Search...")}
             icon={'close'}
             autoFocus
             onIconPress={() => {
-              setSearch('')
+              setSearch('');
               setIsSearch(false);
             }}
             onChangeText={updateSearch}
@@ -186,17 +181,17 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header style={{backgroundColor:theme.colors.background}} elevated>
+        <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Update event members" />
+          <Appbar.Content title={t("Update event members")} />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
-              setFilteredDataSource(friends)
+              setFilteredDataSource(friends);
               setIsSearch(true);
             }}
           />
@@ -207,9 +202,7 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
         <Skeleton />
       ) : (
         <FlatList
-          // data={friends}
           data={isSearch ? filteredDataSource : friends}
-          // stickyHeaderHiddenOnScroll
           onContentSizeChange={getResponsibles}
           stickyHeaderIndices={[0]}
           ListHeaderComponent={() => (
@@ -224,21 +217,14 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
                   // showsHorizontalScrollIndicator={false}
                 >
                   {users.map((user, index) => (
-                    <TouchableOpacity
-                      style={{marginRight: 15, alignItems: 'center'}}
-                      key={index}>
+                    <TouchableOpacity style={{marginRight: 15, alignItems: 'center'}} key={index}>
                       {user?.imageURL ? (
-                        <Avatar.Image
-                          size={50}
-                          source={{uri: user?.imageURL}}
-                        />
+                        <Avatar.Image size={50} source={{uri: user?.imageURL}} />
                       ) : (
                         <Avatar.Text size={50} label={user.name.charAt(0)} />
                       )}
                       <Text style={{}} maxLength={10}>
-                        {user.name.length > 8
-                          ? user.name.substring(0, 8) + '..'
-                          : user.name}
+                        {user.name.length > 8 ? user.name.substring(0, 8) + '..' : user.name}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -249,35 +235,29 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
           )}
           ListEmptyComponent={() => (
             <View style={{marginTop: '40%', alignItems: 'center'}}>
-              <Text>{listEmptyText}</Text>
-              <Button
-                icon="refresh"
-                mode="outlined"
-                style={{marginTop: '5%', }}
-                onPress={refetch}>
-                Refresh
+              <Text>{t(listEmptyText)}</Text>
+              <Button icon="refresh" mode="outlined" style={{marginTop: '5%'}} onPress={refetch}>
+                {t("Refresh")}
               </Button>
             </View>
           )}
           renderItem={({item}) => <Item itemProps={item} />}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
 
       <FAB
         icon="check"
-        label="Add"
-        style={{bottom: snackbarVisible ? 70 : 16, right:16, position:"absolute"}}
+        label={t("Add")}
+        style={{bottom: snackbarVisible ? 70 : 16, right: 16, position: 'absolute'}}
         disabled={addUserLoading}
         loading={addUserLoading}
         onPress={handleAddMember}
       />
 
-    <ErrorSnackBar
+      <ErrorSnackBar
         isVisible={snackbarVisible}
-        text={'Something went wrong'}
+        text={t('Something went wrong')}
         onDismissHandler={setSnackBarVisible}
       />
     </View>
@@ -285,33 +265,3 @@ const UpdateGroupMembers = ({navigation, onClose, route}) => {
 };
 
 export default UpdateGroupMembers;
-
-const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-  error: {
-    color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
-  },
-});

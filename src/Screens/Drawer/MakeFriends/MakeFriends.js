@@ -5,10 +5,12 @@ import {Divider, Text, useTheme} from 'react-native-paper';
 
 import PendingRequest from './PendingRequest';
 import {useNavigation} from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const Social = () => {
   const theme = useTheme();
   const navigation = useNavigation();
+  const {t} = useTranslation()
 
   const [isSearch, setIsSearch] = useState(false);
 
@@ -26,7 +28,7 @@ const Social = () => {
             borderRadius: 50,
             backgroundColor: theme.colors.secondaryContainer,
           }}>
-          <Text style={{color: theme.colors.onSecondaryContainer}}>Suggestions</Text>
+          <Text style={{color: theme.colors.onSecondaryContainer}}>{t("Suggestions")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -39,7 +41,7 @@ const Social = () => {
             borderRadius: 50,
             backgroundColor: theme.colors.secondaryContainer,
           }}>
-          <Text style={{color: theme.colors.onSecondaryContainer}}>Request sent</Text>
+          <Text style={{color: theme.colors.onSecondaryContainer}}>{t("Request sent")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -52,7 +54,7 @@ const Social = () => {
             borderRadius: 50,
             backgroundColor: theme.colors.secondaryContainer,
           }}>
-          <Text style={{color: theme.colors.onSecondaryContainer}}>Your friends</Text>
+          <Text style={{color: theme.colors.onSecondaryContainer}}>{t("Your friends")}</Text>
         </TouchableOpacity>
       </View>
       <Divider />
