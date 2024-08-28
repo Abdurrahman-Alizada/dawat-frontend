@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useContext} from 'react';
+import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -59,7 +59,8 @@ import {useTranslation} from 'react-i18next';
 import InvitaionsSummary from '../Invitations/invitaionsSummary';
 import moment from 'moment';
 
-export default function Example({route}) {
+const Invitations = React.memo(({ route }) => {
+
   const navigation = useNavigation();
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -210,7 +211,7 @@ export default function Example({route}) {
   };
 
   // item to render in flatlist
-  const AccordionItem = ({item}) => {
+  const AccordionItem =  React.memo(({item}) => {
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
 
@@ -309,7 +310,7 @@ export default function Example({route}) {
         </View>
       </TouchableWithoutFeedback>
     );
-  };
+  });
 
   // import export modalize
   const importExportModalizeRef = useRef(null);
@@ -442,8 +443,9 @@ export default function Example({route}) {
       )}
 
       <FlashList
+        keyExtractor={item => item?._id}
         data={isInvitaionSearch ? invitaionsForSearch : filterdInvities}
-        estimatedItemSize={100}
+        estimatedItemSize={invitaionsForSearch?.length ? invitaionsForSearch?.length : 100}
         ListEmptyComponent={() => (
           <View style={{marginTop: '50%', alignItems: 'center'}}>
             {isLoading || localLoading ? (
@@ -636,7 +638,9 @@ export default function Example({route}) {
       </Modalize>
     </View>
   );
-}
+})
+
+export default Invitations;
 
 const styles = StyleSheet.create({
   fab: {

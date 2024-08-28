@@ -21,7 +21,6 @@ import {
   Card,
 } from 'react-native-paper';
 import {
-  useUpdateGroupInfoMutation,
   useUpdateGroupNameMutation,
   useUpdateGroupDescriptionMutation,
   useDeleteGroupForUserMutation,

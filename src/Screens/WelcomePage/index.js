@@ -1,6 +1,6 @@
-import {View, Text, StatusBar} from 'react-native';
+import {View, StatusBar} from 'react-native';
 import React, {useContext} from 'react';
-import {useTheme, Avatar, Button, IconButton} from 'react-native-paper';
+import {useTheme, Avatar, Button,Text, IconButton} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ThemeContext} from '../../themeContext';
 import {useNavigation} from '@react-navigation/native';
@@ -14,8 +14,8 @@ export default function Index({}) {
   const {toggleTheme, isThemeDark} = useContext(ThemeContext);
 
   return (
-    <View style={{flex: 1, backgroundColor: theme.colors.blueBG}}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.blueBG} />
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+      <StatusBar barStyle={isThemeDark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
 
       <View
         style={{
@@ -25,13 +25,13 @@ export default function Index({}) {
         }}>
         <IconButton
           icon="translate"
-          iconColor={'#fff'}
+          iconColor={theme.colors.onBackground}
           onPress={() => navigation.navigate('ChooseLanguage')}
         />
         {isThemeDark ? (
-          <IconButton icon="white-balance-sunny" onPress={() => toggleTheme()} iconColor={'#fff'} />
+          <IconButton icon="white-balance-sunny" onPress={() => toggleTheme()} iconColor={theme.colors.onBackground} />
         ) : (
-          <IconButton icon="weather-night" iconColor={'#fff'} onPress={() => toggleTheme()} />
+          <IconButton icon="weather-night" iconColor={theme.colors.onBackground} onPress={() => toggleTheme()} />
         )}
       </View>
 
@@ -43,77 +43,84 @@ export default function Index({}) {
           paddingBottom: '10%',
           paddingHorizontal: '3%',
         }}>
-        <View>
+        <View style={{alignItems:"center"}}>
           <Avatar.Image
             size={100}
             style={{
-              backgroundColor: theme.colors.blueBG,
+              backgroundColor: theme.colors.background,
             }}
             source={require('../../assets/logo/logo.png')}
           />
+          <Text style={{fontSize:20, marginTop:"3%"}}>Event planner - Guests, Todo</Text>
+          <Text style={{textAlign:"center", marginTop:"3%"}}>A simple way to organize guests lists and Todo</Text>
         </View>
         
         <View style={{width: '100%', marginBottom: '5%'}}>
         <View
             style={{
-              flexDirection: 'row',
+              // flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
               marginVertical: '2%',
               paddingHorizontal: '1%',
             }}>
-            <Button
-              mode="outlined"
-              style={{
-                width: '48%',
-                borderColor:"#fff"
-              }}
-              contentStyle={{
-                padding: '2%',
-              }}
-              labelStyle={{
-                fontWeight: 'bold',
-                color: '#fff',
-              }}
-              onPress={async () => {
-                navigation.navigate('SignUpwithEmail');
-              }}
-              icon="account-plus"
-              // theme={{roundness:30}}
-              >
-              {t("Create account")}
-            </Button>
-            <Button
+
+<Button
               mode="outlined"
               icon={"account"}
               style={{
-                width: '48%',
-                borderColor:"#fff"
+                width: '100%',
+                borderColor:theme.colors.blueBG
               }}
               contentStyle={{
                 padding: '2%',
               }}
+              buttonColor={theme.colors.background}
               labelStyle={{
                 fontWeight: 'bold',
-                color: '#fff',
+                color: theme.colors.blueBG,
               }}
               
               onPress={async () => {
                 navigation.navigate('Login');
               }}
+              theme={{roundness:30}}
               >
               {t("Login")}
             </Button>
+            <Button
+              mode="outlined"
+              style={{
+                width: '100%',
+                borderColor:theme.colors.blueBG,
+                marginTop:"3%"
+              }}
+              contentStyle={{
+                padding: '2%',
+              }}
+              labelStyle={{
+                fontWeight: 'bold',
+                color: theme.colors.blueBG,
+              }}
+              onPress={async () => {
+                navigation.navigate('SignUpwithEmail');
+              }}
+              icon="account-plus"
+              theme={{roundness:30}}
+              >
+              {t("Create account")}
+            </Button>
+
           </View>
 
           <Button
             style={{
               marginTop: '3%',
             }}
-            contentStyle={{padding: '2%', justifyContent: 'flex-start'}}
-            textColor={theme.colors.textGray}
+            contentStyle={{padding: '2%'}}
+            textColor={theme.colors.onPrimary}
             buttonStyle={{padding: '1%', width: '100%'}}
-            // theme={{roundness: 10}}
+            theme={{roundness: 30}}
             mode="contained"
             icon={'cloud-off-outline'}
             labelStyle={{fontWeight: 'bold'}}
@@ -121,7 +128,8 @@ export default function Index({}) {
               await AsyncStorage.setItem('isLoggedIn', 'login');
               navigation.navigate('Drawer', {screen: 'PinnedGroup'});
             }}
-            buttonColor={'#fff'}>
+            buttonColor={theme.colors.blueBG}
+            >
             {t("Continue without account")}
           </Button>
 

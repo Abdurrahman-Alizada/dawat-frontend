@@ -282,6 +282,7 @@ const AddInviti = ({route, navigation}) => {
               </Text>
             ) : null}
 
+
             <View>
               <Text style={{marginTop: '2%'}}>{t("Guest current status")}</Text>
               <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
@@ -301,6 +302,26 @@ const AddInviti = ({route, navigation}) => {
               </View>
             </View>
 
+            {/* <View style={{marginVertical: '2%',}} >
+            <Text style={{marginTop: '2%'}}>{t("Optional")}</Text>
+              
+            <TextInput
+              error={errors.invitiAddress && touched.invitiAddress ? true : false}
+              label={t("Address")}
+              placeholder={t("Address of the guest")}
+              mode="outlined"
+              style={{ width: '100%'}}
+              onChangeText={handleChange('invitiAddress')}
+              onBlur={handleBlur('invitiAddress')}
+              value={values.invitiAddress}
+            />
+            {errors.invitiAddress && touched.invitiAddress ? (
+              <Text style={{color: theme.colors.error, fontSize: 13}}>
+                {errors.invitiAddress}
+              </Text>
+            ) : null}
+            </View> */}
+           
             <FAB
               icon="plus"
               loading={isLoading}

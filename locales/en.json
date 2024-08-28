@@ -306,9 +306,12 @@
     "Watch Rewarded Ad":"Watch Rewarded Ad",
     "You have watched the ad":"You have watched the ad",
     "You can watch ad again when you re-open the app.":"You can watch ad again when you re-open the app.",
-    
     "Update guest":"Update guest",
     "Remove image":"Remove image",
-    "Update":"Update"
+    "Update":"Update",
+
+    "Optional":"Optional",
+    "Address":"Address",
+    "Address of the guest":"Address of the guest"
   }
 }
