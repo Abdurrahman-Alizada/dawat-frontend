@@ -1,14 +1,6 @@
-import { FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
+import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
-import {
-  List,
-  Button,
-  useTheme,
-  Avatar,
-  Appbar,
-  Searchbar,
-  Text
-} from 'react-native-paper';
+import {List, Button, useTheme, Avatar, Appbar, Searchbar, Text} from 'react-native-paper';
 import {
   useDeleteFriendsSeggestionMutation,
   useGetAllFriendsQuery,
@@ -16,32 +8,34 @@ import {
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
 import Skeleton from '../../Skeletons/InvitationsList';
+import {useTranslation} from 'react-i18next';
+
 const FriendsSuggestions = ({navigation}) => {
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const [selectedItems, setSelectedItems] = useState([]);
- 
-  const {data, isLoading, refetch, isFetching, isError, error} =
-    useGetAllFriendsQuery(currentLoginUser?._id);
+
+  const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
+    currentLoginUser?._id,
+  );
 
   // single item to render
   const RenderItem = ({item}) => {
-    const [sendFriendRequest, {isLoading: sendRequestLoading}] =
-    useSendFriendRequestMutation();
+    const [sendFriendRequest, {isLoading: sendRequestLoading}] = useSendFriendRequestMutation();
 
     const [deleteFriendsSeggestion, {isLoading: deleteFriendsSeggestionLoading}] =
-    useDeleteFriendsSeggestionMutation();
-
+      useDeleteFriendsSeggestionMutation();
 
     const [clicked, setClicked] = useState(false);
     const [textAfterAction, setTextAfterAction] = useState('');
-    
+
     const handledeleteFriendsSeggestion = userB => {
       setSelectedItems([...selectedItems, item._id]);
-      setTextAfterAction(`Suggestion of ${item.name} has been deleted`)
+      setTextAfterAction(`Suggestion of ${item.name} has been deleted`);
       setClicked(true);
-      
+
       deleteFriendsSeggestion({userA: currentLoginUser?._id, userB: userB})
         .then(res => {
           // console.log(res.data);
@@ -52,9 +46,9 @@ const FriendsSuggestions = ({navigation}) => {
     };
     const handleSendFriendRequest = userB => {
       setSelectedItems([...selectedItems, item._id]);
-      setTextAfterAction(`Your request has been sent to ${item.name}`)
+      setTextAfterAction(`Your request has been sent to ${item.name}`);
       setClicked(true);
-      
+
       sendFriendRequest({userA: currentLoginUser?._id, userB: userB})
         .then(res => {
           console.log(res.data);
@@ -76,45 +70,44 @@ const FriendsSuggestions = ({navigation}) => {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop:"4%"
+                  marginTop: '4%',
                 }}>
                 <TouchableOpacity
                   onPress={() => handleSendFriendRequest(item._id)}
                   style={{
                     borderRadius: 5,
-                    width:"45%",
-                    paddingVertical:"2%",
+                    width: '45%',
+                    paddingVertical: '2%',
                     backgroundColor: theme.colors.primary,
                   }}>
-                  <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Add</Text>
+                  <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>
+                    {t('Add')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => handledeleteFriendsSeggestion(item._id)}
                   style={{
                     borderRadius: 5,
-                    width:"45%",
-                    paddingVertical:"2%",
+                    width: '45%',
+                    paddingVertical: '2%',
                     backgroundColor: theme.colors.background,
-                    borderColor:theme.colors.tertiary,
-                    borderWidth:1,
-                    marginHorizontal:"4%"
+                    borderColor: theme.colors.tertiary,
+                    borderWidth: 1,
+                    marginHorizontal: '4%',
                   }}>
-                  <Text style={{color: theme.colors.tertiary, textAlign: 'center'}}>Delete</Text>
+                  <Text style={{color: theme.colors.tertiary, textAlign: 'center'}}>{t("Delete")}</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         )}
-
         left={props => (
           <Avatar.Image
             size={70}
             {...props}
             source={
-              item.imageURL
-                ? {uri: item.imageURL}
-                : require('../../../assets/drawer/male-user.png')
+              item.imageURL ? {uri: item.imageURL} : require('../../../assets/drawer/male-user.png')
             }
           />
         )}
@@ -162,8 +155,8 @@ const FriendsSuggestions = ({navigation}) => {
           key={index}
           style={
             piece.toLocaleLowerCase() == search.toLocaleLowerCase()
-              ? {fontWeight:"bold", color: theme.colors.primary}
-              : {fontWeight:"bold",}
+              ? {fontWeight: 'bold', color: theme.colors.primary}
+              : {fontWeight: 'bold'}
           }>
           {piece}
         </Text>
@@ -171,11 +164,9 @@ const FriendsSuggestions = ({navigation}) => {
     });
 
   return (
-    <View style={{flex:1}}>
+    <View style={{flex: 1}}>
       {!isSearch ? (
-        <Appbar.Header
-          style={{backgroundColor: theme.colors.background}}
-          elevated={true}>
+        <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated={true}>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
@@ -191,11 +182,9 @@ const FriendsSuggestions = ({navigation}) => {
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header
-          style={{backgroundColor: theme.colors.elevation.level2}}
-          elevated={true}>
+        <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}} elevated={true}>
           <Searchbar
-            placeholder="Search..."
+            placeholder={t("Search...")}
             onChangeText={updateSearch}
             value={search}
             icon="close"
@@ -221,21 +210,14 @@ const FriendsSuggestions = ({navigation}) => {
           data={isSearch ? filteredDataSource : data?.addFriend}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>There isn't anything in Suggestions</Text>
-              <Button
-                icon="refresh"
-                mode="contained"
-                style={{marginTop: '5%'}}
-                onPress={refetch}>
+              <Text>{t("There isn't anything in Suggestions")}</Text>
+              <Button icon="refresh" mode="contained" style={{marginTop: '5%'}} onPress={refetch}>
                 Refresh
               </Button>
-
             </View>
           )}
           renderItem={({item}) => <RenderItem item={item} />}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
+          refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         />
       )}
     </View>

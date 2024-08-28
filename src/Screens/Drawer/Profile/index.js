@@ -26,13 +26,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import AvatarModal from './AvatarModal';
 import {Modalize} from 'react-native-modalize';
-import {useSelector, useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {DrawerActions} from '@react-navigation/native';
 import {groupApi} from '../../../redux/reducers/groups/groupThunk';
+import {useTranslation} from 'react-i18next';
 
 export default ProfileIndex = ({navigation, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const modalizeRef = useRef(null);
   const onOpenModalize = () => {
@@ -226,32 +228,11 @@ export default ProfileIndex = ({navigation, route}) => {
   return (
     <SafeAreaView style={{flexGrow: 1}}>
       <View style={{flex: 1}}>
-        <Portal>
-          <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
-            <Dialog.Icon icon="alert" />
-            <Dialog.Title>Are you sure?</Dialog.Title>
-            <Dialog.Content>
-              <Text variant="bodyMedium">
-                If you delete your account, your account with all asssociated data will be delete.
-              </Text>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={() => setDeleteDialogVisible(false)}>Cancel</Button>
-              <Button
-                loading={deleteLoading}
-                textColor={theme.colors.error}
-                onPress={deleteUserAccountHandler}>
-                Ok, I understand
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-
         {isLoading ? (
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <ActivityIndicator animating={true} />
             <Text variant="bodyLarge" style={{marginTop: '3%'}}>
-              Loading....
+              {t('Loading....')}
             </Text>
           </View>
         ) : (
@@ -311,7 +292,7 @@ export default ProfileIndex = ({navigation, route}) => {
                   </TouchableOpacity>
 
                   <TextInput
-                    label="Name"
+                    label={t('Name')}
                     style={{
                       textAlignVertical: 'top',
                       marginTop: '2%',
@@ -335,7 +316,7 @@ export default ProfileIndex = ({navigation, route}) => {
                   />
 
                   <TextInput
-                    label="Email"
+                    label={t('Email')}
                     style={{
                       textAlignVertical: 'top',
                       marginTop: '5%',
@@ -343,8 +324,6 @@ export default ProfileIndex = ({navigation, route}) => {
                     }}
                     underlineColor={theme.colors.background}
                     activeOutlineColor={theme.colors.onBackground}
-                    // autoFocus={true}
-                    // mode="outlined"
                     value={user?.email}
                     editable={false}
                     right={
@@ -359,7 +338,7 @@ export default ProfileIndex = ({navigation, route}) => {
                   />
 
                   <TextInput
-                    label="Password"
+                    label={t('Password')}
                     style={{
                       textAlignVertical: 'top',
                       marginTop: '5%',
@@ -367,8 +346,6 @@ export default ProfileIndex = ({navigation, route}) => {
                     }}
                     underlineColor={theme.colors.background}
                     activeOutlineColor={theme.colors.onBackground}
-                    // autoFocus={true}
-                    // mode="outlined"
                     value={'*******'}
                     editable={false}
                     right={
@@ -387,11 +364,11 @@ export default ProfileIndex = ({navigation, route}) => {
                   <Button
                     contentStyle={{padding: '2%'}}
                     theme={{roundness: 20}}
-                    buttonColor={theme.colors.secondary}
-                    mode="contained"
+                    textColor={theme.colors.error}
+                    mode="outlined"
                     style={{marginHorizontal: '9%'}}
                     onPress={logout}>
-                    Logout
+                    {t('Logout')}
                   </Button>
                   <Button
                     contentStyle={{padding: '2%'}}
@@ -401,14 +378,14 @@ export default ProfileIndex = ({navigation, route}) => {
                     style={{marginHorizontal: '9%', marginVertical: '5%'}}
                     textColor={theme.colors.onError}
                     onPress={() => setDeleteDialogVisible(true)}>
-                    Delete my account
+                    {t('Delete my account')}
                   </Button>
                 </View>
               </List.Section>
             ) : (
               <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                 <Text variant="bodyLarge" style={{marginTop: '3%'}}>
-                  No user data{' '}
+                  {t('No user data')}{' '}
                 </Text>
               </View>
             )}
@@ -419,7 +396,7 @@ export default ProfileIndex = ({navigation, route}) => {
       {editNam && (
         <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
-            label="Enter name"
+            label={t('Enter name')}
             style={{
               textAlignVertical: 'top',
               marginTop: '2%',
@@ -449,7 +426,7 @@ export default ProfileIndex = ({navigation, route}) => {
                 setName(user?.name);
                 setEditName(false);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{
@@ -463,7 +440,7 @@ export default ProfileIndex = ({navigation, route}) => {
               onPress={() => editNameHandler()}
               theme={{roundness: 1}}
               disabled={updateNameLoading || name.length < 1}>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -472,7 +449,7 @@ export default ProfileIndex = ({navigation, route}) => {
       {editEmail && (
         <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
-            label="Enter email"
+            label={t('Enter email')}
             autoFocus={true}
             mode="outlined"
             value={email}
@@ -502,7 +479,7 @@ export default ProfileIndex = ({navigation, route}) => {
                 setEmail(user?.email);
                 setEditEmail(false);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{
@@ -516,7 +493,7 @@ export default ProfileIndex = ({navigation, route}) => {
               onPress={() => editEmailHandler()}
               theme={{roundness: 1}}
               disabled={updateEmailLoading || email.length < 1}>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -539,7 +516,7 @@ export default ProfileIndex = ({navigation, route}) => {
             activeOutlineColor={theme.colors.onBackground}
           />
           <TextInput
-            label="Enter new password"
+            label={t('Enter new password')}
             mode="outlined"
             value={newPassword}
             onChangeText={text => setNewPassword(text)}
@@ -566,7 +543,7 @@ export default ProfileIndex = ({navigation, route}) => {
               onPress={() => {
                 setEditPassword(false);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{
@@ -582,7 +559,7 @@ export default ProfileIndex = ({navigation, route}) => {
               disabled={
                 updatePasswordLoading || newPassword.length < 1 || newPassword === oldPassword
               }>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -591,54 +568,6 @@ export default ProfileIndex = ({navigation, route}) => {
       <Snackbar visible={showSnakeBar} onDismiss={() => setShowSnakeBar(false)} duration={4000}>
         {snakeBarMessage}
       </Snackbar>
-
-      <Modalize
-        modalStyle={{backgroundColor: theme.colors.background}}
-        ref={modalizeRef}
-        adjustToContentHeight={true}
-        handlePosition="inside">
-        <View
-          style={{
-            paddingVertical: '8%',
-            paddingHorizontal: '5%',
-            flexDirection: 'row',
-            backgroundColor: theme.colors.background,
-          }}>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="camera-image"
-              mode="outlined"
-              size={40}
-              onPress={openCamera}
-            />
-            <Text>Camera</Text>
-          </View>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="image-outline"
-              mode="outlined"
-              size={40}
-              onPress={openGallery}
-            />
-            <Text>Gallery</Text>
-          </View>
-          <View style={{alignItems: 'center'}}>
-            <IconButton
-              style={{marginHorizontal: '2%'}}
-              icon="account-circle-outline"
-              mode="outlined"
-              size={40}
-              onPress={() => {
-                onCloseModalize();
-                setAvatarModalVisible(true);
-              }}
-            />
-            <Text>Avatars</Text>
-          </View>
-        </View>
-      </Modalize>
 
       {avatarModalVisible && (
         <AvatarModal
@@ -650,6 +579,77 @@ export default ProfileIndex = ({navigation, route}) => {
           imageUploadHandler={imageUploadHandler}
         />
       )}
+
+      <Portal>
+        <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
+          <Dialog.Icon icon="alert" />
+          <Dialog.Title>{t('Are you sure?')}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">
+              {t(
+                'If you delete your account, your account with all asssociated data will be delete.',
+              )}
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDeleteDialogVisible(false)}>{t('Cancel')}</Button>
+            <Button
+              loading={deleteLoading}
+              textColor={theme.colors.error}
+              onPress={deleteUserAccountHandler}>
+              {t('Ok, I understand')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+      </Portal>
+        <Modalize
+          modalStyle={{backgroundColor: theme.colors.background}}
+          ref={modalizeRef}
+          adjustToContentHeight={true}
+          handlePosition="inside">
+          <View
+            style={{
+              paddingVertical: '8%',
+              paddingHorizontal: '5%',
+              flexDirection: 'row',
+              backgroundColor: theme.colors.background,
+            }}>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="camera-image"
+                mode="outlined"
+                size={40}
+                onPress={openCamera}
+              />
+              <Text>{t('Camera')}</Text>
+            </View>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="image-outline"
+                mode="outlined"
+                size={40}
+                onPress={openGallery}
+              />
+              <Text>{t('Gallery')}</Text>
+            </View>
+            <View style={{alignItems: 'center'}}>
+              <IconButton
+                style={{marginHorizontal: '2%'}}
+                icon="account-circle-outline"
+                mode="outlined"
+                size={40}
+                onPress={() => {
+                  onCloseModalize();
+                  setAvatarModalVisible(true);
+                }}
+              />
+              <Text>{t('Avatars')}</Text>
+            </View>
+          </View>
+        </Modalize>
     </SafeAreaView>
   );
 };

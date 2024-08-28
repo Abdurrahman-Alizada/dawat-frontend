@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {Snackbar, Text, useTheme, Card} from 'react-native-paper';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
@@ -10,9 +10,11 @@ import OtherIcon from '../../../../../Components/invitations/otherIcon';
 import PendingIcon from '../../../../../Components/invitations/pendingIcon';
 import RejectedIcon from '../../../../../Components/invitations/rejectedIcon';
 import PinPageBanner from '../../../../../adUnits/summaryScreenBanner';
+import { useTranslation } from 'react-i18next';
 
-const Index = ({group, onClose}) => {
+const Index = () => {
   const dispatch = useDispatch();
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const theme = useTheme();
 
@@ -49,7 +51,7 @@ const Index = ({group, onClose}) => {
       invitedGuests: invitedGuests,
       rejectedGuests: rejectedGuests,
       otherGuests: otherGuests,
-      totalGuest: guests.length,
+      totalGuest: guests?.length,
     });
     pendingGuests = null;
     invitedGuests = null;
@@ -77,7 +79,7 @@ const Index = ({group, onClose}) => {
             fontWeight: '600',
           }}
           variant="bodyMedium">
-          Event: '{currentViewingGroup?.groupName}'
+          {t("Event")}: '{currentViewingGroup?.groupName}'
         </Text>
 
         <View
@@ -87,7 +89,7 @@ const Index = ({group, onClose}) => {
           <Text
             style={{paddingVertical: '3%', paddingHorizontal: '5%', fontWeight: '700'}}
             variant="headlineSmall">
-            Guests
+            {t("Guests")}
           </Text>
 
           <View
@@ -177,11 +179,11 @@ const Index = ({group, onClose}) => {
                   color: theme.colors.secondary,
                 }}
                 variant="headlineLarge">
-                {guestsData?.totalGuest}
+                {guestsData?.totalGuest || '0'}
               </Text>
 
               <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
-                Total
+                {t("Total")}
               </Text>
             </Card>
           </View>

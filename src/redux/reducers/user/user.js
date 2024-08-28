@@ -8,7 +8,8 @@ const initialState = {
   loading: false,
   currentLoginUser : {},
   users: [],
-  passwordResetSuccessflly : false
+  passwordResetSuccessflly : false,
+  currentLanguage: 'en',
 };
 
 export const UserSlice = createSlice({
@@ -21,12 +22,14 @@ export const UserSlice = createSlice({
     handlePasswordResetSuccessfully: (state, action) => {
       state.passwordResetSuccessflly = action.payload
     },
-    
+    handleCurrentLanguage: (state, action) => {
+      state.currentLanguage = action.payload;
+    },
   },
 
 });
 
 // Action creators are generated for each case reducer function
-export const {handleCurrentLoaginUser,handlePasswordResetSuccessfully} = UserSlice.actions;
+export const {handleCurrentLoaginUser,handlePasswordResetSuccessfully, handleCurrentLanguage} = UserSlice.actions;
 
 export default UserSlice.reducer;

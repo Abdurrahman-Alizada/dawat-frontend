@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useContext} from 'react';
+import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   StatusBar,
+  I18nManager,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useSelector, useDispatch} from 'react-redux';
@@ -37,7 +38,6 @@ import {
 import InvitaionsList from '../../../../Skeletons/InvitationsList';
 import {useNavigation} from '@react-navigation/native';
 import InvitiBrief from './InvitiBrief';
-import moment from 'moment';
 import {FlashList} from '@shopify/flash-list';
 import Animated, {
   interpolate,
@@ -55,16 +55,23 @@ import PendingIcon from '../../../../../Components/invitations/pendingIcon';
 import RejectedIcon from '../../../../../Components/invitations/rejectedIcon';
 import OtherIcon from '../../../../../Components/invitations/otherIcon';
 import {ThemeContext} from '../../../../../themeContext';
-export default function Example({route}) {
+import {useTranslation} from 'react-i18next';
+import InvitaionsSummary from '../Invitations/invitaionsSummary';
+import moment from 'moment';
+
+const Invitations = React.memo(({ route }) => {
+
   const navigation = useNavigation();
   const theme = useTheme();
   const dispatch = useDispatch();
+
   const netInfo = useNetInfo();
   const {isThemeDark} = useContext(ThemeContext);
 
   const {groupId, isHeader} = route.params;
 
   const currentInvitiToDisplay = useSelector(state => state.invitations?.currentInviti);
+  const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
   const invitationSearchQuery = useSelector(state => state.invitations.invitationSearchQuery);
   const invitiFlag = useSelector(state => state.invitations.invitiFlag);
@@ -144,20 +151,26 @@ export default function Example({route}) {
     invitiBriefModalizeRef.current?.close();
   };
 
-  const getHighlightedText = result =>
-    result?.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
-      return (
-        <Text
-          key={index}
-          style={
-            piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase()
-              ? {fontWeight: 'bold', color: theme.colors.primary}
-              : {}
-          }>
-          {piece}
-        </Text>
-      );
-    });
+  const getHighlightedText = result => {
+    var rtlChars = '\u0591-\u07FF\u200F\u202B\u202E\uFB1D-\uFDFD\uFE70-\uFEFC',
+      rtlDirCheck = new RegExp('^[^' + rtlChars + ']*?[' + rtlChars + ']');
+
+    return rtlDirCheck.test(result)
+      ? result
+      : result?.split(new RegExp(`(${invitationSearchQuery})`, `gi`)).map((piece, index) => {
+          return (
+            <Text
+              key={index}
+              style={
+                piece.toLocaleLowerCase() == invitationSearchQuery.toLocaleLowerCase()
+                  ? {fontWeight: 'bold', color: theme.colors.primary}
+                  : {}
+              }>
+              {piece}
+            </Text>
+          );
+        });
+  };
 
   // delete inviti
   const [currentItem, setCurrentItem] = useState({});
@@ -198,7 +211,7 @@ export default function Example({route}) {
   };
 
   // item to render in flatlist
-  const AccordionItem = ({item}) => {
+  const AccordionItem =  React.memo(({item}) => {
     const shareValue = useSharedValue(0);
     const [bodySectionHeight, setBodySectionHeight] = useState(0);
 
@@ -224,8 +237,7 @@ export default function Example({route}) {
       <TouchableWithoutFeedback onPress={toggleButton}>
         <View>
           <List.Item
-            // title={item.invitiName}
-            title={getHighlightedText(item.invitiName)}
+            title={I18nManager.isRTL ? item.invitiName : getHighlightedText(item.invitiName)}
             description={item.invitiDescription}
             left={props => (
               <Avatar.Image
@@ -272,7 +284,7 @@ export default function Example({route}) {
                         currentInviti: item,
                       });
                     }}>
-                    Edit
+                    {t('Edit')}
                   </Chip>
                   <Chip
                     icon={() => <Icon name="eye" size={16} color={theme.colors.onBackground} />}
@@ -280,7 +292,7 @@ export default function Example({route}) {
                     textStyle={{color: theme.colors.onBackground}}
                     mode="flat"
                     onPress={() => BriefHandler(item)}>
-                    Detail
+                    {t('Detail')}
                   </Chip>
                 </View>
                 <Chip
@@ -289,7 +301,7 @@ export default function Example({route}) {
                   textStyle={{color: theme.colors.error}}
                   mode="flat"
                   onPress={() => showDialog(item)}>
-                  Delete
+                  {t('Delete')}
                 </Chip>
               </View>
             </View>
@@ -298,9 +310,7 @@ export default function Example({route}) {
         </View>
       </TouchableWithoutFeedback>
     );
-  };
-
-  const [expanded, setExpanded] = useState(true);
+  });
 
   // import export modalize
   const importExportModalizeRef = useRef(null);
@@ -378,6 +388,16 @@ export default function Example({route}) {
     getStatusNumbers();
   }, [masterInvities]);
 
+  // guests Summary modalize
+  const guestsSummaryModalizeRef = useRef(null);
+  const openGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.open();
+  };
+  const closeGuestsSummaryModalize = () => {
+    guestsSummaryModalizeRef.current?.close();
+  };
+
+  const {t, i18n} = useTranslation();
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
       <StatusBar
@@ -389,6 +409,7 @@ export default function Example({route}) {
         <View>
           <GuestsAppbar
             openGuestsImportExportModalize={openGuestsImportExportModalize}
+            openGuestsSummaryModalize={openGuestsSummaryModalize}
             isChipsShow={isChipsShow}
             setIsChipsShow={setIsChipsShow}
             func={func}
@@ -408,7 +429,7 @@ export default function Example({route}) {
                       selected={selectedChips?.includes(chip.name)}
                       mode={selectedChips?.includes(chip.name) ? 'flat' : 'outlined'}
                       onPress={() => selectedChipsHandler(chip.name)}>
-                      {chip.name} {chip.name === 'invited' && invitedNumber}
+                      {t(chip.name)} {chip.name === 'invited' && invitedNumber}
                       {chip.name === 'rejected' && rejectedNumber}
                       {chip.name === 'pending' && pendingNumber}
                       {chip.name === 'other' && otherNumber}
@@ -422,15 +443,16 @@ export default function Example({route}) {
       )}
 
       <FlashList
+        keyExtractor={item => item?._id}
         data={isInvitaionSearch ? invitaionsForSearch : filterdInvities}
-        estimatedItemSize={100}
+        estimatedItemSize={invitaionsForSearch?.length ? invitaionsForSearch?.length : 100}
         ListEmptyComponent={() => (
           <View style={{marginTop: '50%', alignItems: 'center'}}>
             {isLoading || localLoading ? (
-              <Text>Loading...</Text>
+              <Text>{t('Loading...')}</Text>
             ) : (
               <Text>
-                {isInvitaionSearch ? 'Type something fimiliar to search' : 'No invitation'}
+                {isInvitaionSearch ? t('Type something fimiliar to search') : t('No invitation')}
               </Text>
             )}
           </View>
@@ -445,31 +467,33 @@ export default function Example({route}) {
         visible={isExportBanner}
         actions={[
           {
-            label: 'Understood',
+            label: t('Understood'),
             onPress: () => dispatch(handleIsExportBanner(false)),
           },
         ]}
         icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
-        Guests List as CSV file has been exported in *Downlaod folder successfully
+        {t('Guests List as CSV file has been exported in *Downlaod folder successfully')}
       </Banner>
 
       <Banner
         visible={isExportPDFBanner}
         actions={[
           {
-            label: 'Understood',
+            label: t('Understood'),
             onPress: () => dispatch(handleIsExportPDFBanner(false)),
           },
         ]}
         icon={({size}) => <Avatar.Icon size={size} icon="check" />}>
-        Guests List as PDF file has been exported in *Document folder successfully
+        {t('Guests List as PDF file has been exported in *Document folder successfully')}
       </Banner>
 
       <Portal>
         <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Title>{t('Alert')}</Dialog.Title>
           <Dialog.Content>
-            <Text variant="bodyMedium">Do you want to delete "{currentItem?.invitiName}"</Text>
+            <Text variant="bodyMedium">
+              {t('Do you want to delete')} "{currentItem?.invitiName}"
+            </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -479,9 +503,9 @@ export default function Example({route}) {
                 token ? deleteHandler(currentItem) : deleteInvitiFromLocalStorage(currentItem._id)
               }
               textColor={theme.colors.error}>
-              Yes, delete it
+              {t('Yes, delete it')}
             </Button>
-            <Button onPress={hideDialog}>No</Button>
+            <Button onPress={hideDialog}>{t('No')}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -493,6 +517,7 @@ export default function Example({route}) {
         snapPoint={400}
         handlePosition="inside"
         modalHeight={600}
+        shouldUnregister={false}
         HeaderComponent={() => <InvitiBrief FABHandler={FABHandler} onClose={onBriefClose} />}>
         <View style={{marginHorizontal: '5%'}}>
           <View
@@ -502,14 +527,14 @@ export default function Example({route}) {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Text style={{fontWeight: 'bold'}}>Current status</Text>
+            <Text style={{fontWeight: 'bold'}}>{t('Current status')}</Text>
             {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'invited' && <InvitedIcon />}
             {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'pending' && <PendingIcon />}
             {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'rejected' && <RejectedIcon />}
             {currentInvitiToDisplay?.lastStatus?.invitiStatus === 'other' && <OtherIcon />}
           </View>
 
-          <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>Added by</Text>
+          <Text style={{marginVertical: '2%', fontWeight: 'bold'}}>{t('Added by')}</Text>
           <View
             style={{
               borderRadius: 10,
@@ -524,12 +549,17 @@ export default function Example({route}) {
               <View>
                 <Avatar.Icon size={30} icon="account-circle-outline" />
               </View>
-              <Text style={{marginHorizontal: '4%'}}>{currentInvitiToDisplay?.addedBy?.name}</Text>
+              <Text style={{marginHorizontal: '4%'}}>
+                {currentInvitiToDisplay?.addedBy?.name}{' '}
+                {currentLoginUser?.name === currentInvitiToDisplay?.addedBy?.name && '(You)'}
+              </Text>
             </View>
-            <Text style={{}}>{moment(currentInvitiToDisplay?.createdAt).fromNow()}</Text>
+            <Text style={{}}>
+              {moment(currentInvitiToDisplay?.createdAt)?.fromNow()}
+            </Text>
           </View>
 
-          <Text style={{marginTop: '5%', fontWeight: 'bold'}}>History</Text>
+          <Text style={{marginTop: '5%', fontWeight: 'bold'}}>{t('History')}</Text>
           <ScrollView>
             {currentInvitiToDisplay?.statuses?.map((Status, index) => (
               <View
@@ -549,7 +579,8 @@ export default function Example({route}) {
                   }}>
                   <View style={{}}>
                     <Text style={{padding: '2%'}}>
-                      marked as <Text style={{fontWeight: 'bold'}}>{Status.invitiStatus}</Text> by
+                      {t('marked as')}{' '}
+                      <Text style={{fontWeight: 'bold'}}>{t(Status.invitiStatus)}</Text> by
                     </Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                       <Avatar.Image
@@ -560,7 +591,10 @@ export default function Example({route}) {
                             : require('../../../../../assets/drawer/male-user.png')
                         }
                       />
-                      <Text style={{marginHorizontal: '4%'}}>{Status?.addedBy?.name}</Text>
+                      <Text style={{marginHorizontal: '4%'}}>
+                        {Status?.addedBy?.name}{' '}
+                        {currentLoginUser?.name === Status?.addedBy?.name && '(You)'}
+                      </Text>
                     </View>
                   </View>
                   <View style={{alignItems: 'flex-end'}}>
@@ -575,7 +609,9 @@ export default function Example({route}) {
                     )}
 
                     <Text style={{alignSelf: 'flex-end'}}>
-                      {moment(Status?.createdAt).fromNow()}{' '}
+                      {index === 0
+                        ? moment(currentInvitiToDisplay?.createdAt)?.fromNow()
+                        : moment(Status?.createdAt)?.fromNow()}
                     </Text>
                   </View>
                 </View>
@@ -592,9 +628,19 @@ export default function Example({route}) {
         snapPoint={400}>
         <ImportExport group={route.params.group} onClose={onCloseGuestsImportExport} />
       </Modalize>
+
+      <Modalize
+        modalStyle={{backgroundColor: theme.colors.surfaceVariant}}
+        ref={guestsSummaryModalizeRef}
+        handlePosition="inside"
+        snapPoint={500}>
+        <InvitaionsSummary onClose={closeGuestsSummaryModalize} />
+      </Modalize>
     </View>
   );
-}
+})
+
+export default Invitations;
 
 const styles = StyleSheet.create({
   fab: {

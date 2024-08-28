@@ -7,7 +7,10 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import RNFS from 'react-native-fs';
 import {jsonToCSV, readString} from 'react-native-csv';
 import {useSelector, useDispatch} from 'react-redux';
-import {handleIsExportBanner, handleIsExportPDFBanner} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
+import {
+  handleIsExportBanner,
+  handleIsExportPDFBanner,
+} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import moment from 'moment';
 import {check, PERMISSIONS, RESULTS, request} from 'react-native-permissions';
 import DocumentPicker, {types} from 'react-native-document-picker';
@@ -15,11 +18,13 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import base64Logo from '../../../../../assets/logo/base64Logo';
+import {useTranslation} from 'react-i18next';
 
-const Index = ({group, onClose}) => {
+const Index = ({onClose}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const theme = useTheme();
+  const {t} = useTranslation();
   const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
   const importCSV = () => {
@@ -326,108 +331,108 @@ const Index = ({group, onClose}) => {
 
   return (
     <View>
-
-    <View style={{padding: '5%'}}>
-      <List.Item
-        title={currentViewingGroup.groupName}
-        description={currentViewingGroup.groupDescription}
-        left={props => (
-          <Avatar.Image
-            {...props}
-            size={45}
-            source={
-              currentViewingGroup.imageURL
-                ? {uri: currentViewingGroup.imageURL}
-                : require('../../../../../assets/drawer/male-user.png')
-            }
-          />
-        )}
-      />
-      <Divider />
-      <Button
-        loading={isLoadingPdf}
-        onPress={exportPDF}
-        mode="contained"
-        icon={'download'}
-        contentStyle={{padding: '1%'}}
-        style={{marginTop: '5%'}}
-        buttonColor={theme.colors.error}
-        theme={{roundness: 50}}>
-        Downlaod as PDF
-      </Button>
-
-      <Button
-        loading={exportLoading}
-        onPress={exportCSV}
-        mode="contained"
-        icon={'download'}
-        contentStyle={{padding: '1%'}}
-        style={{marginTop: '5%'}}
-        buttonColor={'#297548'}
-        theme={{roundness: 50}}>
-        Downlaod as CSV
-      </Button>
-      <Button
-        onPress={importCSV}
-        mode="contained"
-        icon={'upload'}
-        contentStyle={{padding: '1%'}}
-        style={{marginTop: '5%'}}
-        theme={{roundness: 50}}
-        buttonColor={'#6c8ee3'}>
-        Upload CSV
-      </Button>
-
-      <Divider style={{marginVertical: '5%'}} />
-      <Text style={{margin: '2%'}}>Explanation</Text>
-
-      <View style={{marginHorizontal: '2%'}}>
-        <View style={{marginTop: '2%'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon name="pdffile1" size={16} color={theme.colors.onBackground} />
-            <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>Download PDF</Text>
-          </View>
-          <Text style={{}}>Downlaod the guests list as PDF file</Text>
-        </View>
-
-        <View style={{marginTop: '5%'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <MaterialCommunityIcon
-              name="microsoft-excel"
-              size={16}
-              color={theme.colors.onBackground}
+      <View style={{padding: '5%'}}>
+        <List.Item
+          title={currentViewingGroup.groupName}
+          description={currentViewingGroup.groupDescription}
+          left={props => (
+            <Avatar.Image
+              {...props}
+              size={45}
+              source={
+                currentViewingGroup.imageURL
+                  ? {uri: currentViewingGroup.imageURL}
+                  : require('../../../../../assets/drawer/male-user.png')
+              }
             />
-            <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>Download CSV</Text>
-          </View>
-          <Text style={{}}>Downlaod the guests list as CSV file</Text>
-          <Text style={{}}>- You can use it in future events</Text>
-          <Text style={{}}>
-            - Just upload the CSV file to any event and it will adjust automatically to that event
-          </Text>
-        </View>
+          )}
+        />
+        <Divider />
+        <Button
+          loading={isLoadingPdf}
+          onPress={exportPDF}
+          mode="contained"
+          icon={'download'}
+          contentStyle={{padding: '1%'}}
+          style={{marginTop: '5%'}}
+          buttonColor={theme.colors.error}
+          theme={{roundness: 50}}>
+          {t("Downlaod as PDF")}
+        </Button>
 
-        <View style={{marginTop: '5%'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <MaterialCommunityIcon
-              name="microsoft-excel"
-              size={16}
-              color={theme.colors.onBackground}
-            />
-            <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>Upload CSV</Text>
+        <Button
+          loading={exportLoading}
+          onPress={exportCSV}
+          mode="contained"
+          icon={'download'}
+          contentStyle={{padding: '1%'}}
+          style={{marginTop: '5%'}}
+          buttonColor={'#297548'}
+          theme={{roundness: 50}}>
+          {t("Downlaod as CSV")}
+        </Button>
+        <Button
+          onPress={importCSV}
+          mode="contained"
+          icon={'upload'}
+          contentStyle={{padding: '1%'}}
+          style={{marginTop: '5%'}}
+          theme={{roundness: 50}}
+          buttonColor={'#6c8ee3'}>
+          {t("Upload CSV")}
+        </Button>
+
+        <Divider style={{marginVertical: '5%'}} />
+        <Text style={{margin: '2%'}}>{t("Explanation")}</Text>
+
+        <View style={{marginHorizontal: '2%'}}>
+          <View style={{marginTop: '2%'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon name="pdffile1" size={16} color={theme.colors.onBackground} />
+              <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>{t("Download PDF")}</Text>
+            </View>
+            <Text style={{}}>{t("Downlaod the guests list as PDF file")}</Text>
           </View>
-          <Text style={{}}>Upload the CSV file.</Text>
-          <Text style={{}}>- Upload the CSV file that you have downloaded from another event.</Text>
-          <Text style={{}}>- It will adjust automatically to this event</Text>
-          <Text style={{}}>
-            - You can upload your own created CSV file but it fields have to be according the sample
-            file
-          </Text>
-          <TouchableOpacity onPress={sampleFileDownloadHandler} style={{marginVertical:"2%"}}> 
-            <Text style={{color:theme.colors.primary}}> Downlaod sample file</Text>
-          </TouchableOpacity>
+
+          <View style={{marginTop: '5%'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <MaterialCommunityIcon
+                name="microsoft-excel"
+                size={16}
+                color={theme.colors.onBackground}
+              />
+              <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>{t("Download CSV")}</Text>
+            </View>
+            <Text style={{}}>{t("Downlaod the guests list as CSV file")}</Text>
+            <Text style={{}}>- {t("You can use it in future events")}</Text>
+            <Text style={{}}>
+              - {t("Just upload the CSV file to any event and it will adjust automatically to that event")}
+            </Text>
+          </View>
+
+          <View style={{marginTop: '5%'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <MaterialCommunityIcon
+                name="microsoft-excel"
+                size={16}
+                color={theme.colors.onBackground}
+              />
+              <Text style={{marginHorizontal: '1%', fontWeight: 'bold'}}>{t("Upload CSV")}</Text>
+            </View>
+            <Text style={{}}>{t("Upload the CSV file.")}</Text>
+            <Text style={{}}>
+              - {t("Upload the CSV file that you have downloaded from another event.")}
+            </Text>
+            <Text style={{}}>- {t("It will adjust automatically to this event")}</Text>
+            <Text style={{}}>
+              - {t("You can upload your own created CSV file but it fields have to be according the sample file")}
+            </Text>
+            <TouchableOpacity onPress={sampleFileDownloadHandler} style={{marginVertical: '2%'}}>
+              <Text style={{color: theme.colors.primary}}> {t("Downlaod sample file")}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
 
       <Snackbar
         visible={showSnackBar}
@@ -435,14 +440,13 @@ const Index = ({group, onClose}) => {
         duration={3000}
         onDismiss={() => setShowSnackbar(false)}
         action={{
-          label: 'Ok',
+          label: t('Ok'),
           onPress: () => {
             setShowSnackbar(false);
           },
         }}>
-        {SnackbarMessage}
+        {t(SnackbarMessage)}
       </Snackbar>
-
     </View>
   );
 };

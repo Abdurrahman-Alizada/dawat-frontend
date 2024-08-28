@@ -7,11 +7,13 @@ import {
   handleInvitationSearch,
 } from '../../redux/reducers/groups/invitations/invitationSlice';
 import {handleIsSearch} from '../../redux/reducers/groups/groups';
-
-const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
+import {useTranslation} from 'react-i18next';
+import {I18nManager} from 'react-native';
+const Header = ({openGuestsImportExportModalize, func, openGuestsSummaryModalize, isChipsShow}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigation = useNavigation();
+  const {t} = useTranslation();
 
   //search
   const isSearch = useSelector(state => state.groups.isSearch);
@@ -45,7 +47,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
           }}>
           <Appbar.BackAction onPress={() => navigation.goBack()} />
           <Appbar.Content
-            title="Guests"
+            title={t('Guests')}
             titleStyle={{
               color: theme.colors.onBackground,
             }}
@@ -54,7 +56,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
             icon="magnify"
             color={theme.colors.onBackground}
             onPress={() => {
-              func(true)
+              func(true);
               dispatch(handleIsSearch(true));
               dispatch(handleIsInvitationSearch(true));
             }}
@@ -65,6 +67,13 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
             color={theme.colors.onBackground}
             onPress={() => {
               func();
+            }}
+          />
+          <Appbar.Action
+            icon={`briefcase-outline`}
+            color={theme.colors.onBackground}
+            onPress={() => {
+              openGuestsSummaryModalize()
             }}
           />
           <Menu
@@ -83,7 +92,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
                 closeMenu();
                 openGuestsImportExportModalize();
               }}
-              title="Import/Export"
+              title={t('Import/Export')}
               leadingIcon={'microsoft-excel'}
             />
             <Divider />
@@ -93,7 +102,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
                 closeMenu();
                 navigation.navigate('AddMultipleInviti');
               }}
-              title="Add multiple inviti"
+              title={t('Add multiple guests')}
               leadingIcon={'account-multiple-plus'}
             />
             <Menu.Item
@@ -101,7 +110,7 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
                 closeMenu();
                 navigation.navigate('MultipleInvitiActions');
               }}
-              title="Bulk actions"
+              title={t('Bulk actions')}
               leadingIcon={'checkbox-multiple-blank-circle-outline'}
             />
           </Menu>
@@ -115,12 +124,12 @@ const Header = ({openGuestsImportExportModalize,func, isChipsShow}) => {
             backgroundColor: theme.colors.background,
           }}>
           <Searchbar
-            placeholder="Search..."
+            placeholder={t('Search...')}
             onChangeText={updateSearch}
             value={search}
             cancelButtonTitle="cancel"
             autoFocus
-            icon="arrow-left"
+            icon={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
             onIconPress={BlurHandler}
             theme={{roundness: 0}}
             style={{

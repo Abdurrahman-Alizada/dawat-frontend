@@ -3,11 +3,12 @@ import {View} from 'react-native';
 import {Menu, Divider, Appbar, useTheme} from 'react-native-paper';
 import {useNavigation, DrawerActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTranslation} from 'react-i18next';
 
-const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
+const Header = () => {
   const navigation = useNavigation();
   const theme = useTheme();
-
+  const {t} = useTranslation();
   // "more menu"
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const [visible, setVisible] = React.useState(false);
@@ -24,7 +25,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
         }}
       />
 
-      <Appbar.Content title="Friends" />
+      <Appbar.Content title={t("Friends")} />
       <Appbar.Action
         icon="magnify"
         onPress={() => {
@@ -44,7 +45,7 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction}) => {
             closeMenu();
             navigation.navigate('DeletedFriendsSuggestions');
           }}
-          title="Deleted suggestions"
+          title={t("Deleted suggestions")}
         />
       </Menu>
     </Appbar.Header>

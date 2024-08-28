@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  I18nManager,
 } from 'react-native';
 import React, {useState} from 'react';
 import Skeleton from '../../Skeletons/InvitationsList';
@@ -27,9 +28,11 @@ import {useSelector, useDispatch} from 'react-redux';
 import {groupApi} from '../../../redux/reducers/groups/groupThunk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createRandomId from '../../../utils/createRandomId';
+import {useTranslation} from 'react-i18next';
 
-const AddGroup = ({navigation, onClose, route}) => {
+const AddGroup = ({navigation, route}) => {
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const {groupName, groupDescription, imageURL, isChat, isInvitations, isMute, isTasks, time} =
     route.params;
@@ -38,7 +41,7 @@ const AddGroup = ({navigation, onClose, route}) => {
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const groupsFlag = useSelector(state => state.groups?.groupsFlag);
-  
+
   const {data, isLoading, refetch, isFetching, isError, error} = useGetAllFriendsQuery(
     currentLoginUser?._id,
   );
@@ -174,8 +177,8 @@ const AddGroup = ({navigation, onClose, route}) => {
         <Appbar.Header elevated={true}>
           <Searchbar
             elevation={6}
-            placeholder="Search"
-            icon={'arrow-left'}
+            placeholder={t("Search...")}
+            icon={I18nManager.isRTL ? "arrow-right" : 'arrow-left'}
             autoFocus
             // loading={true}
             onIconPress={() => {
@@ -192,7 +195,7 @@ const AddGroup = ({navigation, onClose, route}) => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Add event members" />
+          <Appbar.Content title={t("Add event members")} />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -239,14 +242,14 @@ const AddGroup = ({navigation, onClose, route}) => {
           )}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>You don't have any friend left to add in this event</Text>
-              <Text>But still you can create event by clicking on Add button</Text>
+              <Text>{t("You don't have any friend left to add in this event")}</Text>
+              <Text>{t("But still you can create event by clicking on Add button")}</Text>
               <Button
                 icon="refresh"
                 mode="contained"
                 style={{marginTop: '5%', marginHorizontal: '2%'}}
                 onPress={refetch}>
-                Refresh
+                {t("Refresh")}
               </Button>
               {/* <Button
               icon="account-search"
@@ -265,7 +268,7 @@ const AddGroup = ({navigation, onClose, route}) => {
 
       <FAB
         icon="check"
-        label="Add"
+        label={t("Add")}
         style={styles.fab}
         disabled={addGroupLoading}
         loading={addGroupLoading}
@@ -278,12 +281,7 @@ const AddGroup = ({navigation, onClose, route}) => {
 export default AddGroup;
 
 const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
+  
   fab: {
     position: 'absolute',
     margin: 16,
@@ -292,17 +290,5 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
-  },
+  }
 });

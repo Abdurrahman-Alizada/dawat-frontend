@@ -1,12 +1,11 @@
-import React, {useState, useCallback} from 'react';
+import React from 'react';
 import {
   ToastAndroid,
-  StyleSheet,
   View,
 } from 'react-native';
 import {Checkbox} from 'react-native-paper'
 
-import {IconButton, Avatar, List, Chip} from 'react-native-paper';
+import {IconButton, List, Chip} from 'react-native-paper';
 import {useDeleteTaskMutation} from '../../../../../redux/reducers/groups/tasks/taskThunk';
 
 const TaskBrief = ({item, closeModalize, navigation}) => {
@@ -118,41 +117,3 @@ const TaskBrief = ({item, closeModalize, navigation}) => {
 };
 
 export default TaskBrief;
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    justifyContent: 'flex-start',
-    borderRadius: 5,
-    paddingVertical: '1%',
-    paddingHorizontal: '2%',
-    height: 100,
-    alignItems: 'baseline',
-  },
-  itemName: {
-    fontSize: 13,
-    color: '#282F3E',
-    fontWeight: '600',
-  },
-
-  itemDate: {
-    fontSize: 13,
-    color: '#282F3E',
-    fontWeight: 'bold',
-  },
-  itemDesc: {
-    fontSize: 13,
-    color: '#282F3E',
-    // fontWeight: 'bold',
-  },
-  groupMembersContent: {
-    flexDirection: 'row',
-  },
-  memberImage: {
-    height: 30,
-    width: 30,
-    borderRadius: 50,
-  },
-});

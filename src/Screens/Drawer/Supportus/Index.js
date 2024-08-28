@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import {
   InterstitialAd,
-  RewardedInterstitialAd,
   RewardedAd,
   RewardedAdEventType,
   AdEventType,
@@ -10,6 +9,7 @@ import {
 } from 'react-native-google-mobile-ads';
 import {Appbar, Button, Text, Card, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 const adUnitIdINTERSTITIAL = __DEV__
   ? TestIds.INTERSTITIAL
   : 'ca-app-pub-9526618780177325/5862732310';
@@ -27,7 +27,7 @@ const rewarded = RewardedAd.createForAdRequest(adUnitIdREWARDED, {
 export default function App() {
   const navigate = useNavigation();
   const theme = useTheme();
-
+  const {t} = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [isInterstitialWatched, setIsInterstitialWatched] = useState(false);
 
@@ -67,17 +67,16 @@ export default function App() {
 
   return (
     <View style={{flex: 1}}>
-      <Appbar.Header style={{backgroundColor:theme.colors.background}}>
+      <Appbar.Header style={{backgroundColor: theme.colors.background}}>
         <Appbar.BackAction onPress={() => navigate.goBack()} />
-        <Appbar.Content title="Watch ad" />
+        <Appbar.Content title={t("Watch ad")} />
       </Appbar.Header>
 
-      <Card theme={{roundness:0}} style={{margin: '0%', backgroundColor:theme.colors.background}}>
+      <Card theme={{roundness: 0}} style={{margin: '0%', backgroundColor: theme.colors.background}}>
         <Card.Content>
-          <Text variant="headlineMedium">Thank you for coming here.</Text>
+          <Text variant="headlineMedium">{t("Thank you for coming here.")}</Text>
           <Text style={{marginVertical: '5%'}} variant="bodyLarge">
-            We greatly appreciate your patience and willingness to watch an Ad. Your support through
-            watching this Ad helps us continue to provide our app for free.
+            {t("Watch ad paragraph")}
           </Text>
         </Card.Content>
       </Card>
@@ -94,7 +93,7 @@ export default function App() {
                   setIsInterstitialWatched(true);
                 }}
                 style={{paddingVertical: '1%'}}>
-                Watch Image Ad
+                {t("Watch Image Ad")}
               </Button>
             ) : (
               <ActivityIndicator size="large" style={{}} />
@@ -115,19 +114,19 @@ export default function App() {
                   setIsrewardedWatched(true);
                 }}
                 style={{paddingVertical: '1%'}}>
-                Watch Rewarded Ad
+                {t("Watch Rewarded Ad")}
               </Button>
             ) : (
               <ActivityIndicator size="large" style={{}} />
             )}
           </View>
         ) : (
-          <Text>You have watched the ad</Text>
+          <Text>{t("You have watched the ad")}</Text>
         )}
 
         {isInterstitialWatched && isrewardedWatched && (
           <Text style={{marginVertical: '10%'}}>
-            You can watch ad again when you re-open the app.
+            {t("You can watch ad again when you re-open the app.")}
           </Text>
         )}
       </View>

@@ -27,6 +27,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleInvitiFlag} from '../../../../../redux/reducers/groups/invitations/invitationSlice';
 import createRandomId from '../../../../../utils/createRandomId';
+import {useTranslation} from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   invitiName: Yup.string().required('Guest name is required').label('invitiName'),
@@ -36,6 +37,7 @@ const validationSchema = Yup.object().shape({
 const AddInviti = ({route, navigation}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const {groupId} = route.params;
   const [addInviti, {isLoading}] = useAddInvitiMutation();
@@ -252,8 +254,8 @@ const AddInviti = ({route, navigation}) => {
 
             <TextInput
               error={errors.invitiName && touched.invitiName ? true : false}
-              label="Name"
-              placeholder="Name of Person who will be invited"
+              label={t("Name")}
+              placeholder={t("Name of Person who will be invited")}
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiName')}
@@ -266,8 +268,8 @@ const AddInviti = ({route, navigation}) => {
 
             <TextInput
               error={errors.invitiDescription && touched.invitiDescription ? true : false}
-              label="Description"
-              placeholder="Description about the person"
+              label={t("Description")}
+              placeholder={t("Description about the person")}
               mode="outlined"
               style={{marginVertical: '2%', width: '100%'}}
               onChangeText={handleChange('invitiDescription')}
@@ -280,8 +282,9 @@ const AddInviti = ({route, navigation}) => {
               </Text>
             ) : null}
 
+
             <View>
-              <Text style={{marginTop: '2%'}}>Inviti statuse</Text>
+              <Text style={{marginTop: '2%'}}>{t("Guest current status")}</Text>
               <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
                 {statuses.map((statuse, index) => (
                   <Chip
@@ -293,17 +296,37 @@ const AddInviti = ({route, navigation}) => {
                       setSelectedStatus(statuse.value);
                       setStatus(statuse.value);
                     }}>
-                    {statuse.label}
+                    {t(statuse.label)}
                   </Chip>
                 ))}
               </View>
             </View>
 
+            {/* <View style={{marginVertical: '2%',}} >
+            <Text style={{marginTop: '2%'}}>{t("Optional")}</Text>
+              
+            <TextInput
+              error={errors.invitiAddress && touched.invitiAddress ? true : false}
+              label={t("Address")}
+              placeholder={t("Address of the guest")}
+              mode="outlined"
+              style={{ width: '100%'}}
+              onChangeText={handleChange('invitiAddress')}
+              onBlur={handleBlur('invitiAddress')}
+              value={values.invitiAddress}
+            />
+            {errors.invitiAddress && touched.invitiAddress ? (
+              <Text style={{color: theme.colors.error, fontSize: 13}}>
+                {errors.invitiAddress}
+              </Text>
+            ) : null}
+            </View> */}
+           
             <FAB
               icon="plus"
               loading={isLoading}
               disabled={isLoading}
-              label={'Add'}
+              label={t('Add')}
               style={{
                 position: 'absolute',
                 marginVertical: 16,
@@ -336,7 +359,7 @@ const AddInviti = ({route, navigation}) => {
               size={40}
               onPress={openCamera}
             />
-            <Text>Camera</Text>
+            <Text>{t("Camera")}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -346,7 +369,7 @@ const AddInviti = ({route, navigation}) => {
               size={40}
               onPress={openGallery}
             />
-            <Text>Gallery</Text>
+            <Text>{t("Gallery")}</Text>
           </View>
           <View style={{alignItems: 'center'}}>
             <IconButton
@@ -359,7 +382,7 @@ const AddInviti = ({route, navigation}) => {
                 setAvatarModalVisible(true);
               }}
             />
-            <Text>Avatars</Text>
+            <Text>{t("Avatars")}</Text>
           </View>
         </View>
       </Modalize>

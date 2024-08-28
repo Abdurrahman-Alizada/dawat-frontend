@@ -4,7 +4,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Profile from '../Screens/Drawer/Profile';
 import AppSettingsMain from '../Screens/Drawer/SettingsMain/Index';
 import Preferences from '../Screens/Drawer/SettingsMain/Preferences/Index';
-import GeneralAppbar from '../Components/GeneralAppbar'
+import GeneralAppbar from '../Components/GeneralAppbar';
+
 const Stack = createStackNavigator();
 
 const AppStack = () => {
@@ -14,7 +15,7 @@ const AppStack = () => {
         name="AppSettings"
         component={AppSettingsMain}
         options={{
-          header: (props) => <GeneralAppbar title="Settings" {...props} />,
+          header: props => <GeneralAppbar title="Settings" {...props} />,
         }}
       />
 
@@ -22,7 +23,7 @@ const AppStack = () => {
         name="Profile"
         component={Profile}
         options={{
-          header: (props) => <GeneralAppbar title="Profile" {...props} />,
+          header: props => <GeneralAppbar title="Profile" {...props} />,
         }}
       />
 
@@ -30,9 +31,11 @@ const AppStack = () => {
         name="Preferences"
         component={Preferences}
         options={{
-          header: (props) => <GeneralAppbar title="Preferences" {...props} />,
+          header: props => <GeneralAppbar title="Preferences" {...props} />,
         }}
-        />
+      />
+
+
     </Stack.Navigator>
   );
 };

@@ -1,18 +1,10 @@
-import {
-  View,
-  FlatList,
-  RefreshControl,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import {View, FlatList, ScrollView, TouchableOpacity, StyleSheet, I18nManager} from 'react-native';
+import React, {useLayoutEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Text,
   FAB,
   Searchbar,
-  Button,
   Appbar,
   List,
   Avatar,
@@ -23,30 +15,28 @@ import {
 import {useUpdateResponsiblesMutation} from '../../../../../../redux/reducers/groups/tasks/taskThunk';
 
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
 
-const AddGroup = ({navigation, onClose, route}) => {
+const AddGroup = ({navigation}) => {
   const theme = useTheme();
+  const {t} = useTranslation();
+
   const [isSearch, setIsSearch] = useState(false);
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
-  const currentViewingTask = useSelector(
-    state => state.tasks?.currentViewingTask,
-  );
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingTask = useSelector(state => state.tasks?.currentViewingTask);
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
   const [updateResponsibles, {isLoading: updateResponsiblesLoading}] =
     useUpdateResponsiblesMutation();
-  
-    const submitHandler = async () => {
-      updateResponsibles({
+
+  const submitHandler = async () => {
+    updateResponsibles({
       responsibles: responsibleUsers,
       userId: await AsyncStorage.getItem('userId'),
       taskId: currentViewingTask._id,
     })
       .then(response => {
-        console.log('updated task is =>', response.data);
         navigation.pop(2);
       })
       .catch(e => {
@@ -58,20 +48,20 @@ const AddGroup = ({navigation, onClose, route}) => {
   const [userIds, setUserIds] = useState([]);
   const [responsibleUsers, setResponsibleUsers] = useState([]);
 
-  
-  useLayoutEffect(()=>{
+  useLayoutEffect(() => {
     const getResponsibles = () => {
-      for(let i=0; i<currentViewingTask.responsibles?.length; i++){
-       let user = currentViewingGroup?.users.find(e => e._id === currentViewingTask?.responsibles[i]?.responsible?._id)
-        if(user){
-          setUsers(prevState => ([...prevState, user]))
-          setUserIds(prevState => ([...prevState, user?._id]))
-          // setResponsibleUsers(prevState => ([...prevState, {id : user?._id, name: user?.name}]))
+      for (let i = 0; i < currentViewingTask.responsibles?.length; i++) {
+        let user = currentViewingGroup?.users.find(
+          e => e._id === currentViewingTask?.responsibles[i]?.responsible?._id,
+        );
+        if (user) {
+          setUsers(prevState => [...prevState, user]);
+          setUserIds(prevState => [...prevState, user?._id]);
         }
       }
     };
-    getResponsibles()
-  },[])
+    getResponsibles();
+  }, []);
 
   const Item = ({itemProps}) => {
     const [include, setInclude] = useState(userIds.includes(itemProps?._id));
@@ -80,25 +70,26 @@ const AddGroup = ({navigation, onClose, route}) => {
         setUserIds(userIds.filter(userId => userId !== itemProps?._id));
         setUsers(users.filter(user => user._id !== itemProps?._id));
       } else {
-        setUsers(prevState => ([...prevState, itemProps]))
-        setUserIds(prevState => ([...prevState, itemProps?._id]))
-      }      
-      
+        setUsers(prevState => [...prevState, itemProps]);
+        setUserIds(prevState => [...prevState, itemProps?._id]);
+      }
+
       let includeInResponsibleUsers = responsibleUsers.some(user => user.id == itemProps?._id);
-      if(includeInResponsibleUsers){
+      if (includeInResponsibleUsers) {
         setResponsibleUsers(responsibleUsers.filter(user => user.id !== itemProps?._id));
-      }else{
-        setResponsibleUsers(prevState => ([...prevState, {id : itemProps._id, name: itemProps.name}]))
-      }      
+      } else {
+        setResponsibleUsers(prevState => [...prevState, {id: itemProps._id, name: itemProps.name}]);
+      }
       setInclude(!include);
     };
     return (
       <View>
         <List.Item
           onPress={add}
-          title={itemProps?.name}
-          // description={itemProps?.responsible?.email}
-          style={{backgroundColor:include ? theme.colors.primaryContainer : theme.colors.background}}
+          title={`${itemProps?.name} ${itemProps?.name === currentLoginUser?.name ? '(You)' : ''}`}
+          style={{
+            backgroundColor: include ? theme.colors.primaryContainer : theme.colors.background,
+          }}
           left={props => (
             <View>
               <Avatar.Image
@@ -114,11 +105,7 @@ const AddGroup = ({navigation, onClose, route}) => {
             </View>
           )}
           right={props => (
-            <Checkbox
-              {...props}
-              status={include ? 'checked' : 'unchecked'}
-              onPress={add}
-            />
+            <Checkbox {...props} status={include ? 'checked' : 'unchecked'} onPress={add} />
           )}
         />
       </View>
@@ -128,28 +115,29 @@ const AddGroup = ({navigation, onClose, route}) => {
   return (
     <View style={{flex: 1}}>
       {isSearch ? (
-        <Appbar.Header>
+        <Appbar.Header style={{backgroundColor: theme.colors.background}}>
           <Searchbar
-            placeholder="Search"
-            icon={'arrow-left'}
+            placeholder={t('Search...')}
+            icon={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
             autoFocus
             // loading={true}
+            style={{backgroundColor: theme.colors.background}}
             onIconPress={() => {
               setIsSearch(false);
             }}
-             theme={{roundness:0}}
+            theme={{roundness: 0}}
             // onChangeText={onChangeSearch}
             // value={searchQuery}
           />
         </Appbar.Header>
       ) : (
-        <Appbar.Header >
+        <Appbar.Header>
           <Appbar.BackAction
             onPress={() => {
               navigation.goBack();
             }}
           />
-          <Appbar.Content title="Update task members" />
+          <Appbar.Content title={t('Update task members')} />
           <Appbar.Action
             icon="magnify"
             onPress={() => {
@@ -178,9 +166,7 @@ const AddGroup = ({navigation, onClose, route}) => {
                     style={{marginRight: 15, alignItems: 'center'}}
                     key={index}
                     onPress={() => {
-                      setUserIds(
-                        userIds.filter(userId => userId !== user?._id),
-                      );
+                      setUserIds(userIds.filter(userId => userId !== user?._id));
                       setUsers(users.filter(user1 => user1._id !== user?._id));
                     }}>
                     {user?.imageURL ? (
@@ -189,20 +175,18 @@ const AddGroup = ({navigation, onClose, route}) => {
                       <Avatar.Text size={50} label={'A'} />
                     )}
                     <Text style={{}} maxLength={10}>
-                      {user?.name.length > 8
-                        ? user?.name.substring(0, 8) + '..'
-                        : user?.name}
+                      {user?.name.length > 8 ? user?.name.substring(0, 8) + '..' : user?.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
             ) : null}
-            <Divider bold style={{marginBottom:"1%"}} />
+            <Divider bold style={{marginBottom: '1%'}} />
           </View>
         )}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>There isn't any participant in this group</Text>
+            <Text>{t("There isn't any participant in this group")}</Text>
           </View>
         )}
         renderItem={({item}) => <Item itemProps={item} />}
@@ -210,9 +194,16 @@ const AddGroup = ({navigation, onClose, route}) => {
 
       <FAB
         icon="check"
-        label="Ok"
-        style={styles.fab}
-        disabled={updateResponsiblesLoading || currentViewingTask?.responsibles?.length == users.length}
+        label={t('Ok')}
+        style={{
+          position: 'absolute',
+          margin: 16,
+          right: 0,
+          bottom: 0,
+        }}
+        disabled={
+          updateResponsiblesLoading || currentViewingTask?.responsibles?.length == users.length
+        }
         loading={updateResponsiblesLoading}
         onPress={submitHandler}
       />
@@ -221,33 +212,3 @@ const AddGroup = ({navigation, onClose, route}) => {
 };
 
 export default AddGroup;
-
-const styles = StyleSheet.create({
-  images: {
-    alignSelf: 'center',
-    width: 150,
-    height: 150,
-    marginHorizontal: 30,
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-  error: {
-    color: 'red',
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalView: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: '5%',
-    // justifyContent: 'center',
-  },
-});

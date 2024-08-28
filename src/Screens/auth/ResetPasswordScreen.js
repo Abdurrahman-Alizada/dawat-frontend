@@ -16,6 +16,7 @@ import {
 import {useResetPasswordMutation} from '../../redux/reducers/user/userThunk';
 import {useDispatch} from 'react-redux';
 import {handlePasswordResetSuccessfully} from '../../redux/reducers/user/user';
+import {useTranslation} from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -31,6 +32,7 @@ const validationSchema = Yup.object().shape({
 const ResetPasswordScreen = ({navigation, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('Something went wrong');
@@ -69,12 +71,12 @@ const ResetPasswordScreen = ({navigation, route}) => {
     <View style={styles.container}>
       <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(true)}>
-          <Dialog.Title>Reset password error</Dialog.Title>
+          <Dialog.Title>{t("Reset password error")}</Dialog.Title>
           <Dialog.Content>
-            <Paragraph> {message} </Paragraph>
+            <Paragraph> {t(message)} </Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setVisible(false)}>Ok</Button>
+            <Button onPress={() => setVisible(false)}>{t("Ok")}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -99,7 +101,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
             <View>
               <TextInput
                 error={errors.password && touched.password ? true : false}
-                label="New password"
+                label={t("New password")}
                 secureTextEntry={showPassword}
                 right={
                   <TextInput.Icon
@@ -121,7 +123,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
 
               <TextInput
                 error={errors.password && touched.password ? true : false}
-                label="Confirm new password"
+                label={t("Confirm new password")}
                 mode="outlined"
                 secureTextEntry={showPasswordConfirmation}
                 right={
@@ -130,8 +132,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
                     onPress={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
                   />
                 }
-          style={{marginTop: '2%', height:55}}
-
+                style={{marginTop: '2%', height: 55}}
                 onChangeText={handleChange('passwordConfirmation')}
                 onBlur={handleBlur('passwordConfirmation')}
                 value={values.passwordConfirmation}
@@ -160,7 +161,7 @@ const ResetPasswordScreen = ({navigation, route}) => {
                 mode="contained"
                 onPress={handleSubmit}
                 buttonColor={theme.colors.secondary}>
-                Reset
+                {t("Reset")}
               </Button>
             </View>
           </View>
@@ -178,29 +179,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: '5%',
     paddingVertical: '2%',
   },
-  img: {
-    width: 100,
-    alignSelf: 'center',
-    height: 100,
-    borderRadius: 400,
-  },
-
-  buttonStyle: {
-    height: 60,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 50,
-    alignItems: 'center',
-    borderRadius: 10,
-    flexDirection: 'row',
-    marginVertical: '2%',
-    backgroundColor: '#EDEEF0',
-  },
-  buttonTextStyle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
+  
   error: {
     color: 'red',
-    // marginLeft: 20,
   },
 });

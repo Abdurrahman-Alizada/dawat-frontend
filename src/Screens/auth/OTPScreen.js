@@ -1,12 +1,4 @@
-import {
-  Platform,
-  Animated,
-  Image,
-  SafeAreaView,
-  Text,
-  View,
-  StyleSheet,
-} from 'react-native';
+import {Platform, Animated, Image, SafeAreaView, View, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useVerifyOTPForPasswordRecoveryMutation} from '../../redux/reducers/user/userThunk';
 import {
@@ -15,7 +7,8 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import {Button, Portal, Dialog, Paragraph, useTheme} from 'react-native-paper';
+import {Button, Portal, Dialog, Paragraph, useTheme, Text} from 'react-native-paper';
+import {useTranslation} from 'react-i18next';
 
 export const CELL_SIZE = 50;
 export const CELL_BORDER_RADIUS = 8;
@@ -27,7 +20,9 @@ export const ACTIVE_CELL_BG_COLOR = '#d8dce3';
 const {Value, Text: AnimatedText} = Animated;
 
 const OTPScreen = ({navigation, route}) => {
-  const theme = useTheme()
+  const theme = useTheme();
+  const {t} = useTranslation();
+
   const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
 
@@ -38,8 +33,8 @@ const OTPScreen = ({navigation, route}) => {
   const [VerifyOTPForPasswordRecovery, {isLoading, isError, error}] =
     useVerifyOTPForPasswordRecoveryMutation();
   const verify = () => {
-    setDisibility(true)
-    VerifyOTPForPasswordRecovery({email:route?.params?.email, OTP:value})
+    setDisibility(true);
+    VerifyOTPForPasswordRecovery({email: route?.params?.email, OTP: value})
       .then(res => {
         if (res?.error?.data?.message) {
           setMessage(res?.error?.data?.message);
@@ -47,11 +42,11 @@ const OTPScreen = ({navigation, route}) => {
         } else if (res?.error?.error) {
           setMessage(res?.error?.error);
           setVisible(true);
-        } else if(res?.data?.message == `OTP verified successfully`) {
-          navigation.navigate("ResetPasswordScreen", {user : res?.data?.user});
-          setValue('')
-        }else{
-          setMessage("Unknown error");
+        } else if (res?.data?.message == `OTP verified successfully`) {
+          navigation.navigate('ResetPasswordScreen', {user: res?.data?.user});
+          setValue('');
+        } else {
+          setMessage('Unknown error');
           setVisible(true);
         }
         setDisibility(false);
@@ -62,13 +57,13 @@ const OTPScreen = ({navigation, route}) => {
       });
   };
 
-  useEffect(()=>{
-   if(value?.length === 5) {
-    setDisibility(false)
-   }else{
-    setDisibility(true)
-   }
-  },[value])
+  useEffect(() => {
+    if (value?.length === 5) {
+      setDisibility(false);
+    } else {
+      setDisibility(true);
+    }
+  }, [value]);
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
@@ -108,28 +103,30 @@ const OTPScreen = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{paddingVertical: '5%', paddingHorizontal: '2%'}}>
-           <Portal>
+    <SafeAreaView style={{paddingHorizontal: '2%'}}>
+   
+      <Portal>
         <Dialog visible={visible} onDismiss={() => setVisible(false)}>
-          <Dialog.Title>OTP verification error</Dialog.Title>
+          <Dialog.Title>{t("OTP verification error")}</Dialog.Title>
           <Dialog.Content>
-            <Paragraph> {message} </Paragraph>
+            <Paragraph> {t(message)} </Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button
-              textColor={theme.colors.tertiary}
-              onPress={() => setVisible(false)}>
-              close
+            <Button textColor={theme.colors.tertiary} onPress={() => setVisible(false)}>
+              {t("close")}
             </Button>
-            <Button onPress={() => {
-              setVisible(false)
-              setDisibility(false)
-              navigation.navigate("ForgotPassword")
-              }}>Try again</Button>
+            <Button
+              onPress={() => {
+                setVisible(false);
+                setDisibility(false);
+                navigation.navigate('ForgotPassword');
+              }}>
+              {t("Try again")}
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
-
+   
       <Image
         style={{
           width: 227 / 2.4,
@@ -140,9 +137,9 @@ const OTPScreen = ({navigation, route}) => {
         }}
         source={require('../../assets/images/smartphone.png')}
       />
-      <Text style={styles.subTitle}>
-        Please enter the verification code{'\n'}
-        we send to {route?.params?.email}
+      <Text style={{paddingTop: 30, textAlign: 'center'}}>
+        {t("Please enter the verification code")}{'\n'}
+        {t("we send to")} {route?.params?.email}
       </Text>
 
       <CodeField
@@ -172,11 +169,12 @@ const OTPScreen = ({navigation, route}) => {
         }}
         contentStyle={{padding: '3%'}}
         buttonStyle={{padding: '1%'}}
+        labelStyle={{color:"#fff"}}
         theme={{roundness: 10}}
         mode="contained"
         onPress={verify}
-        buttonColor={'#665a6f'}>
-        Verify
+        >
+        {t("Verify")}
       </Button>
 
       <View
@@ -190,12 +188,10 @@ const OTPScreen = ({navigation, route}) => {
             fontSize: 15,
             fontWeight: 'bold',
           }}>
-          Didn't recieve code?
+          {t("Didn't recieve code?")}
         </Text>
-        <Button
-          mode="text"
-          onPress={() => navigation.navigate('ForgotPassword')}>
-          Request again
+        <Button mode="text" onPress={() => navigation.navigate('ForgotPassword')}>
+          {t("Request again")}
         </Button>
       </View>
     </SafeAreaView>
@@ -246,12 +242,6 @@ const styles = StyleSheet.create({
 
     // Android
     elevation: 3,
-  },
-
-  subTitle: {
-    paddingTop: 30,
-    color: '#000',
-    textAlign: 'center',
   },
 });
 

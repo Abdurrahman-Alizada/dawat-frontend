@@ -1,48 +1,39 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import {
   IconButton,
-  Avatar,
   List,
   Card,
-  Button,
   Text,
-  Menu,
   ActivityIndicator,
   useTheme,
   Divider,
 } from 'react-native-paper';
-import {useSelector, useDispatch} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useSelector} from 'react-redux';
 import {useGetTaskSummaryQuery} from '../../../../../redux/reducers/groups/tasks/taskThunk';
+import {useTranslation} from 'react-i18next';
+
 const TaskSummary = ({onClose}) => {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const {t} = useTranslation();
   const theme = useTheme();
-  const currentViewingGroup = useSelector(
-    state => state.groups?.currentViewingGroup,
-  );
+  const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
 
-  const {data, isError, isLoading, error, isFetching, refetch} =
-    useGetTaskSummaryQuery({
-      groupId: currentViewingGroup._id,
-    });
-
-  console.log(data);
+  const {data, isError, isLoading, error, isFetching, refetch} = useGetTaskSummaryQuery({
+    groupId: currentViewingGroup._id,
+  });
 
   return (
     <View style={{padding: '5%'}}>
       <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
         <List.Item
-          title={'To-do summary of'}
+          title={t('To-do summary of')}
           description={currentViewingGroup.groupName}
           style={{width: '90%'}}
         />
         <IconButton
           icon="close-circle"
           size={30}
-          accessibilityLabel="Close guests summary"
+          accessibilityLabel="Close todo summary"
           style={{}}
           onPress={onClose}
         />
@@ -66,18 +57,10 @@ const TaskSummary = ({onClose}) => {
               color: theme.colors.primary,
             }}
             variant="headlineLarge">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : data?.isCompleted ? (
-              data?.isCompleted
-            ) : (
-              0
-            )}
+            {isLoading ? <ActivityIndicator /> : data?.isCompleted ? data?.isCompleted : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Completed
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t('Completed')}
           </Text>
         </Card>
 
@@ -92,18 +75,10 @@ const TaskSummary = ({onClose}) => {
               color: theme.colors.tertiary,
             }}
             variant="headlineLarge">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : data?.notCompleted ? (
-              data?.notCompleted
-            ) : (
-              0
-            )}
+            {isLoading ? <ActivityIndicator /> : data?.notCompleted ? data?.notCompleted : 0}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Not completed
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {t('Not completed')}
           </Text>
         </Card>
 
@@ -126,10 +101,8 @@ const TaskSummary = ({onClose}) => {
               0
             )}
           </Text>
-          <Text
-            style={{paddingHorizontal: 10, alignSelf: 'flex-end'}}
-            variant="bodyLarge">
-            Total
+          <Text style={{paddingHorizontal: 10, alignSelf: 'flex-end'}} variant="bodyLarge">
+            {'Total'}
           </Text>
         </Card>
       </View>

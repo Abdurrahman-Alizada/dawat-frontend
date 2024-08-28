@@ -1,14 +1,16 @@
-import { View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
+import {View, FlatList, RefreshControl, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import {
   useGetAllFriendsQuery,
-  useAcceptFriendRequestMutation,
   useDeclineFriendRequestMutation,
 } from '../../../redux/reducers/Friendship/friendshipThunk';
 import {useSelector} from 'react-redux';
-import {Button,Text, List, Avatar, useTheme} from 'react-native-paper';
+import {Button, Text, List, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-const PendingRequest = ({route}) => {
+import {useTranslation} from 'react-i18next';
+
+const PendingRequest = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation();
   const theme = useTheme();
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
@@ -58,7 +60,7 @@ const PendingRequest = ({route}) => {
                   marginTop: '5%',
                   backgroundColor: theme.colors.backdrop,
                 }}>
-                <Text style={{color: '#fff', textAlign: 'center'}}>Cancel</Text>
+                <Text style={{color: '#fff', textAlign: 'center'}}>{t('Cancel')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -79,27 +81,28 @@ const PendingRequest = ({route}) => {
   return (
     <View>
       {/* list of people to whom current login user sent request */}
-      <Text style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical:"2%"}}>
-        Total request sent{' '} <Text style={{color: theme.colors.error}}>{data?.pending?.length}</Text>
+      <Text
+        style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical: '2%'}}>
+        {t("Total request sent")} <Text style={{color: theme.colors.error}}>{data?.pending?.length}</Text>
       </Text>
       <FlatList
         data={data?.pending}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>You didn't sent request to anyone yet</Text>
+            <Text>{t("You didn't sent request to anyone yet")}</Text>
             <Button
               icon="refresh"
               mode="contained"
               style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={refetch}>
-              Refresh
+              {t("Refresh")}
             </Button>
             <Button
               icon="account-search"
               mode="text"
               style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={() => navigation.navigate('FriendsSuggestions')}>
-              Search for friends
+              {t("Search for friends")}
             </Button>
           </View>
         )}

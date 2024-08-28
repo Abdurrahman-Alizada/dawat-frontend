@@ -20,9 +20,11 @@ import {
 import ChatHeader from '../../../../../Components/Appbars/ChatAppbar';
 // for socket.io
 import io from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
 
-const MessagesScreen = ({navigation, route}) => {
+const MessagesScreen = ({route}) => {
   const dispatch = useDispatch();
+  const {t} = useTranslation();
   const theme = useTheme();
   const listRef = useRef();
   const {isHeader} = route.params;
@@ -121,17 +123,17 @@ const MessagesScreen = ({navigation, route}) => {
 
   return (
     <View style={{flexGrow: 1}}>
-      {isHeader && <ChatHeader />}
+      {isHeader && <ChatHeader deleteMessageHandler={deleteMessgeHandler} />}
 
       <View style={{flex: 1}}>
         <Portal>
           <Dialog
             visible={isConfirmDialogVisible}
-            onDismiss={() => isConfirmDialogVisibleHandler(false)}>
-            <Dialog.Title>Delete {selectedMessageIds.length} messages</Dialog.Title>
+            onDismiss={() =>dispatch(isConfirmDialogVisibleHandler(false))}>
+            <Dialog.Title>{t("Delete")} {selectedMessageIds.length} {t("messages")}</Dialog.Title>
             <Dialog.Actions>
-              <Button onPress={() => dispatch(isConfirmDialogVisibleHandler(false))}>cancel</Button>
-              <Button onPress={deleteMessgeHandler}>Delete</Button>
+              <Button onPress={() => dispatch(isConfirmDialogVisibleHandler(false))}>{t("Cancel")}</Button>
+              <Button onPress={deleteMessgeHandler}>{t("Delete")}</Button>
             </Dialog.Actions>
           </Dialog>
         </Portal>
@@ -216,11 +218,13 @@ const MessagesScreen = ({navigation, route}) => {
                 <Image
                   source={require('../../../../../assets/images/groupDetails/Messages-empty.png')}
                 />
-                <Text>Send message to start conversation</Text>
-                <Text>or</Text>
+                <Text>{t("Chat will be available in future versions")}</Text>
+                
+                {/* <Text>{t("Send message to start conversation")}</Text>
+                <Text>{t("or")}</Text>
                 <Button icon="refresh" mode="contained" style={{marginTop: '5%'}} onPress={refetch}>
-                  Refresh
-                </Button>
+                  {t("Refresh")}
+                </Button> */}
               </View>
             )}
             disableAutoLayout={true}
@@ -233,11 +237,11 @@ const MessagesScreen = ({navigation, route}) => {
         )}
       </View>
 
-      <ChatInput
+      {/* <ChatInput
         message={newMessage}
         setMessage={setNewMessage}
         handleAddNewMessage={handleAddNewMessage}
-      />
+      /> */}
     </View>
   );
 };

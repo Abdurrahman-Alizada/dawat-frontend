@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {I18nManager, View} from 'react-native';
 import {Appbar, Searchbar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {handleGroupsSearchText} from '../../redux/reducers/groups/groups';
+import {useTranslation} from 'react-i18next';
 
 const Header = ({isSearch, setIsSearch, searchFilterFunction, onOpen, theme}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
 
   //search
   const [search, setSearch] = useState('');
@@ -25,9 +27,12 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, onOpen, theme}) =>
     <View>
       {!isSearch ? (
         <Appbar.Header style={{backgroundColor: theme.colors.background}} elevated={true}>
-          <Appbar.BackAction color={theme.colors.onBackground} onPress={() => navigation.replace('PinnedGroup')} />
+          <Appbar.BackAction
+            color={theme.colors.onBackground}
+            onPress={() => navigation.replace('PinnedGroup')}
+          />
           <Appbar.Content
-            title="Events"
+            title={t('Events')}
             titleStyle={{
               color: theme.colors.onBackground,
             }}
@@ -45,10 +50,10 @@ const Header = ({isSearch, setIsSearch, searchFilterFunction, onOpen, theme}) =>
       ) : (
         <Appbar.Header style={{backgroundColor: theme.colors.background}}>
           <Searchbar
-            placeholder="Search..."
+            placeholder={t('Search...')}
             onChangeText={updateSearch}
             value={search}
-            icon="arrow-left"
+            icon={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'}
             onIconPress={BlurHandler}
             cancelButtonTitle="cancel"
             autoFocus

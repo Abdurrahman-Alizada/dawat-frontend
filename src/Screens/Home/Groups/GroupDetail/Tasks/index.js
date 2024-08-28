@@ -5,7 +5,7 @@
 // ==========================================
 
 import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, FlatList, View, RefreshControl} from 'react-native';
+import { FlatList, View, RefreshControl} from 'react-native';
 import RenderItem from './SingleTask';
 import {Text} from 'react-native-paper';
 import {FAB, useTheme} from 'react-native-paper';
@@ -18,8 +18,10 @@ import ErrorSnackBar from '../../../../../Components/ErrorSnackBar';
 import TasksAppbar from '../../../../../Components/Appbars/TasksAppbar';
 import {Modalize} from 'react-native-modalize';
 import TaskSummary from './TasksSummary';
+import { useTranslation } from 'react-i18next';
 
 const Task = ({route}) => {
+  const {t} = useTranslation()
   const {groupId, isHeader} = route.params;
 
   const navigation = useNavigation();
@@ -63,7 +65,7 @@ const Task = ({route}) => {
           data={isTaskSearch ? tasksFromRedux : data}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              <Text>No task yet</Text>
+              <Text>{t("No task yet")}</Text>
             </View>
           )}
           renderItem={({item}) => (
@@ -87,7 +89,7 @@ const Task = ({route}) => {
 
       <ErrorSnackBar
         isVisible={snackbarVisible}
-        text={'Something went wrong'}
+        text={t('Something went wrong')}
         onDismissHandler={setSnackBarVisible}
       />
 

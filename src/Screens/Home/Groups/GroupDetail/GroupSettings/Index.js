@@ -6,7 +6,7 @@ import {
   View,
   ImageBackground,
 } from 'react-native';
-import React, {useState, useRef, useEffect, useLayoutEffect, memo} from 'react';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {
   Avatar,
   TextInput,
@@ -21,7 +21,6 @@ import {
   Card,
 } from 'react-native-paper';
 import {
-  useUpdateGroupInfoMutation,
   useUpdateGroupNameMutation,
   useUpdateGroupDescriptionMutation,
   useDeleteGroupForUserMutation,
@@ -41,16 +40,20 @@ import moment from 'moment';
 import BackgroundImages from '../../changeBackMainImage/mainBackgroundImages';
 import DatePicker from 'react-native-date-picker';
 import EventSettingsAppbar from '../../../../../Components/Appbars/eventSettingsAppbar';
+import {useTranslation} from 'react-i18next';
 // imports end
 
-const Index = ({route, navigation}) => {
+const Index = ({navigation}) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const dispatch = useDispatch();
+
+  const [adminIds, setAdminIds] = useState([]);
   const [localDeleteLoding, setLocalDeleteLoading] = useState(false);
+
   const currentViewingGroup = useSelector(state => state.groups?.currentViewingGroup);
   const currentBackgroundImgSrcId = useSelector(state => state.groups.currentBackgroundImgSrcId);
 
-  const [adminIds, setAdminIds] = useState([]);
   const getMembersLenght = () => {
     for (let i = 0; i < groupAdmins?.length; i++) {
       setAdminIds([...adminIds, groupAdmins[i]?._id]);
@@ -75,14 +78,13 @@ const Index = ({route, navigation}) => {
   const [editGroupDescription, setEditGroupDescription] = useState(false);
 
   // show more for description
-  const [textShown, setTextShown] = useState(false); //To show ur remaining Text
-  const [lengthMore, setLengthMore] = useState(false); //to show the "Read more & Less Line"
-  const toggleNumberOfLines = () => {
-    setTextShown(!textShown);
-  };
-
+  const [localLoading, setLocalLoading] = useState(true); //To show ur remaining Text
+  useEffect(() => {
+    setTimeout(() => {
+      setLocalLoading(false);
+    }, 2000);
+  }, []);
   // redux toolkit - start
-  const [updateGroupInfo, {isLoading}] = useUpdateGroupInfoMutation();
 
   const [updateLocalGroupNameLoading, setUpdateLocalGroupNameLoading] = useState(false);
   const [updateGroupName, {isLoading: updateGroupNameLoading}] = useUpdateGroupNameMutation();
@@ -138,7 +140,7 @@ const Index = ({route, navigation}) => {
           seteditGroupName(false);
           setEditGroupDescription(false);
         } else {
-          setSnakeBarMessage('Something went wrong. Please try again');
+          setSnakeBarMessage('Something went wrong');
           setShowSnakeBar(true);
           seteditGroupName(false);
           setEditGroupDescription(false);
@@ -162,12 +164,18 @@ const Index = ({route, navigation}) => {
   const updateLocalGroupS = async date => {
     setUpdateLocalGroupNameLoading(true);
 
-    let group = {
-      ...currentViewingGroup,
-      groupName: name,
-      groupDescription: description,
-      time: date,
-    };
+    let group = date
+      ? {
+          ...currentViewingGroup,
+          groupName: name,
+          groupDescription: description,
+          time: date,
+        }
+      : {
+          ...currentViewingGroup,
+          groupName: name,
+          groupDescription: description,
+        };
     dispatch(handleCurrentViewingGroup(group));
     setSnakeBarMessage('Event data has been updated');
     setShowSnakeBar(true);
@@ -206,14 +214,14 @@ const Index = ({route, navigation}) => {
           seteditGroupName(false);
           setEditGroupDescription(false);
         } else {
-          setSnakeBarMessage('Something went wrong. Please try again');
+          setSnakeBarMessage('Something went wrong');
           setShowSnakeBar(true);
           seteditGroupName(false);
           setEditGroupDescription(false);
         }
       })
       .catch(e => {
-        setSnakeBarMessage('Something went wrong. Please try again');
+        setSnakeBarMessage('Something went wrong');
         setShowSnakeBar(true);
         seteditGroupName(false);
         setEditGroupDescription(false);
@@ -249,7 +257,10 @@ const Index = ({route, navigation}) => {
     let pgId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
 
     if (pgId === currentViewingGroup._id) {
-      await AsyncStorage.setItem('pinGroupId', JSON.stringify(newArr?.length ? newArr[0]?._id : null));
+      await AsyncStorage.setItem(
+        'pinGroupId',
+        JSON.stringify(newArr?.length ? newArr[0]?._id : null),
+      );
     }
     dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
     setLocalDeleteLoading(false);
@@ -284,7 +295,6 @@ const Index = ({route, navigation}) => {
     currentViewingGroup?.time ? new Date(currentViewingGroup?.time) : new Date(),
   );
   const [openDueDate, setOpenDueDate] = useState(false);
-  const [time, setTime] = useState(moment(dueDate).diff(moment(new Date()), 'seconds'));
 
   useLayoutEffect(() => {
     getCurrentUserId();
@@ -339,7 +349,6 @@ const Index = ({route, navigation}) => {
                       justifyContent: 'center',
                     }}>
                     <Countdown
-                      // until={time}
                       until={Math.abs(moment(dueDate).diff(moment(new Date()), 'seconds'))}
                       size={22}
                       style={{margin: '2%'}}
@@ -348,13 +357,14 @@ const Index = ({route, navigation}) => {
                       timeLabelStyle={{color: '#fff'}}
                       running={false}
                       separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                      timeLabels={{d: t('Days'), h: t('Hours'), m: t('Minutes'), s: t('Seconds')}}
                     />
                     <Text
                       style={{
                         fontWeight: 'bold',
                         color: '#fff',
                       }}>
-                      ago
+                      {t('ago')}
                     </Text>
                   </View>
                 ) : (
@@ -366,6 +376,7 @@ const Index = ({route, navigation}) => {
                     digitStyle={{backgroundColor: '#265AE8'}}
                     timeLabelStyle={{color: '#fff'}}
                     separatorStyle={{color: '#fff', alignSelf: 'center'}}
+                    timeLabels={{d: t('Days'), h: t('Hours'), m: t('Minutes'), s: t('Seconds')}}
                   />
                 )}
                 <View
@@ -389,7 +400,7 @@ const Index = ({route, navigation}) => {
                       borderRadius: 5,
                     }}>
                     <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
-                      Title
+                      {t('Title')}
                     </Text>
                     <Icon name="edit" size={16} color={theme.colors.cardBG} />
                   </TouchableOpacity>
@@ -410,7 +421,7 @@ const Index = ({route, navigation}) => {
                       borderRadius: 5,
                     }}>
                     <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
-                      Date
+                      {t('Date')}
                     </Text>
                     <Icon name="edit" size={16} color={theme.colors.cardBG} />
                   </TouchableOpacity>
@@ -429,7 +440,7 @@ const Index = ({route, navigation}) => {
                       borderRadius: 5,
                     }}>
                     <Text style={{color: '#fff', paddingRight: '2%', fontWeight: 'bold'}}>
-                      Background
+                      {t('Background')}
                     </Text>
                     <Icon name="edit" size={16} color={theme.colors.cardBG} />
                   </TouchableOpacity>
@@ -451,7 +462,7 @@ const Index = ({route, navigation}) => {
                   justifyContent: 'space-between',
                 }}>
                 <Text variant="bodyMedium" style={{color: theme.colors.textGray}}>
-                  Description
+                  {t('Description')}
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -481,12 +492,14 @@ const Index = ({route, navigation}) => {
                   padding: '2%',
                   backgroundColor: theme.colors.cardBG,
                 }}>
-                <List.Subheader>Event members ({users?.length ? users?.length : 1})</List.Subheader>
+                <List.Subheader>
+                  {t('Event members')} ({users?.length ? users?.length : 1})
+                </List.Subheader>
                 <List.Item
                   onPress={() => {
                     navigation.navigate('updateGroupMembers');
                   }}
-                  title="Add Member"
+                  title={t('Add Member')}
                   left={() => <Avatar.Icon size={50} icon="account-plus-outline" />}
                 />
 
@@ -507,7 +520,7 @@ const Index = ({route, navigation}) => {
                                 borderRadius: 5,
                                 marginRight: '5%',
                               }}>
-                              <Text style={{textAlign: 'center'}}>Admin</Text>
+                              <Text style={{textAlign: 'center'}}>{t('Admin')}</Text>
                             </View>
 
                             {createdBy?._id === member?._id && (
@@ -518,7 +531,7 @@ const Index = ({route, navigation}) => {
                                   paddingHorizontal: '5%',
                                   borderRadius: 5,
                                 }}>
-                                <Text style={{textAlign: 'center'}}>Creator</Text>
+                                <Text style={{textAlign: 'center'}}>{t('Creator')}</Text>
                               </View>
                             )}
                           </View>
@@ -564,8 +577,7 @@ const Index = ({route, navigation}) => {
           ) : (
             <LoginForMoreFeatures
               token={token}
-              isLoading={isLoading}
-              localLoading={isLoading}
+              localLoading={localLoading}
               navigation={navigation}
             />
           )}
@@ -584,7 +596,7 @@ const Index = ({route, navigation}) => {
               {token ? (
                 <List.Item
                   onPress={handleLeave}
-                  title="Leave event"
+                  title={t('Leave event')}
                   left={() => <List.Icon color={theme.colors.error} icon="logout" />}
                   titleStyle={{color: theme.colors.error}}
                 />
@@ -630,7 +642,7 @@ const Index = ({route, navigation}) => {
         onIconPress={() => console.log('hello')}
         onDismiss={() => setShowSnakeBar(false)}
         duration={4000}>
-        {snakeBarMessage}
+        {t(snakeBarMessage)}
       </Snackbar>
 
       <Snackbar
@@ -638,14 +650,14 @@ const Index = ({route, navigation}) => {
         icon={() => <ActivityIndicator animating={true} size="small" />}
         onIconPress={() => console.log('hello')}
         onDismiss={() => setShowSnakeBar(false)}>
-        {snakeBarMessage}
+        {t(snakeBarMessage)}
       </Snackbar>
 
       {editGroupName && (
         <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
-            label="Group name"
+            label={t('Group name')}
             mode="outlined"
             value={name}
             onChangeText={text => {
@@ -675,7 +687,7 @@ const Index = ({route, navigation}) => {
                 setName(groupName);
                 seteditGroupName(false);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{
@@ -689,7 +701,7 @@ const Index = ({route, navigation}) => {
               onPress={() => handleUpdateGroupName()}
               theme={{roundness: 1}}
               disabled={updateGroupNameLoading || updateLocalGroupNameLoading || name.length < 1}>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -698,7 +710,7 @@ const Index = ({route, navigation}) => {
         <View style={{padding: '2%', backgroundColor: theme.colors.background}}>
           <TextInput
             autoFocus={true}
-            label="Group Description"
+            label={t('Group Description')}
             mode="outlined"
             multiline
             value={description}
@@ -730,7 +742,7 @@ const Index = ({route, navigation}) => {
                 setDescription(groupDescription);
                 setEditGroupDescription(false);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{
@@ -748,7 +760,7 @@ const Index = ({route, navigation}) => {
                 updateGroupDescriptionLoading ||
                 description.length < 1
               }>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>

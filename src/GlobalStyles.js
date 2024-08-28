@@ -37,8 +37,8 @@ export const lightPalette = {
 
 export const darkPalette = {
   background: '#212121',
-  blueBG: '#265AE8',
-  textGray: '#D9D9D9',
+  blueBG: '#cddceb',
+  textGray: '#414141',
   cardBG: '#3E3F41',
   textRed : "#DD105E",
   yellow :"#FFAF4F",

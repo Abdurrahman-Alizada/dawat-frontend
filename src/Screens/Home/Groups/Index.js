@@ -21,10 +21,12 @@ import {
   handlePinGroupLoading,
   handleSelectedGroupLength,
 } from '../../../redux/reducers/groups/groups';
+import {useTranslation} from 'react-i18next';
 
 const Groups = ({navigation}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
   const {isThemeDark} = useContext(ThemeContext);
 
   const PG = useSelector(state => state.groups?.pinGroup);
@@ -69,7 +71,7 @@ const Groups = ({navigation}) => {
   const [addMultipleGroup, {isLoading: addGroupLoading}] = useAddMultipleGroupMutation();
 
   const notSyncGroupHandler = async () => {
-     let localGroups = await getLocalGroups();
+    let localGroups = await getLocalGroups();
     const notSyncGroupsArray = localGroups.filter(item => item.isSyncd == false);
     if (notSyncGroupsArray?.length && token) {
       addMultipleGroup({
@@ -137,7 +139,10 @@ const Groups = ({navigation}) => {
 
     let pgId = JSON.parse(await AsyncStorage.getItem('pinGroupId'));
     if (pgId === groupId) {
-      await AsyncStorage.setItem('pinGroupId', JSON.stringify(newArr?.length ? newArr[0]?._id : null));
+      await AsyncStorage.setItem(
+        'pinGroupId',
+        JSON.stringify(newArr?.length ? newArr[0]?._id : null),
+      );
       dispatch(handlePinGroup(newArr?.length ? newArr[0] : {}));
       dispatch(handlePinGroupFlag(!pinGroupFlag));
     }
@@ -153,10 +158,13 @@ const Groups = ({navigation}) => {
     localGroups = localGroups.filter(object => {
       return object._id == checkedItems[0];
     });
-    dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
     await AsyncStorage.setItem('pinGroupId', JSON.stringify(localGroups[0]?._id));
+    dispatch(handlePinGroup(JSON.stringify(localGroups[0])));
     dispatch(handlePinGroupFlag(!pinGroupFlag));
     localGroups = null;
+
+    checkedBack();
+
     navigation.navigate('PinnedGroup');
     dispatch(handlePinGroupLoading(false));
   };
@@ -241,7 +249,11 @@ const Groups = ({navigation}) => {
           data={filterdGroups}
           ListEmptyComponent={() => (
             <View style={{marginTop: '60%', alignItems: 'center'}}>
-              {isLoading || localLoading ? <Text>Loading...</Text> : <Text>{listEmptyText}</Text>}
+              {isLoading || localLoading ? (
+                <Text>Loading...</Text>
+              ) : (
+                <Text>{t(listEmptyText)}</Text>
+              )}
             </View>
           )}
           renderItem={item => (
@@ -276,7 +288,7 @@ const Groups = ({navigation}) => {
 
       <ErrorSnackBar
         isVisible={snackbarVisible && token}
-        text={'Something went wrong'}
+        text={t('Something went wrong')}
         onDismissHandler={() => setSnackBarVisible(false)}
       />
     </View>

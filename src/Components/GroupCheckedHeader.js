@@ -25,6 +25,7 @@ const Header = ({deleteF, deleteLoading, pinHandler, groupName, checkedBack, the
             <Appbar.Action
               color={theme.colors.onBackground}
               icon="pin"
+              disabled={deleteLoading || pinGroupLoading}
               onPress={() => pinHandler()}
             />
           )}
@@ -37,6 +38,7 @@ const Header = ({deleteF, deleteLoading, pinHandler, groupName, checkedBack, the
         <Appbar.Action
           color={theme.colors.error}
           icon="delete"
+          disabled={deleteLoading || pinGroupLoading}
           onPress={() => {
             deleteF();
           }}

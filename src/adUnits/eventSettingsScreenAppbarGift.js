@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import {InterstitialAd, AdEventType, TestIds} from 'react-native-google-mobile-ads';
-import {Appbar} from 'react-native-paper';
+import {Appbar, useTheme} from 'react-native-paper';
 const adUnitIdINTERSTITIAL = __DEV__
   ? TestIds.INTERSTITIAL
   : 'ca-app-pub-9526618780177325/8576068362';
@@ -13,7 +13,7 @@ const interstitial = InterstitialAd.createForAdRequest(adUnitIdINTERSTITIAL, {
 export default function EventSettingsScreenAppbarGift() {
   const [loaded, setLoaded] = useState(false);
   const [isInterstitialWatched, setIsInterstitialWatched] = useState(false);
-
+  const theme = useTheme();
   useEffect(() => {
     const unsubscribe = interstitial.addAdEventListener(AdEventType.LOADED, () => {
       setLoaded(true);
@@ -32,7 +32,7 @@ export default function EventSettingsScreenAppbarGift() {
           {loaded && (
             <Appbar.Action
               icon="gift-outline"
-              color={'#fff'}
+              color={theme.colors.onBackground}
               onPress={() => {
                 interstitial.show();
                 setIsInterstitialWatched(true);

@@ -1,0 +1,15 @@
+{
+  "en": {
+    "code": "en",
+    "name": "English",
+    "nativeName": "English",
+    "isoCode": "gb"
+  },
+
+  "ur": {
+    "code": "ur",
+    "name": "Urdu",
+    "nativeName": "اردو",
+    "isoCode": "pk"
+  }
+}

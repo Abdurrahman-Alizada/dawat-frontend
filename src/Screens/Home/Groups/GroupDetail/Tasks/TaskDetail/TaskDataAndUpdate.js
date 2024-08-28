@@ -9,7 +9,6 @@ import {
   useTheme,
   Chip,
   IconButton,
-  ToggleButton,
   Snackbar,
   Divider,
 } from 'react-native-paper';
@@ -22,18 +21,21 @@ import {
   useUpdateStartingDatesMutation,
   useUpdateDueDatesMutation,
   useUpdatePriorityMutation,
+  useDeleteTaskMutation,
 } from '../../../../../../redux/reducers/groups/tasks/taskThunk';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import {groupApi} from '../../../../../../redux/reducers/groups/groupThunk';
 
 const TaskDataAndUpdate = ({navigation}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const {t, i18n} = useTranslation();
 
-  const currentViewingTask = useSelector(
-    state => state?.tasks?.currentViewingTask,
-  );
+  const currentViewingTask = useSelector(state => state?.tasks?.currentViewingTask);
+  const currentViewingGroup = useSelector(state => state.groups.currentViewingGroup);
 
-  const [updateTitle, {isLoading: updateTitleLoading}] =
-    useUpdateTitleMutation();
+  const [updateTitle, {isLoading: updateTitleLoading}] = useUpdateTitleMutation();
   const [title, setTitle] = useState(currentViewingTask?.taskName);
   const [editTitle, setEditTitle] = useState(false);
   const updateTitleHandler = async () => {
@@ -53,11 +55,8 @@ const TaskDataAndUpdate = ({navigation}) => {
       });
   };
 
-  const [updateDescription, {isLoading: updateDescriptionLoading}] =
-    useUpdateDescriptionMutation();
-  const [description, setDescription] = useState(
-    currentViewingTask?.taskDescription,
-  );
+  const [updateDescription, {isLoading: updateDescriptionLoading}] = useUpdateDescriptionMutation();
+  const [description, setDescription] = useState(currentViewingTask?.taskDescription);
   const [editDescription, setEditDescription] = useState(false);
 
   const updateDescriptionHandler = async () => {
@@ -67,21 +66,16 @@ const TaskDataAndUpdate = ({navigation}) => {
       taskId: currentViewingTask._id,
     })
       .then(response => {
-        // navigation.goBack();
         setEditDescription(false);
-        console.log('updated task is =>', response);
       })
       .catch(e => {
         console.log(e);
       });
   };
 
-  const [updatePriority, {isLoading: updatePriorityLoading}] =
-    useUpdatePriorityMutation();
+  const [updatePriority, {isLoading: updatePriorityLoading}] = useUpdatePriorityMutation();
 
-  const [priority, setPriority] = useState(
-    currentViewingTask.priority.priority,
-  );
+  const [priority, setPriority] = useState(currentViewingTask.priority.priority);
   const priorities = ['Low', 'Normal', 'High'];
 
   const priorityHandler = async p => {
@@ -102,9 +96,7 @@ const TaskDataAndUpdate = ({navigation}) => {
   };
 
   // date and time
-  const [startDate, setStartDate] = useState(
-    new Date(currentViewingTask.startingDate),
-  );
+  const [startDate, setStartDate] = useState(new Date(currentViewingTask.startingDate));
   const [openStartingDate, setOpenStartingDate] = useState(false);
   const [updateStartingDates, {isLoading: updateStartingDateLoading}] =
     useUpdateStartingDatesMutation();
@@ -126,8 +118,7 @@ const TaskDataAndUpdate = ({navigation}) => {
       });
   };
 
-  const [updateDueDates, {isLoading: updateDueDateLoading}] =
-    useUpdateDueDatesMutation();
+  const [updateDueDates, {isLoading: updateDueDateLoading}] = useUpdateDueDatesMutation();
   const [dueDate, setDueDate] = useState(new Date(currentViewingTask.dueDate));
   const [openDueDate, setOpenDueDate] = useState(false);
   useUpdateStartingDatesMutation();
@@ -152,6 +143,22 @@ const TaskDataAndUpdate = ({navigation}) => {
 
   const [snakeBarVisible, setSnakeBarVisible] = useState(false);
   const [snackbarMessage, setSnackBarMessage] = useState('');
+
+  const [deleteTask, {isLoading: deleteLoading}] = useDeleteTaskMutation();
+  const deleteHandler = async () => {
+    deleteTask({groupId: currentViewingGroup._id, taskId: currentViewingTask?._id})
+      .then(response => {
+        if (response.data?._id) {
+          dispatch(groupApi.util.invalidateTags(['GroupLogs']));
+          navigation.goBack()
+        }
+        console.log('deleted task is =>', response);
+      })
+      .catch(e => {
+        console.log('error in deleteHandler', e);
+      });
+  };
+
   return (
     <View style={{flexGrow: 1}}>
       <View style={{flex: 1, marginTop: '2%'}}>
@@ -165,10 +172,10 @@ const TaskDataAndUpdate = ({navigation}) => {
                   alignItems: 'center',
                 }}>
                 <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-                  <Text style={{fontWeight: 'bold'}}>Title</Text>
-                  <Text style={{fontSize: 10, marginLeft: '4%'}}>{` /${
-                    100 - title.length
-                  } characters remaining`}</Text>
+                  <Text style={{fontWeight: 'bold'}}>{t('Title')}</Text>
+                  <Text style={{fontSize: 10, marginLeft: '4%'}}>{` /${100 - title.length} ${t(
+                    'characters remaining',
+                  )}`}</Text>
                 </View>
                 <IconButton
                   mode="contained-tonal"
@@ -177,7 +184,7 @@ const TaskDataAndUpdate = ({navigation}) => {
                 />
               </View>
             )}
-            description={() => <Text style={{fontSize: 18}}>{title}</Text>}
+            description={() => <Text style={{fontSize: 18}}>{t(title)}</Text>}
             titleStyle={{
               color: theme.colors.secondary,
               fontSize: 14,
@@ -194,10 +201,10 @@ const TaskDataAndUpdate = ({navigation}) => {
                   alignItems: 'center',
                 }}>
                 <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-                  <Text style={{fontWeight: 'bold'}}>Description</Text>
+                  <Text style={{fontWeight: 'bold'}}>{t('Description')}</Text>
                   <Text style={{fontSize: 10, marginLeft: '4%'}}>{` /${
                     300 - description.length
-                  } characters remaining`}</Text>
+                  } ${t('characters remaining')}`}</Text>
                 </View>
                 <IconButton
                   mode="contained-tonal"
@@ -223,7 +230,7 @@ const TaskDataAndUpdate = ({navigation}) => {
           <Divider />
 
           <View style={{paddingHorizontal: '5%', marginVertical: '4%'}}>
-            <Text style={{fontWeight: 'bold'}}>Participant members</Text>
+            <Text style={{fontWeight: 'bold'}}>{t('Participant members')}</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -232,9 +239,7 @@ const TaskDataAndUpdate = ({navigation}) => {
                 marginTop: '2%',
               }}>
               {currentViewingTask.responsibles?.map((responsible, index) => (
-                <View
-                  key={index}
-                  style={{marginRight: '2%', alignItems: 'center'}}>
+                <View key={index} style={{marginRight: '2%', alignItems: 'center'}}>
                   <Avatar.Image
                     size={40}
                     style={{marginVertical: '2%'}}
@@ -257,31 +262,25 @@ const TaskDataAndUpdate = ({navigation}) => {
                   navigation.navigate('UpdateTaskMembers');
                 }}>
                 <Avatar.Icon icon="account-plus" mode="contained" size={40} />
-                <Text>Add</Text>
+                <Text>{t('Add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
           <Divider />
 
           <View style={{margin: '4%'}}>
-            <Text style={{fontWeight: 'bold', margin: '2%'}}>Priority</Text>
+            <Text style={{fontWeight: 'bold', margin: '2%'}}>{t('Priority')}</Text>
             <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
               {priorities.map((singlePriority, index) => (
                 <Chip
                   key={index}
                   style={{margin: '2%'}}
-                  selected={
-                    singlePriority.toLowerCase() === priority.toLowerCase()
-                      ? true
-                      : false
-                  }
+                  selected={singlePriority.toLowerCase() === priority.toLowerCase() ? true : false}
                   mode={
-                    singlePriority.toLowerCase() === priority.toLowerCase()
-                      ? 'flat'
-                      : 'outlined'
+                    singlePriority.toLowerCase() === priority.toLowerCase() ? 'flat' : 'outlined'
                   }
                   onPress={() => priorityHandler(singlePriority)}>
-                  {singlePriority}
+                  {t(singlePriority)}
                 </Chip>
               ))}
             </View>
@@ -294,7 +293,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               justifyContent: 'space-between',
             }}>
             <View style={{width: '49%', marginTop: '2%'}}>
-              <Text style={{fontWeight: 'bold'}}>Starting Timing</Text>
+              <Text style={{fontWeight: 'bold'}}>{t('Starting Timing')}</Text>
               <TouchableOpacity
                 onPress={() => setOpenStartingDate(true)}
                 style={{
@@ -305,12 +304,12 @@ const TaskDataAndUpdate = ({navigation}) => {
                   marginVertical: '4%',
                   textAlign: 'center',
                 }}>
-                <Text>{moment(startDate).format('lll')}</Text>
+                <Text>{moment(startDate)?.format('lll')}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={{width: '49%', marginTop: '2%'}}>
-              <Text style={{fontWeight: 'bold'}}>Due Timing</Text>
+              <Text style={{fontWeight: 'bold'}}>{t('Due Timing')}</Text>
               <TouchableOpacity
                 onPress={() => setOpenDueDate(true)}
                 style={{
@@ -321,11 +320,23 @@ const TaskDataAndUpdate = ({navigation}) => {
                   marginVertical: '4%',
                   textAlign: 'center',
                 }}>
-                <Text>{moment(dueDate).format('lll')}</Text>
+                <Text>{moment(dueDate)?.format('lll')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
+        <Button
+          style={{margin: '8%'}}
+          mode="contained"
+          contentStyle={{padding: '1%'}}
+          theme={{roundness: 10}}
+          buttonColor={theme.colors.errorContainer}
+          textColor={theme.colors.error}
+          onPress={deleteHandler}
+          loading={deleteLoading}
+          disabled={deleteLoading}>
+          {t('Delete task')}
+        </Button>
       </View>
 
       {editTitle && (
@@ -363,17 +374,17 @@ const TaskDataAndUpdate = ({navigation}) => {
                 setEditTitle(false);
                 setTitle(currentViewingTask.taskName);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
-              style={{width: '49%', marginLeft: '1%', color:theme.colors.onBackground}}
+              style={{width: '49%', marginLeft: '1%', color: theme.colors.onBackground}}
               icon="check"
               mode="contained"
               loading={updateTitleLoading}
               onPress={() => updateTitleHandler()}
               theme={{roundness: 1}}
               disabled={updateTitleLoading || title.length < 1}>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -413,7 +424,7 @@ const TaskDataAndUpdate = ({navigation}) => {
                 setEditDescription(false);
                 setDescription(currentViewingTask.taskDescription);
               }}>
-              cancel
+              {t('Cancel')}
             </Button>
             <Button
               style={{width: '49%', marginLeft: '1%'}}
@@ -423,7 +434,7 @@ const TaskDataAndUpdate = ({navigation}) => {
               onPress={() => updateDescriptionHandler()}
               theme={{roundness: 1}}
               disabled={updateDescriptionLoading || description.length < 1}>
-              Ok
+              {t('Ok')}
             </Button>
           </View>
         </View>
@@ -433,7 +444,7 @@ const TaskDataAndUpdate = ({navigation}) => {
         visible={snakeBarVisible}
         duration={3000}
         onDismiss={() => setSnakeBarVisible(false)}>
-        {snackbarMessage}
+        {t(snackbarMessage)}
       </Snackbar>
 
       <DatePicker
@@ -464,9 +475,3 @@ const TaskDataAndUpdate = ({navigation}) => {
 };
 
 export default TaskDataAndUpdate;
-
-const styles = StyleSheet.create({
-  error: {
-    color: 'red',
-  },
-});

@@ -12,6 +12,8 @@ import {
   handleCurrentBackgroundImgSrcId,
   handlePinGroupId,
 } from '../../redux/reducers/groups/groups';
+import { handleCurrentLanguage } from '../../redux/reducers/user/user';
+import i18next from '../../../locales/i18next';
 
 const SplashScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -52,6 +54,19 @@ const SplashScreen = ({navigation}) => {
       .catch(err => {
         console.log(err);
       });
+  }, []);
+
+  const getCurrentLanguage = async () => {
+    const lng = await AsyncStorage.getItem('currentLanguage');
+    if (!lng) {
+      await AsyncStorage.setItem('currentLanguage', 'en');
+    } else {
+      dispatch(handleCurrentLanguage(lng));
+      i18next.changeLanguage(lng);
+    }
+  };
+  useEffect(() => {
+    getCurrentLanguage();
   }, []);
 
   return (

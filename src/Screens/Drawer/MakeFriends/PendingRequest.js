@@ -9,9 +9,12 @@ import {useSelector} from 'react-redux';
 import {Button, List,Text, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
+import { useTranslation } from 'react-i18next';
+
 const PendingRequest = () => {
   const navigation = useNavigation();
   const theme = useTheme();
+  const {t} = useTranslation();
 
   const currentLoginUser = useSelector(state => state.user?.currentLoginUser);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -63,7 +66,7 @@ const PendingRequest = () => {
         description={() => (
           <View>
             {clicked || selectedItems.includes(item._id) ? (
-              <Text>{textAfterAction}</Text>
+              <Text>{t(textAfterAction)}</Text>
             ) : (
               <View
                 style={{
@@ -78,7 +81,7 @@ const PendingRequest = () => {
                     paddingVertical:"3%",
                     backgroundColor: theme.colors.primary,
                   }}>
-                  <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>Accept</Text>
+                  <Text style={{color: theme.colors.onPrimary, textAlign: 'center'}}>{t("Accept")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -92,7 +95,7 @@ const PendingRequest = () => {
                     borderWidth:1,
                     marginHorizontal:"4%"
                   }}>
-                  <Text style={{color: theme.colors.error, textAlign: 'center'}}>Delete</Text>
+                  <Text style={{color: theme.colors.error, textAlign: 'center'}}>{t("Delete")}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -116,27 +119,27 @@ const PendingRequest = () => {
       {/* list of people who sent request to current login user */}
       <Text
         style={{fontWeight: 'bold', fontSize: 16, marginHorizontal: '5%', marginVertical: '2%'}}>
-        Friend requests <Text style={{color: theme.colors.error}}>{data?.requested?.length}</Text>
+        {t("Friend requests")} <Text style={{color: theme.colors.error}}>{data?.requested?.length}</Text>
       </Text>
       <FlatList
         data={data?.requested}
         ListEmptyComponent={() => (
           <View style={{marginTop: '60%', alignItems: 'center'}}>
-            <Text>No one sent you friend request yet</Text>
-            <Text>Please refresh or search for new friends</Text>
+            <Text>{t("No one sent you friend request yet")}</Text>
+            <Text>{t("Please refresh or search for new friends")}</Text>
             <Button
               icon="refresh"
               mode="contained"
               style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={refetch}>
-              Refresh
+              {t("Refresh")}
             </Button>
             <Button
               icon="account-search"
               mode="text"
               style={{marginTop: '5%', marginHorizontal: '2%'}}
               onPress={() => navigation.navigate('FriendsSuggestions')}>
-              Search for friends
+              {t("Search for friends")}
             </Button>
           </View>
         )}

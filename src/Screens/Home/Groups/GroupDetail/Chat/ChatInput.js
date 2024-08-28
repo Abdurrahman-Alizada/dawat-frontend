@@ -1,24 +1,46 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useState} from 'react';
+import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   StyleSheet,
   KeyboardAvoidingView,
-  TextInput,
   Platform,
   TouchableOpacity,
+  I18nManager,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {TextInput, useTheme} from 'react-native-paper';
 
 const ChatInput = ({message, setMessage, handleAddNewMessage}) => {
+  const {t} = useTranslation();
+  const theme = useTheme()
   return (
-    <View style={[styles.container]}>
+    <View style={{
+      justifyContent: 'center',
+      backgroundColor: theme.colors.background,
+    }}>
       <KeyboardAvoidingView style={styles.innerContainer}>
-        <View style={styles.inputAndMicrophone}>
+        <View
+          style={{
+            backgroundColor: '#f0f0f0',
+            flex: 3,
+            marginRight: 10,
+            paddingVertical: Platform.OS === 'ios' ? 10 : 0,
+            borderRadius: 30,
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+          }}>
           <TextInput
             multiline
-            placeholder={'Type something...'}
-            style={styles.input}
+            placeholder={t('Type something...')}
+            underlineColor={'transparent'}
+            activeUnderlineColor={'transparent'}
+            style={{
+              fontSize: 15,
+              maxHeight: 150,
+              backgroundColor: 'transparent',
+              width:"100%"
+            }}
             value={message}
             onChangeText={text => setMessage(text)}
           />
@@ -34,7 +56,14 @@ const ChatInput = ({message, setMessage, handleAddNewMessage}) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Icon name="send" size={23} color="#fff" />
+          <Icon
+            name="send"
+            style={{
+              transform: [{rotate: I18nManager.isRTL ? '180deg' : '0deg'}],
+            }}
+            size={23}
+            color="#fff"
+          />
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
@@ -45,6 +74,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     backgroundColor: '#fff',
+    // borderTopWidth:1
   },
   replyContainer: {
     paddingHorizontal: 10,

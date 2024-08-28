@@ -26,6 +26,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
 import AuthAppbar from '../../../Components/Appbars/AuthAbbar';
+import { useTranslation } from 'react-i18next';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -41,6 +42,8 @@ const validationSchema = Yup.object().shape({
 const LoginScreen = ({navigation, route}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
+
   const [visible, setVisible] = useState(false);
 
   const passwordResetSuccessflly = useSelector(
@@ -99,7 +102,7 @@ const LoginScreen = ({navigation, route}) => {
         flex: 1,
         paddingVertical: '2%',
       }}>
-      <AuthAppbar title={'Sign in'} />
+      <AuthAppbar title={t('Login')} />
 
       <Formik
         initialValues={{
@@ -130,7 +133,7 @@ const LoginScreen = ({navigation, route}) => {
             <View>
               <TextInput
                 error={errors.email && touched.email ? true : false}
-                label="Email"
+                label={t("Email")}
                 // placeholder="Enter your email"
                 mode="outlined"
                 style={{marginTop: '2%', height: 55}}
@@ -144,7 +147,7 @@ const LoginScreen = ({navigation, route}) => {
               ) : null}
               <TextInput
                 error={errors.password && touched.password ? true : false}
-                label="Password"
+                label={t("Password")}
                 secureTextEntry={!showPassword}
                 right={
                   <TextInput.Icon
@@ -177,14 +180,14 @@ const LoginScreen = ({navigation, route}) => {
                 onPress={handleSubmit}
                 buttonColor={theme.colors.blueBG}
                 textColor={'#fff'}>
-                Login
+                {t("Login")}
               </Button>
 
               <TouchableOpacity
                 style={{marginVertical: '3%', alignSelf: 'center'}}
                 onPress={() => navigation.navigate('ForgotPassword')}>
                 <Text style={{fontWeight: 'bold', color: theme.colors.textRed}}>
-                  Forgot password?
+                  {t("Forgot password")}
                 </Text>
               </TouchableOpacity>
             </View>
